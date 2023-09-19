@@ -1,0 +1,17 @@
+{
+  "npm.enableRunFromFolder": true,
+  "[typescript][vue][css]": {
+    "editor.rulers": [
+      120
+    ]
+  },
+  "css.format.newlineBetweenSelectors": false,
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "config-*.json"
+      ],
+      "url": "./src/common/config.schema.json"
+    }
+  ]
+}
