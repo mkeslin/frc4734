@@ -1,5 +1,5 @@
 <template>
-  <img :src="absolutePath" :alt="`Could not load file assets/${data.file}`" :width="data.width" :height="data.height" />
+  <img :src="absolutePath" style="width:500px;" :alt="`Could not load file assets/${data.file}`" :width="data.width" :height="data.height" />
 </template>
 
 <script setup lang="ts">
