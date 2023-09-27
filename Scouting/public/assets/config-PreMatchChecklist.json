@@ -1,0 +1,33 @@
+{
+  "heading": "PreMatch Checklist",
+  "skipTeamSelection": true,
+  "pages": [
+    {
+      "name": "Basic Widgets",
+      "widgets": [
+        {
+          "name": "Drive Train Spins Freely",
+          "type": "checkbox"
+        },
+        {
+          "name": "Charged 110+ psi",
+          "type": "checkbox"
+        },
+        {
+          "name": "Pointed at the right angle (fwd)?",
+          "type": "checkbox"
+        },
+        {
+          "name": "Correct Auton Number?",
+          "type": "checkbox"
+        },
+        {
+          "name": "Cameras Getting Signal?",
+          "type": "checkbox"
+        }
+
+
+      ]
+    }
+  ]
+}
