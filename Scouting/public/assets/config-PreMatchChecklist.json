@@ -4,11 +4,19 @@
   "skipTeamSelection": true,
   "pages": [
     {
-      "name": "Basic Widgets",
+      "name": "PreMatch Checklist",
       "widgets": [
+        {
+          "name": "rain",
+          "type": "heading"
+        },
         {
           "name": "Drive Train Spins Freely",
           "type": "checkbox"
+        },
+        {
+          "name": "atics",
+          "type": "heading"
         },
         {
           "name": "Charged 110+ psi",

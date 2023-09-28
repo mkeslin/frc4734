@@ -4,8 +4,12 @@
   "skipTeamSelection": true,
   "pages": [
     {
-      "name": "Basic Widgets",
+      "name": "Long Break CHecklist",
       "widgets": [
+        {
+          "name": "Drive Train",
+          "type": "heading"
+        },
         {
           "name": "Check shaft collar screws",
           "type": "checkbox"
@@ -21,6 +25,10 @@
         {
           "name": "Grease",
           "type": "checkbox"
+        },
+        {
+          "name": "Subsystem 1",
+          "type": "heading"
         },
         {
           "name": "Wheel Axle Bolts Tight?",
@@ -45,6 +53,10 @@
         {
           "name": "Anderson connectors still ziptied?",
           "type": "checkbox"
+        },
+        {
+          "name": "Subsystem 2",
+          "type": "heading"
         },
         {
           "name": "Bolts tight?",

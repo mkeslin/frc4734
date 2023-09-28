@@ -3,3 +3,4 @@ pits
 PreMatchChecklist
 FullFunctionalChecklist
 LongBreakChecklist
+PracticeDayChecklist

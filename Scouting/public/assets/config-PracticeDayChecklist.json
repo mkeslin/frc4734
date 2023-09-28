@@ -4,40 +4,37 @@
   "skipTeamSelection": true,
   "pages": [
     {
-      "name": "Full Functional Checklist",
+      "name": "Practice Day Checklist",
       "widgets": [
         {
           "name": "Drive Train",
           "type": "heading"
         },
         {
-          "name": "Check Hardware in Gearboxes",
+          "name": "Tighten all drive train bolts",
           "type": "checkbox"
         },
         {
-          "name": "Drivetrain spins freely",
+          "name": "Check for any gearwear",
           "type": "checkbox"
         },
         {
-          "name": "Grease Gearboxes",
+          "name": "Tighten Falcon Mounting Bolts",
           "type": "checkbox"
         },
         {
-          "name": "Functional Test",
+          "name": "Subsystem 1",
           "type": "heading"
         },
         {
-          "name": "Motor Check",
+          "name": "Tighten Axle Bolts and Reloctite",
           "type": "checkbox"
         },
         {
-          "name": "Drive Train (Fwd, Rev, Left, Right)",
-          "type": "checkbox"
-        },
-        {
-          "name": "Pneumatics (Charged?)",
+          "name": "Open VPs, lubricate, and loctite set screw, motors, etc",
           "type": "checkbox"
         }
+
 
 
       ]
