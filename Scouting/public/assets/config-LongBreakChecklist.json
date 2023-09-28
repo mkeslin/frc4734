@@ -1,0 +1,62 @@
+{
+  "heading": "Full Functional Checklist",
+  "logo": "logo.png",
+  "skipTeamSelection": true,
+  "pages": [
+    {
+      "name": "Basic Widgets",
+      "widgets": [
+        {
+          "name": "Check shaft collar screws",
+          "type": "checkbox"
+        },
+        {
+          "name": "check shaft screws",
+          "type": "checkbox"
+        },
+        {
+          "name": "check gearbox output sprocket screws",
+          "type": "checkbox"
+        },
+        {
+          "name": "Grease",
+          "type": "checkbox"
+        },
+        {
+          "name": "Wheel Axle Bolts Tight?",
+          "type": "checkbox"
+        },
+        {
+          "name": "Wheel Helth, any damge? Hubs?",
+          "type": "checkbox"
+        },
+        {
+          "name": "Pulleys and Belt Tension?",
+          "type": "checkbox"
+        },
+        {
+          "name": "Tighten VP mounting bolts and VP motor plate bolts",
+          "type": "checkbox"
+        },
+        {
+          "name": "Tubing looks good, no kinks?",
+          "type": "checkbox"
+        },
+        {
+          "name": "Anderson connectors still ziptied?",
+          "type": "checkbox"
+        },
+        {
+          "name": "Bolts tight?",
+          "type": "checkbox"
+        },
+        {
+          "name": "Tubing looks good, no kinks?",
+          "type": "checkbox"
+        }
+
+
+      ]
+    }
+  ]
+}

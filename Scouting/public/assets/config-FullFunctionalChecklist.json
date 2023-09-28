@@ -1,0 +1,38 @@
+{
+  "heading": "Full Functional Checklist",
+  "logo": "logo.png",
+  "skipTeamSelection": true,
+  "pages": [
+    {
+      "name": "Basic Widgets",
+      "widgets": [
+        {
+          "name": "Check Hardware in Gearboxes",
+          "type": "checkbox"
+        },
+        {
+          "name": "Drivetrain spins freely",
+          "type": "checkbox"
+        },
+        {
+          "name": "Grease Gearboxes",
+          "type": "checkbox"
+        },
+        {
+          "name": "Motor Check",
+          "type": "checkbox"
+        },
+        {
+          "name": "Drive Train (Fwd, Rev, Left, Right)",
+          "type": "checkbox"
+        },
+        {
+          "name": "Pneumatics (Charged?)",
+          "type": "checkbox"
+        }
+
+
+      ]
+    }
+  ]
+}
