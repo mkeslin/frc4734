@@ -16,12 +16,10 @@ public class Constants {
     public static final int XC1ID = 0; //Xbox controller 1 ID
     public static final int XC2ID = 1; //Xbox controller 2 ID
 
-
     public static final double FREO = -36+30-15-98+90; //Front right encoder offset
     public static final double FLEO = -55+40+45+15+105+90-180-15; //Front left encoder offset
     public static final double BREO = -60+35+110-180+22+5; //back right encoder offset 38
     public static final double BLEO = -176-93+70; //back left encoder offset
-
 
     public static final int HORELEVATOR1ID = 13;
     public static final int HORELEVATOR2ID = 14;

@@ -15,13 +15,13 @@ public class Auto {
     private boolean balancing, scoringhigh;
     private Timer timer;
 
-    private SwerveDrive swerve;
-    private Intake intake;
-    private RotateArm rotateArm;
-    private Elevator horizontalElevator;
-    private Elevator verticalElevator;
-    private Limelight limelight;
-    private Gyro gyro;
+    protected SwerveDrive swerve;
+    protected Intake intake;
+    protected RotateArm rotateArm;
+    protected Elevator horizontalElevator;
+    protected Elevator verticalElevator;
+    protected Limelight limelight;
+    protected Gyro gyro;
 
     public Auto(SwerveDrive s, Intake i, RotateArm r, Elevator he, Elevator ve, Limelight l, Gyro g) {
         swerve = s;
@@ -31,6 +31,7 @@ public class Auto {
         verticalElevator = ve;
         limelight = l;
         gyro = g;
+
         state = 0;
         colorTimeelapsed = 0;
         minY = 0;

@@ -9,17 +9,23 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveDrive {
+  private XboxController driverController;
+
   private TalonFX FRD, FLD, BRD, BLD, FRS, FLS, BRS, BLS;
   private CANCoder FRE, FLE, BRE, BLE;
-  private XboxController controller;
-  private double Strafe, Forward, Rotation, WSFR, WSFL, WSBR, WSBL, WAFR, WAFL, WABR, WABL, FRA, FLA, BRA, BLA, fieldRelativeOffset;
+  private double Strafe, Forward, Rotation, WSFR, WSFL, WSBR, WSBL, WAFR, WAFL, WABR, WABL, FRA, FLA, BRA, BLA,
+      fieldRelativeOffset;
   public double FieldRelative;
   private double SpeedFactor;
+
   /**
    * Creates a new SwerveDrive
+   * 
    * @param c Driver controller
    */
   public SwerveDrive(XboxController c) {
+    driverController = c;
+
     FRD = new TalonFX(FRDID);
     FLD = new TalonFX(FLDID);
     BRD = new TalonFX(BRDID);
@@ -32,10 +38,28 @@ public class SwerveDrive {
     FLE = new CANCoder(FLEID);
     BRE = new CANCoder(BREID);
     BLE = new CANCoder(BLEID);
-    controller = c;
+
     fieldRelativeOffset = 0;
     SpeedFactor = 0.5;
     zeroMotors();
+  }
+
+  public void handleSwerve() {
+    if (driverController.getRawButton(CLB)) {
+      setMode(NeutralMode.Brake);
+    } else if (driverController.getRawButton(CRB)) {
+      setMode(NeutralMode.Coast);
+    } else {
+      controllerDrive();
+    }
+
+    if (driverController.getRawAxis(CLT) > 0.5) {
+      setSpeedFactor(0.5);
+    }
+
+    if (driverController.getRawAxis(CRT) > 0.5) {
+      setSpeedFactor(1);
+    }
   }
 
   /**
@@ -44,9 +68,9 @@ public class SwerveDrive {
   public void controllerDrive() {
     calculateEncoder();
     calculateGyro();
-    Forward = -stickDrift(controller.getRawAxis(CLY));
-    Strafe = stickDrift(controller.getRawAxis(CLX));
-    Rotation = stickDrift(controller.getRawAxis(CRX) * 0.75);
+    Forward = -stickDrift(driverController.getRawAxis(CLY));
+    Strafe = stickDrift(driverController.getRawAxis(CLX));
+    Rotation = stickDrift(driverController.getRawAxis(CRX) * 0.75);
     calculateSwerve();
     swerveDrive(FRD, FRS, WAFR, WSFR);
     swerveDrive(FLD, FLS, WAFL, WSFL);
@@ -96,7 +120,7 @@ public class SwerveDrive {
     WABR = Math.toDegrees(Math.atan2(A, C));
     WABL = Math.toDegrees(Math.atan2(A, D));
     double WSM = Math.max(Math.max(WSFR, WSFL), Math.max(WSBR, WSBL));
-    if(WSM > 1.0) {
+    if (WSM > 1.0) {
       WSFR = WSFR / WSM;
       WSFL = WSFL / WSM;
       WSBR = WSBR / WSM;
@@ -110,9 +134,10 @@ public class SwerveDrive {
 
   /**
    * Optimizes the swerve angles to be between 0-90
+   * 
    * @param dm drive motor
-   * @param a angle
-   * @param e encoder value
+   * @param a  angle
+   * @param e  encoder value
    */
   private double optimizeSwerve(TalonFX dm, double a, double e) {
     a = fixAngle(a + e) - 180;
@@ -121,17 +146,18 @@ public class SwerveDrive {
 
   /**
    * Sets the speed and angle for a swerve module
+   * 
    * @param dm drive motor
    * @param sm steer motor
-   * @param a desired angle
-   * @param s speed
+   * @param a  desired angle
+   * @param s  speed
    */
   private void swerveDrive(TalonFX dm, TalonFX sm, double a, double s) {
-    if(Math.abs(s) * DTS > 0.05)
+    if (Math.abs(s) * DTS > 0.05)
       dm.set(ControlMode.PercentOutput, s * DTS * SpeedFactor);
     else
       dm.set(ControlMode.PercentOutput, 0.0);
-    if(Math.abs(a) / 180 > 0.05)
+    if (Math.abs(a) / 180 > 0.05)
       sm.set(ControlMode.PercentOutput, a / 180.0);
     else
       sm.set(ControlMode.PercentOutput, 0.0);
@@ -145,7 +171,7 @@ public class SwerveDrive {
     FLA = fixAngle(FLE.getAbsolutePosition() - FLEO);
     BRA = fixAngle(BRE.getAbsolutePosition() - BREO);
     BLA = fixAngle(BLE.getAbsolutePosition() - BLEO);
-    }
+  }
 
   /**
    * Sets the gyro yaw to FieldRelative
@@ -153,18 +179,18 @@ public class SwerveDrive {
   private void calculateGyro() {
     FieldRelative = Math.toRadians(fixAngle(-fieldRelativeOffset));
   }
-  
+
   /**
-  * Fixes the angle to be between 0-360
-  *
-  * @param a The current angle
-  * @return The value of the angle between 0-360
-  */
+   * Fixes the angle to be between 0-360
+   *
+   * @param a The current angle
+   * @return The value of the angle between 0-360
+   */
   private double fixAngle(double a) {
-    if(a > 360)
+    if (a > 360)
       a %= 360;
-    else if(a < 0)
-      a = 360-(Math.abs(a) % 360);
+    else if (a < 0)
+      a = 360 - (Math.abs(a) % 360);
     return a;
   }
 
@@ -172,27 +198,28 @@ public class SwerveDrive {
    * Sets all motor speeds to 0.0
    */
   public void zeroMotors() {
-  FRD.set(ControlMode.PercentOutput, 0.0);    
-  FLD.set(ControlMode.PercentOutput, 0.0);
-  BRD.set(ControlMode.PercentOutput, 0.0);
-  BLD.set(ControlMode.PercentOutput, 0.0);
-  FRS.set(ControlMode.PercentOutput, 0.0);
-  FLS.set(ControlMode.PercentOutput, 0.0);
-  BRS.set(ControlMode.PercentOutput, 0.0);
-  BLS.set(ControlMode.PercentOutput, 0.0);    
-  FRD.setInverted(false);
-  FLD.setInverted(false);
-  BRD.setInverted(false);
-  BLD.setInverted(false);
+    FRD.set(ControlMode.PercentOutput, 0.0);
+    FLD.set(ControlMode.PercentOutput, 0.0);
+    BRD.set(ControlMode.PercentOutput, 0.0);
+    BLD.set(ControlMode.PercentOutput, 0.0);
+    FRS.set(ControlMode.PercentOutput, 0.0);
+    FLS.set(ControlMode.PercentOutput, 0.0);
+    BRS.set(ControlMode.PercentOutput, 0.0);
+    BLS.set(ControlMode.PercentOutput, 0.0);
+    FRD.setInverted(false);
+    FLD.setInverted(false);
+    BRD.setInverted(false);
+    BLD.setInverted(false);
   }
 
   /**
    * Negates stick drift
+   * 
    * @param n number to remove stick drift
    * @return number incoorporating stick drift
    */
   private double stickDrift(double n) {
-    if(n > -0.1 && n < 0.1)
+    if (n > -0.1 && n < 0.1)
       n = 0;
     return n;
   }
@@ -201,7 +228,7 @@ public class SwerveDrive {
    * Resets the zero point for the gyro
    */
   public void reset0() {
-    //fieldRelativeOffset = NavX.getYaw();
+    // fieldRelativeOffset = NavX.getYaw();
     SmartDashboard.putNumber("NavX", fieldRelativeOffset);
   }
 

@@ -5,9 +5,13 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import static frc.robot.Constants.*;
+
 public class Elevator {
+    private XboxController mechanismController;
 
     private TalonFX motor1;
     private TalonFX motor2;
@@ -16,14 +20,18 @@ public class Elevator {
     private double m1EncoderVal, m2EncoderVal;
     private String name;
 
-    public Elevator(String n, int id1, int id2, int zero, int half, int full) {
+    public Elevator(
+            XboxController _mechanismController,
+            String n, int id1, int id2, int zero, int half, int full) {
+        mechanismController = _mechanismController;
+
         motor1 = new TalonFX(id1);
         motor2 = new TalonFX(id2);
         motor1.setSelectedSensorPosition(0);
         motor2.setSelectedSensorPosition(0);
         motor1.setNeutralMode(NeutralMode.Brake);
         motor2.setNeutralMode(NeutralMode.Brake);
-        
+
         motor1.config_kD(0, 0.69, 0);
         motor2.config_kD(0, 0.69, 0);
         motor1.config_kI(0, 0.001, 0);
@@ -43,19 +51,42 @@ public class Elevator {
         elevatorMovingIn = false;
         elevatorMovingOut = false;
     }
+
+    public void handleElevators() 
+    {
+        // todo: split into horizontal and vertical
+        if (mechanismController.getRawAxis(CRY) < -0.5 || getElevatorMovingOut()) {
+            movePositive();
+        }
+        if (mechanismController.getRawAxis(CRY) > 0.5 || getElevatorMovingIn()) {
+            moveNegative();
+        }
+        if (!getElevatorMovingOut() && !getElevatorMovingIn()) {
+            zero();
+        }
+
+        if (mechanismController.getRawButtonPressed(CYB) || getElevatorMovingOut()) {
+            movePositive();
+        }
+        if (mechanismController.getRawButtonPressed(CAB) || getElevatorMovingIn()) {
+            moveNegative();
+        }
+        if (!getElevatorMovingOut() && !getElevatorMovingIn()) {
+            zero();
+        }
+    }
+
     public void movePositive() {
         SmartDashboard.putNumber(name + "Elevator", getElevatorEncoderValue());
         elevatorMovingOut = true;
         elevatorMovingIn = false;
-        if(Math.abs(getElevatorEncoderValue()) < Math.abs(halfValue)) {
+        if (Math.abs(getElevatorEncoderValue()) < Math.abs(halfValue)) {
             motor1.set(ControlMode.PercentOutput, Math.signum(fullValue) * 0.25);
             motor2.set(ControlMode.PercentOutput, Math.signum(fullValue) * 0.25);
-        }
-        else if(Math.abs(getElevatorEncoderValue()) < Math.abs(fullValue)) {
+        } else if (Math.abs(getElevatorEncoderValue()) < Math.abs(fullValue)) {
             motor1.set(ControlMode.PercentOutput, Math.signum(fullValue) * 0.1);
             motor2.set(ControlMode.PercentOutput, Math.signum(fullValue) * 0.1);
-        }
-        else {
+        } else {
             setZero(fullValue);
             elevatorMovingOut = false;
         }
@@ -65,15 +96,13 @@ public class Elevator {
         SmartDashboard.putNumber(name + "Elevator", getElevatorEncoderValue());
         elevatorMovingOut = false;
         elevatorMovingIn = true;
-        if(Math.abs(getElevatorEncoderValue()) > Math.abs(halfValue)) {
-            motor1.set(ControlMode.PercentOutput,  -Math.signum(fullValue) * 0.25);
-            motor2.set(ControlMode.PercentOutput,  -Math.signum(fullValue) * 0.25);
-        }
-        else if(Math.abs(getElevatorEncoderValue()) > Math.abs(zeroValue)) {
-            motor1.set(ControlMode.PercentOutput,  -Math.signum(fullValue) * 0.1);
-            motor2.set(ControlMode.PercentOutput,  -Math.signum(fullValue) * 0.1);
-        }
-        else {
+        if (Math.abs(getElevatorEncoderValue()) > Math.abs(halfValue)) {
+            motor1.set(ControlMode.PercentOutput, -Math.signum(fullValue) * 0.25);
+            motor2.set(ControlMode.PercentOutput, -Math.signum(fullValue) * 0.25);
+        } else if (Math.abs(getElevatorEncoderValue()) > Math.abs(zeroValue)) {
+            motor1.set(ControlMode.PercentOutput, -Math.signum(fullValue) * 0.1);
+            motor2.set(ControlMode.PercentOutput, -Math.signum(fullValue) * 0.1);
+        } else {
             setZero(motor1.getSelectedSensorPosition());
             elevatorMovingIn = false;
         }
@@ -85,11 +114,10 @@ public class Elevator {
     }
 
     public void zero() {
-        if(Math.abs(m1EncoderVal - getElevatorEncoderValue()) > 200 && m1EncoderVal > 40000) {
+        if (Math.abs(m1EncoderVal - getElevatorEncoderValue()) > 200 && m1EncoderVal > 40000) {
             motor1.set(ControlMode.MotionMagic, m1EncoderVal, DemandType.ArbitraryFeedForward, 0.069);
             motor2.set(ControlMode.MotionMagic, m2EncoderVal, DemandType.ArbitraryFeedForward, 0.069);
-        }
-        else {
+        } else {
             motor1.set(ControlMode.PercentOutput, 0);
             motor2.set(ControlMode.PercentOutput, 0);
         }

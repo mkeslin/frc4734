@@ -7,13 +7,15 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
+// import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static frc.robot.Constants.*;
 
 public class Intake {
+    private XboxController mechanismController;
 
     private TalonFX wheels1;
     private TalonFX wheels2;
@@ -21,13 +23,31 @@ public class Intake {
     private DoubleSolenoid sol;
     private Compressor compressor;
 
-    public Intake() {
+    public Intake(XboxController _mechanismController) {
+        mechanismController = _mechanismController;
+
         wheels1 = new TalonFX(INTAKELEFTID);
         wheels2 = new TalonFX(INTAKERIGHTID);
         hub = new PneumaticHub();
         sol = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 0, 1);
         compressor = new Compressor(1, PneumaticsModuleType.REVPH);
     }
+
+    public void handleIntake() {
+        if (mechanismController.getRawAxis(CLT) > 0.5) {
+          wheelsIn();
+        } else if (mechanismController.getRawAxis(CRT) > 0.5) {
+          wheelsOut();
+        } else {
+          zero();
+        }
+    
+        if (mechanismController.getRawButton(CLB)) {
+          open();
+        } else if (mechanismController.getRawButton(CRB)) {
+          close();
+        }
+      }
 
     public void open() {
         sol.set(Value.kReverse);
