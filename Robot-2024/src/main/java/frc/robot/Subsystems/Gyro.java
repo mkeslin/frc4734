@@ -7,7 +7,7 @@ package frc.robot.Subsystems;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.I2C.Port;
 
-public class Gyro {
+public class Gyro extends BaseSubsystem {
 
     //private AHRS NavX;
     // private Pigeon2 gyro;
@@ -15,11 +15,17 @@ public class Gyro {
     private double roll;
 
     public Gyro() {
+        super();
+
         pitch = 0;
         roll = 0;
         //gyro = new Pigeon2(61);
         //NavX = new AHRS(Port.kMXP);
         //NavX = new AHRS(Port.kOnboard); //kOnboard is the RIO's I2C port; change value if port changes
+    }
+
+    public void HandleController() {
+        // no controllable actions
     }
 
     private void calculateGyro() {

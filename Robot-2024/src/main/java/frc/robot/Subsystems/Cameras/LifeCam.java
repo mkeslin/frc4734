@@ -1,5 +1,14 @@
 package frc.robot.Subsystems.Cameras;
 
-public class LifeCam {
+import frc.robot.Subsystems.BaseSubsystem;
 
+public class LifeCam extends BaseSubsystem {
+
+    public LifeCam() {
+        super();
+    }
+
+    public void HandleController() {
+
+    }
 }

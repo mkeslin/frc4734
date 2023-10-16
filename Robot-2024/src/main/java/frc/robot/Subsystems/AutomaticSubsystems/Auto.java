@@ -377,14 +377,14 @@ public class Auto {
         }
     }
 
-    private void alignLeft() {
-        /*if(Limelight.getArea() > 0.03 && Limelight.getX() < 23) {
-            swerve.drive(0, -0.75, 0);
-        } else {
-            swerve.zeroMotors();
-            changeState();
-        }*/
-    }
+    // private void alignLeft() {
+    //     /*if(Limelight.getArea() > 0.03 && Limelight.getX() < 23) {
+    //         swerve.drive(0, -0.75, 0);
+    //     } else {
+    //         swerve.zeroMotors();
+    //         changeState();
+    //     }*/
+    // }
 
     public boolean getScoringHigh() {
         return scoringhigh;

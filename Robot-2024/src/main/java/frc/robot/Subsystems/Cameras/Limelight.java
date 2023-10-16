@@ -5,13 +5,20 @@ import edu.wpi.first.networktables.NetworkTable;
 //import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Subsystems.BaseSubsystem;
 
-public class Limelight {
+public class Limelight extends BaseSubsystem {
 
     public static NetworkTable table;   //check if static variable works; otherwise, use script from 2022
 
     public Limelight() {
+        super(); 
+
         table = NetworkTableInstance.getDefault().getTable("limelight");
+    }
+
+    public void HandleController() {
+        
     }
 
     /**

@@ -11,10 +11,11 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.Controls.MechanismController;
 
 import static frc.robot.Constants.*;
 
-public class Intake {
+public class Intake extends BaseSubsystem {
     private XboxController mechanismController;
 
     private TalonFX wheels1;
@@ -23,8 +24,9 @@ public class Intake {
     private DoubleSolenoid sol;
     private Compressor compressor;
 
-    public Intake(XboxController _mechanismController) {
-        mechanismController = _mechanismController;
+    public Intake(MechanismController pMechanismController) {
+        // mechanismController = _mechanismController;
+        super(pMechanismController);
 
         wheels1 = new TalonFX(INTAKELEFTID);
         wheels2 = new TalonFX(INTAKERIGHTID);
@@ -33,7 +35,8 @@ public class Intake {
         compressor = new Compressor(1, PneumaticsModuleType.REVPH);
     }
 
-    public void handleIntake() {
+    public void HandleController() {
+    // public void handleIntake() {
         if (mechanismController.getRawAxis(CLT) > 0.5) {
           wheelsIn();
         } else if (mechanismController.getRawAxis(CRT) > 0.5) {

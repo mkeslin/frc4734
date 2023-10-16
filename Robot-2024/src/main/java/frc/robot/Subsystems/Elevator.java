@@ -5,13 +5,14 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
-import edu.wpi.first.wpilibj.XboxController;
+// import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.Controls.MechanismController;
 
 import static frc.robot.Constants.*;
 
-public class Elevator {
-    private XboxController mechanismController;
+public class Elevator extends BaseSubsystem {
+    // private XboxController mechanismController;
 
     private TalonFX motor1;
     private TalonFX motor2;
@@ -21,9 +22,10 @@ public class Elevator {
     private String name;
 
     public Elevator(
-            XboxController _mechanismController,
-            String n, int id1, int id2, int zero, int half, int full) {
-        mechanismController = _mechanismController;
+        MechanismController pMechanismController,
+        String n, int id1, int id2, int zero, int half, int full) {
+        super(pMechanismController);
+        // mechanismController = _mechanismController;
 
         motor1 = new TalonFX(id1);
         motor2 = new TalonFX(id2);
@@ -52,8 +54,8 @@ public class Elevator {
         elevatorMovingOut = false;
     }
 
-    public void handleElevators() 
-    {
+    // public void handleElevators() {
+    public void HandleController() {
         // todo: split into horizontal and vertical
         if (mechanismController.getRawAxis(CRY) < -0.5 || getElevatorMovingOut()) {
             movePositive();

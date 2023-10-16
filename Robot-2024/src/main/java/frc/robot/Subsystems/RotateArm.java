@@ -5,17 +5,19 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
-import edu.wpi.first.wpilibj.XboxController;
+// import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.Controls.MechanismController;
 
-public class RotateArm {
-    private XboxController mechanismController;
+public class RotateArm extends BaseSubsystem {
+    // private XboxController mechanismController;
     
     private TalonFX armMotor;
     private boolean armMovingIn, armMovingOut;
 
-    public RotateArm(XboxController _mechanismController) {
-        mechanismController= _mechanismController;
+    public RotateArm(MechanismController pMechanismController) {
+        super(pMechanismController);
+        // mechanismController= _mechanismController;
 
         armMotor = new TalonFX(ROTATEARMID);
         armMotor.setSelectedSensorPosition(0);
@@ -24,7 +26,8 @@ public class RotateArm {
         armMovingOut = false;
     }
 
-    public void handleRotateArm() {
+    // public void handleRotateArm() {
+    public void HandleController() {
         if (mechanismController.getRawAxis(CLY) < -0.5) {
             extend(Math.abs(mechanismController.getRawAxis(CLY)));
         } else if (mechanismController.getRawAxis(CLY) > 0.5) {

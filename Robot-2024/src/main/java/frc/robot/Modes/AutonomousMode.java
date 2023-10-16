@@ -1,5 +1,6 @@
 package frc.robot.Modes;
 
+import frc.Controls.DriveController;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Gyro;
 import frc.robot.Subsystems.Intake;
@@ -19,9 +20,12 @@ public class AutonomousMode extends Auto implements IMode {
     // private Limelight limelight;
     // private Gyro gyro;
 
+    private DriveController driverController;
+
     // private Auto auto;
 
     public AutonomousMode(
+            DriveController _driverController,
             SwerveDrive _swerveDrive,
             Intake _intake,
             RotateArm _rotateArm,
@@ -31,6 +35,8 @@ public class AutonomousMode extends Auto implements IMode {
             Gyro _gyro) {
         super(_swerveDrive, _intake, _rotateArm, _horizontalElevator, _verticalElevator, _limelight, _gyro);
         // Auto(swerveDrive);
+
+        driverController = _driverController;
     }
 
     /**
@@ -60,5 +66,18 @@ public class AutonomousMode extends Auto implements IMode {
     /** This function is called periodically during autonomous. */
     public void periodic() {
         this.periodicAuto();
+
+        // todo: what does this do?
+        setScoreHigh();
+    }
+
+    private void setScoreHigh() {
+        if (driverController.getRawButton(CAB) && !this.getScoringHigh()) {
+            this.changeState();
+            this.scoreHigh();
+        }
+        if (this.getScoringHigh()) {
+            this.scoreHigh();
+        }
     }
 }
