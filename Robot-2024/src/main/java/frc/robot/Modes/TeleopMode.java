@@ -1,12 +1,12 @@
 package frc.robot.Modes;
 
-import edu.wpi.first.wpilibj.XboxController;
+// import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.RotateArm;
 import frc.robot.Subsystems.SwerveDrive;
-import frc.robot.Subsystems.AutomaticSubsystems.Auto;
-import frc.robot.Subsystems.Cameras.Limelight;
+// import frc.robot.Subsystems.AutomaticSubsystems.Auto;
+// import frc.robot.Subsystems.Cameras.Limelight;
 
 public class TeleopMode implements IMode {
 
@@ -43,7 +43,7 @@ public class TeleopMode implements IMode {
 
     /** This function is called periodically during operator control. */
     public void periodic() {
-        swerveDrive.handleSwerve();
+        swerveDrive.HandleController();
         intake.handleIntake();
         rotateArm.handleRotateArm();
         horizontalElevator.handleElevators();

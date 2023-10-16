@@ -11,7 +11,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 // import edu.wpi.first.cscore.UsbCamera;
 // import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
+// import edu.wpi.first.wpilibj.XboxController;
+import frc.Controls.DriveController;
+import frc.Controls.MechanismController;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Modes.*;
 import frc.robot.Subsystems.*;
@@ -27,7 +29,8 @@ import frc.robot.Subsystems.Cameras.Limelight;
 public class Robot extends TimedRobot {
 
   // input
-  private XboxController driverController, mechanismController;
+  private DriveController driveController;
+  private MechanismController mechanismController;
   private Gyro gyro;
   // private LifeCam lifeCam;
   private Limelight limelight;
@@ -59,11 +62,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // Controllers
-    driverController = new XboxController(XC1ID);
-    mechanismController = new XboxController(XC2ID);
+    driveController = new DriveController(XC1ID);
+    mechanismController = new MechanismController(XC2ID);
 
     // outputs
-    swerve = new SwerveDrive(driverController);
+    swerve = new SwerveDrive(driveController);
     intake = new Intake(mechanismController);
     rotateArm = new RotateArm(mechanismController);
     horizontalElevator = new Elevator(

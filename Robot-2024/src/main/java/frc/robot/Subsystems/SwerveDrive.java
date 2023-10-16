@@ -1,15 +1,18 @@
 package frc.robot.Subsystems;
 
 import static frc.robot.Constants.*;
+// import frc.robot.Subsystems.IControllable;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
-import edu.wpi.first.wpilibj.XboxController;
+// import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.Controls.DriveController;
 
-public class SwerveDrive {
-  private XboxController driverController;
+public class SwerveDrive extends BaseSubsystem {
+  // private XboxController driveController;
 
   private TalonFX FRD, FLD, BRD, BLD, FRS, FLS, BRS, BLS;
   private CANCoder FRE, FLE, BRE, BLE;
@@ -23,8 +26,11 @@ public class SwerveDrive {
    * 
    * @param c Driver controller
    */
-  public SwerveDrive(XboxController c) {
-    driverController = c;
+  public SwerveDrive(DriveController pDriveController) {
+    super(pDriveController);
+
+    // driveController = c;
+    // driveController = pDriveController;
 
     FRD = new TalonFX(FRDID);
     FLD = new TalonFX(FLDID);
@@ -44,20 +50,24 @@ public class SwerveDrive {
     zeroMotors();
   }
 
-  public void handleSwerve() {
-    if (driverController.getRawButton(CLB)) {
+  // public void HandleController(XboxController pDriveController, XboxController pMechanismController) {
+  public void HandleController() {
+    // driveController = pDriveController;
+
+  // public void handleSwerve() {
+    if (driveController.getRawButton(CLB)) {
       setMode(NeutralMode.Brake);
-    } else if (driverController.getRawButton(CRB)) {
+    } else if (driveController.getRawButton(CRB)) {
       setMode(NeutralMode.Coast);
     } else {
       controllerDrive();
     }
 
-    if (driverController.getRawAxis(CLT) > 0.5) {
+    if (driveController.getRawAxis(CLT) > 0.5) {
       setSpeedFactor(0.5);
     }
 
-    if (driverController.getRawAxis(CRT) > 0.5) {
+    if (driveController.getRawAxis(CRT) > 0.5) {
       setSpeedFactor(1);
     }
   }
@@ -68,9 +78,9 @@ public class SwerveDrive {
   public void controllerDrive() {
     calculateEncoder();
     calculateGyro();
-    Forward = -stickDrift(driverController.getRawAxis(CLY));
-    Strafe = stickDrift(driverController.getRawAxis(CLX));
-    Rotation = stickDrift(driverController.getRawAxis(CRX) * 0.75);
+    Forward = -stickDrift(driveController.getRawAxis(CLY));
+    Strafe = stickDrift(driveController.getRawAxis(CLX));
+    Rotation = stickDrift(driveController.getRawAxis(CRX) * 0.75);
     calculateSwerve();
     swerveDrive(FRD, FRS, WAFR, WSFR);
     swerveDrive(FLD, FLS, WAFL, WSFL);
