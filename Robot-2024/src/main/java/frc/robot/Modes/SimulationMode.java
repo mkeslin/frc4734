@@ -1,21 +1,15 @@
 package frc.robot.Modes;
 
-// import frc.robot.Subsystems.Intake;
-// import frc.robot.Subsystems.SwerveDrive;
-
 public class SimulationMode {
 
-    // private Intake intake;
-
     public SimulationMode() {
-            // Intake _intake) {
-        // intake = _intake;
     }
 
+    /** This function is called when mode starts. */
     public void init() {
     }
 
-    /** This function is called periodically during operator control. */
+    /** This function is called periodically. */
     public void periodic() {
     }
 }

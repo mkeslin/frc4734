@@ -7,7 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 // import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.Controls.MechanismController;
+import frc.robot.Controls.MechanismController;
 
 public class RotateArm extends BaseSubsystem {
     // private XboxController mechanismController;

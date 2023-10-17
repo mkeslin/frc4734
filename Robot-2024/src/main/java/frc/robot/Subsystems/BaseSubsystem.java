@@ -1,7 +1,7 @@
 package frc.robot.Subsystems;
 
-import frc.Controls.DriveController;
-import frc.Controls.MechanismController;
+import frc.robot.Controls.DriveController;
+import frc.robot.Controls.MechanismController;
 
 public abstract class BaseSubsystem {
     protected DriveController driveController;

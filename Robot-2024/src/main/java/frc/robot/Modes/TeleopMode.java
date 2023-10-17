@@ -3,12 +3,12 @@ package frc.robot.Modes;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.RotateArm;
-import frc.robot.Subsystems.SwerveDrive;
+import frc.robot.Subsystems.SwerveDriveRobot;
 // import frc.robot.Subsystems.Cameras.Limelight;
 
 public class TeleopMode implements IMode {
 
-    private SwerveDrive swerveDrive;
+    private SwerveDriveRobot swerveDrive;
     private Intake intake;
     private RotateArm rotateArm;
     private Elevator horizontalElevator;
@@ -20,7 +20,7 @@ public class TeleopMode implements IMode {
 
     public TeleopMode(
             // Motors _motors,
-            SwerveDrive _swerveDrive,
+            SwerveDriveRobot _swerveDrive,
             Intake _intake,
             RotateArm _rotateArm,
             Elevator _horizontalElevator,
@@ -32,12 +32,12 @@ public class TeleopMode implements IMode {
         verticalElevator = _verticalElevator;
     }
 
-    /** This function is called once when teleop is enabled. */
+    /** This function is called when mode starts. */
     public void init() {
         swerveDrive.zeroMotors();
     }
 
-    /** This function is called periodically during operator control. */
+    /** This function is called periodically. */
     public void periodic() {
         swerveDrive.HandleController();
         intake.HandleController();

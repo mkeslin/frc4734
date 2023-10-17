@@ -12,12 +12,13 @@ public class TestMode {
         intake = _intake;
     }
 
+    /** This function is called when mode starts. */
     public void init() {
         // Limelight.setPipeline(0);
         intake.enableCompressor();
     }
 
-    /** This function is called periodically during operator control. */
+    /** This function is called periodically. */
     public void periodic() {
     }
 }

@@ -15,7 +15,7 @@ public class Auto {
     private boolean balancing, scoringhigh;
     private Timer timer;
 
-    protected SwerveDrive swerve;
+    protected SwerveDriveRobot swerve;
     protected Intake intake;
     protected RotateArm rotateArm;
     protected Elevator horizontalElevator;
@@ -23,7 +23,7 @@ public class Auto {
     protected Limelight limelight;
     protected Gyro gyro;
 
-    public Auto(SwerveDrive s, Intake i, RotateArm r, Elevator he, Elevator ve, Limelight l, Gyro g) {
+    public Auto(SwerveDriveRobot s, Intake i, RotateArm r, Elevator he, Elevator ve, Limelight l, Gyro g) {
         swerve = s;
         intake = i;
         rotateArm = r;

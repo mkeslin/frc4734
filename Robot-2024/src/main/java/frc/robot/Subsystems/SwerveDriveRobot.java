@@ -9,9 +9,9 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 // import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.Controls.DriveController;
+import frc.robot.Controls.DriveController;
 
-public class SwerveDrive extends BaseSubsystem {
+public class SwerveDriveRobot extends BaseSubsystem {
   // private XboxController driveController;
 
   private TalonFX FRD, FLD, BRD, BLD, FRS, FLS, BRS, BLS;
@@ -26,7 +26,7 @@ public class SwerveDrive extends BaseSubsystem {
    * 
    * @param c Driver controller
    */
-  public SwerveDrive(DriveController pDriveController) {
+  public SwerveDriveRobot(DriveController pDriveController) {
     super(pDriveController);
 
     // driveController = c;
