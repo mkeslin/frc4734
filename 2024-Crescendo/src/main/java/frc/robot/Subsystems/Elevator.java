@@ -5,8 +5,9 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Elevator {
+public class Elevator extends SubsystemBase {
 
     private TalonFX motor1;
     private TalonFX motor2;
@@ -41,6 +42,11 @@ public class Elevator {
         m2EncoderVal = 0;
         elevatorMovingIn = false;
         elevatorMovingOut = false;
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
     }
 
     public void movePositive() {

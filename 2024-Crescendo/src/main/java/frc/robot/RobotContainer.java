@@ -1,8 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
+
+import static frc.robot.Constants.*;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
@@ -12,40 +10,64 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Subsystems.Elevator;
 import frc.robot.generated.TunerConstants;
 
 public class RobotContainer {
 
+    // subsystems
+    private Elevator horizontalElevator;
+    private Elevator verticalElevator;
+
     final double MaxSpeed = 6; // 6 meters per second desired top speed
     final double MaxAngularRate = Math.PI; // Half a rotation per second max angular velocity
 
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    CommandXboxController joystick = new CommandXboxController(0); // My joystick
-    CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
-    SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric().withIsOpenLoop(true); // I want field-centric
-    // driving in open loop
+    // controllers
+    CommandXboxController driveController = new CommandXboxController(XC1ID);
+    CommandXboxController mechanismController = new CommandXboxController(XC2ID);
+
+    // swerve drivetrain
+    CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;
+    SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric().withIsOpenLoop(true);
     SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     Telemetry logger = new Telemetry(MaxSpeed);
 
-    private void configureBindings() {
-        drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+    public RobotContainer() {
+        // initialize subsystems
+        horizontalElevator =
+            new Elevator("horizontal", HORELEVATOR1ID, HORELEVATOR2ID, -200, -14000, -24000);
+        verticalElevator =
+            new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
+
+        // configure bindings
+        configureBindings_DriveTrain();
+        configureBindings_HorizontalElevator();
+        configureBindings_VerticalElevator();
+    }
+
+    private void configureBindings_DriveTrain() {
+        // Drivetrain will execute this command periodically
+        // Sticks
+        drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
                 drive
-                    .withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
-                    // negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                    .withVelocityX(-driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-driveController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick
+        // A Button: Brake
+        driveController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+
+        // B Button
+        driveController
             .b()
             .whileTrue(
                 drivetrain.applyRequest(() ->
                     point.withModuleDirection(
-                        new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX())
+                        new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX())
                     )
                 )
             );
@@ -55,11 +77,76 @@ public class RobotContainer {
                 new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90))
             );
         }
+
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-    public RobotContainer() {
-        configureBindings();
+    private void configureBindings_HorizontalElevator() {
+        mechanismController
+            .axisLessThan(CRY, -0.5)
+            .whileTrue(
+                Commands.runOnce(
+                    () -> {
+                        horizontalElevator.movePositive();
+                    },
+                    horizontalElevator
+                )
+            );
+        mechanismController
+            .axisGreaterThan(CRY, 0.5)
+            .whileTrue(
+                Commands.runOnce(
+                    () -> {
+                        horizontalElevator.moveNegative();
+                    },
+                    horizontalElevator
+                )
+            );
+
+        // A Button: reset position
+        mechanismController
+            .a()
+            .whileTrue(
+                Commands.runOnce(
+                    () -> {
+                        horizontalElevator.zero();
+                    },
+                    horizontalElevator
+                )
+            );
+    }
+
+    private void configureBindings_VerticalElevator() {
+        mechanismController
+            .axisLessThan(CRY, -0.5)
+            .whileTrue(
+                Commands.runOnce(
+                    () -> {
+                        verticalElevator.movePositive();
+                    },
+                    verticalElevator
+                )
+            );
+        mechanismController
+            .axisGreaterThan(CRY, 0.5)
+            .whileTrue(
+                Commands.runOnce(
+                    () -> {
+                        verticalElevator.moveNegative();
+                    },
+                    verticalElevator
+                )
+            );
+        mechanismController
+            .a()
+            .whileTrue(
+                Commands.runOnce(
+                    () -> {
+                        verticalElevator.zero();
+                    },
+                    verticalElevator
+                )
+            );
     }
 
     public Command getAutonomousCommand() {
