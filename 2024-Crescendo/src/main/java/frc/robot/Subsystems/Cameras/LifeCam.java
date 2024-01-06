@@ -1,5 +1,3 @@
 package frc.robot.Subsystems.Cameras;
 
-public class LifeCam {
-
-}
+public class LifeCam {}

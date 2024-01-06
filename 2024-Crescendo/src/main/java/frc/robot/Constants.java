@@ -1,6 +1,7 @@
 package frc.robot;
 
 public class Constants {
+
     public static final int FRDID = 1; //Front right drive ID
     public static final int FLDID = 2; //Front left drive ID
     public static final int BRDID = 3; //Back right drive ID
@@ -16,12 +17,10 @@ public class Constants {
     public static final int XC1ID = 0; //Xbox controller 1 ID
     public static final int XC2ID = 1; //Xbox controller 2 ID
 
-
-    public static final double FREO = -36+30-15-98+90; //Front right encoder offset
-    public static final double FLEO = -55+40+45+15+105+90-180-15; //Front left encoder offset
-    public static final double BREO = -60+35+110-180+22+5; //back right encoder offset 38
-    public static final double BLEO = -176-93+70; //back left encoder offset
-
+    public static final double FREO = -36 + 30 - 15 - 98 + 90; //Front right encoder offset
+    public static final double FLEO = -55 + 40 + 45 + 15 + 105 + 90 - 180 - 15; //Front left encoder offset
+    public static final double BREO = -60 + 35 + 110 - 180 + 22 + 5; //back right encoder offset 38
+    public static final double BLEO = -176 - 93 + 70; //back left encoder offset
 
     public static final int HORELEVATOR1ID = 13;
     public static final int HORELEVATOR2ID = 14;
@@ -31,7 +30,7 @@ public class Constants {
     public static final int INTAKELEFTID = 18;
     public static final int INTAKERIGHTID = 19;
     public static final int PNEUMATICHUBID = 20;
-    
+
     public static final int CRX = 4; //Right X
     public static final int CRY = 5; //Right Y
     public static final int CRT = 3; //Right Trigger
@@ -46,7 +45,7 @@ public class Constants {
     public static final int CBB = 2; //B
     public static final int CXB = 3; //X
     public static final int CYB = 4; //Y
-    
+
     public static final double WBL = 0.58; //Wheelbase length 19.5in 0.50m
     public static final double WBW = 0.50; //Wheelbase width 23.0in 0.58m
     public static final double WBR = Math.sqrt(Math.pow(WBL, 2) + Math.pow(WBW, 2)); //Wheelbase diameter

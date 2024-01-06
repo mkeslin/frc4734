@@ -1,10 +1,10 @@
 package frc.robot.Subsystems;
 
 import static frc.robot.Constants.*;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class RotateArm {
@@ -23,16 +23,13 @@ public class RotateArm {
     public void extend(double s) {
         armMovingOut = true;
         armMovingIn = false;
-        if(getArmEncoderValue() > -24000) {
+        if (getArmEncoderValue() > -24000) {
             armMotor.set(ControlMode.PercentOutput, -0.25 * s);
-        }
-        else if(getArmEncoderValue() > -35000) {
+        } else if (getArmEncoderValue() > -35000) {
             armMotor.set(ControlMode.PercentOutput, -0.15 * s);
-        }
-        else if(getArmEncoderValue() > -49000) {
+        } else if (getArmEncoderValue() > -49000) {
             armMotor.set(ControlMode.PercentOutput, -0.1 * s);
-        }
-        else {
+        } else {
             armMovingOut = false;
             zero();
         }
@@ -41,16 +38,13 @@ public class RotateArm {
     public void retract(double s) {
         armMovingOut = false;
         armMovingIn = true;
-        if(getArmEncoderValue() < -20000) {
+        if (getArmEncoderValue() < -20000) {
             armMotor.set(ControlMode.PercentOutput, 0.25 * s);
-        }
-        else if(getArmEncoderValue() < -10000) {
+        } else if (getArmEncoderValue() < -10000) {
             armMotor.set(ControlMode.PercentOutput, 0.15 * s);
-        }
-        else if(getArmEncoderValue() < -1000) {
+        } else if (getArmEncoderValue() < -1000) {
             armMotor.set(ControlMode.PercentOutput, 0.1 * s);
-        }
-        else {
+        } else {
             armMovingIn = false;
             zero();
         }

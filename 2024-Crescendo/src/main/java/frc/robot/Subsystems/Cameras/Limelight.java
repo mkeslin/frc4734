@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Limelight {
 
-    public static NetworkTable table;   //check if static variable works; otherwise, use script from 2022
+    public static NetworkTable table; //check if static variable works; otherwise, use script from 2022
 
     public Limelight() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -18,14 +18,14 @@ public class Limelight {
      * @return X value of limelight
      */
     public static double getX() {
-        return(table.getEntry("tx").getDouble(0.0));
+        return (table.getEntry("tx").getDouble(0.0));
     }
 
     /**
      * @return Y value of limelight
      */
     public static double getY() {
-        return(table.getEntry("ty").getDouble(0.0));
+        return (table.getEntry("ty").getDouble(0.0));
     }
 
     /*public static double getTargetYaw() {
@@ -36,7 +36,7 @@ public class Limelight {
      * @return Area value of limelight
      */
     public static double getArea() {
-        return(table.getEntry("ta").getDouble(0.0));
+        return (table.getEntry("ta").getDouble(0.0));
     }
 
     /**
@@ -44,16 +44,15 @@ public class Limelight {
      * @param b true if on, false if off
      */
     public static void status(boolean b) {
-        if(b) {
+        if (b) {
             table.getEntry("ledMode").setNumber(3);
-        }
-        else {
+        } else {
             table.getEntry("ledMode").setNumber(1);
         }
     }
 
     public static double getPipeline() {
-        return(table.getEntry("pipeline").getDouble(0));
+        return (table.getEntry("pipeline").getDouble(0));
     }
 
     public static void setPipeline(int p) {

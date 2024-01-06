@@ -14,6 +14,7 @@
     "**/.factorypath": true,
     "**/*~": true
   },
+  "editor.defaultFormatter": "mwpb.java-prettier-formatter",
   "java.test.config": [
     {
       "name": "WPIlibUnitTests",
