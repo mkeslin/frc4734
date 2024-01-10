@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.Constants.*;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,16 +20,18 @@ public class RobotContainer {
     private Elevator horizontalElevator;
     private Elevator verticalElevator;
 
-    final double MaxSpeed = 6; // 6 meters per second desired top speed
-    final double MaxAngularRate = Math.PI; // Half a rotation per second max angular velocity
+    private double MaxSpeed = 6; // 6 meters per second desired top speed
+  private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
     // controllers
     CommandXboxController driveController = new CommandXboxController(XC1ID);
     CommandXboxController mechanismController = new CommandXboxController(XC2ID);
 
     // swerve drivetrain
-    CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;
-    SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric().withIsOpenLoop(true);
+    private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric driving in open loop
     SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     Telemetry logger = new Telemetry(MaxSpeed);
