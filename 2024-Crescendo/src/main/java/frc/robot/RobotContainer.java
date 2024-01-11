@@ -21,17 +21,18 @@ public class RobotContainer {
     private Elevator verticalElevator;
 
     private double MaxSpeed = 6; // 6 meters per second desired top speed
-  private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+    private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
     // controllers
     CommandXboxController driveController = new CommandXboxController(XC1ID);
-    CommandXboxController mechanismController = new CommandXboxController(XC2ID);
+    //   CommandXboxController mechanismController = new CommandXboxController(XC2ID);
 
     // swerve drivetrain
     private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
-     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric driving in open loop
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+        .withDeadband(MaxSpeed * 0.1)
+        .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric driving in open loop
     SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     Telemetry logger = new Telemetry(MaxSpeed);
@@ -85,71 +86,71 @@ public class RobotContainer {
     }
 
     private void configureBindings_HorizontalElevator() {
-        mechanismController
-            .axisLessThan(CRY, -0.5)
-            .whileTrue(
-                Commands.runOnce(
-                    () -> {
-                        horizontalElevator.movePositive();
-                    },
-                    horizontalElevator
-                )
-            );
-        mechanismController
-            .axisGreaterThan(CRY, 0.5)
-            .whileTrue(
-                Commands.runOnce(
-                    () -> {
-                        horizontalElevator.moveNegative();
-                    },
-                    horizontalElevator
-                )
-            );
+        // mechanismController
+        //     .axisLessThan(CRY, -0.5)
+        //     .whileTrue(
+        //         Commands.runOnce(
+        //             () -> {
+        //                 horizontalElevator.movePositive();
+        //             },
+        //             horizontalElevator
+        //         )
+        //     );
+        // mechanismController
+        //     .axisGreaterThan(CRY, 0.5)
+        //     .whileTrue(
+        //         Commands.runOnce(
+        //             () -> {
+        //                 horizontalElevator.moveNegative();
+        //             },
+        //             horizontalElevator
+        //         )
+        //     );
 
-        // A Button: reset position
-        mechanismController
-            .a()
-            .whileTrue(
-                Commands.runOnce(
-                    () -> {
-                        horizontalElevator.zero();
-                    },
-                    horizontalElevator
-                )
-            );
+        // // A Button: reset position
+        // mechanismController
+        //     .a()
+        //     .whileTrue(
+        //         Commands.runOnce(
+        //             () -> {
+        //                 horizontalElevator.zero();
+        //             },
+        //             horizontalElevator
+        //         )
+        //     );
     }
 
     private void configureBindings_VerticalElevator() {
-        mechanismController
-            .axisLessThan(CRY, -0.5)
-            .whileTrue(
-                Commands.runOnce(
-                    () -> {
-                        verticalElevator.movePositive();
-                    },
-                    verticalElevator
-                )
-            );
-        mechanismController
-            .axisGreaterThan(CRY, 0.5)
-            .whileTrue(
-                Commands.runOnce(
-                    () -> {
-                        verticalElevator.moveNegative();
-                    },
-                    verticalElevator
-                )
-            );
-        mechanismController
-            .a()
-            .whileTrue(
-                Commands.runOnce(
-                    () -> {
-                        verticalElevator.zero();
-                    },
-                    verticalElevator
-                )
-            );
+        // mechanismController
+        //     .axisLessThan(CRY, -0.5)
+        //     .whileTrue(
+        //         Commands.runOnce(
+        //             () -> {
+        //                 verticalElevator.movePositive();
+        //             },
+        //             verticalElevator
+        //         )
+        //     );
+        // mechanismController
+        //     .axisGreaterThan(CRY, 0.5)
+        //     .whileTrue(
+        //         Commands.runOnce(
+        //             () -> {
+        //                 verticalElevator.moveNegative();
+        //             },
+        //             verticalElevator
+        //         )
+        //     );
+        // mechanismController
+        //     .a()
+        //     .whileTrue(
+        //         Commands.runOnce(
+        //             () -> {
+        //                 verticalElevator.zero();
+        //             },
+        //             verticalElevator
+        //         )
+        //     );
     }
 
     public Command getAutonomousCommand() {

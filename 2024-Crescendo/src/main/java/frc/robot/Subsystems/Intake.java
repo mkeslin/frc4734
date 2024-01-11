@@ -2,8 +2,10 @@ package frc.robot.Subsystems;
 
 import static frc.robot.Constants.*;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFX;
+
+// import com.ctre.phoenix.motorcontrol.ControlMode;
+// import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -38,18 +40,18 @@ public class Intake {
     }
 
     public void wheelsIn() {
-        wheels1.set(ControlMode.PercentOutput, -0.25);
-        wheels2.set(ControlMode.PercentOutput, 0.25);
+        // wheels1.set(ControlMode.PercentOutput, -0.25);
+        // wheels2.set(ControlMode.PercentOutput, 0.25);
     }
 
     public void wheelsOut() {
-        wheels1.set(ControlMode.PercentOutput, 0.25);
-        wheels2.set(ControlMode.PercentOutput, -0.25);
+        // wheels1.set(ControlMode.PercentOutput, 0.25);
+        // wheels2.set(ControlMode.PercentOutput, -0.25);
     }
 
     public void zero() {
-        wheels1.set(ControlMode.PercentOutput, 0);
-        wheels2.set(ControlMode.PercentOutput, 0);
+        // wheels1.set(ControlMode.PercentOutput, 0);
+        // wheels2.set(ControlMode.PercentOutput, 0);
     }
 
     public void enableCompressor() {

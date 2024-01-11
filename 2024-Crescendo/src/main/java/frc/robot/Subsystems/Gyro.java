@@ -1,6 +1,8 @@
 package frc.robot.Subsystems;
 
-import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix6.hardware.Pigeon2;
+
+// import com.ctre.phoenix.sensors.Pigeon2;
 //import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
