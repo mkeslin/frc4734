@@ -111,12 +111,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For use with PathPlanner
-    private double MaxSpeed = 6; // 6 meters per second desired top speed
-    private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-        .withDeadband(MaxSpeed * 0.1)
-        .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric driving in open loop
+    private SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric();
 
     public Pose2d getPose2() {
         return this.m_odometry.getEstimatedPosition();
@@ -131,16 +126,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void driveRobotRelative2(ChassisSpeeds chassisSpeeds) {
-        // this.driveRobotRelative(chassisSpeeds);
-
-        // chassisSpeeds.
-        // this.m_kinematics.toChassisSpeeds(chassisSpeeds)
-
-        this.applyRequest(() ->
-                drive
-                    .withVelocityX(chassisSpeeds.vxMetersPerSecond) // Drive forward with negative Y (forward)
-                    .withVelocityY(chassisSpeeds.vyMetersPerSecond) // Drive left with negative X (left)
-                    .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond) // Drive counterclockwise with negative X (left)
+        this.setControl(
+                driveRequest
+                    .withVelocityX(chassisSpeeds.vxMetersPerSecond)
+                    .withVelocityY(chassisSpeeds.vyMetersPerSecond)
+                    .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond)
             );
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
