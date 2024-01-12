@@ -1,34 +1,41 @@
 package frc.robot;
 
-import static frc.robot.Constants.*;
-
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Subsystems.Elevator;
-import frc.robot.generated.TunerConstants;
+
+import frc.robot.Constants.ControllerIds;
+import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
+import frc.robot.SwerveDrivetrain.*;
 
 public class RobotContainer {
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ROBOT SELECTOR
+    private final CommandSwerveDrivetrain selectedDrivetrain = DrivetrainA.DriveTrain;
+    // private final CommandSwerveDrivetrain selectedDrivetrain = DrivetrainB.DriveTrain;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // subsystems
-    private Elevator horizontalElevator;
-    private Elevator verticalElevator;
+    // private Elevator horizontalElevator;
+    // private Elevator verticalElevator;
 
     private double MaxSpeed = 6; // 6 meters per second desired top speed
     private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
     // controllers
-    CommandXboxController driveController = new CommandXboxController(XC1ID);
-    //   CommandXboxController mechanismController = new CommandXboxController(XC2ID);
+    CommandXboxController driveController = new CommandXboxController(ControllerIds.XC1ID);
+    //   CommandXboxController mechanismController = new CommandXboxController(ControllerIds.XC2ID);
 
     // swerve drivetrain
-    private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+    private final CommandSwerveDrivetrain drivetrain = selectedDrivetrain;
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
         .withDeadband(MaxSpeed * 0.1)
         .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -39,10 +46,10 @@ public class RobotContainer {
 
     public RobotContainer() {
         // initialize subsystems
-        horizontalElevator =
-            new Elevator("horizontal", HORELEVATOR1ID, HORELEVATOR2ID, -200, -14000, -24000);
-        verticalElevator =
-            new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
+        // horizontalElevator =
+        //     new Elevator("horizontal", HORELEVATOR1ID, HORELEVATOR2ID, -200, -14000, -24000);
+        // verticalElevator =
+        //     new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
 
         // configure bindings
         configureBindings_DriveTrain();

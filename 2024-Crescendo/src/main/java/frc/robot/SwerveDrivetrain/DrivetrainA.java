@@ -1,4 +1,4 @@
-package frc.robot.generated;
+package frc.robot.SwerveDrivetrain;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
@@ -9,9 +9,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackTy
 
 import edu.wpi.first.math.util.Units;
 
-import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
-
-public class TunerConstants {
+public class DrivetrainA {
     // Both sets of gains need to be tuned to your individual robot.
 
     // The steer motor uses any SwerveModule.SteerRequestType control request with the

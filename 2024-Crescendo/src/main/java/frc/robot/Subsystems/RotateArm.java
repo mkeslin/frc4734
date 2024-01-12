@@ -1,6 +1,6 @@
 package frc.robot.Subsystems;
 
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.Constants.*;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
