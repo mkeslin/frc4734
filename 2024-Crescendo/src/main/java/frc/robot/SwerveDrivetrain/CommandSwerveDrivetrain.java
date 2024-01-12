@@ -3,6 +3,7 @@ package frc.robot.SwerveDrivetrain;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -11,6 +12,7 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -55,13 +57,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         // PathPlanner
         AutoBuilder.configureHolonomic(
             // Robot pose supplier
-            this::getPose,
+            this::getPose2,
             // Method to reset odometry (will be called if your auto has a starting pose)
-            this::resetPose,
+            this::resetPose2,
             // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            this::getRobotRelativeSpeeds,
+            this::getRobotRelativeSpeeds2,
             // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-            this::driveRobotRelative,
+            this::driveRobotRelative2,
             // HolonomicPathFollowerConfig, this should likely live in your Constants class
             new HolonomicPathFollowerConfig(
                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
@@ -83,6 +85,8 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             },
             this // Reference to this subsystem to set requirements
         );
+        // Set up custom logging to add the current path to a field 2d widget
+        // PathPlannerLogging.setLogActivePathCallback(poses -> field.getObject("path").setPoses(poses));
     }
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -107,20 +111,37 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For use with PathPlanner
-    private Pose2d getPose() {
-        return this.getPose();
+    private double MaxSpeed = 6; // 6 meters per second desired top speed
+    private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+        .withDeadband(MaxSpeed * 0.1)
+        .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric driving in open loop
+
+    public Pose2d getPose2() {
+        return this.m_odometry.getEstimatedPosition();
     }
 
-    private void resetPose(Pose2d pose) {
-        this.resetPose(pose);
+    public void resetPose2(Pose2d pose) {
+        this.m_odometry.resetPosition(pose.getRotation(), this.m_modulePositions, pose);
     }
 
-    private ChassisSpeeds getRobotRelativeSpeeds() {
-        return this.getRobotRelativeSpeeds();
+    public ChassisSpeeds getRobotRelativeSpeeds2() {
+        return this.m_kinematics.toChassisSpeeds(this.m_cachedState.ModuleStates);
     }
 
-    private void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
-        this.driveRobotRelative(chassisSpeeds);
+    public void driveRobotRelative2(ChassisSpeeds chassisSpeeds) {
+        // this.driveRobotRelative(chassisSpeeds);
+
+        // chassisSpeeds.
+        // this.m_kinematics.toChassisSpeeds(chassisSpeeds)
+
+        this.applyRequest(() ->
+                drive
+                    .withVelocityX(chassisSpeeds.vxMetersPerSecond) // Drive forward with negative Y (forward)
+                    .withVelocityY(chassisSpeeds.vyMetersPerSecond) // Drive left with negative X (left)
+                    .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond) // Drive counterclockwise with negative X (left)
+            );
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
