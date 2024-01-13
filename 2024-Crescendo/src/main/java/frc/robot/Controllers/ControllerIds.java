@@ -1,4 +1,4 @@
-package frc.robot.Constants;
+package frc.robot.Controllers;
 
 public class ControllerIds {
     public static final int XC1ID = 0; //Xbox controller 1 ID

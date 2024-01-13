@@ -20,12 +20,12 @@
         "y": 5.550936522700434
       },
       "prevControl": {
-        "x": 2.051802334703099,
-        "y": 5.527514849608872
+        "x": 2.0518011957389892,
+        "y": 5.527536499961148
       },
       "nextControl": {
-        "x": 2.9485365439542117,
-        "y": 5.574711386937876
+        "x": 2.9485377000935267,
+        "y": 5.574689410105392
       },
       "isLocked": false,
       "linkedName": null
@@ -136,7 +136,18 @@
     }
   ],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "acquireNote",
+      "waypointRelativePos": 1.1500000000000001,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": []
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 6.0,
     "maxAcceleration": 3.0,

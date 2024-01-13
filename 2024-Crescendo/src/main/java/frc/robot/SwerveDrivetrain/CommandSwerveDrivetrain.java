@@ -19,10 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.function.Supplier;
 
-/**
- * Class that extends the Phoenix SwerveDrivetrain class and implements subsystem
- * so it can be used in command-based projects easily.
- */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
 
     private static final double kSimLoopPeriod = 0.005; // 5 ms
@@ -63,8 +59,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
                 6.0, // Max module speed, in m/s
                 Units.inchesToMeters(14.849242), // Drive base radius in meters. Distance from robot center to furthest module.
-                new ReplanningConfig(), // Default path replanning config. See the API for the options here,
-                0.2
+                new ReplanningConfig() // Default path replanning config. See the API for the options here,
             ),
             () -> {
                 // Boolean supplier that controls when the path will be mirrored for the red alliance

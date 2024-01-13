@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.SwerveDrivetrain;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain.SwerveDriveState;
@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
-public class Telemetry {
+public class SwerveDrivetrainTelemetry {
     private final double MaxSpeed;
 
     /**
@@ -24,7 +24,7 @@ public class Telemetry {
      * 
      * @param maxSpeed Maximum speed in meters per second
      */
-    public Telemetry(double maxSpeed) {
+    public SwerveDrivetrainTelemetry(double maxSpeed) {
         MaxSpeed = maxSpeed;
     }
 
