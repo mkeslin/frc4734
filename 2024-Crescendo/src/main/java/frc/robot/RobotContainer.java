@@ -7,9 +7,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.AcquireNoteCommand;
-import frc.robot.Commands.ShootSpeakerNoteCommand;
+import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.PathPlanner;
+import frc.robot.Subsystems.AprilTagAligner;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.*;
@@ -22,28 +23,22 @@ public class RobotContainer {
     // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // SUBSYSTEMS
-    private Intake intake = new Intake();
-    private Shooter shooter = new Shooter();
-    // private Elevator horizontalElevator;
-    // private Elevator verticalElevator;
-
     // CONTROLLERS
     private final CommandXboxController driveController = new CommandXboxController(ControllerIds.XC1ID);
     // private final CommandXboxController mechanismController = new CommandXboxController(
     //     ControllerIds.XC2ID
     // );
 
-    // COMMANDS
-    // private final AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(
-    //     null,
-    //     null,
-    //     intake
-    // );
-
     // PATHPLANNER
     private final PathPlanner pathPlanner = new PathPlanner(drivetrain);
     private final SendableChooser<Command> autoChooser;
+
+    // SUBSYSTEMS
+    private Intake intake = new Intake();
+    private Shooter shooter = new Shooter();
+    private AprilTagAligner aprilTagAligner = new AprilTagAligner(null, pathPlanner);
+    // private Elevator horizontalElevator;
+    // private Elevator verticalElevator;
 
     public RobotContainer() {
         // initialize subsystems
@@ -54,9 +49,9 @@ public class RobotContainer {
 
         // Register Named Commands
         NamedCommands.registerCommand("acquireNote", new AcquireNoteCommand(null, pathPlanner, intake));
-        NamedCommands.registerCommand("shootSpeakerNote", new ShootSpeakerNoteCommand(null, pathPlanner, shooter));
-        // NamedCommands.registerCommand("exampleCommand", exampleSubsystem.exampleCommand());
-        // NamedCommands.registerCommand("someOtherCommand", new SomeOtherCommand());
+        NamedCommands.registerCommand("shootSpeakerNote", new ShootSpeakerCommand(null, pathPlanner, shooter, aprilTagAligner));
+        // NamedCommands.registerCommand("shootAmpNote", new ShootAmpCommand(null, pathPlanner, intake, aprilTagAligner));
+        // NamedCommands.registerCommand("shootTrapNote", new ShootTrapCommand(null, pathPlanner, intake, aprilTagAligner));
 
         // configure bindings
         SwerveDrivetrainBindings.configureBindings(driveController, drivetrain);

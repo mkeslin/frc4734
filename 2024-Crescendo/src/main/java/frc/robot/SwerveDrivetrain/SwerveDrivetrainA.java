@@ -96,7 +96,7 @@ public class SwerveDrivetrainA {
         .withCouplingGearRatio(kCoupleRatio)
         .withSteerMotorInverted(kSteerMotorReversed);
 
-    private static final double wheelPositionInches = 10.5;
+    // private static final double wheelPositionInches = 10.5;
     // private static final double wheelPositionInches = 10.625;
 
     // Front Left
