@@ -10,9 +10,10 @@ import frc.robot.Commands.AcquireNoteCommand;
 import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.PathPlanner;
-import frc.robot.Subsystems.AprilTagAligner;
+import frc.robot.Subsystems.LimelightAligner;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.SwerveDrivetrain.*;
 
 public class RobotContainer {
@@ -34,9 +35,10 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     // SUBSYSTEMS
+    private Limelight limelight = new Limelight();
     private Intake intake = new Intake();
     private Shooter shooter = new Shooter();
-    private AprilTagAligner aprilTagAligner = new AprilTagAligner(null, pathPlanner);
+    private LimelightAligner limelightAligner = new LimelightAligner(limelight, pathPlanner);
     // private Elevator horizontalElevator;
     // private Elevator verticalElevator;
 
@@ -48,8 +50,8 @@ public class RobotContainer {
         //     new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
 
         // Register Named Commands
-        NamedCommands.registerCommand("acquireNote", new AcquireNoteCommand(null, pathPlanner, intake));
-        NamedCommands.registerCommand("shootSpeakerNote", new ShootSpeakerCommand(null, pathPlanner, shooter, aprilTagAligner));
+        NamedCommands.registerCommand("acquireNote", new AcquireNoteCommand(limelight, pathPlanner, intake, limelightAligner));
+        NamedCommands.registerCommand("shootSpeakerNote", new ShootSpeakerCommand(limelight, pathPlanner, shooter, limelightAligner));
         // NamedCommands.registerCommand("shootAmpNote", new ShootAmpCommand(null, pathPlanner, intake, aprilTagAligner));
         // NamedCommands.registerCommand("shootTrapNote", new ShootTrapCommand(null, pathPlanner, intake, aprilTagAligner));
 

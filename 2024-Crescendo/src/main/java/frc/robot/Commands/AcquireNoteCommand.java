@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.LimelightAligner;
 
 /*
  * Use limelight to find note
@@ -24,7 +25,12 @@ public class AcquireNoteCommand extends SequentialCommandGroup {
     // private final PathPlanner m_pathPlanner;
     // private final Intake m_intake;
 
-    public AcquireNoteCommand(Limelight limelight, PathPlanner pathPlanner, Intake intake) {
+    public AcquireNoteCommand(
+        Limelight limelight, 
+        PathPlanner pathPlanner, 
+        Intake intake, 
+        LimelightAligner limelightAligner
+    ) {
         // super(2);
 
         // m_limelight = limelight;
@@ -35,7 +41,7 @@ public class AcquireNoteCommand extends SequentialCommandGroup {
 
         addCommands(
             // use limelight to position robot in front of note
-
+            // limelightAligner.alignToTag(),
             // wait
             Commands.waitSeconds(2),
             // start intake motors
