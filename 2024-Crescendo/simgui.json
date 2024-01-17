@@ -1,4 +1,18 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "Pigeon 2 (v6)[0]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[118]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -18,6 +32,29 @@
       "/SmartDashboard/On-the-fly path": "Command",
       "/SmartDashboard/Pathfind to closest notes": "Command",
       "/SmartDashboard/Pathfind to not implemented": "Command"
+    },
+    "windows": {
+      "/Pose": {
+        "bottom": 544,
+        "builtin": "2024 Crescendo",
+        "height": 8.013679504394531,
+        "left": 46,
+        "right": 1088,
+        "robotPose": {
+          "length": 0.5333999991416931,
+          "width": 0.5333999991416931
+        },
+        "top": 36,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Go to Speaker": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
@@ -42,7 +79,9 @@
             "open": true
           }
         },
-        "open": true
+        "Go to Amp": {
+          "open": true
+        }
       }
     }
   },
