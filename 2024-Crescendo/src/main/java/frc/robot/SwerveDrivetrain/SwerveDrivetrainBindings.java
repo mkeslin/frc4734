@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class SwerveDrivetrainBindings {
 
-    private static final double MaxSpeed = SwerveDrivetrainConstants.MaxSpeed;
-    private static final double MaxAngularRate = SwerveDrivetrainConstants.MaxAngularRate;
+    private static final double MaxSpeed = DrivetrainConstants.MaxSpeed;
+    private static final double MaxAngularRate = DrivetrainConstants.MaxAngularRate;
 
     private static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
         .withDeadband(MaxSpeed * 0.1)

@@ -66,4 +66,18 @@ public class Limelight extends SubsystemBase {
         //SmartDashboard.putNumber("lime-target-yaw", getTargetYaw());
         SmartDashboard.putNumber("lime-area", getArea());
     }
+
+    //////////////////////////////////////////
+
+    public boolean canShootAmp() {
+        return false;
+    }
+
+    public boolean canShootSpeaker() {
+        return false;
+    }
+
+    public boolean canClimb() {
+        return false;
+    }
 }
