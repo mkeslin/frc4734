@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
+import frc.robot.SwerveDrivetrain.DrivetrainConstants;
 import java.util.List;
 
 public class PathPlanner extends SubsystemBase {
@@ -37,7 +38,6 @@ public class PathPlanner extends SubsystemBase {
         SmartDashboard.putData("Go to Stage 1", moveToStage1());
         SmartDashboard.putData("Go to Stage 2", moveToStage2());
         SmartDashboard.putData("Go to Stage 3", moveToStage3());
-
         // Add a button to SmartDashboard that will create and follow an on-the-fly path
         // This example will simply move the robot 2m in the +X field direction
         // SmartDashboard.putData("On-the-fly path", moveRelative(2.0, 0.0));
@@ -45,8 +45,8 @@ public class PathPlanner extends SubsystemBase {
 
     public Command moveToPose(Pose2d pose) {
         var constraints = new PathConstraints(
-            4.0,
-            4.0,
+            DrivetrainConstants.MaxSpeed,
+            DrivetrainConstants.MaxAcceleration,
             Units.degreesToRadians(360),
             Units.degreesToRadians(540)
         );
@@ -59,17 +59,14 @@ public class PathPlanner extends SubsystemBase {
 
             // The rotation component in these poses represents the direction of travel
             Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
-            Pose2d endPos = new Pose2d(
-                currentPose.getTranslation().plus(new Translation2d(x, y)),
-                new Rotation2d()
-            );
+            Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(x, y)), new Rotation2d());
 
             List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(startPos, endPos);
             PathPlannerPath path = new PathPlannerPath(
                 bezierPoints,
                 new PathConstraints(
-                    4.0,
-                    4.0,
+                    DrivetrainConstants.MaxSpeed,
+                    DrivetrainConstants.MaxAcceleration,
                     Units.degreesToRadians(360),
                     Units.degreesToRadians(540)
                 ),
@@ -81,6 +78,15 @@ public class PathPlanner extends SubsystemBase {
 
             AutoBuilder.followPath(path).schedule();
         });
+    }
+
+    public Command moveForward(double distance) {
+        Pose2d currentPose = m_drivetrain.getPose();
+
+        var y = currentPose.getRotation().getSin() * distance;
+        var x = currentPose.getRotation().getCos() * distance;
+
+        return moveRelative(x, y);
     }
 
     // Hard-coded

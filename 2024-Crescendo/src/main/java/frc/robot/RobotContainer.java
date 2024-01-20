@@ -7,9 +7,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.AcquireNoteCommand;
+import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.PathPlanner;
+import frc.robot.Subsystems.LimelightAligner;
 import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.SwerveDrivetrain.*;
 
 public class RobotContainer {
@@ -20,29 +24,23 @@ public class RobotContainer {
     // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // SUBSYSTEMS
-    private Intake intake = new Intake();
-    // private Elevator horizontalElevator;
-    // private Elevator verticalElevator;
-
     // CONTROLLERS
-    private final CommandXboxController driveController = new CommandXboxController(
-        ControllerIds.XC1ID
-    );
+    private final CommandXboxController driveController = new CommandXboxController(ControllerIds.XC1ID);
     // private final CommandXboxController mechanismController = new CommandXboxController(
     //     ControllerIds.XC2ID
-    // );
-
-    // COMMANDS
-    // private final AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(
-    //     null,
-    //     null,
-    //     intake
     // );
 
     // PATHPLANNER
     private final PathPlanner pathPlanner = new PathPlanner(drivetrain);
     private final SendableChooser<Command> autoChooser;
+
+    // SUBSYSTEMS
+    private Limelight limelight = new Limelight();
+    private Intake intake = new Intake();
+    private Shooter shooter = new Shooter();
+    private LimelightAligner limelightAligner = new LimelightAligner(limelight, pathPlanner);
+    // private Elevator horizontalElevator;
+    // private Elevator verticalElevator;
 
     public RobotContainer() {
         // initialize subsystems
@@ -52,9 +50,10 @@ public class RobotContainer {
         //     new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
 
         // Register Named Commands
-        NamedCommands.registerCommand("acquireNote", new AcquireNoteCommand(null, null, intake));
-        // NamedCommands.registerCommand("exampleCommand", exampleSubsystem.exampleCommand());
-        // NamedCommands.registerCommand("someOtherCommand", new SomeOtherCommand());
+        NamedCommands.registerCommand("acquireNote", new AcquireNoteCommand(limelight, pathPlanner, intake, limelightAligner));
+        NamedCommands.registerCommand("shootSpeakerNote", new ShootSpeakerCommand(limelight, pathPlanner, shooter, limelightAligner));
+        // NamedCommands.registerCommand("shootAmpNote", new ShootAmpCommand(null, pathPlanner, intake, aprilTagAligner));
+        // NamedCommands.registerCommand("shootTrapNote", new ShootTrapCommand(null, pathPlanner, intake, aprilTagAligner));
 
         // configure bindings
         SwerveDrivetrainBindings.configureBindings(driveController, drivetrain);
