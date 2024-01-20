@@ -51,7 +51,7 @@ public class SwerveDrivetrainB {
 //     private static final boolean kInvertRightSide = true;
 
     private static final String kCANbusName = "";
-    private static final int kPigeonId = 0;
+    private static final int kPigeonId = 30;
 
 
     // These are only used for simulation
@@ -85,44 +85,44 @@ public class SwerveDrivetrainB {
 
 
     // Front Left
-    private static final int kFrontLeftDriveMotorId = 4;
-    private static final int kFrontLeftSteerMotorId = 6;
-    private static final int kFrontLeftEncoderId = 1;
-    private static final double kFrontLeftEncoderOffset = 0.493408203125;
+    private static final int kFrontLeftDriveMotorId = 31;
+    private static final int kFrontLeftSteerMotorId = 35;
+    private static final int kFrontLeftEncoderId = 42;
+    private static final double kFrontLeftEncoderOffset = -0.3583984375;
 
-    private static final double kFrontLeftXPosInches = 10.5;
-    private static final double kFrontLeftYPosInches = 10.5;
+    private static final double kFrontLeftXPosInches = 13;
+    private static final double kFrontLeftYPosInches = 10.25;
 
     // Front Right
-    private static final int kFrontRightDriveMotorId = 2;
-    private static final int kFrontRightSteerMotorId = 0;
-    private static final int kFrontRightEncoderId = 0;
-    private static final double kFrontRightEncoderOffset = 0.44384765625;
+    private static final int kFrontRightDriveMotorId = 32;
+    private static final int kFrontRightSteerMotorId = 36;
+    private static final int kFrontRightEncoderId = 41;
+    private static final double kFrontRightEncoderOffset = 0.1982421875;
 
-    private static final double kFrontRightXPosInches = 10.5;
-    private static final double kFrontRightYPosInches = -10.5;
+    private static final double kFrontRightXPosInches = 13;
+    private static final double kFrontRightYPosInches = -10.25;
 
     // Back Left
-    private static final int kBackLeftDriveMotorId = 3;
-    private static final int kBackLeftSteerMotorId = 7;
-    private static final int kBackLeftEncoderId = 2;
+    private static final int kBackLeftDriveMotorId = 33;
+    private static final int kBackLeftSteerMotorId = 37;
+    private static final int kBackLeftEncoderId = 39;
     private static final double kBackLeftEncoderOffset = -0.143798828125;
 
-    private static final double kBackLeftXPosInches = -10.5;
-    private static final double kBackLeftYPosInches = 10.5;
+    private static final double kBackLeftXPosInches = -13;
+    private static final double kBackLeftYPosInches = 10.25;
 
     // Back Right
-    private static final int kBackRightDriveMotorId = 5;
-    private static final int kBackRightSteerMotorId = 1;
-    private static final int kBackRightEncoderId = 3;
+    private static final int kBackRightDriveMotorId = 34;
+    private static final int kBackRightSteerMotorId = 38;
+    private static final int kBackRightEncoderId = 40;
     private static final double kBackRightEncoderOffset = 0.47412109375;
 
-    private static final double kBackRightXPosInches = -10.5;
-    private static final double kBackRightYPosInches = -10.5;
+    private static final double kBackRightXPosInches = -13;
+    private static final double kBackRightYPosInches = -10.25;
 
 
     private static final SwerveModuleConstants FrontLeft = ConstantCreator.createModuleConstants(
-            kFrontLeftSteerMotorId, kFrontLeftDriveMotorId, kFrontLeftEncoderId, kFrontLeftEncoderOffset, Units.inchesToMeters(kFrontLeftXPosInches), Units.inchesToMeters(kFrontLeftYPosInches), false);
+            kFrontLeftSteerMotorId, kFrontLeftDriveMotorId, kFrontLeftEncoderId, kFrontLeftEncoderOffset, Units.inchesToMeters(kFrontLeftXPosInches), Units.inchesToMeters(kFrontLeftYPosInches), true);
     private static final SwerveModuleConstants FrontRight = ConstantCreator.createModuleConstants(
             kFrontRightSteerMotorId, kFrontRightDriveMotorId, kFrontRightEncoderId, kFrontRightEncoderOffset, Units.inchesToMeters(kFrontRightXPosInches), Units.inchesToMeters(kFrontRightYPosInches), true);
     private static final SwerveModuleConstants BackLeft = ConstantCreator.createModuleConstants(
