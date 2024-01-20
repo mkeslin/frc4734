@@ -20,8 +20,8 @@ public class RobotContainer {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // DRIVETRAIN
-    private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainA.DriveTrain;
-    // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
+    // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainA.DriveTrain;
+    private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // CONTROLLERS
