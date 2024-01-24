@@ -10,18 +10,18 @@ import frc.robot.Commands.AcquireNoteCommand;
 import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.PathPlanner;
-import frc.robot.Subsystems.LimelightAligner;
-import frc.robot.Subsystems.Intake;
-import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.LimelightAligner;
+import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.*;
 
 public class RobotContainer {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // DRIVETRAIN
-    // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainA.DriveTrain;
-    private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
+    private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainA.DriveTrain;
+    // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // CONTROLLERS
@@ -39,6 +39,8 @@ public class RobotContainer {
     private Intake intake = new Intake();
     private Shooter shooter = new Shooter();
     private LimelightAligner limelightAligner = new LimelightAligner(limelight, pathPlanner);
+
+    // private TelescopeArm telescopeArm = new TelescopeArm();
     // private Elevator horizontalElevator;
     // private Elevator verticalElevator;
 
@@ -59,6 +61,15 @@ public class RobotContainer {
         SwerveDrivetrainBindings.configureBindings(driveController, drivetrain);
         // HorizontalElevatorBindings.configureBindings(mechanismController, horizontalElevator);
         // VerticalElevatorBindings.configureBindings(mechanismController, verticalElevator);
+
+        // intake
+        // driveController.y().onTrue(intake.isOn() ? intake.commandStop() : intake.commandStartIn());
+        driveController.y().onTrue(intake.commandStartIn());
+        driveController.x().onTrue(intake.commandStop());
+
+        // shooter
+        driveController.rightBumper().onTrue(shooter.commandShoot());
+        driveController.leftBumper().onTrue(shooter.commandStop());
 
         // PathPlanner
         autoChooser = AutoBuilder.buildAutoChooser("Auto-1");

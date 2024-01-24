@@ -9,16 +9,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
 
-    private TalonFX wheels1;
-    private TalonFX wheels2;
+    private TalonFX rollerBottom;
+    private TalonFX rollerTop;
 
     public Shooter() {
-        wheels1 = new TalonFX(INTAKELEFTID);
-        wheels2 = new TalonFX(INTAKERIGHTID);
+        rollerBottom = new TalonFX(SHOOTERBOTTOMID);
+        rollerTop = new TalonFX(SHOOTERTOPID);
+        // roller.getConfigurator().apply(new Config);
     }
 
     public Command commandShoot() {
-        return Commands.run(() -> this.shoot());
+        return Commands.runOnce(() -> this.shoot());
+    }
+
+    public Command commandShoot(double speed) {
+        return Commands.runOnce(() -> this.shoot(speed));
     }
 
     public Command commandStop() {
@@ -26,12 +31,16 @@ public class Shooter extends SubsystemBase {
     }
 
     public void shoot() {
-        wheels1.set(1);
-        wheels2.set(1);
+        shoot(.55);
+    }
+
+    public void shoot(double speed) {
+        rollerBottom.set(-speed);
+        rollerTop.set(speed);
     }
 
     public void stop() {
-        wheels1.set(0);
-        wheels2.set(0);
+        rollerBottom.set(0);
+        rollerTop.set(0);
     }
 }

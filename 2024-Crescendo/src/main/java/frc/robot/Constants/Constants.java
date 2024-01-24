@@ -25,8 +25,12 @@ public class Constants {
     public static final int VERTELEVATOR1ID = 115;
     public static final int VERTELEVATOR2ID = 116;
     public static final int ROTATEARMID = 117;
-    public static final int INTAKELEFTID = 118;
-    public static final int INTAKERIGHTID = 119;
+
+    public static final int INTAKEID = 50;
+    public static final int SHOOTERBOTTOMID = 51;
+    public static final int SHOOTERTOPID = 52;
+
+    // public static final int INTAKERIGHTID = 119;
     public static final int PNEUMATICHUBID = 120;
 
     // public static final double WBL = 0.58; //Wheelbase length 19.5in 0.50m
