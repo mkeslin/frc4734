@@ -64,12 +64,12 @@
     },
     {
       "anchor": {
-        "x": 3.6447138884125474,
-        "y": 6.7674606009110505
+        "x": 2.7310308543584263,
+        "y": 7.01
       },
       "prevControl": {
-        "x": 3.0528819942858982,
-        "y": 6.7674606009110505
+        "x": 2.139198960231777,
+        "y": 7.01
       },
       "nextControl": null,
       "isLocked": false,
@@ -83,9 +83,50 @@
       "name": "acquireNote",
       "waypointRelativePos": 1.1500000000000001,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
-          "commands": []
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "acquireNote"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "acquireNote",
+      "waypointRelativePos": 2.1,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "acquireNote"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 3.15,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "acquireNote"
+              }
+            }
+          ]
         }
       }
     }

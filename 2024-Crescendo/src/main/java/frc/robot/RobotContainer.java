@@ -71,6 +71,10 @@ public class RobotContainer {
         driveController.rightBumper().onTrue(shooter.commandShoot());
         driveController.leftBumper().onTrue(shooter.commandStop());
 
+        // pathplanner buttons
+        driveController.rightTrigger().onTrue(pathPlanner.moveToSource());
+        driveController.leftTrigger().onTrue(pathPlanner.moveToStartA());
+
         // PathPlanner
         autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
         SmartDashboard.putData("Auto Mode", autoChooser);
