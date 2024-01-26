@@ -9,7 +9,7 @@ import frc.robot.Subsystems.Shooter;
 
 public class ShootSpeakerCommand extends SequentialCommandGroup {
 
-    public ShootSpeakerCommand(Limelight limelight, PathPlanner pathPlanner, Shooter shooter, LimelightAligner limelightAligner) {
+    public ShootSpeakerCommand(Limelight shooterLimelight, Limelight intakeLimelight, PathPlanner pathPlanner, Shooter shooter, LimelightAligner limelightAligner) {
         addCommands(
             // rotate to speaker
             pathPlanner.moveToSpeaker(),

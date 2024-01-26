@@ -8,7 +8,7 @@ import frc.robot.Subsystems.Cameras.Limelight;
 
 public class LimelightAligner extends SubsystemBase {
 
-    public LimelightAligner(Limelight limelight, PathPlanner pathPlanner) {}
+    public LimelightAligner(Limelight shooterLimelight, Limelight intakeLimelight, PathPlanner pathPlanner) {}
 
     public Command alignToTag(int aprilTagId) {
         return Commands.runOnce(() -> {});

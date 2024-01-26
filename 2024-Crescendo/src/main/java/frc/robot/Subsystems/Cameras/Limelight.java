@@ -9,12 +9,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Limelight extends SubsystemBase {
 
-    public static NetworkTable table; //check if static variable works; otherwise, use script from 2022
-    public static NetworkTable table2;
+    //public static NetworkTable table; //check if static variable works; otherwise, use script from 2022
+    //public static NetworkTable table2;
 
-    public Limelight() {
-        table = NetworkTableInstance.getDefault().getTable("limelight-one");
-        table2 = NetworkTableInstance.getDefault().getTable("limelight-two");
+    public static NetworkTable table;
+
+    public Limelight(String t, int p) {
+        table = NetworkTableInstance.getDefault().getTable(t);
+        setPipeline(p);
     }
 
     /**

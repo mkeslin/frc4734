@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static frc.robot.Constants.Constants.APRILTAGPIPELINE;
+import static frc.robot.Constants.Constants.NOTEPIPELINE;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -26,19 +29,18 @@ public class RobotContainer {
 
     // CONTROLLERS
     private final CommandXboxController driveController = new CommandXboxController(ControllerIds.XC1ID);
-    // private final CommandXboxController mechanismController = new CommandXboxController(
-    //     ControllerIds.XC2ID
-    // );
+    private final CommandXboxController mechanismController = new CommandXboxController(ControllerIds.XC2ID);
 
     // PATHPLANNER
     private final PathPlanner pathPlanner = new PathPlanner(drivetrain);
     private final SendableChooser<Command> autoChooser;
 
     // SUBSYSTEMS
-    private Limelight limelight = new Limelight();
+    private Limelight shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
+    private Limelight intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
     private Intake intake = new Intake();
     private Shooter shooter = new Shooter();
-    private LimelightAligner limelightAligner = new LimelightAligner(limelight, pathPlanner);
+    private LimelightAligner limelightAligner = new LimelightAligner(shooterLimelight, intakeLimelight, pathPlanner);
 
     // private TelescopeArm telescopeArm = new TelescopeArm();
     // private Elevator horizontalElevator;
@@ -52,8 +54,8 @@ public class RobotContainer {
         //     new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
 
         // Register Named Commands
-        NamedCommands.registerCommand("acquireNote", new AcquireNoteCommand(limelight, pathPlanner, intake, limelightAligner));
-        NamedCommands.registerCommand("shootSpeakerNote", new ShootSpeakerCommand(limelight, pathPlanner, shooter, limelightAligner));
+        NamedCommands.registerCommand("acquireNote", new AcquireNoteCommand(shooterLimelight, intakeLimelight, pathPlanner, intake, limelightAligner));
+        NamedCommands.registerCommand("shootSpeakerNote", new ShootSpeakerCommand(shooterLimelight, intakeLimelight, pathPlanner, shooter, limelightAligner));
         // NamedCommands.registerCommand("shootAmpNote", new ShootAmpCommand(null, pathPlanner, intake, aprilTagAligner));
         // NamedCommands.registerCommand("shootTrapNote", new ShootTrapCommand(null, pathPlanner, intake, aprilTagAligner));
 
@@ -79,6 +81,9 @@ public class RobotContainer {
         autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
         SmartDashboard.putData("Auto Mode", autoChooser);
         pathPlanner.configure();
+
+        // note alignment
+
     }
 
     public Command getAutonomousCommand() {

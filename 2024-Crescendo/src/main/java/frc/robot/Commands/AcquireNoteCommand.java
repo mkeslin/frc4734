@@ -26,7 +26,8 @@ public class AcquireNoteCommand extends SequentialCommandGroup {
     // private final Intake m_intake;
 
     public AcquireNoteCommand(
-        Limelight limelight, 
+        Limelight shooterLimelight, 
+        Limelight intakeLimelight,
         PathPlanner pathPlanner, 
         Intake intake, 
         LimelightAligner limelightAligner

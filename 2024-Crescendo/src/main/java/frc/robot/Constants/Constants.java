@@ -30,6 +30,9 @@ public class Constants {
     public static final int SHOOTERBOTTOMID = 51;
     public static final int SHOOTERTOPID = 52;
 
+    public static final int APRILTAGPIPELINE = 0;
+    public static final int NOTEPIPELINE = 1;
+
     // public static final int INTAKERIGHTID = 119;
     public static final int PNEUMATICHUBID = 120;
 
