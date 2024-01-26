@@ -3,6 +3,8 @@ package frc.robot.SwerveDrivetrain;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -24,11 +26,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
-    public CommandSwerveDrivetrain(
-        SwerveDrivetrainConstants driveTrainConstants,
-        double OdometryUpdateFrequency,
-        SwerveModuleConstants... modules
-    ) {
+    public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
         if (Utils.isSimulation()) {
             startSimThread();
@@ -36,10 +34,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         configurePathPlanner();
     }
 
-    public CommandSwerveDrivetrain(
-        SwerveDrivetrainConstants driveTrainConstants,
-        SwerveModuleConstants... modules
-    ) {
+    public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
         if (Utils.isSimulation()) {
             startSimThread();
@@ -98,9 +93,23 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For use with PathPlanner
-    private SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric();
+    // private static final double MaxSpeed = DrivetrainConstants.MaxSpeed;
+    // private static final double MaxAngularRate = DrivetrainConstants.MaxAngularRate;
+
+    // private SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric()
+    //     .withDeadband(MaxSpeed * 0.1)
+    //     .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+    //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
+    //     .withSteerRequestType(SteerRequestType.MotionMagicExpo);
+
+    private SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
+        // .withDeadband(MaxSpeed * 0.1)
+        // .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
+        .withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
     public Pose2d getPose() {
+        // return this.m_cachedState.Pose;
         return this.m_odometry.getEstimatedPosition();
     }
 
@@ -109,7 +118,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public ChassisSpeeds getRobotRelativeSpeeds() {
-        return this.m_kinematics.toChassisSpeeds(this.m_cachedState.ModuleStates);
+        // return this.m_kinematics.toChassisSpeeds(this.m_cachedState.ModuleStates);
+
+        // var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(2.0, 2.0, Math.PI / 2.0, Rotation2d.fromDegrees(45.0));
+
+        var vx = driveRequest.VelocityX;
+        var vy = driveRequest.VelocityY;
+        var omega = driveRequest.RotationalRate;
+        return new ChassisSpeeds(vx, vy, omega);
     }
 
     public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {

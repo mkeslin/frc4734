@@ -7,6 +7,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class SwerveDrivetrainBindings {
@@ -23,19 +24,25 @@ public class SwerveDrivetrainBindings {
     private static final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     private static final SwerveDrivetrainTelemetry logger = new SwerveDrivetrainTelemetry(MaxSpeed);
 
-    public static void configureBindings(
-        CommandXboxController driveController,
-        CommandSwerveDrivetrain drivetrain
-    ) {
+    public static void configureBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
         // Drivetrain will execute this command periodically
         // Sticks
         drivetrain.setDefaultCommand(
-            drivetrain.applyRequest(() ->
+            drivetrain.applyRequest(() -> {
+                // flip the orientation for blue/red
+                var coordinateOrientation = -1;
+                var alliance = DriverStation.getAlliance();
+                if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+                    coordinateOrientation = 1;
+                }
+
                 drive
-                    .withVelocityX(-driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driveController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
+                    .withVelocityX(coordinateOrientation * driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(coordinateOrientation * driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-driveController.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+
+                return drive;
+            })
         );
 
         // A Button: Brake
@@ -45,11 +52,7 @@ public class SwerveDrivetrainBindings {
         driveController
             .b()
             .whileTrue(
-                drivetrain.applyRequest(() ->
-                    point.withModuleDirection(
-                        new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX())
-                    )
-                )
+                drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX())))
             );
 
         // test path
@@ -68,9 +71,7 @@ public class SwerveDrivetrainBindings {
         //     );
 
         if (Utils.isSimulation()) {
-            drivetrain.seedFieldRelative(
-                new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90))
-            );
+            drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         }
 
         drivetrain.registerTelemetry(logger::telemeterize);
