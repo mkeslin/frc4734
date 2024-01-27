@@ -48,7 +48,7 @@ public class AcquireNoteCommand extends SequentialCommandGroup {
             // start intake motors
             intake.commandStartIn(),
             // drive forward to intake note
-            pathPlanner.moveForward(.2),
+            //pathPlanner.moveForwardRobot(.2),
             // wait
             Commands.waitSeconds(2),
             // stop intake motors

@@ -80,13 +80,13 @@ public class PathPlanner extends SubsystemBase {
         });
     }
 
-    public Command moveForward(double distance) {
-        Pose2d currentPose = m_drivetrain.getPose();
+    public Command moveForwardRobot(double distance) {
+        //Pose2d currentPose = m_drivetrain.getPose();
 
-        var y = currentPose.getRotation().getSin() * distance;
-        var x = currentPose.getRotation().getCos() * distance;
+        //var y = currentPose.getRotation().getSin() * distance;
+        //var x = currentPose.getRotation().getCos() * distance;
 
-        return moveRelative(x, y);
+        return moveRelative(distance, 0);
     }
 
     // Hard-coded
