@@ -1,5 +1,8 @@
 package frc.robot.PathPlanner;
 
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -53,13 +56,13 @@ public class PathPlanner extends SubsystemBase {
         return AutoBuilder.pathfindToPose(pose, constraints, 0, 0);
     }
 
-    public Command moveRelative(double x, double y) {
-        return Commands.runOnce(() -> {
+    public void moveRelative(double x, double y, double rot) {
+        // return Commands.runOnce(() -> {
             Pose2d currentPose = m_drivetrain.getPose();
 
             // The rotation component in these poses represents the direction of travel
             Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
-            Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(x, y)), new Rotation2d());
+            Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(x, y)), new Rotation2d().plus(new Rotation2d(rot)));
 
             List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(startPos, endPos);
             PathPlannerPath path = new PathPlannerPath(
@@ -75,18 +78,32 @@ public class PathPlanner extends SubsystemBase {
 
             // Prevent this path from being flipped on the red alliance, since the given positions are already correct
             path.preventFlipping = true;
+            SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
+                .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
+                .withSteerRequestType(SteerRequestType.MotionMagicExpo);
+            // return AutoBuilder.followPath(path).schedule();
+            m_drivetrain.applyRequest(() -> {
+                driveRequest.withVelocityX(x) // Drive forward with negative Y (forward)
+                    .withVelocityY(y) // Drive left with negative X (left)
+                    .withRotationalRate(rot); // Drive counterclockwise with negative X (left)
 
-            AutoBuilder.followPath(path).schedule();
-        });
+                return driveRequest;
+            });
+        // });
     }
 
-    public Command moveForwardRobot(double distance) {
+    public void moveForwardRobot(double distance) {
         //Pose2d currentPose = m_drivetrain.getPose();
 
         //var y = currentPose.getRotation().getSin() * distance;
         //var x = currentPose.getRotation().getCos() * distance;
 
-        return moveRelative(distance, 0);
+        moveRelative(distance, 0, 0);
+    }
+
+    public void rotateRobot(double degrees) {
+        double radians = degrees * Math.PI/180;
+        moveRelative(0, 0, radians);
     }
 
     // Hard-coded
