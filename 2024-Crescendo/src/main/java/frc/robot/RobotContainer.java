@@ -83,7 +83,8 @@ public class RobotContainer {
         pathPlanner.configure();
 
         // note alignment
-
+        mechanismController.a().onTrue(limelightAligner.alignToNote());
+        mechanismController.b().onTrue(limelightAligner.alignToTag(1));
     }
 
     public Command getAutonomousCommand() {

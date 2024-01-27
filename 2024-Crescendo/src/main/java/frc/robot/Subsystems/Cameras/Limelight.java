@@ -12,7 +12,7 @@ public class Limelight extends SubsystemBase {
     //public static NetworkTable table; //check if static variable works; otherwise, use script from 2022
     //public static NetworkTable table2;
 
-    public static NetworkTable table;
+    public NetworkTable table;
 
     public Limelight(String t, int p) {
         table = NetworkTableInstance.getDefault().getTable(t);
@@ -22,14 +22,14 @@ public class Limelight extends SubsystemBase {
     /**
      * @return X value of limelight
      */
-    public static double getX() {
+    public double getX() {
         return (table.getEntry("tx").getDouble(0.0));
     }
 
     /**
      * @return Y value of limelight
      */
-    public static double getY() {
+    public double getY() {
         return (table.getEntry("ty").getDouble(0.0));
     }
 
@@ -40,7 +40,7 @@ public class Limelight extends SubsystemBase {
     /**
      * @return Area value of limelight
      */
-    public static double getArea() {
+    public double getArea() {
         return (table.getEntry("ta").getDouble(0.0));
     }
 
@@ -48,7 +48,7 @@ public class Limelight extends SubsystemBase {
      * Turns the limelight on and off
      * @param b true if on, false if off
      */
-    public static void status(boolean b) {
+    public void status(boolean b) {
         if (b) {
             table.getEntry("ledMode").setNumber(3);
         } else {
@@ -56,15 +56,19 @@ public class Limelight extends SubsystemBase {
         }
     }
 
-    public static double getPipeline() {
+    public double getPipeline() {
         return (table.getEntry("pipeline").getDouble(0));
     }
 
-    public static void setPipeline(int p) {
+    public double getAprilTagID() {
+        return (table.getEntry("tid").getDouble(0));
+    }
+
+    public void setPipeline(int p) {
         table.getEntry("pipeline").setNumber(p);
     }
 
-    public static void putNums() {
+    public void putNums() {
         SmartDashboard.putNumber("lime-x", getX());
         SmartDashboard.putNumber("lime-y", getY());
         //SmartDashboard.putNumber("lime-target-yaw", getTargetYaw());
