@@ -16,6 +16,24 @@
           "data": {
             "pathName": "Start-2"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "acquireNote"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "acquireNote"
+          }
         }
       ]
     }
