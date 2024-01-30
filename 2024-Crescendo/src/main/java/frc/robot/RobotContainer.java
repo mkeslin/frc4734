@@ -53,9 +53,20 @@ public class RobotContainer {
         // verticalElevator =
         //     new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
 
+        var acquireNoteCommand = new AcquireNoteCommand(shooterLimelight, intakeLimelight, pathPlanner, intake, limelightAligner);
+
         // Register Named Commands
-        NamedCommands.registerCommand("acquireNote", new AcquireNoteCommand(shooterLimelight, intakeLimelight, pathPlanner, intake, limelightAligner));
-        NamedCommands.registerCommand("shootSpeakerNote", new ShootSpeakerCommand(shooterLimelight, intakeLimelight, pathPlanner, shooter, limelightAligner));
+        NamedCommands.registerCommand(
+            "acquireNote",
+            acquireNoteCommand
+            // intake.commandStartIn().andThen(Commands.waitSeconds(2).andThen(intake.commandStop()))
+        );
+        NamedCommands.registerCommand(
+            "shootSpeakerNote",
+            new ShootSpeakerCommand(shooterLimelight, intakeLimelight, pathPlanner, shooter, limelightAligner)
+        );
+        // var acquireNoteCommand = new AcquireNoteCommand(limelight, pathPlanner, intake, limelightAligner);
+        // NamedCommands.registerCommand("acquireNote", acquireNoteCommand.schedule());
         // NamedCommands.registerCommand("shootAmpNote", new ShootAmpCommand(null, pathPlanner, intake, aprilTagAligner));
         // NamedCommands.registerCommand("shootTrapNote", new ShootTrapCommand(null, pathPlanner, intake, aprilTagAligner));
 
@@ -69,9 +80,11 @@ public class RobotContainer {
         driveController.y().onTrue(intake.commandStartIn());
         driveController.x().onTrue(intake.commandStop());
 
+        driveController.rightBumper().onTrue(acquireNoteCommand);
+
         // shooter
-        driveController.rightBumper().onTrue(shooter.commandShoot());
-        driveController.leftBumper().onTrue(shooter.commandStop());
+        // driveController.rightBumper().onTrue(shooter.commandShoot());
+        // driveController.leftBumper().onTrue(shooter.commandStop());
 
         // pathplanner buttons
         driveController.rightTrigger().onTrue(pathPlanner.moveToSource());

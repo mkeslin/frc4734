@@ -4,6 +4,7 @@
 
 package frc.robot.Commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -40,19 +41,25 @@ public class AcquireNoteCommand extends SequentialCommandGroup {
 
         // addRequirements(m_limelight, m_pathPlanner, m_intake);
 
+        SmartDashboard.putString("acquireNote", "I'm here!!!");
+        System.out.println("acquireNote ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
         addCommands(
             // use limelight to position robot in front of note
             // limelightAligner.alignToTag(),
             // wait
+            Commands.print("acquireNote-111111111111111111111111111111111111111"),
             Commands.waitSeconds(2),
+            Commands.print("acquireNote-222222222222222222222222222222222222222"),
             // start intake motors
-            intake.commandStartIn(),
+            // intake.commandStartIn(),
             // drive forward to intake note
             //pathPlanner.moveForwardRobot(.2),
             // wait
             Commands.waitSeconds(2),
+            Commands.print("acquireNote-333333333333333333333333333333333333333")
             // stop intake motors
-            intake.commandStop()
+            // intake.commandStop()
         );
     }
     // Called just before this Command runs the first time

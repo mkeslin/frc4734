@@ -91,6 +91,12 @@
               "data": {
                 "name": "acquireNote"
               }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 2.0
+              }
             }
           ]
         }
@@ -108,13 +114,19 @@
               "data": {
                 "name": "acquireNote"
               }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 2.0
+              }
             }
           ]
         }
       }
     },
     {
-      "name": "New Event Marker",
+      "name": "acquireNote",
       "waypointRelativePos": 3.15,
       "command": {
         "type": "sequential",
@@ -124,6 +136,12 @@
               "type": "named",
               "data": {
                 "name": "acquireNote"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 2.0
               }
             }
           ]
