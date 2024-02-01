@@ -105,7 +105,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
         // .withDeadband(MaxSpeed * 0.1)
         // .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
+        .withDriveRequestType(DriveRequestType.Velocity) // robot-centric driving based on velocity
         .withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
     public Pose2d getPose() {

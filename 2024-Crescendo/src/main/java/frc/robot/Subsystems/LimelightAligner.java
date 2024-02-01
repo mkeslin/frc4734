@@ -13,6 +13,10 @@ public class LimelightAligner extends SubsystemBase {
     public Limelight intakeLimelight;
     public PathPlanner m_PathPlanner;
 
+    private double MAX_WHEEL_STRAFE = 1;
+    private double MAX_CAMERA_X = 30;
+    private double wheelStrafe;
+
     public LimelightAligner(Limelight shooterCamera, Limelight intakeCamera, PathPlanner pathPlanner) {
         intakeLimelight = intakeCamera;
         shooterLimelight = shooterCamera;
@@ -27,7 +31,6 @@ public class LimelightAligner extends SubsystemBase {
         return Commands.run(() -> {
             SmartDashboard.putNumber("bruh", intakeLimelight.getX());
             centerToTarget(intakeLimelight, 0);
-            m_PathPlanner.moveRelative(1, 0, 0);
         });
     }
 
@@ -37,12 +40,14 @@ public class LimelightAligner extends SubsystemBase {
         if(limelight.getArea() > 0.05 && (target < 1 || limelight.getAprilTagID() == target)) {
             //if the target is to the left of the camera's sensor
             if(limelight.getX() < 0) {
-                //m_PathPlanner.moveRelative(10, 0, 0);
                 SmartDashboard.putString("node-pose", "left");
             } else if(limelight.getX() > 0) { //otherwise if the target is to the right
-                //m_PathPlanner.moveRelative(10, 0, 0);
+                
                 SmartDashboard.putString("node-pose", "right");
             }
+            wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (limelight.getX()/MAX_CAMERA_X + 1));
+            m_PathPlanner.moveRelative(1, wheelStrafe, 0);
+
         } else {
             SmartDashboard.putString("node-pose", "none");
         }

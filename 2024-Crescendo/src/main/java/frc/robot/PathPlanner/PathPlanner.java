@@ -10,6 +10,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -78,7 +79,8 @@ public class PathPlanner extends SubsystemBase {
 
             // Prevent this path from being flipped on the red alliance, since the given positions are already correct
             path.preventFlipping = true;
-            SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
+            m_drivetrain.driveRobotRelative(new ChassisSpeeds(x, y, rot));
+            /*SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
                 .withSteerRequestType(SteerRequestType.MotionMagicExpo);
             // return AutoBuilder.followPath(path).schedule();
@@ -86,9 +88,8 @@ public class PathPlanner extends SubsystemBase {
                 driveRequest.withVelocityX(x) // Drive forward with negative Y (forward)
                     .withVelocityY(y) // Drive left with negative X (left)
                     .withRotationalRate(rot); // Drive counterclockwise with negative X (left)
-
                 return driveRequest;
-            });
+            });*/
         // });
     }
 
