@@ -17,7 +17,7 @@ public class SwerveDrivetrainBindings {
 
     private static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
         .withDeadband(MaxSpeed * 0.1)
-        .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+        .withRotationalDeadband(MaxAngularRate * 0.2) // Add a 10% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
         .withSteerRequestType(SteerRequestType.MotionMagicExpo);
     private static final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();

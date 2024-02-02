@@ -1,8 +1,5 @@
 package frc.robot.PathPlanner;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -14,7 +11,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.SwerveDrivetrain.DrivetrainConstants;
@@ -79,7 +75,9 @@ public class PathPlanner extends SubsystemBase {
 
             // Prevent this path from being flipped on the red alliance, since the given positions are already correct
             path.preventFlipping = true;
+
             m_drivetrain.driveRobotRelative(new ChassisSpeeds(x, y, rot));
+            
             /*SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
                 .withSteerRequestType(SteerRequestType.MotionMagicExpo);
@@ -109,30 +107,52 @@ public class PathPlanner extends SubsystemBase {
 
     // Hard-coded
     public Command moveToStartA() {
-        return moveToPose(Landmarks.StartA);
+        return moveToPose(Landmarks.OurStartA);
     }
 
     public Command moveToAmp() {
-        return moveToPose(Landmarks.Amp);
+        return moveToPose(Landmarks.OurAmp);
     }
-
     public Command moveToSpeaker() {
-        return moveToPose(Landmarks.Speaker);
+        return moveToPose(Landmarks.OurSpeaker);
     }
-
     public Command moveToSource() {
-        return moveToPose(Landmarks.Source);
+        return moveToPose(Landmarks.OurSource);
     }
 
     public Command moveToStage1() {
-        return moveToPose(Landmarks.Stage1);
+        return moveToPose(Landmarks.OurStage1);
     }
-
     public Command moveToStage2() {
-        return moveToPose(Landmarks.Stage2);
+        return moveToPose(Landmarks.OurStage2);
+    }
+    public Command moveToStage3() {
+        return moveToPose(Landmarks.OurStage3);
     }
 
-    public Command moveToStage3() {
-        return moveToPose(Landmarks.Stage3);
+    public Command moveToRing1() {
+        return moveToPose(Landmarks.OurRing1);
+    }
+    public Command moveToRing2() {
+        return moveToPose(Landmarks.OurRing2);
+    }
+    public Command moveToRing3() {
+        return moveToPose(Landmarks.OurRing3);
+    }
+
+    public Command moveToRing4() {
+        return moveToPose(Landmarks.OurRing4);
+    }
+    public Command moveToRing5() {
+        return moveToPose(Landmarks.OurRing5);
+    }
+    public Command moveToRing6() {
+        return moveToPose(Landmarks.OurRing6);
+    }
+    public Command moveToRing7() {
+        return moveToPose(Landmarks.OurRing7);
+    }
+    public Command moveToRing8() {
+        return moveToPose(Landmarks.OurRing8);
     }
 }

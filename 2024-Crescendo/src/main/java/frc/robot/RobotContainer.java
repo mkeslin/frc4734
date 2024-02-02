@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.AcquireNoteCommand;
+import frc.robot.Commands.AutoCommand;
 import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.PathPlanner;
@@ -23,24 +24,24 @@ public class RobotContainer {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // DRIVETRAIN
-    private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainA.DriveTrain;
+    private final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.DriveTrain;
     // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // CONTROLLERS
-    private final CommandXboxController driveController = new CommandXboxController(ControllerIds.XC1ID);
-    private final CommandXboxController mechanismController = new CommandXboxController(ControllerIds.XC2ID);
+    private final CommandXboxController m_driveController = new CommandXboxController(ControllerIds.XC1ID);
+    private final CommandXboxController m_mechanismController = new CommandXboxController(ControllerIds.XC2ID);
 
     // PATHPLANNER
-    private final PathPlanner pathPlanner = new PathPlanner(drivetrain);
-    private final SendableChooser<Command> autoChooser;
+    private final PathPlanner m_pathPlanner = new PathPlanner(m_drivetrain);
+    private final SendableChooser<Command> m_autoChooser;
 
     // SUBSYSTEMS
-    private Limelight shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
-    private Limelight intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
-    private Intake intake = new Intake();
-    private Shooter shooter = new Shooter();
-    private LimelightAligner limelightAligner = new LimelightAligner(shooterLimelight, intakeLimelight, pathPlanner);
+    private Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
+    private Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
+    private Intake m_intake = new Intake();
+    private Shooter m_shooter = new Shooter();
+    private LimelightAligner m_limelightAligner = new LimelightAligner(m_shooterLimelight, m_intakeLimelight, m_pathPlanner);
 
     // private TelescopeArm telescopeArm = new TelescopeArm();
     // private Elevator horizontalElevator;
@@ -53,7 +54,7 @@ public class RobotContainer {
         // verticalElevator =
         //     new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
 
-        var acquireNoteCommand = new AcquireNoteCommand(shooterLimelight, intakeLimelight, pathPlanner, intake, limelightAligner);
+        var acquireNoteCommand = new AcquireNoteCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_limelightAligner);
 
         // Register Named Commands
         NamedCommands.registerCommand(
@@ -63,7 +64,7 @@ public class RobotContainer {
         );
         NamedCommands.registerCommand(
             "shootSpeakerNote",
-            new ShootSpeakerCommand(shooterLimelight, intakeLimelight, pathPlanner, shooter, limelightAligner)
+            new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_shooter, m_limelightAligner)
         );
         // var acquireNoteCommand = new AcquireNoteCommand(limelight, pathPlanner, intake, limelightAligner);
         // NamedCommands.registerCommand("acquireNote", acquireNoteCommand.schedule());
@@ -71,39 +72,42 @@ public class RobotContainer {
         // NamedCommands.registerCommand("shootTrapNote", new ShootTrapCommand(null, pathPlanner, intake, aprilTagAligner));
 
         // configure bindings
-        SwerveDrivetrainBindings.configureBindings(driveController, drivetrain);
+        SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
         // HorizontalElevatorBindings.configureBindings(mechanismController, horizontalElevator);
         // VerticalElevatorBindings.configureBindings(mechanismController, verticalElevator);
 
         // intake
         // driveController.y().onTrue(intake.isOn() ? intake.commandStop() : intake.commandStartIn());
-        driveController.y().onTrue(intake.commandStartIn());
-        driveController.x().onTrue(intake.commandStop());
+        m_driveController.y().onTrue(m_intake.commandStartIn());
+        m_driveController.x().onTrue(m_intake.commandStop());
 
-        driveController.rightBumper().onTrue(acquireNoteCommand);
+        m_driveController.rightBumper().onTrue(acquireNoteCommand);
 
         // shooter
         // driveController.rightBumper().onTrue(shooter.commandShoot());
         // driveController.leftBumper().onTrue(shooter.commandStop());
 
         // pathplanner buttons
-        driveController.rightTrigger().onTrue(pathPlanner.moveToSource());
-        driveController.leftTrigger().onTrue(pathPlanner.moveToStartA());
+        // m_driveController.rightTrigger().onTrue(m_pathPlanner.moveToSource());
+        // m_driveController.leftTrigger().onTrue(m_pathPlanner.moveToStartA());
 
         // PathPlanner
-        autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
-        SmartDashboard.putData("Auto Mode", autoChooser);
-        pathPlanner.configure();
+        m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
+        SmartDashboard.putData("Auto Mode", m_autoChooser);
+        m_pathPlanner.configure();
 
         // note alignment
-        mechanismController.a().onTrue(limelightAligner.alignToNote());
-        mechanismController.b().onTrue(limelightAligner.alignToTag(1));
+        // m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
+        // m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
     }
 
     public Command getAutonomousCommand() {
+        // return autoChooser.getSelected();
+        var autoCommand = new AutoCommand(m_pathPlanner);
+        return autoCommand;
+        
         // return Commands.print("No autonomous command configured");
         // return new PathPlannerAuto("Example Auto");
-        return autoChooser.getSelected();
         // Load the path you want to follow using its name in the GUI
         // var path = PathPlannerPath.fromPathFile("Auto-1");
         // Create a path following command using AutoBuilder. This will also trigger event markers.
