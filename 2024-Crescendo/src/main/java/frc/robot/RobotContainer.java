@@ -30,7 +30,7 @@ public class RobotContainer {
 
     // CONTROLLERS
     private final CommandXboxController m_driveController = new CommandXboxController(ControllerIds.XC1ID);
-    // private final CommandXboxController m_mechanismController = new CommandXboxController(ControllerIds.XC2ID);
+    private final CommandXboxController m_mechanismController = new CommandXboxController(ControllerIds.XC2ID);
     // private final CommandXboxController m_arcadeController = new CommandXboxController(ControllerIds.XC3ID);
 
     // PATHPLANNER
@@ -105,8 +105,8 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Mode", m_autoChooser);
         m_pathPlanner.configure();
         // note alignment
-        // m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
-        // m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
+        m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
+        m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
     }
 
     public Command getAutonomousCommand() {
