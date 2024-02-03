@@ -30,8 +30,8 @@ public class RobotContainer {
 
     // CONTROLLERS
     private final CommandXboxController m_driveController = new CommandXboxController(ControllerIds.XC1ID);
-    private final CommandXboxController m_mechanismController = new CommandXboxController(ControllerIds.XC2ID);
-    private final CommandXboxController m_arcadeController = new CommandXboxController(ControllerIds.XC3ID);
+    // private final CommandXboxController m_mechanismController = new CommandXboxController(ControllerIds.XC2ID);
+    // private final CommandXboxController m_arcadeController = new CommandXboxController(ControllerIds.XC3ID);
 
     // PATHPLANNER
     private final PathPlanner m_pathPlanner = new PathPlanner(m_drivetrain);
@@ -91,14 +91,14 @@ public class RobotContainer {
         // pathplanner buttons
         // m_driveController.x().onTrue(m_pathPlanner.moveToOurSource());
 
-        m_arcadeController.x().onTrue(m_pathPlanner.moveToOurSource());
-        m_arcadeController.y().onTrue(m_pathPlanner.moveToOurStage1());
-        m_arcadeController.rightBumper().onTrue(m_pathPlanner.moveToOurSpeaker());
-        m_arcadeController.leftBumper().onTrue(m_pathPlanner.moveToOurAmp());
+        // m_arcadeController.x().onTrue(m_pathPlanner.moveToOurSource());
+        // m_arcadeController.y().onTrue(m_pathPlanner.moveToOurStage1());
+        // m_arcadeController.rightBumper().onTrue(m_pathPlanner.moveToOurSpeaker());
+        // m_arcadeController.leftBumper().onTrue(m_pathPlanner.moveToOurAmp());
 
-        m_arcadeController.a().onTrue(m_pathPlanner.moveToOurRing3());
-        m_arcadeController.b().onTrue(m_pathPlanner.moveToOurRing2());
-        m_arcadeController.rightTrigger().onTrue(m_pathPlanner.moveToOurRing1());
+        // m_arcadeController.a().onTrue(m_pathPlanner.moveToOurRing3());
+        // m_arcadeController.b().onTrue(m_pathPlanner.moveToOurRing2());
+        // m_arcadeController.rightTrigger().onTrue(m_pathPlanner.moveToOurRing1());
 
         // PathPlanner
         m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
