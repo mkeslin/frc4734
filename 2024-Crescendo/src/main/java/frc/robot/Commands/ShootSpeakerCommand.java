@@ -12,7 +12,7 @@ public class ShootSpeakerCommand extends SequentialCommandGroup {
     public ShootSpeakerCommand(Limelight shooterLimelight, Limelight intakeLimelight, PathPlanner pathPlanner, Shooter shooter, LimelightAligner limelightAligner) {
         addCommands(
             // rotate to speaker
-            pathPlanner.moveToSpeaker(),
+            pathPlanner.moveToOurSpeaker(),
             Commands.waitSeconds(1),
             // align to tag
             // limelightAligner.alignToTag(1),

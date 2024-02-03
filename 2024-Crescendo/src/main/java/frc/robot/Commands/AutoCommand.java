@@ -46,7 +46,7 @@ public class AutoCommand extends SequentialCommandGroup {
 
         addCommands(
 
-            pathPlanner.moveToRing1()
+            pathPlanner.moveToOurRing1()
             // limelightAligner
 
             // use limelight to position robot in front of note
