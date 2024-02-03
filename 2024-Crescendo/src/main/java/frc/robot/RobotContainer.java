@@ -82,7 +82,7 @@ public class RobotContainer {
         m_driveController.y().onTrue(m_intake.commandStartIn());
         m_driveController.x().onTrue(m_intake.commandStop());
 
-        m_driveController.rightBumper().onTrue(acquireNoteCommand);
+        // m_driveController.rightBumper().onTrue(acquireNoteCommand);
 
         // shooter
         // driveController.rightBumper().onTrue(shooter.commandShoot());
@@ -104,6 +104,7 @@ public class RobotContainer {
         m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
         SmartDashboard.putData("Auto Mode", m_autoChooser);
         m_pathPlanner.configure();
+
         // note alignment
         // m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
         // m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
