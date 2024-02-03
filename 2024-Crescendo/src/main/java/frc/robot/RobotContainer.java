@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Auto.AutoCommand;
 import frc.robot.Commands.AcquireNoteCommand;
 import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
@@ -88,6 +89,8 @@ public class RobotContainer {
         // driveController.leftBumper().onTrue(shooter.commandStop());
 
         // pathplanner buttons
+        // m_driveController.x().onTrue(m_pathPlanner.moveToOurSource());
+
         m_arcadeController.x().onTrue(m_pathPlanner.moveToOurSource());
         m_arcadeController.y().onTrue(m_pathPlanner.moveToOurStage1());
         m_arcadeController.rightBumper().onTrue(m_pathPlanner.moveToOurSpeaker());
@@ -101,17 +104,16 @@ public class RobotContainer {
         m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
         SmartDashboard.putData("Auto Mode", m_autoChooser);
         m_pathPlanner.configure();
-
         // note alignment
         // m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
         // m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
     }
 
     public Command getAutonomousCommand() {
-        return m_autoChooser.getSelected();
-        // var autoCommand = new AutoCommand(m_pathPlanner);
-        // return autoCommand;
-        
+        // return m_autoChooser.getSelected();
+        var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_limelightAligner);
+        return autoCommand;
+
         // return Commands.print("No autonomous command configured");
         // return new PathPlannerAuto("Example Auto");
         // Load the path you want to follow using its name in the GUI
