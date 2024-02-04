@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 
@@ -13,6 +14,9 @@ public class LimelightAligner extends SubsystemBase {
     public Limelight intakeLimelight;
     public PathPlanner m_PathPlanner;
 
+    private CenterToTargetCommand centerIntakeCommand;
+    private CenterToTargetCommand centerShooterCommand;
+
     private double MAX_WHEEL_STRAFE = 1;
     private double MAX_CAMERA_X = 30;
     private double wheelStrafe;
@@ -21,6 +25,8 @@ public class LimelightAligner extends SubsystemBase {
         intakeLimelight = intakeCamera;
         shooterLimelight = shooterCamera;
         m_PathPlanner = pathPlanner;
+        centerIntakeCommand = new CenterToTargetCommand(intakeLimelight, m_PathPlanner, 0);
+        centerShooterCommand = new CenterToTargetCommand(shooterLimelight, m_PathPlanner, 0);
     }
 
     public Command alignToTag(int aprilTagId) {
@@ -28,9 +34,10 @@ public class LimelightAligner extends SubsystemBase {
     }
 
     public Command alignToNote() {
-        return Commands.run(() -> {
+        return Commands.runOnce(() -> {
             SmartDashboard.putNumber("bruh", intakeLimelight.getX());
-            centerToTarget(intakeLimelight, 0);
+            centerIntakeCommand.execute();
+            //centerToTarget(intakeLimelight, 0);
         });
     }
 

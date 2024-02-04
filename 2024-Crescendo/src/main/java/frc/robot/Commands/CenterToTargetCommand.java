@@ -38,7 +38,6 @@ public class CenterToTargetCommand extends Command {
             if(m_limelight.getX() < 0) {
                 SmartDashboard.putString("node-pose", "left");
             } else if(m_limelight.getX() > 0) { //otherwise if the target is to the right
-                
                 SmartDashboard.putString("node-pose", "right");
             }
             wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (m_limelight.getX()/MAX_CAMERA_X + 1));
@@ -52,7 +51,7 @@ public class CenterToTargetCommand extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 0.05;
+        return m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 1;
     }
 
     // Called once after isFinished returns true

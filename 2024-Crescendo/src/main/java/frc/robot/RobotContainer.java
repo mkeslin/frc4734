@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommand;
 import frc.robot.Commands.AcquireNoteCommand;
+import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.PathPlanner;
@@ -56,12 +57,22 @@ public class RobotContainer {
         //     new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
 
         var acquireNoteCommand = new AcquireNoteCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_limelightAligner);
+        var centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0);
+        var centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, 0);
 
         // Register Named Commands
         NamedCommands.registerCommand(
             "acquireNote",
             acquireNoteCommand
             // intake.commandStartIn().andThen(Commands.waitSeconds(2).andThen(intake.commandStop()))
+        );
+        NamedCommands.registerCommand(
+            "centerIntakeToTargetCommand",
+            centerIntakeToTargetCommand
+        );
+        NamedCommands.registerCommand(
+            "centerShooterToTargetCommand",
+            centerShooterToTargetCommand
         );
         NamedCommands.registerCommand(
             "shootSpeakerNote",
@@ -106,8 +117,9 @@ public class RobotContainer {
         m_pathPlanner.configure();
 
         // note alignment
-        m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
-        m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
+        m_mechanismController.a().onTrue(centerIntakeToTargetCommand);
+        //m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
+        //m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
     }
 
     public Command getAutonomousCommand() {
