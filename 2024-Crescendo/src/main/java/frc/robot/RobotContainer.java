@@ -56,7 +56,7 @@ public class RobotContainer {
         // verticalElevator =
         //     new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
 
-        var acquireNoteCommand = new AcquireNoteCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_limelightAligner);
+        var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
         var centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0);
         var centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, 0);
 
@@ -117,7 +117,7 @@ public class RobotContainer {
         m_pathPlanner.configure();
 
         // note alignment
-        m_mechanismController.a().onTrue(centerIntakeToTargetCommand);
+        m_mechanismController.a().onTrue(acquireNoteCommand);
         //m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
         //m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
     }

@@ -22,44 +22,22 @@ import frc.robot.Subsystems.LimelightAligner;
 
 public class AcquireNoteCommand extends SequentialCommandGroup {
 
-    // private final Limelight m_limelight;
-    // private final PathPlanner m_pathPlanner;
-    // private final Intake m_intake;
+    private final Limelight m_intakeLimelight;
+    private final PathPlanner m_pathPlanner;
+    private final Intake m_intake;
 
     public AcquireNoteCommand(
-        Limelight shooterLimelight, 
         Limelight intakeLimelight,
         PathPlanner pathPlanner, 
-        Intake intake, 
-        LimelightAligner limelightAligner
+        Intake intake
     ) {
-        // super(2);
-
-        // m_limelight = limelight;
-        // m_pathPlanner = pathPlanner;
-        // m_intake = intake;
-
-        // addRequirements(m_limelight, m_pathPlanner, m_intake);
-
-        SmartDashboard.putString("acquireNote", "I'm here!!!");
-        System.out.println("acquireNote ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        m_intakeLimelight = intakeLimelight;
+        m_pathPlanner = pathPlanner;
+        m_intake = intake;
 
         addCommands(
-            // use limelight to position robot in front of note
-            // limelightAligner.alignToTag(),
-            // wait
-            Commands.print("acquireNote-111111111111111111111111111111111111111"),
-            Commands.waitSeconds(2),
-            Commands.print("acquireNote-222222222222222222222222222222222222222"),
-            // start intake motors
-            // intake.commandStartIn(),
-            // drive forward to intake note
-            //pathPlanner.moveForwardRobot(.2),
-            // wait
-            Commands.waitSeconds(2),
-            Commands.print("acquireNote-333333333333333333333333333333333333333")
-            // stop intake motors
-            // intake.commandStop()
+            new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0),
+            new IntakeNoteCommand(m_intake)
         );
     }
     // Called just before this Command runs the first time
