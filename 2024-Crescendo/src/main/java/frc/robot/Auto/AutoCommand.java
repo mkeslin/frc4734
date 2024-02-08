@@ -51,7 +51,7 @@ public class AutoCommand extends Command {
             m_limelightAligner.alignToNote(),
             m_intake.commandStartIn(),
             Commands.runOnce(() -> m_pathPlanner.moveForwardRobot(.5), m_pathPlanner),
-            m_intake.commandStop(),
+            m_intake.commandStopRoller(),
             // shoot
             m_limelightAligner.alignToTag(3)
             // Commands.print("acquireNote-333333333333333333333333333333333333333")

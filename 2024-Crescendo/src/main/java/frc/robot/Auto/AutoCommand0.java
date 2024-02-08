@@ -51,7 +51,7 @@ public class AutoCommand0 extends SequentialCommandGroup {
             limelightAligner.alignToNote(),
             intake.commandStartIn(),
             Commands.runOnce(() -> pathPlanner.moveForwardRobot(.5), pathPlanner),
-            intake.commandStop(),
+            intake.commandStopRoller(),
             // shoot
             limelightAligner.alignToTag(3)
             // Commands.print("acquireNote-333333333333333333333333333333333333333")

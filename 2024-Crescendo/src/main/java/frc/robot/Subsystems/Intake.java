@@ -15,7 +15,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase {
 
     private TalonFX roller;
+
     private TalonFX pivot;
+    private double pivotEncoderVal;
 
     // private TalonFX wheels2;
     // private PneumaticHub hub;
@@ -52,14 +54,16 @@ public class Intake extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         pivot.getConfigurator().apply(configs2);
+
+        pivotEncoderVal = 0;
     }
 
     public Command commandStartIn() {
         return Commands.runOnce(() -> this.startIn());
     }
 
-    public Command commandStop() {
-        return Commands.runOnce(() -> this.stop());
+    public Command commandStopRoller() {
+        return Commands.runOnce(() -> this.stopRoller());
     }
 
     public boolean isOn() {
@@ -77,7 +81,7 @@ public class Intake extends SubsystemBase {
 		SmartDashboard.putNumber("Intake speed setpoint", 1);
     }
 
-    public void stop() {
+    public void stopRoller() {
         // wheels1.set(ControlMode.PercentOutput, 0);
         // wheels2.set(ControlMode.PercentOutput, 0);
 
@@ -96,12 +100,38 @@ public class Intake extends SubsystemBase {
     public Command commandDeploy() {
         return Commands.runOnce(() -> this.deploy());
     }
+    public Command commandStopPivot() {
+        return Commands.runOnce(() -> this.stopPivot());
+    }
+
+    public double getEncoderValue() {
+        var statusSignal = pivot.getPosition();
+        return statusSignal.getValueAsDouble();
+    }
 
     public void stow() {
+        var startEncoder = getEncoderValue();
+        var currentEncoder = startEncoder; 
+        pivot.set(.125);
+        while(Math.abs(currentEncoder - startEncoder) < 4) {
+            SmartDashboard.putNumber("Intake-Pivot", getEncoderValue());
+            currentEncoder = getEncoderValue();
+        }
         pivot.set(0);
     }
     public void deploy() {
-        pivot.set(.25);
+        var startEncoder = getEncoderValue();
+        var currentEncoder = startEncoder; 
+        pivot.set(-.125);
+        while(Math.abs(currentEncoder - startEncoder) < 1) {
+            SmartDashboard.putNumber("Intake-Pivot", getEncoderValue());
+            currentEncoder = getEncoderValue();
+        }
+        pivot.set(0);
+    }
+    public void stopPivot()
+    {
+        pivot.set(0);
     }
 
 

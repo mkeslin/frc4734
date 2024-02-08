@@ -16,7 +16,7 @@ public class ShootTrapCommand extends SequentialCommandGroup {
             //
             // intake.commandShoot(),
             Commands.waitSeconds(2),
-            intake.commandStop()
+            intake.commandStopRoller()
         );
     }
 }

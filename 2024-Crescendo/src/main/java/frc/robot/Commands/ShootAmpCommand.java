@@ -16,7 +16,7 @@ public class ShootAmpCommand extends SequentialCommandGroup {
             //
             // intake.commandShoot(),
             Commands.waitSeconds(2),
-            intake.commandStop()
+            intake.commandStopRoller()
         );
     }
 }
