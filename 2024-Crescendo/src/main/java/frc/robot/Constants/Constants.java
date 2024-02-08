@@ -14,7 +14,7 @@ public class Constants {
     // public static final int FLEID = 12; //Front left encoder ID
     // public static final int BREID = 9; //Back right encoder ID
     // public static final int BLEID = 10; //Back left encoder ID
-    
+
     // public static final double FREO = -36 + 30 - 15 - 98 + 90; //Front right encoder offset
     // public static final double FLEO = -55 + 40 + 45 + 15 + 105 + 90 - 180 - 15; //Front left encoder offset
     // public static final double BREO = -60 + 35 + 110 - 180 + 22 + 5; //back right encoder offset 38
@@ -27,15 +27,16 @@ public class Constants {
     public static final int ROTATEARMID = 117;
 
     public static final int INTAKEID = 50;
-    public static final int SHOOTERBOTTOMID = 51;
-    public static final int SHOOTERTOPID = 52;
+    public static final int INTAKEPIVOTID = 51;
+
+    public static final int SHOOTERBOTTOMID = 52;
+    public static final int SHOOTERTOPID = 53;
 
     public static final int APRILTAGPIPELINE = 0;
     public static final int NOTEPIPELINE = 1;
 
     // public static final int INTAKERIGHTID = 119;
     public static final int PNEUMATICHUBID = 120;
-
     // public static final double WBL = 0.58; //Wheelbase length 19.5in 0.50m
     // public static final double WBW = 0.50; //Wheelbase width 23.0in 0.58m
     // public static final double WBR = Math.sqrt(Math.pow(WBL, 2) + Math.pow(WBW, 2)); //Wheelbase diameter

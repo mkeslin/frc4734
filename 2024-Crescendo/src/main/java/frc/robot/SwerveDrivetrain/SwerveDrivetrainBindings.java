@@ -31,10 +31,10 @@ public class SwerveDrivetrainBindings {
             drivetrain.applyRequest(() -> {
                 // flip the orientation for blue/red
                 var coordinateOrientation = -1;
-                var alliance = DriverStation.getAlliance();
-                if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-                    coordinateOrientation = 1;
-                }
+                // var alliance = DriverStation.getAlliance();
+                // if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+                //     coordinateOrientation = 1;
+                // }
 
                 drive
                     .withVelocityX(coordinateOrientation * driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)

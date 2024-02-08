@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase {
 
     private TalonFX roller;
+    private TalonFX pivot;
 
     // private TalonFX wheels2;
     // private PneumaticHub hub;
@@ -23,7 +24,6 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         roller = new TalonFX(INTAKEID);
-        // wheels2 = new TalonFX(INTAKERIGHTID);
         // hub = new PneumaticHub();
         // sol = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 0, 1);
         // compressor = new Compressor(1, PneumaticsModuleType.REVPH);
@@ -42,38 +42,25 @@ public class Intake extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         roller.getConfigurator().apply(configs);
+
+
+        pivot = new TalonFX(INTAKEPIVOTID);
+        pivot.setInverted(false);
+        pivot.setNeutralMode(NeutralModeValue.Brake);
+        var configs2 = new TalonFXConfiguration();
+        configs2.CurrentLimits = new CurrentLimitsConfigs();
+        // configs.CurrentLimits.SupplyCurrentLimit = 20;
+        // configs.CurrentLimits.SupplyCurrentLimit = 40;
+        pivot.getConfigurator().apply(configs2);
     }
 
     public Command commandStartIn() {
         return Commands.runOnce(() -> this.startIn());
     }
 
-    // public Command commandStartOut() {
-    //     return Commands.runOnce(() -> this.startOut());
-    // }
-
     public Command commandStop() {
         return Commands.runOnce(() -> this.stop());
     }
-
-    // public void open() {
-    //     // sol.set(Value.kReverse);
-    //     // SmartDashboard.putBoolean("Comp", compressor.isEnabled());
-    // }
-
-    // public void close() {
-    //     // sol.set(Value.kForward);
-    // }
-
-    // public void wheelsIn() {
-    //     // wheels1.set(ControlMode.PercentOutput, -0.25);
-    //     // wheels2.set(ControlMode.PercentOutput, 0.25);
-    // }
-
-    // public void wheelsOut() {
-    //     // wheels1.set(ControlMode.PercentOutput, 0.25);
-    //     // wheels2.set(ControlMode.PercentOutput, -0.25);
-    // }
 
     public boolean isOn() {
         return getSpeed() > 0;
@@ -90,11 +77,6 @@ public class Intake extends SubsystemBase {
 		SmartDashboard.putNumber("Intake speed setpoint", 1);
     }
 
-    // public void startOut() {
-    //     wheels1.set(-1);
-    //     // wheels2.set(-1);
-    // }
-
     public void stop() {
         // wheels1.set(ControlMode.PercentOutput, 0);
         // wheels2.set(ControlMode.PercentOutput, 0);
@@ -104,10 +86,24 @@ public class Intake extends SubsystemBase {
 
         SmartDashboard.putNumber("Intake speed setpoint", 0);
     }
-    // public void enableCompressor() {
-    //     // compressor.enableDigital();
-    //     // hub.enableCompressorAnalog(50, 120);
-    // }
+
+
+
+
+    public Command commandStow() {
+        return Commands.runOnce(() -> this.stow());
+    }
+    public Command commandDeploy() {
+        return Commands.runOnce(() -> this.deploy());
+    }
+
+    public void stow() {
+        pivot.set(0);
+    }
+    public void deploy() {
+        pivot.set(.25);
+    }
+
 
     // @Override
 	// public void periodic() {
