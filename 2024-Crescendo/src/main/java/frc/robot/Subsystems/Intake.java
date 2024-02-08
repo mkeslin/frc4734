@@ -75,7 +75,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void startIn() {
-        roller.set(-.25);
+        roller.set(-.45);
         // wheels2.set(1);
 
 		SmartDashboard.putNumber("Intake speed setpoint", 1);
