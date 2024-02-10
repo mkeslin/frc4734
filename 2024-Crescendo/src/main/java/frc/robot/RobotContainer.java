@@ -8,12 +8,14 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommand;
 import frc.robot.Commands.AcquireNoteCommand;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
+import frc.robot.PathPlanner.Landmarks;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Intake;
@@ -111,7 +113,8 @@ public class RobotContainer {
         // m_arcadeController.rightBumper().onTrue(m_pathPlanner.moveToOurSpeaker());
         // m_arcadeController.leftBumper().onTrue(m_pathPlanner.moveToOurAmp());
 
-        // m_arcadeController.a().onTrue(m_pathPlanner.moveToOurRing3());
+        // m_driveController.leftTrigger().onTrue(m_pathPlanner.moveToOurRing2());
+        // m_driveController.leftTrigger().onTrue(m_pathPlanner.moveToPose(Landmarks.TheirRing2));
         // m_arcadeController.b().onTrue(m_pathPlanner.moveToOurRing2());
         // m_arcadeController.rightTrigger().onTrue(m_pathPlanner.moveToOurRing1());
 
