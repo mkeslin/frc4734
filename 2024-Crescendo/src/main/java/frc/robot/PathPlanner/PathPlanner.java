@@ -1,5 +1,8 @@
 package frc.robot.PathPlanner;
 
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -76,19 +79,18 @@ public class PathPlanner extends SubsystemBase {
             // Prevent this path from being flipped on the red alliance, since the given positions are already correct
             path.preventFlipping = true;
 
+            //  SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
+            //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
+            //     .withSteerRequestType(SteerRequestType.MotionMagicExpo);
+
             m_drivetrain.driveRobotRelative(new ChassisSpeeds(x, y, rot));
-            
-            /*SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
-                .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
-                .withSteerRequestType(SteerRequestType.MotionMagicExpo);
-            // return AutoBuilder.followPath(path).schedule();
-            m_drivetrain.applyRequest(() -> {
-                driveRequest.withVelocityX(x) // Drive forward with negative Y (forward)
-                    .withVelocityY(y) // Drive left with negative X (left)
-                    .withRotationalRate(rot); // Drive counterclockwise with negative X (left)
-                return driveRequest;
-            });*/
-        // });
+            // m_drivetrain.applyRequest(() -> {
+            //     driveRequest.withVelocityX(x) // Drive forward with negative Y (forward)
+            //         .withVelocityY(y) // Drive left with negative X (left)
+            //         .withRotationalRate(rot); // Drive counterclockwise with negative X (left)
+
+            //     return driveRequest;
+            // });
     }
 
     public void moveForwardRobot(double distance) {
