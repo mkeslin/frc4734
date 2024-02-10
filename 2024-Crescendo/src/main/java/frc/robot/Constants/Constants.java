@@ -29,8 +29,10 @@ public class Constants {
     public static final int INTAKEID = 50;
     public static final int INTAKEPIVOTID = 51;
 
-    public static final int SHOOTERBOTTOMID = 52;
-    public static final int SHOOTERTOPID = 53;
+    public static final int SHOOTERINTOPID = 55;
+    public static final int SHOOTEROUTTOPID = 56;
+    public static final int SHOOTEROUTBOTTOMID = 57;
+    public static final int SHOOTERPIVOTID = 58;
 
     public static final int APRILTAGPIPELINE = 0;
     public static final int NOTEPIPELINE = 1;
