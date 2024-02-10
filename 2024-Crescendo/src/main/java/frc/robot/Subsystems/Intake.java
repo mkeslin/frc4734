@@ -11,14 +11,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Commands.IntakeStowCommand;
+import frc.robot.Commands.IntakeDeployCommand;
 
 public class Intake extends SubsystemBase {
 
     private TalonFX roller;
-
+    private boolean stowing;
+    private boolean deploying;
     private TalonFX pivot;
     private double pivotEncoderVal;
 
+    private double STOWED_ENCODER_VAL = -0.5;    //Actual Stowed Value: 0
+    private double DEPLOYED_ENCODER_VAL = -4.5;    //Actual Deploy Value: -5.175
+
+    private IntakeStowCommand intakeStowCommand = new IntakeStowCommand(this, STOWED_ENCODER_VAL);
+    private IntakeDeployCommand intakeDeployCommand = new IntakeDeployCommand(this, DEPLOYED_ENCODER_VAL);
     // private TalonFX wheels2;
     // private PneumaticHub hub;
     // private DoubleSolenoid sol;
@@ -49,6 +57,7 @@ public class Intake extends SubsystemBase {
         pivot = new TalonFX(INTAKEPIVOTID);
         pivot.setInverted(false);
         pivot.setNeutralMode(NeutralModeValue.Brake);
+        pivot.setPosition(0);
         var configs2 = new TalonFXConfiguration();
         configs2.CurrentLimits = new CurrentLimitsConfigs();
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
@@ -56,6 +65,8 @@ public class Intake extends SubsystemBase {
         pivot.getConfigurator().apply(configs2);
 
         pivotEncoderVal = 0;
+        stowing = false;
+        deploying = false;
     }
 
     public Command commandStartIn() {
@@ -95,13 +106,13 @@ public class Intake extends SubsystemBase {
 
 
     public Command commandStow() {
-        return Commands.runOnce(() -> this.stow());
+        return Commands.runOnce(() -> intakeStowCommand.schedule());
     }
     public Command commandDeploy() {
-        return Commands.runOnce(() -> this.deploy());
+        return Commands.runOnce(() -> intakeDeployCommand.schedule());
     }
     public Command commandStopPivot() {
-        return Commands.runOnce(() -> this.stopPivot());
+        return Commands.run(() -> this.stopPivot());
     }
 
     public double getEncoderValue() {
@@ -109,25 +120,49 @@ public class Intake extends SubsystemBase {
         return statusSignal.getValueAsDouble();
     }
 
+    public void setPivotMotor(double s) {
+        SmartDashboard.putNumber("Encoder Val", getEncoderValue());
+        SmartDashboard.putNumber("Speed", s);
+        pivot.set(s);
+    }
+
     public void stow() {
+        /*stowing = true;
+        deploying = false;
         var startEncoder = getEncoderValue();
         var currentEncoder = startEncoder; 
-        pivot.set(.125);
-        while(Math.abs(currentEncoder - startEncoder) < 4) {
+        var distance = 2;
+        //pivot.set(.125);
+        while(stowing && Math.abs(currentEncoder - startEncoder) < 4) {
             SmartDashboard.putNumber("Intake-Pivot", getEncoderValue());
+            if(Math.abs(currentEncoder - startEncoder) > distance) {
+                pivot.set(.125);
+            } else {
+                pivot.set(.25);
+            }
             currentEncoder = getEncoderValue();
         }
         pivot.set(0);
+        stowing = false;*/
     }
     public void deploy() {
+        /*stowing = false;
+        deploying = true;
         var startEncoder = getEncoderValue();
         var currentEncoder = startEncoder; 
-        pivot.set(-.125);
-        while(Math.abs(currentEncoder - startEncoder) < 1) {
+        var distance = 0.5;
+        //pivot.set(-.125);
+        while(deploying && Math.abs(currentEncoder - startEncoder) < 1.5) {
             SmartDashboard.putNumber("Intake-Pivot", getEncoderValue());
+            if(Math.abs(currentEncoder - startEncoder) > distance) {
+                pivot.set(-.125);
+            } else {
+                pivot.set(-.25);
+            }
             currentEncoder = getEncoderValue();
         }
         pivot.set(0);
+        deploying = false;*/
     }
     public void stopPivot()
     {

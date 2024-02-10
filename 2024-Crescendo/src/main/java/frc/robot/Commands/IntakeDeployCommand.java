@@ -1,42 +1,45 @@
 package frc.robot.Commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Subsystems.Intake;
-import edu.wpi.first.wpilibj.Timer;
 
-public class IntakeNoteCommand extends Command {
+public class IntakeDeployCommand extends Command {
     public Intake m_intake;
-    public Timer t = new Timer();
+    public double target_val;
+    public double current_val;
+    
 
-    public IntakeNoteCommand(Intake intake) {
+    public IntakeDeployCommand(Intake intake, double target) {
         m_intake = intake;
+        target_val = target;
         addRequirements(m_intake);
     }
 
     // Called just before this Command runs the first time
     @Override
     public void initialize() {
-        t.start();
+        current_val = m_intake.getEncoderValue();
     }
 
     @Override
     public void execute() {
-        m_intake.startIn();
+        current_val = m_intake.getEncoderValue();
+        if(current_val < target_val/2) {
+            m_intake.setPivotMotor(-0.05);
+        } else {
+            m_intake.setPivotMotor(-0.125);
+        }
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return t.hasElapsed(2);
+        return current_val <= target_val;
     }
 
     // Called once after isFinished returns true
     @Override
     public void end(boolean interrupted) {
-        m_intake.stopRoller();
-        t.stop();
-        t.reset();
+        m_intake.stopPivot();
     }
 }
