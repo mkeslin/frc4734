@@ -92,8 +92,8 @@ public class RobotContainer {
 
         // intake
         // driveController.y().onTrue(intake.isOn() ? intake.commandStop() : intake.commandStartIn());
-        m_driveController.y().onTrue(m_shooter.commandShoot(.70));
-        m_driveController.x().onTrue(m_shooter.commandStop());
+        m_driveController.y().onTrue(m_intake.commandStartIn());
+        m_driveController.x().onTrue(m_intake.commandStopRoller());
 
         m_driveController.rightBumper().onTrue(m_intake.commandStow());
         m_driveController.rightTrigger().onTrue(m_intake.commandDeploy());

@@ -1,10 +1,7 @@
 package frc.robot.Commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Auto.AutoState;
 import frc.robot.PathPlanner.PathPlanner;
-import frc.robot.Subsystems.Intake;
-import frc.robot.Subsystems.LimelightAligner;
 import frc.robot.Subsystems.Cameras.Limelight;
 
 public class CenterToTargetCommand extends Command {
@@ -14,6 +11,7 @@ public class CenterToTargetCommand extends Command {
 
     private double MAX_WHEEL_STRAFE = 1;
     private double MAX_CAMERA_X = 30;
+    private double offset;
     private double wheelStrafe;
 
     public CenterToTargetCommand(Limelight limelight, PathPlanner pathPlanner, int target) {
@@ -27,6 +25,7 @@ public class CenterToTargetCommand extends Command {
     // Called just before this Command runs the first time
     @Override
     public void initialize() {
+        offset = 0;
     }
 
     @Override
@@ -40,18 +39,18 @@ public class CenterToTargetCommand extends Command {
             } else if(m_limelight.getX() > 0) { //otherwise if the target is to the right
                 SmartDashboard.putString("node-pose", "right");
             }
-            wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (m_limelight.getX()/MAX_CAMERA_X + 1));
-            m_PathPlanner.moveRelative(1, wheelStrafe, 0);
-
+            offset = Math.round(m_limelight.getX() * 100)/100;
         } else {
             SmartDashboard.putString("node-pose", "none");
         }
+        wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (offset/MAX_CAMERA_X + 1));
+        m_PathPlanner.moveRelative(1, wheelStrafe, 0);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 1;
+        return m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 2;
     }
 
     // Called once after isFinished returns true

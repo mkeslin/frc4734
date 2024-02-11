@@ -17,6 +17,7 @@ import frc.robot.Commands.IntakeDeployCommand;
 public class Intake extends SubsystemBase {
 
     private TalonFX roller;
+    private TalonFX shooterBottom;
     private boolean stowing;
     private boolean deploying;
     private TalonFX pivot;
@@ -34,6 +35,7 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         roller = new TalonFX(INTAKEID);
+        shooterBottom = new TalonFX(SHOOTERINTOPID);
         // hub = new PneumaticHub();
         // sol = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 0, 1);
         // compressor = new Compressor(1, PneumaticsModuleType.REVPH);
@@ -87,6 +89,7 @@ public class Intake extends SubsystemBase {
 
     public void startIn() {
         roller.set(-.55);
+        shooterBottom.set(-.55);
         // wheels2.set(1);
 
 		SmartDashboard.putNumber("Intake speed setpoint", 1);
@@ -97,6 +100,7 @@ public class Intake extends SubsystemBase {
         // wheels2.set(ControlMode.PercentOutput, 0);
 
         roller.set(0);
+        shooterBottom.set(0);
         // wheels2.set(0);
 
         SmartDashboard.putNumber("Intake speed setpoint", 0);

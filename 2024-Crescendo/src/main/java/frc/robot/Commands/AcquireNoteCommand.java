@@ -37,6 +37,7 @@ public class AcquireNoteCommand extends SequentialCommandGroup {
 
         addCommands(
             new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0),
+            new MoveToNoteCommand(m_intakeLimelight, m_pathPlanner),
             new IntakeNoteCommand(m_intake)
         );
     }
