@@ -18,6 +18,7 @@ import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.Landmarks;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.LimelightAligner;
 import frc.robot.Subsystems.Shooter;
@@ -45,6 +46,7 @@ public class RobotContainer {
     private Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
     private Intake m_intake = new Intake();
     private Shooter m_shooter = new Shooter();
+    private Elevator m_elevator = new Elevator();
     private LimelightAligner m_limelightAligner = new LimelightAligner(m_shooterLimelight, m_intakeLimelight, m_pathPlanner);
 
     // private TelescopeArm telescopeArm = new TelescopeArm();
@@ -92,18 +94,24 @@ public class RobotContainer {
 
         // intake
         // driveController.y().onTrue(intake.isOn() ? intake.commandStop() : intake.commandStartIn());
-        m_driveController.y().onTrue(m_intake.commandStartIn());
-        m_driveController.x().onTrue(m_intake.commandStopRoller());
+        // m_driveController.y().onTrue(m_intake.commandStartIn());
+        // m_driveController.x().onTrue(m_intake.commandStopRoller());
 
-        m_driveController.rightBumper().onTrue(m_intake.commandStow());
-        m_driveController.rightTrigger().onTrue(m_intake.commandDeploy());
-        m_driveController.leftBumper().onTrue(m_intake.commandStopPivot());
-
-        // m_driveController.rightBumper().onTrue(acquireNoteCommand);
+        // m_driveController.rightBumper().onTrue(m_intake.commandStow());
+        // m_driveController.rightTrigger().onTrue(m_intake.commandDeploy());
+        // m_driveController.leftBumper().onTrue(m_intake.commandStopPivot());
 
         // shooter
-        // driveController.rightBumper().onTrue(shooter.commandShoot());
-        // driveController.leftBumper().onTrue(shooter.commandStop());
+        // m_driveController.y().onTrue(m_shooter.commandShoot());
+        // m_driveController.x().onTrue(m_shooter.commandStop());
+
+        // elevator
+        // m_driveController.y().onTrue(m_elevator.CommandExtend());
+        // m_driveController.x().onTrue(m_elevator.CommandRetract());
+        // m_driveController.y().onTrue(m_elevator.CommandPivotOut());
+        // m_driveController.x().onTrue(m_elevator.CommandPivotIn());
+
+        // m_driveController.rightBumper().onTrue(acquireNoteCommand);
 
         // pathplanner buttons
         // m_driveController.x().onTrue(m_pathPlanner.moveToOurSource());
