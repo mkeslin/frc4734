@@ -64,7 +64,7 @@ public class SwerveDrivetrainA {
     private static final boolean kInvertLeftSide = false;
     private static final boolean kInvertRightSide = false;
 
-    private static final String kCANbusName = "";
+    private static final String kCANbusName = "Canivore";
     private static final int kPigeonId = 0;
 
     // These are only used for simulation

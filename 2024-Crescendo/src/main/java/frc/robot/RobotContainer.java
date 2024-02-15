@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommand;
-import frc.robot.Commands.AcquireNoteCommand;
+import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
