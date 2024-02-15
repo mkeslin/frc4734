@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommand;
-import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.CenterToTargetCommand;
+import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.Landmarks;
@@ -70,14 +70,8 @@ public class RobotContainer {
             acquireNoteCommand
             // intake.commandStartIn().andThen(Commands.waitSeconds(2).andThen(intake.commandStop()))
         );
-        NamedCommands.registerCommand(
-            "centerIntakeToTargetCommand",
-            centerIntakeToTargetCommand
-        );
-        NamedCommands.registerCommand(
-            "centerShooterToTargetCommand",
-            centerShooterToTargetCommand
-        );
+        NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
+        NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
         NamedCommands.registerCommand(
             "shootSpeakerNote",
             new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_shooter, m_limelightAligner)
@@ -94,16 +88,16 @@ public class RobotContainer {
 
         // intake
         // driveController.y().onTrue(intake.isOn() ? intake.commandStop() : intake.commandStartIn());
-        // m_driveController.y().onTrue(m_intake.commandStartIn());
-        // m_driveController.x().onTrue(m_intake.commandStopRoller());
+        m_driveController.y().onTrue(m_intake.commandStartIn());
+        m_driveController.x().onTrue(m_intake.commandStopRoller());
 
         // m_driveController.rightBumper().onTrue(m_intake.commandStow());
         // m_driveController.rightTrigger().onTrue(m_intake.commandDeploy());
         // m_driveController.leftBumper().onTrue(m_intake.commandStopPivot());
 
         // shooter
-        // m_driveController.y().onTrue(m_shooter.commandShoot());
-        // m_driveController.x().onTrue(m_shooter.commandStop());
+        m_driveController.y().onTrue(m_shooter.commandShoot());
+        m_driveController.x().onTrue(m_shooter.commandStop());
 
         // elevator
         // m_driveController.y().onTrue(m_elevator.CommandExtend());
@@ -113,8 +107,62 @@ public class RobotContainer {
 
         // m_driveController.rightBumper().onTrue(acquireNoteCommand);
 
-        // pathplanner buttons
-        // m_driveController.x().onTrue(m_pathPlanner.moveToOurSource());
+        // pathplanner test
+        // Command testSequence = Commands.sequence(
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! move"),
+        //     // m_pathPlanner.moveToOurSource()
+        //     // Commands.runOnce(() -> m_pathPlanner.moveToPose(new Pose2d(0, 0, new Rotation2d(0))).schedule()),
+        //     m_pathPlanner.moveToPose(new Pose2d(50,50, new Rotation2d(0))),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake start"),
+        //     m_intake.commandStartIn(),
+        //     Commands.waitSeconds(2),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake stop"),
+        //     m_intake.commandStopRoller()
+        // );
+
+        // Command autoSequence = Commands.sequence(
+        //     // m_pathPlanner.moveToOurSource()
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! move to first note"),
+        //     Commands.runOnce(() -> m_pathPlanner.moveToOurRing1().schedule()),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake start"),
+        //     m_intake.commandStartIn(),
+        //     Commands.waitSeconds(2),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake stop"),
+        //     m_intake.commandStopRoller(),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! shooter start"),
+        //     m_shooter.commandShoot(),
+        //     Commands.waitSeconds(2),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! shooter stop"),
+        //     m_shooter.commandStop(),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! move to first note"),
+        //     Commands.runOnce(() -> m_pathPlanner.moveToOurRing2().schedule()),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake start"),
+        //     m_intake.commandStartIn(),
+        //     Commands.waitSeconds(2),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake stop"),
+        //     m_intake.commandStopRoller(),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! shooter start"),
+        //     m_shooter.commandShoot(),
+        //     Commands.waitSeconds(2),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! shooter stop"),
+        //     m_shooter.commandStop(),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! move to first note"),
+        //     Commands.runOnce(() -> m_pathPlanner.moveToOurRing3().schedule()),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake start"),
+        //     m_intake.commandStartIn(),
+        //     Commands.waitSeconds(2),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake stop"),
+        //     m_intake.commandStopRoller(),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! shooter start"),
+        //     m_shooter.commandShoot(),
+        //     Commands.waitSeconds(2),
+        //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! shooter stop"),
+        //     m_shooter.commandStop()
+        // );
+
+        // m_driveController.rightBumper().onTrue(testSequence);
+        // m_driveController.rightBumper().onTrue(m_pathPlanner.moveToOurSource());
+        // m_driveController.rightBumper().onTrue(Commands.runOnce(() -> m_pathPlanner.moveToOurSource().schedule()));
 
         // m_arcadeController.x().onTrue(m_pathPlanner.moveToOurSource());
         // m_arcadeController.y().onTrue(m_pathPlanner.moveToOurStage1());
@@ -141,7 +189,7 @@ public class RobotContainer {
         // return m_autoChooser.getSelected();
         var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_limelightAligner);
         return autoCommand;
-
+        
         // return Commands.print("No autonomous command configured");
         // return new PathPlannerAuto("Example Auto");
         // Load the path you want to follow using its name in the GUI

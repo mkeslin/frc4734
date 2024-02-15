@@ -16,8 +16,8 @@ import frc.robot.Commands.IntakeDeployCommand;
 
 public class Intake extends SubsystemBase {
 
-    private TalonFX roller;
-    private TalonFX shooterBottom;
+    private TalonFX m_roller;
+    private TalonFX m_shooterIn;
     private boolean stowing;
     private boolean deploying;
     private TalonFX pivot;
@@ -34,14 +34,14 @@ public class Intake extends SubsystemBase {
     // private Compressor compressor;
 
     public Intake() {
-        roller = new TalonFX(INTAKE_ID);
-        shooterBottom = new TalonFX(SHOOTER_IN_ID);
+        m_roller = new TalonFX(INTAKE_ID);
+        m_shooterIn = new TalonFX(SHOOTER_IN_ID);
         // hub = new PneumaticHub();
         // sol = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 0, 1);
         // compressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
-        roller.setInverted(false);
-        roller.setNeutralMode(NeutralModeValue.Brake);
+        m_roller.setInverted(false);
+        m_roller.setNeutralMode(NeutralModeValue.Brake);
         // talon.configOpenloopRamp(0.15);
         // wheels1.configContinuousCurrentLimit(20);
         // wheels1.configPeakCurrentLimit(40);
@@ -53,7 +53,7 @@ public class Intake extends SubsystemBase {
         configs.CurrentLimits = new CurrentLimitsConfigs();
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        roller.getConfigurator().apply(configs);
+        m_roller.getConfigurator().apply(configs);
 
 
         pivot = new TalonFX(INTAKE_PIVOT_ID);
@@ -84,12 +84,12 @@ public class Intake extends SubsystemBase {
     }
 
     public double getSpeed() { 
-        return roller.get();
+        return m_roller.get();
     }
 
     public void startIn() {
-        roller.set(-.55);
-        shooterBottom.set(-.55);
+        m_roller.set(-.55);
+        m_shooterIn.set(-.55);
         // wheels2.set(1);
 
 		SmartDashboard.putNumber("Intake speed setpoint", 1);
@@ -99,8 +99,8 @@ public class Intake extends SubsystemBase {
         // wheels1.set(ControlMode.PercentOutput, 0);
         // wheels2.set(ControlMode.PercentOutput, 0);
 
-        roller.set(0);
-        shooterBottom.set(0);
+        m_roller.set(0);
+        m_shooterIn.set(0);
         // wheels2.set(0);
 
         SmartDashboard.putNumber("Intake speed setpoint", 0);

@@ -58,39 +58,39 @@ public class PathPlanner extends SubsystemBase {
 
     public void moveRelative(double x, double y, double rot) {
         // return Commands.runOnce(() -> {
-            Pose2d currentPose = m_drivetrain.getPose();
+        Pose2d currentPose = m_drivetrain.getPose();
 
-            // The rotation component in these poses represents the direction of travel
-            Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
-            Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(x, y)), new Rotation2d().plus(new Rotation2d(rot)));
+        // The rotation component in these poses represents the direction of travel
+        Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
+        Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(x, y)), new Rotation2d().plus(new Rotation2d(rot)));
 
-            List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(startPos, endPos);
-            PathPlannerPath path = new PathPlannerPath(
-                bezierPoints,
-                new PathConstraints(
-                    DrivetrainConstants.MaxSpeed,
-                    DrivetrainConstants.MaxAcceleration,
-                    Units.degreesToRadians(360),
-                    Units.degreesToRadians(540)
-                ),
-                new GoalEndState(0.0, currentPose.getRotation())
-            );
+        List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(startPos, endPos);
+        PathPlannerPath path = new PathPlannerPath(
+            bezierPoints,
+            new PathConstraints(
+                DrivetrainConstants.MaxSpeed,
+                DrivetrainConstants.MaxAcceleration,
+                Units.degreesToRadians(360),
+                Units.degreesToRadians(540)
+            ),
+            new GoalEndState(0.0, currentPose.getRotation())
+        );
 
-            // Prevent this path from being flipped on the red alliance, since the given positions are already correct
-            path.preventFlipping = true;
+        // Prevent this path from being flipped on the red alliance, since the given positions are already correct
+        path.preventFlipping = true;
 
-            //  SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
-            //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
-            //     .withSteerRequestType(SteerRequestType.MotionMagicExpo);
+        //  SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
+        //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
+        //     .withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
-            m_drivetrain.driveRobotRelative(new ChassisSpeeds(x, y, rot));
-            // m_drivetrain.applyRequest(() -> {
-            //     driveRequest.withVelocityX(x) // Drive forward with negative Y (forward)
-            //         .withVelocityY(y) // Drive left with negative X (left)
-            //         .withRotationalRate(rot); // Drive counterclockwise with negative X (left)
+        m_drivetrain.driveRobotRelative(new ChassisSpeeds(x, y, rot));
+        // m_drivetrain.applyRequest(() -> {
+        //     driveRequest.withVelocityX(x) // Drive forward with negative Y (forward)
+        //         .withVelocityY(y) // Drive left with negative X (left)
+        //         .withRotationalRate(rot); // Drive counterclockwise with negative X (left)
 
-            //     return driveRequest;
-            // });
+        //     return driveRequest;
+        // });
     }
 
     public void moveForwardRobot(double distance) {
@@ -103,7 +103,7 @@ public class PathPlanner extends SubsystemBase {
     }
 
     public void rotateRobot(double degrees) {
-        double radians = degrees * Math.PI/180;
+        double radians = degrees * Math.PI / 180;
         moveRelative(0, 0, radians);
     }
 
@@ -115,9 +115,11 @@ public class PathPlanner extends SubsystemBase {
     public Command moveToOurAmp() {
         return moveToPose(Landmarks.OurAmp);
     }
+
     public Command moveToOurSpeaker() {
         return moveToPose(Landmarks.OurSpeaker);
     }
+
     public Command moveToOurSource() {
         return moveToPose(Landmarks.OurSource);
     }
@@ -125,9 +127,11 @@ public class PathPlanner extends SubsystemBase {
     public Command moveToOurStage1() {
         return moveToPose(Landmarks.OurStage1);
     }
+
     public Command moveToOurStage2() {
         return moveToPose(Landmarks.OurStage2);
     }
+
     public Command moveToOurStage3() {
         return moveToPose(Landmarks.OurStage3);
     }
@@ -135,9 +139,11 @@ public class PathPlanner extends SubsystemBase {
     public Command moveToOurRing1() {
         return moveToPose(Landmarks.OurRing1);
     }
+
     public Command moveToOurRing2() {
         return moveToPose(Landmarks.OurRing2);
     }
+
     public Command moveToOurRing3() {
         return moveToPose(Landmarks.OurRing3);
     }
@@ -145,15 +151,19 @@ public class PathPlanner extends SubsystemBase {
     public Command moveToOurRing4() {
         return moveToPose(Landmarks.OurRing4);
     }
+
     public Command moveToOurRing5() {
         return moveToPose(Landmarks.OurRing5);
     }
+
     public Command moveToOurRing6() {
         return moveToPose(Landmarks.OurRing6);
     }
+
     public Command moveToOurRing7() {
         return moveToPose(Landmarks.OurRing7);
     }
+
     public Command moveToOurRing8() {
         return moveToPose(Landmarks.OurRing8);
     }

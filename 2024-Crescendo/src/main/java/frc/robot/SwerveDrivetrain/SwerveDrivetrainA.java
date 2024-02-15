@@ -96,17 +96,12 @@ public class SwerveDrivetrainA {
         .withCouplingGearRatio(kCoupleRatio)
         .withSteerMotorInverted(kSteerMotorReversed);
 
-    // private static final double wheelPositionInches = 10.5;
-    // private static final double wheelPositionInches = 10.625;
-
     // Front Left
     private static final int kFrontLeftDriveMotorId = 4;
     private static final int kFrontLeftSteerMotorId = 6;
     private static final int kFrontLeftEncoderId = 1;
     private static final double kFrontLeftEncoderOffset = 0.496826171875;
 
-    // private static final double kFrontLeftXPosInches = wheelPositionInches;
-    // private static final double kFrontLeftYPosInches = wheelPositionInches;
     private static final double kFrontLeftXPosInches = 10.5;
     private static final double kFrontLeftYPosInches = 10.5;
 
@@ -114,10 +109,9 @@ public class SwerveDrivetrainA {
     private static final int kFrontRightDriveMotorId = 2;
     private static final int kFrontRightSteerMotorId = 13;
     private static final int kFrontRightEncoderId = 0;
+    // private static final double kFrontRightEncoderOffset = 0.19140625;
     private static final double kFrontRightEncoderOffset = 0.1982421875;
 
-    // private static final double kFrontRightXPosInches = wheelPositionInches;
-    // private static final double kFrontRightYPosInches = -wheelPositionInches;
     private static final double kFrontRightXPosInches = 10.5;
     private static final double kFrontRightYPosInches = -10.5;
 
@@ -125,10 +119,9 @@ public class SwerveDrivetrainA {
     private static final int kBackLeftDriveMotorId = 3;
     private static final int kBackLeftSteerMotorId = 7;
     private static final int kBackLeftEncoderId = 2;
+    // private static final double kBackLeftEncoderOffset = -0.143798828125;
     private static final double kBackLeftEncoderOffset = 0.113798828125;
 
-    // private static final double kBackLeftXPosInches = -wheelPositionInches;
-    // private static final double kBackLeftYPosInches = wheelPositionInches;
     private static final double kBackLeftXPosInches = -10.5;
     private static final double kBackLeftYPosInches = 10.5;
 
@@ -136,10 +129,9 @@ public class SwerveDrivetrainA {
     private static final int kBackRightDriveMotorId = 5;
     private static final int kBackRightSteerMotorId = 1;
     private static final int kBackRightEncoderId = 3;
+    // private static final double kBackRightEncoderOffset = -0.4912109375;
     private static final double kBackRightEncoderOffset = 0.2100390625;
 
-    // private static final double kBackRightXPosInches = -wheelPositionInches;
-    // private static final double kBackRightYPosInches = -wheelPositionInches;
     private static final double kBackRightXPosInches = -10.5;
     private static final double kBackRightYPosInches = -10.5;
 
