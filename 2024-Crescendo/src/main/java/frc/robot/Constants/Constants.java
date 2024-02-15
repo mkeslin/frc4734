@@ -20,19 +20,23 @@ public class Constants {
     // public static final double BREO = -60 + 35 + 110 - 180 + 22 + 5; //back right encoder offset 38
     // public static final double BLEO = -176 - 93 + 70; //back left encoder offset
 
-    public static final int HORELEVATOR1ID = 113;
-    public static final int HORELEVATOR2ID = 114;
-    public static final int VERTELEVATOR1ID = 115;
-    public static final int VERTELEVATOR2ID = 116;
-    public static final int ROTATEARMID = 117;
+    // public static final int HORELEVATOR1ID = 113;
+    // public static final int HORELEVATOR2ID = 114;
+    // public static final int VERTELEVATOR1ID = 115;
+    // public static final int VERTELEVATOR2ID = 116;
+    // public static final int ROTATE_ARM_ID = 117;
 
-    public static final int INTAKEID = 50;
-    public static final int INTAKEPIVOTID = 51;
+    public static final int INTAKE_ID = 30;
+    public static final int INTAKE_PIVOT_ID = 31;
 
-    public static final int SHOOTERINTOPID = 55;
-    public static final int SHOOTEROUTTOPID = 56;
-    public static final int SHOOTEROUTBOTTOMID = 57;
-    public static final int SHOOTERPIVOTID = 58;
+    public static final int SHOOTER_IN_ID = 40;
+    public static final int SHOOTER_OUT_TOP_ID = 41;
+    public static final int SHOOTER_OUT_BOTTOM_ID = 42;
+    public static final int SHOOTER_PIVOT_ID = 43;
+
+    public static final int ELEVATOR_LEFT_ID = 50;
+    public static final int ELEVATOR_RIGHT_ID = 51;
+    public static final int ELEVATOR_PIVOT_ID = 52;
 
     public static final int APRILTAGPIPELINE = 0;
     public static final int NOTEPIPELINE = 1;

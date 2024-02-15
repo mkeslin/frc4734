@@ -34,8 +34,8 @@ public class Intake extends SubsystemBase {
     // private Compressor compressor;
 
     public Intake() {
-        roller = new TalonFX(INTAKEID);
-        shooterBottom = new TalonFX(SHOOTERINTOPID);
+        roller = new TalonFX(INTAKE_ID);
+        shooterBottom = new TalonFX(SHOOTER_IN_ID);
         // hub = new PneumaticHub();
         // sol = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 0, 1);
         // compressor = new Compressor(1, PneumaticsModuleType.REVPH);
@@ -56,7 +56,7 @@ public class Intake extends SubsystemBase {
         roller.getConfigurator().apply(configs);
 
 
-        pivot = new TalonFX(INTAKEPIVOTID);
+        pivot = new TalonFX(INTAKE_PIVOT_ID);
         pivot.setInverted(false);
         pivot.setNeutralMode(NeutralModeValue.Brake);
         pivot.setPosition(0);

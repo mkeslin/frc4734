@@ -20,7 +20,7 @@ public class Shooter extends SubsystemBase {
 
     public Shooter() {
         
-         m_shooterIn = new TalonFX(SHOOTERINTOPID);
+         m_shooterIn = new TalonFX(SHOOTER_IN_ID);
         m_shooterIn.setInverted(false);
         m_shooterIn.setNeutralMode(NeutralModeValue.Brake);
         var configs1 = new TalonFXConfiguration();
@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_shooterIn.getConfigurator().apply(configs1);
 
-        m_shooterOutTop = new TalonFX(SHOOTEROUTTOPID);
+        m_shooterOutTop = new TalonFX(SHOOTER_OUT_TOP_ID);
         m_shooterOutTop.setInverted(false);
         m_shooterOutTop.setNeutralMode(NeutralModeValue.Brake);
         var configs2 = new TalonFXConfiguration();
@@ -38,7 +38,7 @@ public class Shooter extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_shooterOutTop.getConfigurator().apply(configs2);
 
-        m_shooterOutBottom = new TalonFX(SHOOTEROUTBOTTOMID);
+        m_shooterOutBottom = new TalonFX(SHOOTER_OUT_BOTTOM_ID);
         m_shooterOutBottom.setInverted(false);
         m_shooterOutBottom.setNeutralMode(NeutralModeValue.Brake);
         var configs3 = new TalonFXConfiguration();
@@ -47,7 +47,7 @@ public class Shooter extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_shooterOutBottom.getConfigurator().apply(configs3);
 
-        m_shooterPivot = new TalonFX(SHOOTERPIVOTID);
+        m_shooterPivot = new TalonFX(SHOOTER_PIVOT_ID);
         m_shooterPivot.setInverted(false);
         m_shooterPivot.setNeutralMode(NeutralModeValue.Brake);
         var configs4 = new TalonFXConfiguration();
