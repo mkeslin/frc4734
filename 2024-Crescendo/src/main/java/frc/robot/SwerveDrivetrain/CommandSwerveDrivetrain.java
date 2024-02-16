@@ -3,17 +3,18 @@ package frc.robot.SwerveDrivetrain;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,33 +27,52 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
+    /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
+    private final Rotation2d BlueAlliancePerspectiveRotation = Rotation2d.fromDegrees(0);
+    /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
+    private final Rotation2d RedAlliancePerspectiveRotation = Rotation2d.fromDegrees(180);
+    /* Keep track if we've ever applied the operator perspective before or not */
+    private boolean hasAppliedOperatorPerspective = false;
+
+    private final SwerveRequest.ApplyChassisSpeeds AutoRequest = new SwerveRequest.ApplyChassisSpeeds();
+
+    // private final SwerveRequest.SysIdSwerveTranslation TranslationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
+    // private final SwerveRequest.SysIdSwerveRotation RotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+    // private final SwerveRequest.SysIdSwerveSteerGains SteerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
+
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
+        configurePathPlanner();
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        configurePathPlanner();
     }
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
+        configurePathPlanner();
         if (Utils.isSimulation()) {
             startSimThread();
         }
-        configurePathPlanner();
     }
 
     private void configurePathPlanner() {
+        double driveBaseRadius = 0;
+        for (var moduleLocation : m_moduleLocations) {
+            driveBaseRadius = Math.max(driveBaseRadius, moduleLocation.getNorm());
+        }
+
         AutoBuilder.configureHolonomic(
             this::getPose, // Robot pose supplier
             this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
             this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             new HolonomicPathFollowerConfig(
-                // new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                // new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                new PIDConstants(10.0, 0.0, 0.0), // Translation PID constants
+                new PIDConstants(10.0, 0.0, 0.0), // Rotation PID constants
                 DrivetrainConstants.MaxSpeed, // Max module speed, in m/s
-                Units.inchesToMeters(15.026), // Drive base radius in meters. Distance from robot center to furthest module.
+                // Units.inchesToMeters(15.026), // Drive base radius in meters. Distance from robot center to furthest module.
+                driveBaseRadius, // Drive base radius in meters. Distance from robot center to furthest module.
                 new ReplanningConfig() // Default path replanning config. See the API for the options here,
             ),
             () -> {
@@ -75,6 +95,22 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         return run(() -> this.setControl(requestSupplier.get()));
     }
 
+    public Command getAutoPath(String pathName) {
+        return new PathPlannerAuto(pathName);
+    }
+
+    /*
+     * Both the sysid commands are specific to one particular sysid routine, change
+     * which one you're trying to characterize
+     */
+    // public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    //     return RoutineToApply.quasistatic(direction);
+    // }
+
+    // public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    //     return RoutineToApply.dynamic(direction);
+    // }
+
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 
@@ -93,48 +129,41 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // For use with PathPlanner
-    // private static final double MaxSpeed = DrivetrainConstants.MaxSpeed;
-    // private static final double MaxAngularRate = DrivetrainConstants.MaxAngularRate;
-
-    // private SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric()
-    //     .withDeadband(MaxSpeed * 0.1)
-    //     .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-    //     .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric driving in open loop
-    //     .withSteerRequestType(SteerRequestType.MotionMagicExpo);
-
-    private SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
-        // .withDeadband(MaxSpeed * 0.1)
-        // .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-        .withDriveRequestType(DriveRequestType.Velocity) // robot-centric driving based on velocity
-        .withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
     public Pose2d getPose() {
-        // return this.m_cachedState.Pose;
-        return this.m_odometry.getEstimatedPosition();
+        return this.getState().Pose;
     }
 
     public void resetPose(Pose2d pose) {
-        this.m_odometry.resetPosition(pose.getRotation(), this.m_modulePositions, pose);
+        this.seedFieldRelative(pose);
     }
 
     public ChassisSpeeds getRobotRelativeSpeeds() {
-        // return this.m_kinematics.toChassisSpeeds(this.m_cachedState.ModuleStates);
-
-        // var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(2.0, 2.0, Math.PI / 2.0, Rotation2d.fromDegrees(45.0));
-
-        var vx = driveRequest.VelocityX;
-        var vy = driveRequest.VelocityY;
-        var omega = driveRequest.RotationalRate;
-        return new ChassisSpeeds(vx, vy, omega);
+        return this.m_kinematics.toChassisSpeeds(this.getState().ModuleStates);
     }
 
     public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
-        this.setControl(
-                driveRequest
-                    .withVelocityX(chassisSpeeds.vxMetersPerSecond)
-                    .withVelocityY(chassisSpeeds.vyMetersPerSecond)
-                    .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond)
-            );
+        this.setControl(AutoRequest.withSpeeds(chassisSpeeds));
     }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    @Override
+    public void periodic() {
+        /* Periodically try to apply the operator perspective */
+        /* If we haven't applied the operator perspective before, then we should apply it regardless of DS state */
+        /* This allows us to correct the perspective in case the robot code restarts mid-match */
+        /* Otherwise, only check and apply the operator perspective if the DS is disabled */
+        /* This ensures driving behavior doesn't change until an explicit disable event occurs during testing*/
+        if (!hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
+            DriverStation
+                .getAlliance()
+                .ifPresent(allianceColor -> {
+                    this.setOperatorPerspectiveForward(
+                            allianceColor == Alliance.Red ? RedAlliancePerspectiveRotation : BlueAlliancePerspectiveRotation
+                        );
+                    hasAppliedOperatorPerspective = true;
+                });
+        }
+    }
 }

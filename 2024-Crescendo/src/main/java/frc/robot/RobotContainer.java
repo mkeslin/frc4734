@@ -8,14 +8,11 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Auto.AutoCommand;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.ShootSpeakerCommand;
 import frc.robot.Controllers.ControllerIds;
-import frc.robot.PathPlanner.Landmarks;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Elevator;
@@ -28,7 +25,7 @@ public class RobotContainer {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // DRIVETRAIN
-    private final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.DriveTrain;
+    public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.DriveTrain;
     // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -40,6 +37,8 @@ public class RobotContainer {
     // PATHPLANNER
     private final PathPlanner m_pathPlanner = new PathPlanner(m_drivetrain);
     private final SendableChooser<Command> m_autoChooser;
+
+    private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
 
     // SUBSYSTEMS
     private Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
@@ -187,8 +186,10 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         // return m_autoChooser.getSelected();
-        var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_limelightAligner);
-        return autoCommand;
+        // var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_limelightAligner);
+        // return autoCommand;
+
+        return runAuto;
         
         // return Commands.print("No autonomous command configured");
         // return new PathPlannerAuto("Example Auto");

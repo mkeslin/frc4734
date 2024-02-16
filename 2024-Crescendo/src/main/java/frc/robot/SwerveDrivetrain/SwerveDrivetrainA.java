@@ -17,7 +17,8 @@ public class SwerveDrivetrainA {
     private static final Slot0Configs steerGains = new Slot0Configs()
         .withKP(100)
         .withKI(0)
-        .withKD(0.2)
+        // .withKD(0.2)
+        .withKD(0.05)
         .withKS(0)
         .withKV(1.5)
         .withKA(0);
@@ -34,13 +35,13 @@ public class SwerveDrivetrainA {
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors
     private static final ClosedLoopOutputType steerClosedLoopOutput =
-        ClosedLoopOutputType.TorqueCurrentFOC;
-    //     private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.Voltage;
+        // ClosedLoopOutputType.TorqueCurrentFOC;
+        ClosedLoopOutputType.Voltage;
     // The closed-loop output type to use for the drive motors;
     // This affects the PID/FF gains for the drive motors
     private static final ClosedLoopOutputType driveClosedLoopOutput =
-        ClosedLoopOutputType.TorqueCurrentFOC;
-    //     private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.Voltage;
+        // ClosedLoopOutputType.TorqueCurrentFOC;
+        ClosedLoopOutputType.Voltage;
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
@@ -48,21 +49,20 @@ public class SwerveDrivetrainA {
 
     // Theoretical free speed (m/s) at 12v applied output;
     // This needs to be tuned to your individual robot
-    public static final double kSpeedAt12VoltsMps = 5.8;
+    public static final double kSpeedAt12VoltsMps = 5.0;
 
     // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
     // This may need to be tuned to your individual robot
-    private static final double kCoupleRatio = 2;
-    // private static final double kCoupleRatio = 0;
-    // private static final double kCoupleRatio = 7.513;
+    // private static final double kCoupleRatio = 2;
+    private static final double kCoupleRatio = 3.5;
 
     private static final double kDriveGearRatio = 5.5;
     private static final double kSteerGearRatio = 10.285714285714286;
     private static final double kWheelRadiusInches = 2;
 
     private static final boolean kSteerMotorReversed = true;
-    private static final boolean kInvertLeftSide = false;
-    private static final boolean kInvertRightSide = false;
+    // private static final boolean kInvertLeftSide = false;
+    // private static final boolean kInvertRightSide = false;
 
     private static final String kCANbusName = "Canivore";
     private static final int kPigeonId = 0;
