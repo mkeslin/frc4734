@@ -34,13 +34,14 @@ public class PathPlanner extends SubsystemBase {
         // SmartDashboard.putData("Example Auto", new PathPlannerAuto("Example Auto"));
 
         // Add a button to run pathfinding commands to SmartDashboard
-        SmartDashboard.putData("Go to Start A", moveToOurStartA());
-        SmartDashboard.putData("Go to Amp", moveToOurAmp());
-        SmartDashboard.putData("Go to Speaker", moveToOurSpeaker());
-        SmartDashboard.putData("Go to Source", moveToOurSource());
-        SmartDashboard.putData("Go to Stage 1", moveToOurStage1());
-        SmartDashboard.putData("Go to Stage 2", moveToOurStage2());
-        SmartDashboard.putData("Go to Stage 3", moveToOurStage3());
+        // SmartDashboard.putData("Go to Start A", moveToOurStartA());
+        // SmartDashboard.putData("Go to Amp", moveToOurAmp());
+        // SmartDashboard.putData("Go to Speaker", moveToOurSpeaker());
+        // SmartDashboard.putData("Go to Source", moveToOurSource());
+        // SmartDashboard.putData("Go to Stage 1", moveToOurStage1());
+        // SmartDashboard.putData("Go to Stage 2", moveToOurStage2());
+        // SmartDashboard.putData("Go to Stage 3", moveToOurStage3());
+
         // Add a button to SmartDashboard that will create and follow an on-the-fly path
         // This example will simply move the robot 2m in the +X field direction
         // SmartDashboard.putData("On-the-fly path", moveRelative(2.0, 0.0));
@@ -109,62 +110,61 @@ public class PathPlanner extends SubsystemBase {
 
     // Hard-coded
     public Command moveToOurStartA() {
-        return moveToPose(Landmarks.OurStartA);
+        return moveToPose(Landmarks.OurStartA());
     }
 
     public Command moveToOurAmp() {
-        return moveToPose(Landmarks.OurAmp);
+        return moveToPose(Landmarks.OurAmp());
     }
 
     public Command moveToOurSpeaker() {
-        return moveToPose(Landmarks.OurSpeaker);
+        return moveToPose(Landmarks.OurSpeaker());
     }
 
     public Command moveToOurSource() {
-        return moveToPose(Landmarks.OurSource);
+        return moveToPose(Landmarks.OurSource());
     }
-
     public Command moveToOurStage1() {
-        return moveToPose(Landmarks.OurStage1);
+        return moveToPose(Landmarks.OurStage1());
     }
 
     public Command moveToOurStage2() {
-        return moveToPose(Landmarks.OurStage2);
+        return moveToPose(Landmarks.OurStage2());
     }
 
     public Command moveToOurStage3() {
-        return moveToPose(Landmarks.OurStage3);
+        return moveToPose(Landmarks.OurStage3());
     }
 
-    public Command moveToOurRing1() {
-        return moveToPose(Landmarks.OurRing1);
+    public Command moveToOurNote1() {
+        return moveToPose(Landmarks.OurNote1());
     }
 
-    public Command moveToOurRing2() {
-        return moveToPose(Landmarks.OurRing2);
+    public Command moveToOurNote2() {
+        return moveToPose(Landmarks.OurNote2());
     }
 
-    public Command moveToOurRing3() {
-        return moveToPose(Landmarks.OurRing3);
+    public Command moveToOurNote3() {
+        return moveToPose(Landmarks.OurNote3());
     }
 
-    public Command moveToOurRing4() {
-        return moveToPose(Landmarks.OurRing4);
+    public Command moveToOurNote4() {
+        return moveToPose(Landmarks.OurNote4());
     }
 
-    public Command moveToOurRing5() {
-        return moveToPose(Landmarks.OurRing5);
+    public Command moveToOurNote5() {
+        return moveToPose(Landmarks.OurNote5());
     }
 
-    public Command moveToOurRing6() {
-        return moveToPose(Landmarks.OurRing6);
+    public Command moveToOurNote6() {
+        return moveToPose(Landmarks.OurNote6());
     }
 
-    public Command moveToOurRing7() {
-        return moveToPose(Landmarks.OurRing7);
+    public Command moveToOurNote7() {
+        return moveToPose(Landmarks.OurNote7());
     }
 
-    public Command moveToOurRing8() {
-        return moveToPose(Landmarks.OurRing8);
+    public Command moveToOurNote8() {
+        return moveToPose(Landmarks.OurNote8());
     }
 }

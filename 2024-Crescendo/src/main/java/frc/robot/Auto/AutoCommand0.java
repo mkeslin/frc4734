@@ -47,7 +47,7 @@ public class AutoCommand0 extends SequentialCommandGroup {
 
         addCommands(
             // move and acquire
-            pathPlanner.moveToOurRing1(),
+            pathPlanner.moveToOurNote1(),
             limelightAligner.alignToNote(),
             intake.commandStartIn(),
             Commands.runOnce(() -> pathPlanner.moveForwardRobot(.5), pathPlanner),

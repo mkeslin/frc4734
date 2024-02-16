@@ -8,6 +8,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
@@ -109,9 +110,9 @@ public class RobotContainer {
         // pathplanner test
         // Command testSequence = Commands.sequence(
         //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! move"),
-        //     // m_pathPlanner.moveToOurSource()
+        //     m_pathPlanner.moveToOurSource(),
         //     // Commands.runOnce(() -> m_pathPlanner.moveToPose(new Pose2d(0, 0, new Rotation2d(0))).schedule()),
-        //     m_pathPlanner.moveToPose(new Pose2d(50,50, new Rotation2d(0))),
+        //     // m_pathPlanner.moveToPose(new Pose2d(50,50, new Rotation2d(0))),
         //     Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake start"),
         //     m_intake.commandStartIn(),
         //     Commands.waitSeconds(2),
@@ -159,7 +160,23 @@ public class RobotContainer {
         //     m_shooter.commandStop()
         // );
 
-        // m_driveController.rightBumper().onTrue(testSequence);
+        m_driveController
+            .rightBumper()
+            .onTrue(
+                Commands.sequence(
+                    Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! move"),
+                    m_pathPlanner.moveToOurSource(),
+                    // Commands.runOnce(() -> m_pathPlanner.moveToPose(new Pose2d(0, 0, new Rotation2d(0))).schedule()),
+                    // m_pathPlanner.moveToPose(new Pose2d(50,50, new Rotation2d(0))),
+                    Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake start"),
+                    m_intake.commandStartIn(),
+                    Commands.waitSeconds(2),
+                    Commands.print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! intake stop"),
+                    m_intake.commandStopRoller(),
+
+                    m_pathPlanner.moveToOurSpeaker()
+                )
+            );
         // m_driveController.rightBumper().onTrue(m_pathPlanner.moveToOurSource());
         // m_driveController.rightBumper().onTrue(Commands.runOnce(() -> m_pathPlanner.moveToOurSource().schedule()));
 
@@ -190,7 +207,6 @@ public class RobotContainer {
         // return autoCommand;
 
         return runAuto;
-        
         // return Commands.print("No autonomous command configured");
         // return new PathPlannerAuto("Example Auto");
         // Load the path you want to follow using its name in the GUI

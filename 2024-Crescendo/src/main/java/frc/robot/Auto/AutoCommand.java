@@ -47,7 +47,7 @@ public class AutoCommand extends Command {
 
         Commands.sequence(
             // move and acquire
-            m_pathPlanner.moveToOurRing1(),
+            m_pathPlanner.moveToOurNote1(),
             m_limelightAligner.alignToNote(),
             m_intake.commandStartIn(),
             Commands.runOnce(() -> m_pathPlanner.moveForwardRobot(.5), m_pathPlanner),
