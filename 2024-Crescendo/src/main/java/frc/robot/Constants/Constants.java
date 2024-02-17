@@ -28,6 +28,7 @@ public class Constants {
 
     public static final int INTAKE_ID = 30;
     public static final int INTAKE_PIVOT_ID = 31;
+    public static final int INTAKE_SENSOR = 0;
 
     public static final int SHOOTER_IN_ID = 40;
     public static final int SHOOTER_OUT_TOP_ID = 41;

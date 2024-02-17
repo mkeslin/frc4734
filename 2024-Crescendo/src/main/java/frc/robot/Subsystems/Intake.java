@@ -7,38 +7,31 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Commands.IntakeStowCommand;
 import frc.robot.Commands.IntakeDeployCommand;
+import frc.robot.Commands.IntakeStowCommand;
 
 public class Intake extends SubsystemBase {
 
     private TalonFX m_roller;
     private TalonFX m_shooterIn;
-    private boolean stowing;
-    private boolean deploying;
-    private TalonFX pivot;
-    private double pivotEncoderVal;
+    private TalonFX m_pivot;
 
-    private double STOWED_ENCODER_VAL = -0.5;    //Actual Stowed Value: 0
-    private double DEPLOYED_ENCODER_VAL = -4.5;    //Actual Deploy Value: -5.175
+    private DigitalInput m_intakeSensor = new DigitalInput(INTAKE_SENSOR);
+
+    private double STOWED_ENCODER_VAL = -0.5; //Actual Stowed Value: 0
+    private double DEPLOYED_ENCODER_VAL = -4.5; //Actual Deploy Value: -5.175
 
     private IntakeStowCommand intakeStowCommand = new IntakeStowCommand(this, STOWED_ENCODER_VAL);
     private IntakeDeployCommand intakeDeployCommand = new IntakeDeployCommand(this, DEPLOYED_ENCODER_VAL);
-    // private TalonFX wheels2;
-    // private PneumaticHub hub;
-    // private DoubleSolenoid sol;
-    // private Compressor compressor;
 
     public Intake() {
         m_roller = new TalonFX(INTAKE_ID);
         m_shooterIn = new TalonFX(SHOOTER_IN_ID);
-        // hub = new PneumaticHub();
-        // sol = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 0, 1);
-        // compressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
         m_roller.setInverted(false);
         m_roller.setNeutralMode(NeutralModeValue.Brake);
@@ -55,20 +48,15 @@ public class Intake extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_roller.getConfigurator().apply(configs);
 
-
-        pivot = new TalonFX(INTAKE_PIVOT_ID);
-        pivot.setInverted(false);
-        pivot.setNeutralMode(NeutralModeValue.Brake);
-        pivot.setPosition(0);
+        m_pivot = new TalonFX(INTAKE_PIVOT_ID);
+        m_pivot.setInverted(false);
+        m_pivot.setNeutralMode(NeutralModeValue.Brake);
+        m_pivot.setPosition(0);
         var configs2 = new TalonFXConfiguration();
         configs2.CurrentLimits = new CurrentLimitsConfigs();
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        pivot.getConfigurator().apply(configs2);
-
-        pivotEncoderVal = 0;
-        stowing = false;
-        deploying = false;
+        m_pivot.getConfigurator().apply(configs2);
     }
 
     public Command commandStartIn() {
@@ -87,16 +75,15 @@ public class Intake extends SubsystemBase {
         return getSpeed() > 0;
     }
 
-    public double getSpeed() { 
+    public double getSpeed() {
         return m_roller.get();
     }
 
     public void startIn() {
         m_roller.set(-.55);
         m_shooterIn.set(-.55);
-        // wheels2.set(1);
 
-		SmartDashboard.putNumber("Intake speed setpoint", 1);
+        SmartDashboard.putNumber("Intake speed setpoint", 1);
     }
 
     public void startOut() {
@@ -105,55 +92,46 @@ public class Intake extends SubsystemBase {
     }
 
     public void stopRoller() {
-        // wheels1.set(ControlMode.PercentOutput, 0);
-        // wheels2.set(ControlMode.PercentOutput, 0);
-
         m_roller.set(0);
         m_shooterIn.set(0);
-        // wheels2.set(0);
 
         SmartDashboard.putNumber("Intake speed setpoint", 0);
     }
 
-
-
-
     public Command commandStow() {
         return Commands.runOnce(() -> intakeStowCommand.schedule());
     }
+
     public Command commandDeploy() {
         return Commands.runOnce(() -> intakeDeployCommand.schedule());
     }
+
     public Command commandStopPivot() {
         return Commands.run(() -> this.stopPivot());
     }
 
     public double getEncoderValue() {
-        var statusSignal = pivot.getPosition();
+        var statusSignal = m_pivot.getPosition();
         return statusSignal.getValueAsDouble();
     }
 
     public void setPivotMotor(double s) {
         SmartDashboard.putNumber("Encoder Val", getEncoderValue());
         SmartDashboard.putNumber("Speed", s);
-        pivot.set(s);
+        m_pivot.set(s);
     }
 
-    public void stopPivot()
-    {
-        pivot.set(0);
+    public void stopPivot() {
+        m_pivot.set(0);
     }
-
 
     // @Override
-	// public void periodic() {
-	// 	// setSpeed(Robot.m_oi.getIntakeSpeed());
-	// 	// System.out.println("speed " + Robot.m_oi.getIntakeSpeed());
-	// }
+    // public void periodic() {}
 
-	// @Override
-	// public void initDefaultCommand() {
-	// 	// Set the default command for a subsystem here.
-	// 	setDefaultCommand(new IntakeTelop());
-	// }
+    // @Override
+    // public void initDefaultCommand() {}
+
+    public boolean noteIsSeen() {
+        return m_intakeSensor.get();
+    }
 }

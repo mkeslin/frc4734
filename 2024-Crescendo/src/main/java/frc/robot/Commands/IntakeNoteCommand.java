@@ -29,7 +29,10 @@ public class IntakeNoteCommand extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return t.hasElapsed(2);
+        // set a time limit in case sensor fails
+        if (t.hasElapsed(2)) { return true;}
+        // main finished condition
+        return m_intake.noteIsSeen();
     }
 
     // Called once after isFinished returns true
