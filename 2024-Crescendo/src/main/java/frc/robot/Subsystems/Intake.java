@@ -75,6 +75,10 @@ public class Intake extends SubsystemBase {
         return Commands.runOnce(() -> this.startIn());
     }
 
+    public Command commandStartOut() {
+        return Commands.runOnce(() -> this.startOut());
+    }
+
     public Command commandStopRoller() {
         return Commands.runOnce(() -> this.stopRoller());
     }
@@ -93,6 +97,11 @@ public class Intake extends SubsystemBase {
         // wheels2.set(1);
 
 		SmartDashboard.putNumber("Intake speed setpoint", 1);
+    }
+
+    public void startOut() {
+        m_roller.set(.55);
+        m_shooterIn.set(.55);
     }
 
     public void stopRoller() {
@@ -130,44 +139,6 @@ public class Intake extends SubsystemBase {
         pivot.set(s);
     }
 
-    public void stow() {
-        /*stowing = true;
-        deploying = false;
-        var startEncoder = getEncoderValue();
-        var currentEncoder = startEncoder; 
-        var distance = 2;
-        //pivot.set(.125);
-        while(stowing && Math.abs(currentEncoder - startEncoder) < 4) {
-            SmartDashboard.putNumber("Intake-Pivot", getEncoderValue());
-            if(Math.abs(currentEncoder - startEncoder) > distance) {
-                pivot.set(.125);
-            } else {
-                pivot.set(.25);
-            }
-            currentEncoder = getEncoderValue();
-        }
-        pivot.set(0);
-        stowing = false;*/
-    }
-    public void deploy() {
-        /*stowing = false;
-        deploying = true;
-        var startEncoder = getEncoderValue();
-        var currentEncoder = startEncoder; 
-        var distance = 0.5;
-        //pivot.set(-.125);
-        while(deploying && Math.abs(currentEncoder - startEncoder) < 1.5) {
-            SmartDashboard.putNumber("Intake-Pivot", getEncoderValue());
-            if(Math.abs(currentEncoder - startEncoder) > distance) {
-                pivot.set(-.125);
-            } else {
-                pivot.set(-.25);
-            }
-            currentEncoder = getEncoderValue();
-        }
-        pivot.set(0);
-        deploying = false;*/
-    }
     public void stopPivot()
     {
         pivot.set(0);

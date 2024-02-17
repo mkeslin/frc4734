@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
-import frc.robot.Commands.ShootSpeakerCommand;
+import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
+import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
+import frc.robot.Commands.SequenceCommands.ShootTrapCommand;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
@@ -63,7 +65,10 @@ public class RobotContainer {
         var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
         var centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0);
         var centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, 0);
-
+        var shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
+        var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
+        var shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
+        
         // Register Named Commands
         NamedCommands.registerCommand(
             "acquireNote",
@@ -72,14 +77,11 @@ public class RobotContainer {
         );
         NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
         NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
-        NamedCommands.registerCommand(
-            "shootSpeakerNote",
-            new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_shooter, m_limelightAligner)
-        );
+        NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
+        NamedCommands.registerCommand("shootSpeakerNoteCommand", shootSpeakerNoteCommand);
+        NamedCommands.registerCommand("shootTrapNoteCommand", shootTrapNoteCommand);
         // var acquireNoteCommand = new AcquireNoteCommand(limelight, pathPlanner, intake, limelightAligner);
         // NamedCommands.registerCommand("acquireNote", acquireNoteCommand.schedule());
-        // NamedCommands.registerCommand("shootAmpNote", new ShootAmpCommand(null, pathPlanner, intake, aprilTagAligner));
-        // NamedCommands.registerCommand("shootTrapNote", new ShootTrapCommand(null, pathPlanner, intake, aprilTagAligner));
 
         // configure bindings
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
@@ -197,6 +199,7 @@ public class RobotContainer {
 
         // note alignment
         m_mechanismController.a().onTrue(acquireNoteCommand);
+        m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
         //m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
         //m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
     }
