@@ -87,8 +87,8 @@ public class Intake extends SubsystemBase {
     }
 
     public void startOut() {
-        m_roller.set(.55);
-        m_shooterIn.set(.55);
+        m_roller.set(.25);
+        m_shooterIn.set(.25);
     }
 
     public void stopRoller() {

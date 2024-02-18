@@ -1,35 +1,33 @@
 package frc.robot.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.Elevator;
 
-public class IntakeStowCommand extends Command {
-    public Intake m_intake;
+public class ElevatorExtendCommand extends Command {
+    public Elevator m_Elevator;
     public double target_val;
-    public double start_val;
     public double current_val;
     
 
-    public IntakeStowCommand(Intake intake, double target) {
-        m_intake = intake;
+    public ElevatorExtendCommand(Elevator elevator, double target) {
+        m_Elevator = elevator;
         target_val = target;
-        addRequirements(m_intake);
+        addRequirements(m_Elevator);
     }
 
     // Called just before this Command runs the first time
     @Override
     public void initialize() {
-        current_val = m_intake.getEncoderValue();
-        start_val = m_intake.getEncoderValue();
+        current_val = m_Elevator.getExtendEncoderValue();
     }
 
     @Override
     public void execute() {
-        current_val = m_intake.getEncoderValue();
-        if(current_val > start_val/2) {
-            m_intake.setPivotMotor(0.1);
+        current_val = m_Elevator.getExtendEncoderValue();
+        if(current_val > target_val * 0.75) {
+            m_Elevator.setExtendRetractMotor(0.65);
         } else {
-            m_intake.setPivotMotor(0.2);
+            m_Elevator.setExtendRetractMotor(0.85);
         }
     }
 
@@ -42,6 +40,6 @@ public class IntakeStowCommand extends Command {
     // Called once after isFinished returns true
     @Override
     public void end(boolean interrupted) {
-        m_intake.stopPivot();
+        m_Elevator.StopExtendRetract();
     }
 }

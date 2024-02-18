@@ -18,10 +18,13 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 // import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Commands.ElevatorStowCommand;
+import frc.robot.Commands.ElevatorDeployCommand;
+import frc.robot.Commands.ElevatorExtendCommand;
+import frc.robot.Commands.ElevatorRetractCommand;
 
 // public enum ElevatorDirection {
 //   ELEVATOR_UP,      // Elevator is going up
@@ -38,6 +41,16 @@ public class Elevator extends SubsystemBase {
     private int zeroValue, halfValue, fullValue;
     private double m1EncoderVal, m2EncoderVal;
     private String name;
+
+    private double STOWED_ENCODER_VAL = 15; //Actual Stowed Value: 15.97
+    private double DEPLOYED_ENCODER_VAL = -22; //Actual Deploy Value: -20.45
+    private double RETRACT_ENCODER_VAL = 3; //Actual Stowed Value: 0
+    private double EXTEND_ENCODER_VAL = 190; //Actual Deploy Value: -198
+
+    private ElevatorStowCommand elevatorStowCommand = new ElevatorStowCommand(this, STOWED_ENCODER_VAL);
+    private ElevatorDeployCommand elevatorDeployCommand = new ElevatorDeployCommand(this, DEPLOYED_ENCODER_VAL);
+    private ElevatorExtendCommand elevatorExtendCommand = new ElevatorExtendCommand(this, EXTEND_ENCODER_VAL);
+    private ElevatorRetractCommand elevatorRetractCommand = new ElevatorRetractCommand(this, RETRACT_ENCODER_VAL);
 
     public Elevator() {
         // public Elevator(String n, int id1, int id2, int zero, int half, int full) {
@@ -127,30 +140,74 @@ public class Elevator extends SubsystemBase {
         return Commands.runOnce(() -> Retract());
     }
 
-    public Command CommandPivotOut() {
-        return Commands.runOnce(() -> PivotOut());
+    public Command CommandFullExtend() {
+        return Commands.runOnce(() -> elevatorExtendCommand.schedule());
     }
 
-    public Command CommandPivotIn() {
-        return Commands.runOnce(() -> PivotIn());
+    public Command CommandFullRetract() {
+        return Commands.runOnce(() -> elevatorRetractCommand.schedule());
+    }
+
+    public Command CommandStopExtendRetract() {
+        return Commands.runOnce(() -> StopExtendRetract());
+    }
+
+    public Command CommandPivotDeploy() {
+        return Commands.runOnce(() -> elevatorDeployCommand.schedule());
+    }
+
+    public Command CommandPivotStow() {
+        return Commands.runOnce(() -> elevatorStowCommand.schedule());
+    }
+
+    public Command CommandPivotStop() {
+        return Commands.runOnce(() -> StopPivot());
     }
 
     public void Extend() {
-        m_elevatorLeft.set(-.05);
-        m_elevatorRight.set(.05);
+        m_elevatorLeft.set(-.85);
+        m_elevatorRight.set(-.85);
     }
 
     public void Retract() {
-        m_elevatorLeft.set(.05);
-        m_elevatorRight.set(-.05);
+        m_elevatorLeft.set(.85);
+        m_elevatorRight.set(.85);
+    }
+
+    public void setExtendRetractMotor(double s) {
+        m_elevatorLeft.set(s);
+        m_elevatorRight.set(s);
+    }
+
+    public void StopExtendRetract() {
+        m_elevatorLeft.set(0);
+        m_elevatorRight.set(0);
+    }
+
+    public void setPivot(double s) {
+        m_elevatorPivot.set(s);
     }
 
     public void PivotOut() {
-        m_elevatorPivot.set(.1);
+        setPivot(0.1);
     }
 
     public void PivotIn() {
-        m_elevatorPivot.set(-.1);
+        setPivot(-0.1);
+    }
+
+    public void StopPivot() {
+        setPivot(0);
+    }
+
+    public double getExtendEncoderValue() {
+        var statusSignal = m_elevatorLeft.getPosition();
+        return statusSignal.getValueAsDouble();
+    }
+
+    public double getPivotEncoderValue() {
+        var statusSignal = m_elevatorPivot.getPosition();
+        return statusSignal.getValueAsDouble();
     }
     // @Override
     // public void periodic() {

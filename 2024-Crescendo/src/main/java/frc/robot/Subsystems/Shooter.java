@@ -73,7 +73,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void shoot() {
-        shoot(.55);
+        shoot(.85);
     }
 
     public void shoot(double speed) {

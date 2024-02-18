@@ -12,7 +12,8 @@ public class ShootNoteCommand extends Command {
 
     public ShootNoteCommand(Intake intake, Shooter shooter) {
         m_intake = intake;
-        addRequirements(m_intake);
+        m_shooter = shooter;
+        addRequirements(m_intake, m_shooter);
     }
 
     // Called just before this Command runs the first time
@@ -23,10 +24,10 @@ public class ShootNoteCommand extends Command {
 
     @Override
     public void execute() {
-        if(t.get() < 0.5) {
+        if(t.get() < 0.2) {
             m_intake.startOut();
         } else {
-            m_shooter.commandShoot();
+            m_shooter.shoot();
             if(t.get() < 2) {
                 m_intake.stopRoller();
             }
