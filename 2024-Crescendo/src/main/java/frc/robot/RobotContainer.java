@@ -15,6 +15,7 @@ import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
 import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
 import frc.robot.Commands.SequenceCommands.ShootTrapCommand;
+import frc.robot.Controllers.ControllerButtons;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
@@ -205,8 +206,10 @@ public class RobotContainer {
         // note alignment
         m_mechanismController.a().onTrue(acquireNoteCommand);
         m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
-        m_mechanismController.y().onTrue(m_intake.commandStartIn());
-        m_mechanismController.x().onTrue(m_intake.commandStopRoller());
+        m_mechanismController.y().onTrue(m_shooter.commandSetAngle(13));
+        m_mechanismController.x().onTrue(m_shooter.commandSetAngle(0));
+        //m_mechanismController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(m_shooter.commandSetAngle(13));
+        //m_mechanismController.axisGreaterThan(ControllerButtons.CLY, 0.5).whileTrue(m_shooter.commandSetAngle(0));
         //m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
         //m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
     }

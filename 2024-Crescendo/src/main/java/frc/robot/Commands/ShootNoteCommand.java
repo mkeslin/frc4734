@@ -47,7 +47,7 @@ public class ShootNoteCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         m_intake.stopRoller();
-        m_shooter.stop();
+        m_shooter.stopShoot();
         t.stop();
         t.reset();
     }

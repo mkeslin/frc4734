@@ -7,9 +7,11 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Commands.ShooterSetAngleCommand;
 
 public class Shooter extends SubsystemBase {
 
@@ -17,6 +19,10 @@ public class Shooter extends SubsystemBase {
     private TalonFX m_shooterOutTop;
     private TalonFX m_shooterOutBottom;
     private TalonFX m_shooterPivot;
+
+    private double MAX_PIVOT_ENCODER_VAL = 13.5; //Actual Max Value: 13.64
+
+    private ShooterSetAngleCommand shooterSetAngleCommand = new ShooterSetAngleCommand(this, MAX_PIVOT_ENCODER_VAL);
 
     public Shooter() {
         
@@ -55,6 +61,7 @@ public class Shooter extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_shooterPivot.getConfigurator().apply(configs4);
+        m_shooterPivot.setPosition(0);
 
 
         // roller.getConfigurator().apply(new Config);
@@ -69,7 +76,22 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command commandStop() {
-        return Commands.runOnce(() -> this.stop());
+        return Commands.runOnce(() -> this.stopShoot());
+    }
+
+    public Command commandSetAngle(double a) {
+        return Commands.runOnce(() -> {
+            shooterSetAngleCommand.setTarget(a);
+            shooterSetAngleCommand.schedule();
+        });
+    }
+
+    public Command commandIncrementAngle(double a) {
+        return Commands.runOnce(() -> {
+            SmartDashboard.putNumber("Oi", a);
+            //shooterSetAngleCommand.setTarget(getPivotEncoderValue() + a);
+            //shooterSetAngleCommand.schedule();
+        });
     }
 
     public void shoot() {
@@ -82,9 +104,22 @@ public class Shooter extends SubsystemBase {
         m_shooterIn.set(-speed);
     }
 
-    public void stop() {
+    public void stopShoot() {
         m_shooterOutTop.set(0);
         m_shooterOutBottom.set(0);
         m_shooterIn.set(0);
+    }
+
+    public double getPivotEncoderValue() {
+        var statusSignal = m_shooterPivot.getPosition();
+        return statusSignal.getValueAsDouble();
+    }
+
+    public void setPivotMotor(double s) {
+        m_shooterPivot.set(s);
+    }
+
+    public void stopPivot() {
+        setPivotMotor(0);
     }
 }

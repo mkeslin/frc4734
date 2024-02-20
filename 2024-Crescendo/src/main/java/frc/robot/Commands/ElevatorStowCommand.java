@@ -26,7 +26,7 @@ public class ElevatorStowCommand extends Command {
     @Override
     public void execute() {
         current_val = m_Elevator.getPivotEncoderValue();
-        if(current_val > start_val/2) {
+        if(current_val > start_val * 0.3) {
             m_Elevator.setPivot(0.1);
         } else {
             m_Elevator.setPivot(0.2);
