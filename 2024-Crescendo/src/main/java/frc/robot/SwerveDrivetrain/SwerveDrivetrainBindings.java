@@ -11,18 +11,18 @@ public class SwerveDrivetrainBindings {
     private static final double MaxAngularRate = DrivetrainConstants.MaxAngularRate;
 
     // field-centric
-    private static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+    private static final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
         .withDeadband(MaxSpeed * 0.1)
         .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // field-centric driving in open loop
         // .withSteerRequestType(SteerRequestType.MotionMagicExpo);
-    private static final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private static final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+    private static final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
+    private static final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
     
     // robot-centric
-    private static final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    private static final SwerveRequest.RobotCentric m_forwardStraight = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     
-    private static final SwerveDrivetrainTelemetry logger = new SwerveDrivetrainTelemetry(MaxSpeed);
+    private static final SwerveDrivetrainTelemetry m_logger = new SwerveDrivetrainTelemetry(MaxSpeed);
 
     public static void configureBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
         // Drivetrain will execute this command periodically
@@ -36,23 +36,23 @@ public class SwerveDrivetrainBindings {
                 //     coordinateOrientation = 1;
                 // }
 
-                drive
+                m_drive
                     .withVelocityX(coordinateOrientation * driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(coordinateOrientation * driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-driveController.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
 
-                return drive;
+                return m_drive;
             }).ignoringDisable(true)
         );
 
         // A Button: Brake
-        driveController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        driveController.a().whileTrue(drivetrain.applyRequest(() -> m_brake));
 
         // B Button
         driveController
             .b()
             .whileTrue(
-                drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX())))
+                drivetrain.applyRequest(() -> m_point.withModuleDirection(new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX())))
             );
 
         // LEFT BUMPER: Reset the field-centric heading
@@ -77,7 +77,7 @@ public class SwerveDrivetrainBindings {
         //     drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         // }
 
-        drivetrain.registerTelemetry(logger::telemeterize);
+        drivetrain.registerTelemetry(m_logger::telemeterize);
 
         // driveController.pov(0).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
         // driveController.pov(180).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));

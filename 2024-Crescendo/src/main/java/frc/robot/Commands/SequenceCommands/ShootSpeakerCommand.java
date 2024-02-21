@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
-import frc.robot.Subsystems.LimelightAligner;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Intake;
 

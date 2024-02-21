@@ -23,18 +23,18 @@ import java.util.function.Supplier;
 
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
 
-    private static final double kSimLoopPeriod = 0.005; // 5 ms
+    private static final double m_simLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
-    private final Rotation2d BlueAlliancePerspectiveRotation = Rotation2d.fromDegrees(0);
+    private final Rotation2d m_blueAlliancePerspectiveRotation = Rotation2d.fromDegrees(0);
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
-    private final Rotation2d RedAlliancePerspectiveRotation = Rotation2d.fromDegrees(180);
+    private final Rotation2d m_redAlliancePerspectiveRotation = Rotation2d.fromDegrees(180);
     /* Keep track if we've ever applied the operator perspective before or not */
-    private boolean hasAppliedOperatorPerspective = false;
+    private boolean m_hasAppliedOperatorPerspective = false;
 
-    private final SwerveRequest.ApplyChassisSpeeds AutoRequest = new SwerveRequest.ApplyChassisSpeeds();
+    private final SwerveRequest.ApplyChassisSpeeds m_autoRequest = new SwerveRequest.ApplyChassisSpeeds();
 
     // private final SwerveRequest.SysIdSwerveTranslation TranslationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     // private final SwerveRequest.SysIdSwerveRotation RotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
@@ -124,7 +124,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 /* use the measured time delta, get battery voltage from WPILib */
                 updateSimState(deltaTime, RobotController.getBatteryVoltage());
             });
-        m_simNotifier.startPeriodic(kSimLoopPeriod);
+        m_simNotifier.startPeriodic(m_simLoopPeriod);
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,7 +143,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
-        this.setControl(AutoRequest.withSpeeds(chassisSpeeds));
+        this.setControl(m_autoRequest.withSpeeds(chassisSpeeds));
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,14 +155,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         /* This allows us to correct the perspective in case the robot code restarts mid-match */
         /* Otherwise, only check and apply the operator perspective if the DS is disabled */
         /* This ensures driving behavior doesn't change until an explicit disable event occurs during testing*/
-        if (!hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
+        if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation
                 .getAlliance()
                 .ifPresent(allianceColor -> {
                     this.setOperatorPerspectiveForward(
-                            allianceColor == Alliance.Red ? RedAlliancePerspectiveRotation : BlueAlliancePerspectiveRotation
+                            allianceColor == Alliance.Red ? m_redAlliancePerspectiveRotation : m_blueAlliancePerspectiveRotation
                         );
-                    hasAppliedOperatorPerspective = true;
+                    m_hasAppliedOperatorPerspective = true;
                 });
         }
     }

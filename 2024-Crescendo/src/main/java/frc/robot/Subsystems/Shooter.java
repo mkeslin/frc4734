@@ -6,7 +6,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,11 +21,10 @@ public class Shooter extends SubsystemBase {
 
     private double MAX_PIVOT_ENCODER_VAL = 13.5; //Actual Max Value: 13.64
 
-    private ShooterSetAngleCommand shooterSetAngleCommand = new ShooterSetAngleCommand(this, MAX_PIVOT_ENCODER_VAL);
+    private ShooterSetAngleCommand m_shooterSetAngleCommand = new ShooterSetAngleCommand(this, MAX_PIVOT_ENCODER_VAL);
 
     public Shooter() {
-        
-         m_shooterIn = new TalonFX(SHOOTER_IN_ID);
+        m_shooterIn = new TalonFX(SHOOTER_IN_ID);
         m_shooterIn.setInverted(false);
         m_shooterIn.setNeutralMode(NeutralModeValue.Brake);
         var configs1 = new TalonFXConfiguration();
@@ -62,9 +60,6 @@ public class Shooter extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_shooterPivot.getConfigurator().apply(configs4);
         m_shooterPivot.setPosition(0);
-
-
-        // roller.getConfigurator().apply(new Config);
     }
 
     public Command commandShoot() {
@@ -81,8 +76,8 @@ public class Shooter extends SubsystemBase {
 
     public Command commandSetAngle(double a) {
         return Commands.runOnce(() -> {
-            shooterSetAngleCommand.setTarget(a);
-            shooterSetAngleCommand.schedule();
+            m_shooterSetAngleCommand.setTarget(a);
+            m_shooterSetAngleCommand.schedule();
         });
     }
 

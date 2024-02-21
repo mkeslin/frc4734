@@ -4,18 +4,13 @@
 
 package frc.robot.Commands.SequenceCommands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.IntakeNoteCommand;
 import frc.robot.Commands.MoveToNoteCommand;
-// import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Intake;
-import frc.robot.Subsystems.LimelightAligner;
 
 /*
  * Use limelight to find note
@@ -44,6 +39,7 @@ public class AcquireNoteCommand extends SequentialCommandGroup {
             new IntakeNoteCommand(m_intake)
         );
     }
+    
     // Called just before this Command runs the first time
     // @Override
     // public void initialize() {}

@@ -3,17 +3,9 @@ package frc.robot.Subsystems;
 import static frc.robot.Constants.Constants.ELEVATOR_ID;
 import static frc.robot.Constants.Constants.ELEVATOR_PIVOT_ID;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-// import com.ctre.phoenix.motorcontrol.ControlMode;
-// import com.ctre.phoenix.motorcontrol.DemandType;
-// import com.ctre.phoenix.motorcontrol.ControlMode;
-// import com.ctre.phoenix.motorcontrol.DemandType;
-// import com.ctre.phoenix.motorcontrol.NeutralMode;
-// import com.ctre.phoenix.motorcontrol.ControlMode;
-// import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-// import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,44 +14,22 @@ import frc.robot.Commands.ElevatorDeployCommand;
 import frc.robot.Commands.ElevatorExtendCommand;
 import frc.robot.Commands.ElevatorRetractCommand;
 
-// public enum ElevatorDirection {
-//   ELEVATOR_UP,      // Elevator is going up
-//   ELEVATOR_DOWN,    // Elevator is going down
-//   ELEVATOR_HOLD     // Elevator is being held
-// }
-
 public class Elevator extends SubsystemBase {
 
     private TalonFX m_elevatorPivot;
     private TalonFX m_elevator;
-    // private TalonFX m_elevatorRight;
-    // private boolean elevatorMovingIn, elevatorMovingOut;
-    // private int zeroValue, halfValue, fullValue;
-    // private double m1EncoderVal, m2EncoderVal;
-    // private String name;
 
     private double STOWED_ENCODER_VAL = 31; //Actual Stowed Value: 32.38
     private double DEPLOYED_ENCODER_VAL = 1; //Actual Deploy Value: 0
     private double RETRACT_ENCODER_VAL = 3; //Actual Stowed Value: 0
     private double EXTEND_ENCODER_VAL = 190; //Actual Deploy Value: -198
 
-    private ElevatorStowCommand elevatorStowCommand = new ElevatorStowCommand(this, STOWED_ENCODER_VAL);
-    private ElevatorDeployCommand elevatorDeployCommand = new ElevatorDeployCommand(this, DEPLOYED_ENCODER_VAL);
-    private ElevatorExtendCommand elevatorExtendCommand = new ElevatorExtendCommand(this, EXTEND_ENCODER_VAL);
-    private ElevatorRetractCommand elevatorRetractCommand = new ElevatorRetractCommand(this, RETRACT_ENCODER_VAL);
+    private ElevatorStowCommand m_elevatorStowCommand = new ElevatorStowCommand(this, STOWED_ENCODER_VAL);
+    private ElevatorDeployCommand m_elevatorDeployCommand = new ElevatorDeployCommand(this, DEPLOYED_ENCODER_VAL);
+    private ElevatorExtendCommand m_ = new ElevatorExtendCommand(this, EXTEND_ENCODER_VAL);
+    private ElevatorRetractCommand m_elevatorRetractCommand = new ElevatorRetractCommand(this, RETRACT_ENCODER_VAL);
 
     public Elevator() {
-        // public Elevator(String n, int id1, int id2, int zero, int half, int full) {
-        // motor1 = new TalonFX(id1);
-        // motor2 = new TalonFX(id2);
-        // motor1.setPosition(0);
-        // motor2.setPosition(0);
-        // motor1.setNeutralMode(NeutralModeValue.Brake);
-        // motor2.setNeutralMode(NeutralModeValue.Brake);
-
-        // // in init function
-        // var talonFXConfigs = new TalonFXConfiguration();
-
         // // set slot 0 gains
         // var slot0Configs = talonFXConfigs.Slot0;
         // // slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
@@ -108,16 +78,6 @@ public class Elevator extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_elevator.getConfigurator().apply(configs2);
 
-        // m_elevatorRight = new TalonFX(ELEVATOR_RIGHT_ID);
-        // m_elevatorRight.setInverted(false);
-        // m_elevatorRight.setNeutralMode(NeutralModeValue.Brake);
-        // m_elevatorRight.setPosition(0);
-        // var configs3 = new TalonFXConfiguration();
-        // configs3.CurrentLimits = new CurrentLimitsConfigs();
-        // // configs.CurrentLimits.SupplyCurrentLimit = 20;
-        // // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        // m_elevatorRight.getConfigurator().apply(configs3);
-
         // zeroValue = zero;
         // halfValue = half;
         // fullValue = full;
@@ -137,11 +97,11 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command CommandFullExtend() {
-        return Commands.runOnce(() -> elevatorExtendCommand.schedule());
+        return Commands.runOnce(() -> m_.schedule());
     }
 
     public Command CommandFullRetract() {
-        return Commands.runOnce(() -> elevatorRetractCommand.schedule());
+        return Commands.runOnce(() -> m_elevatorRetractCommand.schedule());
     }
 
     public Command CommandStopExtendRetract() {
@@ -149,11 +109,11 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command CommandPivotDeploy() {
-        return Commands.runOnce(() -> elevatorDeployCommand.schedule());
+        return Commands.runOnce(() -> m_elevatorDeployCommand.schedule());
     }
 
     public Command CommandPivotStow() {
-        return Commands.runOnce(() -> elevatorStowCommand.schedule());
+        return Commands.runOnce(() -> m_elevatorStowCommand.schedule());
     }
 
     public Command CommandPivotStop() {
@@ -162,22 +122,18 @@ public class Elevator extends SubsystemBase {
 
     public void Extend() {
         m_elevator.set(-.85);
-        // m_elevatorRight.set(-.85);
     }
 
     public void Retract() {
         m_elevator.set(.85);
-        // m_elevatorRight.set(.85);
     }
 
     public void setExtendRetractMotor(double s) {
         m_elevator.set(s);
-        // m_elevatorRight.set(s);
     }
 
     public void StopExtendRetract() {
         m_elevator.set(0);
-        // m_elevatorRight.set(0);
     }
 
     public void setPivot(double s) {
@@ -205,96 +161,9 @@ public class Elevator extends SubsystemBase {
         var statusSignal = m_elevatorPivot.getPosition();
         return statusSignal.getValueAsDouble();
     }
+    
     // @Override
     // public void periodic() {
     //     // This method will be called once per scheduler run
-    // }
-
-    // public void movePositive() {
-    //     SmartDashboard.putNumber(name + "Elevator", getElevatorEncoderValue());
-
-    //     elevatorMovingOut = true;
-    //     elevatorMovingIn = false;
-
-    //     // create a Motion Magic request, voltage output, slot 0 configs
-    //     var request = new MotionMagicVoltage(0).withSlot(0);
-
-    //     // set position to 10 rotations
-    //     motor1.setControl(request.withPosition(10));
-    //     motor2.setControl(request.withPosition(10));
-    //     // if (Math.abs(getElevatorEncoderValue()) < Math.abs(halfValue)) {
-    //     //     motor1.set(ControlMode.PercentOutput, Math.signum(fullValue) * 0.25);
-    //     //     motor2.set(ControlMode.PercentOutput, Math.signum(fullValue) * 0.25);
-    //     // } else if (Math.abs(getElevatorEncoderValue()) < Math.abs(fullValue)) {
-    //     //     motor1.set(ControlMode.PercentOutput, Math.signum(fullValue) * 0.1);
-    //     //     motor2.set(ControlMode.PercentOutput, Math.signum(fullValue) * 0.1);
-    //     // } else {
-    //     //     setZero(fullValue);
-    //     //     elevatorMovingOut = false;
-    //     // }
-    // }
-
-    // public void moveNegative() {
-    //     SmartDashboard.putNumber(name + "Elevator", getElevatorEncoderValue());
-
-    //     elevatorMovingOut = false;
-    //     elevatorMovingIn = true;
-
-    //     // create a Motion Magic request, voltage output, slot 0 configs
-    //     var request = new MotionMagicVoltage(0).withSlot(0);
-
-    //     // set position to 10 rotations
-    //     motor1.setControl(request.withPosition(10));
-    //     motor2.setControl(request.withPosition(10));
-    //     // if (Math.abs(getElevatorEncoderValue()) > Math.abs(halfValue)) {
-    //     //     motor1.set(ControlMode.PercentOutput, -Math.signum(fullValue) * 0.25);
-    //     //     motor2.set(ControlMode.PercentOutput, -Math.signum(fullValue) * 0.25);
-    //     // } else if (Math.abs(getElevatorEncoderValue()) > Math.abs(zeroValue)) {
-    //     //     motor1.set(ControlMode.PercentOutput, -Math.signum(fullValue) * 0.1);
-    //     //     motor2.set(ControlMode.PercentOutput, -Math.signum(fullValue) * 0.1);
-    //     // } else {
-    //     //     setZero(motor1.getSelectedSensorPosition());
-    //     //     elevatorMovingIn = false;
-    //     // }
-    // }
-
-    // public void setZero(double z) {
-    //     m1EncoderVal = z;
-    //     m2EncoderVal = z;
-    // }
-
-    // public void zero() {
-    //     // if (Math.abs(m1EncoderVal - getElevatorEncoderValue()) > 200 && m1EncoderVal > 40000) {
-    //     //     motor1.set(
-    //     //         ControlMode.MotionMagic,
-    //     //         m1EncoderVal,
-    //     //         DemandType.ArbitraryFeedForward,
-    //     //         0.069
-    //     //     );
-    //     //     motor2.set(
-    //     //         ControlMode.MotionMagic,
-    //     //         m2EncoderVal,
-    //     //         DemandType.ArbitraryFeedForward,
-    //     //         0.069
-    //     //     );
-    //     // } else {
-    //     //     motor1.set(ControlMode.PercentOutput, 0);
-    //     //     motor2.set(ControlMode.PercentOutput, 0);
-    //     // }
-    //     SmartDashboard.putNumber(name + "Elevator", getElevatorEncoderValue());
-    //     SmartDashboard.putNumber(name + "Magic", m1EncoderVal);
-    // }
-
-    // public double getElevatorEncoderValue() {
-    //     // return motor1.getSelectedSensorPosition();
-    //     return 0;
-    // }
-
-    // public boolean getElevatorMovingIn() {
-    //     return elevatorMovingIn;
-    // }
-
-    // public boolean getElevatorMovingOut() {
-    //     return elevatorMovingOut;
     // }
 }

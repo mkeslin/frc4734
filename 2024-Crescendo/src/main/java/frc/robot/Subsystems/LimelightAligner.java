@@ -10,33 +10,33 @@ import frc.robot.Subsystems.Cameras.Limelight;
 
 public class LimelightAligner extends SubsystemBase {
     
-    public Limelight shooterLimelight;
-    public Limelight intakeLimelight;
+    public Limelight m_shooterLimelight;
+    public Limelight m_intakeLimelight;
     public PathPlanner m_PathPlanner;
 
-    private CenterToTargetCommand centerIntakeCommand;
-    private CenterToTargetCommand centerShooterCommand;
+    private CenterToTargetCommand m_centerIntakeCommand;
+    private CenterToTargetCommand m_centerShooterCommand;
 
     private double MAX_WHEEL_STRAFE = 1;
     private double MAX_CAMERA_X = 30;
-    private double wheelStrafe;
+    private double m_wheelStrafe;
 
     public LimelightAligner(Limelight shooterCamera, Limelight intakeCamera, PathPlanner pathPlanner) {
-        intakeLimelight = intakeCamera;
-        shooterLimelight = shooterCamera;
+        m_intakeLimelight = intakeCamera;
+        m_shooterLimelight = shooterCamera;
         m_PathPlanner = pathPlanner;
-        centerIntakeCommand = new CenterToTargetCommand(intakeLimelight, m_PathPlanner, 0);
-        centerShooterCommand = new CenterToTargetCommand(shooterLimelight, m_PathPlanner, 0);
+        m_centerIntakeCommand = new CenterToTargetCommand(m_intakeLimelight, m_PathPlanner, 0);
+        m_centerShooterCommand = new CenterToTargetCommand(m_shooterLimelight, m_PathPlanner, 0);
     }
 
     public Command alignToTag(int aprilTagId) {
-        return Commands.runOnce(() -> {centerToTarget(shooterLimelight, aprilTagId);});
+        return Commands.runOnce(() -> {centerToTarget(m_shooterLimelight, aprilTagId);});
     }
 
     public Command alignToNote() {
         return Commands.runOnce(() -> {
-            SmartDashboard.putNumber("bruh", intakeLimelight.getX());
-            centerIntakeCommand.execute();
+            SmartDashboard.putNumber("bruh", m_intakeLimelight.getX());
+            m_centerIntakeCommand.execute();
             //centerToTarget(intakeLimelight, 0);
         });
     }
@@ -52,8 +52,8 @@ public class LimelightAligner extends SubsystemBase {
                 
                 SmartDashboard.putString("node-pose", "right");
             }
-            wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (limelight.getX()/MAX_CAMERA_X + 1));
-            m_PathPlanner.moveRelative(1, wheelStrafe, 0);
+            m_wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (limelight.getX()/MAX_CAMERA_X + 1));
+            m_PathPlanner.moveRelative(1, m_wheelStrafe, 0);
 
         } else {
             SmartDashboard.putString("node-pose", "none");

@@ -26,8 +26,8 @@ public class Intake extends SubsystemBase {
     private double STOWED_ENCODER_VAL = -0.5; //Actual Stowed Value: 0
     private double DEPLOYED_ENCODER_VAL = -4.5; //Actual Deploy Value: -5.175
 
-    private IntakeStowCommand intakeStowCommand = new IntakeStowCommand(this, STOWED_ENCODER_VAL);
-    private IntakeDeployCommand intakeDeployCommand = new IntakeDeployCommand(this, DEPLOYED_ENCODER_VAL);
+    private IntakeStowCommand m_intakeStowCommand = new IntakeStowCommand(this, STOWED_ENCODER_VAL);
+    private IntakeDeployCommand m_intakeDeployCommand = new IntakeDeployCommand(this, DEPLOYED_ENCODER_VAL);
 
     public Intake() {
         m_roller = new TalonFX(INTAKE_ID);
@@ -40,12 +40,11 @@ public class Intake extends SubsystemBase {
         // wheels1.configPeakCurrentLimit(40);
         // wheels1.configPeakCurrentDuration(400);
         // wheels1.enableCurrentLimit(true);
-        // talon.setName("Intake");
-
         var configs = new TalonFXConfiguration();
         configs.CurrentLimits = new CurrentLimitsConfigs();
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
+        configs.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.15;
         m_roller.getConfigurator().apply(configs);
 
         m_pivot = new TalonFX(INTAKE_PIVOT_ID);
@@ -99,11 +98,11 @@ public class Intake extends SubsystemBase {
     }
 
     public Command commandStow() {
-        return Commands.runOnce(() -> intakeStowCommand.schedule());
+        return Commands.runOnce(() -> m_intakeStowCommand.schedule());
     }
 
     public Command commandDeploy() {
-        return Commands.runOnce(() -> intakeDeployCommand.schedule());
+        return Commands.runOnce(() -> m_intakeDeployCommand.schedule());
     }
 
     public Command commandStopPivot() {

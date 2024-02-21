@@ -52,30 +52,17 @@ public class RobotContainer {
     private Elevator m_elevator = new Elevator();
     private LimelightAligner m_limelightAligner = new LimelightAligner(m_shooterLimelight, m_intakeLimelight, m_pathPlanner);
 
-    // private TelescopeArm telescopeArm = new TelescopeArm();
-    // private Elevator horizontalElevator;
-    // private Elevator verticalElevator;
-
     public RobotContainer() {
-        // initialize subsystems
-        // horizontalElevator =
-        //     new Elevator("horizontal", HORELEVATOR1ID, HORELEVATOR2ID, -200, -14000, -24000);
-        // verticalElevator =
-        //     new Elevator("vertical", VERTELEVATOR1ID, VERTELEVATOR2ID, 3000, 45000, 45000);
-
+        // Commands
         var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
         var centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0);
         var centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, 0);
         var shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
         var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
         var shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
-        
+
         // Register Named Commands
-        NamedCommands.registerCommand(
-            "acquireNote",
-            acquireNoteCommand
-            // intake.commandStartIn().andThen(Commands.waitSeconds(2).andThen(intake.commandStop()))
-        );
+        NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
         NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
         NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
         NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
@@ -98,21 +85,29 @@ public class RobotContainer {
         m_driveController.leftTrigger().onTrue(m_intake.commandDeploy());
         m_driveController.b().onTrue(m_intake.commandStopPivot());
 
-        m_driveController.rightBumper().onTrue(m_elevator.CommandPivotStow());
-        m_driveController.rightTrigger().onTrue(m_elevator.CommandPivotDeploy());
-        m_driveController.b().onTrue(m_elevator.CommandPivotStop());
-
         // shooter
         m_driveController.y().onTrue(m_shooter.commandShoot());
         m_driveController.x().onTrue(m_shooter.commandStop());
 
         // elevator
-        //m_driveController.b().onTrue(m_elevator.CommandExtend());
-        //m_driveController.leftTrigger().onTrue(m_elevator.CommandRetract());
-        //m_driveController.a().onTrue(m_elevator.CommandStopExtendRetract());
-        // m_driveController.y().onTrue(m_elevator.CommandPivotOut());
-        // m_driveController.x().onTrue(m_elevator.CommandPivotIn());
+        m_driveController.rightBumper().onTrue(m_elevator.CommandPivotStow());
+        m_driveController.rightTrigger().onTrue(m_elevator.CommandPivotDeploy());
+        m_driveController.b().onTrue(m_elevator.CommandPivotStop());
 
+        // LEFT STICK - Y - ELEVATOR EXTEND/RETRACT
+        m_mechanismController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(m_elevator.CommandExtend());
+        m_mechanismController.axisGreaterThan(ControllerButtons.CLY, 0.5).whileTrue(m_elevator.CommandRetract());
+        m_driveController.b().onTrue(m_elevator.CommandStopExtendRetract());
+
+        // RIGHT STICK - Y - SHOOTER ANGLE
+        m_mechanismController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(13));
+        m_mechanismController.axisGreaterThan(ControllerButtons.CRY, 0.5).whileTrue(m_shooter.commandSetAngle(0));
+
+        // RIGHT STICK - X - ELEVATOR ANGLE
+        m_mechanismController.axisLessThan(ControllerButtons.CRX, -0.5).onTrue(m_elevator.CommandPivotDeploy());
+        m_mechanismController.axisGreaterThan(ControllerButtons.CRX, 0.5).whileTrue(m_elevator.CommandPivotStow());
+
+        // commands
         // m_driveController.rightBumper().onTrue(acquireNoteCommand);
 
         // pathplanner test

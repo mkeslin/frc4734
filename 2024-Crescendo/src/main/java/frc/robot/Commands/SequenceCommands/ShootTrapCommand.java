@@ -1,6 +1,5 @@
 package frc.robot.Commands.SequenceCommands;
 
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.PathPlanner.PathPlanner;
