@@ -82,7 +82,7 @@ public class RobotContainer {
         // VerticalElevatorBindings.configureBindings(mechanismController, verticalElevator);
 
         // configure bindings for mechanisms
-        // configureMechanismBindings();
+        configureMechanismBindings();
 
         // command tests
         // m_driveController.rightBumper().onTrue(acquireNoteCommand);
@@ -144,7 +144,7 @@ public class RobotContainer {
         // return runAuto;
         
         // return Commands.print("No autonomous command configured");
-        
+
         // return new PathPlannerAuto("Example Auto");
         // Load the path you want to follow using its name in the GUI
         // var path = PathPlannerPath.fromPathFile("Auto-1");

@@ -67,13 +67,15 @@ public class AutoCommand extends SequentialCommandGroup {
         }
 
         return Commands.sequence(
+            Commands.print("Executing cycle for note " + noteNumber + "..."),
             moveToNoteCommand,
             m_intake.commandStartIn(),
             Commands.waitSeconds(2),
             m_intake.commandStopRoller(),
             m_shooter.commandShoot(),
             Commands.waitSeconds(2),
-            m_shooter.commandStop()
+            m_shooter.commandStop(),
+            Commands.print("...finished executing cycle for note " + noteNumber)
         );
     }
 }
