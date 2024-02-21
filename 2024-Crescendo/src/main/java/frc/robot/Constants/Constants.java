@@ -35,9 +35,12 @@ public class Constants {
     public static final int SHOOTER_OUT_BOTTOM_ID = 42;
     public static final int SHOOTER_PIVOT_ID = 43;
 
-    public static final int ELEVATOR_LEFT_ID = 50;
-    public static final int ELEVATOR_RIGHT_ID = 51;
+    public static final int ELEVATOR_ID = 50;
+    // public static final int ELEVATOR_RIGHT_ID = 51;
     public static final int ELEVATOR_PIVOT_ID = 52;
+
+    public static final int CLIMBER_RIGHT_ID = 60;
+    public static final int CLIMBER_LEFT_ID = 61;
 
     public static final int APRILTAGPIPELINE = 0;
     public static final int NOTEPIPELINE = 1;

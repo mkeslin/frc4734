@@ -1,10 +1,7 @@
 package frc.robot.Subsystems;
 
-import static frc.robot.Constants.Constants.ELEVATOR_LEFT_ID;
+import static frc.robot.Constants.Constants.ELEVATOR_ID;
 import static frc.robot.Constants.Constants.ELEVATOR_PIVOT_ID;
-import static frc.robot.Constants.Constants.ELEVATOR_RIGHT_ID;
-import static frc.robot.Constants.Constants.INTAKE_PIVOT_ID;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 // import com.ctre.phoenix.motorcontrol.ControlMode;
 // import com.ctre.phoenix.motorcontrol.DemandType;
@@ -14,7 +11,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 // import com.ctre.phoenix.motorcontrol.ControlMode;
 // import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 // import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -35,12 +31,12 @@ import frc.robot.Commands.ElevatorRetractCommand;
 public class Elevator extends SubsystemBase {
 
     private TalonFX m_elevatorPivot;
-    private TalonFX m_elevatorLeft;
-    private TalonFX m_elevatorRight;
-    private boolean elevatorMovingIn, elevatorMovingOut;
-    private int zeroValue, halfValue, fullValue;
-    private double m1EncoderVal, m2EncoderVal;
-    private String name;
+    private TalonFX m_elevator;
+    // private TalonFX m_elevatorRight;
+    // private boolean elevatorMovingIn, elevatorMovingOut;
+    // private int zeroValue, halfValue, fullValue;
+    // private double m1EncoderVal, m2EncoderVal;
+    // private String name;
 
     private double STOWED_ENCODER_VAL = 31; //Actual Stowed Value: 32.38
     private double DEPLOYED_ENCODER_VAL = 1; //Actual Deploy Value: 0
@@ -102,34 +98,34 @@ public class Elevator extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_elevatorPivot.getConfigurator().apply(configs1);
 
-        m_elevatorLeft = new TalonFX(ELEVATOR_LEFT_ID);
-        m_elevatorLeft.setInverted(false);
-        m_elevatorLeft.setNeutralMode(NeutralModeValue.Brake);
-        m_elevatorLeft.setPosition(0);
+        m_elevator = new TalonFX(ELEVATOR_ID);
+        m_elevator.setInverted(false);
+        m_elevator.setNeutralMode(NeutralModeValue.Brake);
+        m_elevator.setPosition(0);
         var configs2 = new TalonFXConfiguration();
         configs2.CurrentLimits = new CurrentLimitsConfigs();
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        m_elevatorLeft.getConfigurator().apply(configs2);
+        m_elevator.getConfigurator().apply(configs2);
 
-        m_elevatorRight = new TalonFX(ELEVATOR_RIGHT_ID);
-        m_elevatorRight.setInverted(false);
-        m_elevatorRight.setNeutralMode(NeutralModeValue.Brake);
-        m_elevatorRight.setPosition(0);
-        var configs3 = new TalonFXConfiguration();
-        configs3.CurrentLimits = new CurrentLimitsConfigs();
-        // configs.CurrentLimits.SupplyCurrentLimit = 20;
-        // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        m_elevatorRight.getConfigurator().apply(configs3);
+        // m_elevatorRight = new TalonFX(ELEVATOR_RIGHT_ID);
+        // m_elevatorRight.setInverted(false);
+        // m_elevatorRight.setNeutralMode(NeutralModeValue.Brake);
+        // m_elevatorRight.setPosition(0);
+        // var configs3 = new TalonFXConfiguration();
+        // configs3.CurrentLimits = new CurrentLimitsConfigs();
+        // // configs.CurrentLimits.SupplyCurrentLimit = 20;
+        // // configs.CurrentLimits.SupplyCurrentLimit = 40;
+        // m_elevatorRight.getConfigurator().apply(configs3);
 
         // zeroValue = zero;
         // halfValue = half;
         // fullValue = full;
         // name = n;
-        m1EncoderVal = 0;
-        m2EncoderVal = 0;
-        elevatorMovingIn = false;
-        elevatorMovingOut = false;
+        // m1EncoderVal = 0;
+        // m2EncoderVal = 0;
+        // elevatorMovingIn = false;
+        // elevatorMovingOut = false;
     }
 
     public Command CommandExtend() {
@@ -165,23 +161,23 @@ public class Elevator extends SubsystemBase {
     }
 
     public void Extend() {
-        m_elevatorLeft.set(-.85);
-        m_elevatorRight.set(-.85);
+        m_elevator.set(-.85);
+        // m_elevatorRight.set(-.85);
     }
 
     public void Retract() {
-        m_elevatorLeft.set(.85);
-        m_elevatorRight.set(.85);
+        m_elevator.set(.85);
+        // m_elevatorRight.set(.85);
     }
 
     public void setExtendRetractMotor(double s) {
-        m_elevatorLeft.set(s);
-        m_elevatorRight.set(s);
+        m_elevator.set(s);
+        // m_elevatorRight.set(s);
     }
 
     public void StopExtendRetract() {
-        m_elevatorLeft.set(0);
-        m_elevatorRight.set(0);
+        m_elevator.set(0);
+        // m_elevatorRight.set(0);
     }
 
     public void setPivot(double s) {
@@ -201,7 +197,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public double getExtendEncoderValue() {
-        var statusSignal = m_elevatorLeft.getPosition();
+        var statusSignal = m_elevator.getPosition();
         return statusSignal.getValueAsDouble();
     }
 
