@@ -1,81 +1,79 @@
 package frc.robot.Auto;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.LimelightAligner;
+import frc.robot.Subsystems.Shooter;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
- * Use limelight to find note
- * Move robot to correct position
- * Intake note
+ * Command that executes during autonomous mode
  */
-public class AutoCommand extends Command {
+public class AutoCommand extends SequentialCommandGroup {
 
     private final PathPlanner m_pathPlanner;
     private final Intake m_intake;
-    private final LimelightAligner m_limelightAligner;
+    private final Shooter m_shooter;
+    // private final LimelightAligner m_limelightAligner;
 
-    private AutoState m_state = AutoState.Idling;
-
-    public AutoCommand(PathPlanner pathPlanner, Intake intake, LimelightAligner limelightAligner) {
+    public AutoCommand(PathPlanner pathPlanner, Intake intake, Shooter shooter, LimelightAligner limelightAligner, int[] noteOrder) {
         m_pathPlanner = pathPlanner;
         m_intake = intake;
-        m_limelightAligner = limelightAligner;
+        m_shooter = shooter;
+        // m_limelightAligner = limelightAligner;
 
-        addRequirements(m_pathPlanner, m_intake, m_limelightAligner);
-        // addCommands(
-        //     // move and acquire
-        //     pathPlanner.moveToOurRing1(),
-        //     limelightAligner.alignToNote(),
-        //     intake.commandStartIn(),
-        //     Commands.runOnce(() -> pathPlanner.moveForwardRobot(.5), pathPlanner),
-        //     intake.commandStop(),
-        //     // shoot
-        //     limelightAligner.alignToTag(3)
-        //     // Commands.print("acquireNote-333333333333333333333333333333333333333")
-        // );
+        // addRequirements(m_pathPlanner, m_intake, m_limelightAligner);
+
+        // load the commands for the specific notes
+        List<Command> commands = new ArrayList<Command>();
+        for (Integer noteNumber : noteOrder) {
+            commands.add(moveAcquireShootCycle(noteNumber));
+        }
+        addCommands(commands.toArray(new Command[0]));
     }
 
-    // Called just before this Command runs the first time
-    @Override
-    public void initialize() {
-        SmartDashboard.putString("auto command", "I'm here!!!");
-        System.out.println("autoCommand ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    private Command moveAcquireShootCycle(int noteNumber) {
+        Command moveToNoteCommand;
+        switch (noteNumber) {
+            default:
+            case 1:
+                moveToNoteCommand = m_pathPlanner.moveToOurNote1();
+                break;
+            case 2:
+                moveToNoteCommand = m_pathPlanner.moveToOurNote2();
+                break;
+            case 3:
+                moveToNoteCommand = m_pathPlanner.moveToOurNote3();
+                break;
+            case 4:
+                moveToNoteCommand = m_pathPlanner.moveToOurNote4();
+                break;
+            case 5:
+                moveToNoteCommand = m_pathPlanner.moveToOurNote5();
+                break;
+            case 6:
+                moveToNoteCommand = m_pathPlanner.moveToOurNote6();
+                break;
+            case 7:
+                moveToNoteCommand = m_pathPlanner.moveToOurNote7();
+                break;
+            case 8:
+                moveToNoteCommand = m_pathPlanner.moveToOurNote8();
+                break;
+        }
 
-        Commands.sequence(
-            // move and acquire
-            m_pathPlanner.moveToOurNote1(),
-            m_limelightAligner.alignToNote(),
+        return Commands.sequence(
+            moveToNoteCommand,
             m_intake.commandStartIn(),
-            Commands.runOnce(() -> m_pathPlanner.moveForwardRobot(.5), m_pathPlanner),
+            Commands.waitSeconds(2),
             m_intake.commandStopRoller(),
-            // shoot
-            m_limelightAligner.alignToTag(3)
-            // Commands.print("acquireNote-333333333333333333333333333333333333333")
+            m_shooter.commandShoot(),
+            Commands.waitSeconds(2),
+            m_shooter.commandStop()
         );
     }
-
-    @Override
-    public void execute() {
-        // System.out.println("autoCommand - execute $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-
-        // switch (m_state) {
-        //     case Idling:
-        //         m_state = AutoState.Driving;
-        //         return;
-        // }
-    }
-
-    // Make this return true when this Command no longer needs to run execute()
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-
-    // Called once after isFinished returns true
-    @Override
-    public void end(boolean interrupted) {}
 }
