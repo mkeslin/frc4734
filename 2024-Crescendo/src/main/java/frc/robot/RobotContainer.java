@@ -21,7 +21,6 @@ import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
-import frc.robot.Subsystems.LimelightAligner;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.*;
 
@@ -29,12 +28,23 @@ public class RobotContainer {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // DRIVETRAIN
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Drivetrain A is the 2024 robot
+    // Drivetrain B is the practice swerve robot
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.DriveTrain;
     // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // AUTO NOTE ORDER
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //   |(4)|    | \    (3)  ||    
+    //   |(5)|    |  >   (2)  || Driver Station 
+    //   |(6)|    | /    (1)  ||  
+    //   |(7)|                ||   
+    //   |(8)|                ||  
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public final int[] m_autoNoteOrder = { 1, 2, 3 };
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -55,7 +65,7 @@ public class RobotContainer {
     private Intake m_intake = new Intake();
     private Shooter m_shooter = new Shooter();
     private Elevator m_elevator = new Elevator();
-    private LimelightAligner m_limelightAligner = new LimelightAligner(m_shooterLimelight, m_intakeLimelight, m_pathPlanner);
+    // private LimelightAligner m_limelightAligner = new LimelightAligner(m_shooterLimelight, m_intakeLimelight, m_pathPlanner);
 
     public RobotContainer() {
         // Commands
@@ -138,7 +148,8 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         // return m_autoChooser.getSelected();
-        var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_shooter, m_limelightAligner, m_autoNoteOrder);
+        // var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_shooter, m_limelightAligner, m_intakeLimelight, m_shooterLimelight, m_autoNoteOrder);
+        var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_shooter, m_intakeLimelight, m_shooterLimelight, m_autoNoteOrder);
         return autoCommand;
 
         // return runAuto;

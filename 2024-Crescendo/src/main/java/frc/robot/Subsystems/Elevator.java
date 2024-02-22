@@ -21,6 +21,7 @@ public class Elevator extends SubsystemBase {
 
     private double STOWED_ENCODER_VAL = 31; //Actual Stowed Value: 32.38
     private double DEPLOYED_ENCODER_VAL = 1; //Actual Deploy Value: 0
+
     private double RETRACT_ENCODER_VAL = 3; //Actual Stowed Value: 0
     private double EXTEND_ENCODER_VAL = 190; //Actual Deploy Value: -198
 
