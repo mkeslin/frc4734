@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 public class MoveToNoteCommand extends Command {
     public Limelight m_limelight;
     public PathPlanner m_PathPlanner;
+
     public Timer t = new Timer();
 
     public MoveToNoteCommand(Limelight limelight, PathPlanner pathPlanner) {
@@ -31,7 +32,10 @@ public class MoveToNoteCommand extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return (m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getY()) < -16) || t.hasElapsed(2);
+        // set a time failsafe
+        if (t.hasElapsed(2)) { return true;}
+        
+        return (m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getY()) < -16);
     }
 
     // Called once after isFinished returns true

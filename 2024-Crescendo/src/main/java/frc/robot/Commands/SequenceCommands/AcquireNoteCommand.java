@@ -4,6 +4,7 @@
 
 package frc.robot.Commands.SequenceCommands;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.IntakeNoteCommand;
@@ -35,8 +36,9 @@ public class AcquireNoteCommand extends SequentialCommandGroup {
 
         addCommands(
             new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0),
-            new MoveToNoteCommand(m_intakeLimelight, m_pathPlanner),
-            new IntakeNoteCommand(m_intake)
+            Commands.parallel(
+                new MoveToNoteCommand(m_intakeLimelight, m_pathPlanner),
+                new IntakeNoteCommand(m_intake))
         );
     }
     

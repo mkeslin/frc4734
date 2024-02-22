@@ -3,9 +3,11 @@ package frc.robot.Auto;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
+import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
 import frc.robot.PathPlanner.PathPlanner;
+import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Intake;
-import frc.robot.Subsystems.LimelightAligner;
 import frc.robot.Subsystems.Shooter;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +21,35 @@ public class AutoCommand extends SequentialCommandGroup {
     private final Intake m_intake;
     private final Shooter m_shooter;
     // private final LimelightAligner m_limelightAligner;
+    private final Limelight m_intakeLimelight;
+    private final Limelight m_shooterLimelight;
 
-    public AutoCommand(PathPlanner pathPlanner, Intake intake, Shooter shooter, LimelightAligner limelightAligner, int[] noteOrder) {
+    // commands
+    Command acquireNoteCommand;
+    Command shootSpeakerNoteCommand;
+
+    // public AutoCommand(PathPlanner pathPlanner, Intake intake, Shooter shooter, LimelightAligner limelightAligner, Limelight intakeLimelight, Limelight shooterLimelight, int[] noteOrder) {
+    public AutoCommand(
+        PathPlanner pathPlanner,
+        Intake intake,
+        Shooter shooter,
+        Limelight intakeLimelight,
+        Limelight shooterLimelight,
+        int[] noteOrder
+    ) {
         m_pathPlanner = pathPlanner;
         m_intake = intake;
         m_shooter = shooter;
         // m_limelightAligner = limelightAligner;
+        m_intakeLimelight = intakeLimelight;
+        m_shooterLimelight = shooterLimelight;
 
-        // addRequirements(m_pathPlanner, m_intake, m_limelightAligner);
+        addRequirements(m_pathPlanner, m_intake, m_shooter, m_intakeLimelight, m_shooterLimelight);
+
+        acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
+        shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
+
+        // int[] noteOrder2 = { 1, 2, 3 };
 
         // load the commands for the specific notes
         List<Command> commands = new ArrayList<Command>();
@@ -69,12 +92,16 @@ public class AutoCommand extends SequentialCommandGroup {
         return Commands.sequence(
             Commands.print("Executing cycle for note " + noteNumber + "..."),
             moveToNoteCommand,
-            m_intake.commandStartIn(),
-            Commands.waitSeconds(2),
-            m_intake.commandStopRoller(),
-            m_shooter.commandShoot(),
-            Commands.waitSeconds(2),
-            m_shooter.commandStop(),
+            acquireNoteCommand,
+            shootSpeakerNoteCommand,
+
+            // m_intake.commandStartIn(),
+            // Commands.waitSeconds(2),
+            // m_intake.commandStopRoller(),
+            // m_shooter.commandShoot(),
+            // Commands.waitSeconds(2),
+            // m_shooter.commandStop(),
+
             Commands.print("...finished executing cycle for note " + noteNumber)
         );
     }

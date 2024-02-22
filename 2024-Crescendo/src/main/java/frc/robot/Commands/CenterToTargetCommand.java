@@ -1,4 +1,5 @@
 package frc.robot.Commands;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.PathPlanner.PathPlanner;
@@ -11,8 +12,11 @@ public class CenterToTargetCommand extends Command {
 
     private double MAX_WHEEL_STRAFE = 1;
     private double MAX_CAMERA_X = 30;
+
     private double offset;
     private double wheelStrafe;
+
+    public Timer t = new Timer();
 
     public CenterToTargetCommand(Limelight limelight, PathPlanner pathPlanner, int target) {
         m_limelight = limelight;
@@ -26,6 +30,8 @@ public class CenterToTargetCommand extends Command {
     @Override
     public void initialize() {
         offset = 0;
+
+        t.start();
     }
 
     @Override
@@ -50,10 +56,16 @@ public class CenterToTargetCommand extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
+        // set a time failsafe
+        if (t.hasElapsed(5)) { return true;}
+
         return m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 2;
     }
 
     // Called once after isFinished returns true
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        t.stop();
+        t.reset();
+    }
 }

@@ -8,6 +8,7 @@ import frc.robot.Subsystems.Shooter;
 public class ShootNoteCommand extends Command {
     public Intake m_intake;
     public Shooter m_shooter;
+
     public Timer t = new Timer();
 
     public ShootNoteCommand(Intake intake, Shooter shooter) {
@@ -40,7 +41,7 @@ public class ShootNoteCommand extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return t.hasElapsed(4);
+        return t.hasElapsed(3);
     }
 
     // Called once after isFinished returns true
@@ -48,6 +49,7 @@ public class ShootNoteCommand extends Command {
     public void end(boolean interrupted) {
         m_intake.stopRoller();
         m_shooter.stopShoot();
+        
         t.stop();
         t.reset();
     }
