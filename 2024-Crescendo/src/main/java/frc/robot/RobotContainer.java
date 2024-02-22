@@ -23,6 +23,7 @@ import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.LimelightAligner;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.Climber;
 import frc.robot.SwerveDrivetrain.*;
 
 public class RobotContainer {
@@ -55,6 +56,7 @@ public class RobotContainer {
     private Intake m_intake = new Intake();
     private Shooter m_shooter = new Shooter();
     private Elevator m_elevator = new Elevator();
+    private Climber m_climber = new Climber();
     private LimelightAligner m_limelightAligner = new LimelightAligner(m_shooterLimelight, m_intakeLimelight, m_pathPlanner);
 
     public RobotContainer() {
@@ -95,8 +97,8 @@ public class RobotContainer {
         // note alignment
         m_mechanismController.a().onTrue(acquireNoteCommand);
         m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
-        m_mechanismController.y().onTrue(m_shooter.commandSetAngle(13));
-        m_mechanismController.x().onTrue(m_shooter.commandSetAngle(0));
+        //m_mechanismController.y().onTrue(m_shooter.commandSetAngle(13));
+        //m_mechanismController.x().onTrue(m_shooter.commandSetAngle(0));
         //m_mechanismController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(m_shooter.commandSetAngle(13));
         //m_mechanismController.axisGreaterThan(ControllerButtons.CLY, 0.5).whileTrue(m_shooter.commandSetAngle(0));
         //m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
@@ -134,6 +136,9 @@ public class RobotContainer {
         // RIGHT STICK - X - ELEVATOR ANGLE
         m_mechanismController.axisLessThan(ControllerButtons.CRX, -0.5).onTrue(m_elevator.CommandPivotDeploy());
         m_mechanismController.axisGreaterThan(ControllerButtons.CRX, 0.5).whileTrue(m_elevator.CommandPivotStow());
+
+        m_mechanismController.x().onTrue(m_climber.CommandFullRetract());
+        m_mechanismController.y().onTrue(m_climber.CommandFullExtend());
     }
 
     public Command getAutonomousCommand() {

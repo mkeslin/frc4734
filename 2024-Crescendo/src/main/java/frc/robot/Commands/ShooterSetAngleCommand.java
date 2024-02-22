@@ -29,7 +29,6 @@ public class ShooterSetAngleCommand extends Command {
 
     @Override
     public void execute() {
-        SmartDashboard.putNumber("Yo", target_val);
         current_val = m_shooter.getPivotEncoderValue();
         if(target_val > start_val) {
             if(current_val > start_val + (target_val - start_val)/2 && target_val - start_val > 1) {

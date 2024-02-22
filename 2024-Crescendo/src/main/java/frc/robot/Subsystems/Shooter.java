@@ -83,7 +83,6 @@ public class Shooter extends SubsystemBase {
 
     public Command commandIncrementAngle(double a) {
         return Commands.runOnce(() -> {
-            SmartDashboard.putNumber("Oi", a);
             //shooterSetAngleCommand.setTarget(getPivotEncoderValue() + a);
             //shooterSetAngleCommand.schedule();
         });

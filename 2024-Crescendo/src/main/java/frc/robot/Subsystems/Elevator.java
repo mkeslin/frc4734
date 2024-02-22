@@ -26,7 +26,7 @@ public class Elevator extends SubsystemBase {
 
     private ElevatorStowCommand m_elevatorStowCommand = new ElevatorStowCommand(this, STOWED_ENCODER_VAL);
     private ElevatorDeployCommand m_elevatorDeployCommand = new ElevatorDeployCommand(this, DEPLOYED_ENCODER_VAL);
-    private ElevatorExtendCommand m_ = new ElevatorExtendCommand(this, EXTEND_ENCODER_VAL);
+    private ElevatorExtendCommand m_eElevatorExtendCommand = new ElevatorExtendCommand(this, EXTEND_ENCODER_VAL);
     private ElevatorRetractCommand m_elevatorRetractCommand = new ElevatorRetractCommand(this, RETRACT_ENCODER_VAL);
 
     public Elevator() {
@@ -97,7 +97,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command CommandFullExtend() {
-        return Commands.runOnce(() -> m_.schedule());
+        return Commands.runOnce(() -> m_eElevatorExtendCommand.schedule());
     }
 
     public Command CommandFullRetract() {
