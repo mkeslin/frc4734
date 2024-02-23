@@ -8,6 +8,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommand;
 import frc.robot.Commands.CenterToTargetCommand;
@@ -19,10 +20,11 @@ import frc.robot.Controllers.ControllerButtons;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.Shooter;
-import frc.robot.Subsystems.Climber;
 import frc.robot.SwerveDrivetrain.*;
 
 public class RobotContainer {
@@ -40,11 +42,11 @@ public class RobotContainer {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // AUTO NOTE ORDER
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //   |(4)|    | \    (3)  ||    
-    //   |(5)|    |  >   (2)  || Driver Station 
-    //   |(6)|    | /    (1)  ||  
-    //   |(7)|                ||   
-    //   |(8)|                ||  
+    //   |(4)|    | \    (3)  ||
+    //   |(5)|    |  >   (2)  || Driver Station
+    //   |(6)|    | /    (1)  ||
+    //   |(7)|                ||
+    //   |(8)|                ||
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public final int[] m_autoNoteOrder = { 1, 2, 3 };
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,6 +69,8 @@ public class RobotContainer {
     private Shooter m_shooter = new Shooter();
     private Elevator m_elevator = new Elevator();
     private Climber m_climber = new Climber();
+    private Lights m_lights = new Lights();
+
     // private LimelightAligner m_limelightAligner = new LimelightAligner(m_shooterLimelight, m_intakeLimelight, m_pathPlanner);
 
     public RobotContainer() {
@@ -94,7 +98,10 @@ public class RobotContainer {
         // VerticalElevatorBindings.configureBindings(mechanismController, verticalElevator);
 
         // configure bindings for mechanisms
-        configureMechanismBindings();
+        // configureMechanismBindings();
+
+        // lights
+        configureLightsBindings();
 
         // command tests
         // m_driveController.rightBumper().onTrue(acquireNoteCommand);
@@ -151,14 +158,25 @@ public class RobotContainer {
         m_mechanismController.y().onTrue(m_climber.CommandFullExtend());
     }
 
+    public void configureLightsBindings() {
+        m_lights.setDefaultCommand(
+            m_lights.setColors(
+                (int) (m_driveController.getLeftTriggerAxis() * 255),
+                (int) (m_driveController.getRightTriggerAxis() * 255),
+                (int) (m_driveController.getLeftX() * 255)
+            )
+        );
+
+        m_driveController.y().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(),m_lights));
+    }
+
     public Command getAutonomousCommand() {
         // return m_autoChooser.getSelected();
         // var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_shooter, m_limelightAligner, m_intakeLimelight, m_shooterLimelight, m_autoNoteOrder);
         var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_shooter, m_intakeLimelight, m_shooterLimelight, m_autoNoteOrder);
         return autoCommand;
-
         // return runAuto;
-        
+
         // return Commands.print("No autonomous command configured");
 
         // return new PathPlannerAuto("Example Auto");

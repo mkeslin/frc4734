@@ -45,8 +45,10 @@ public class Constants {
     public static final int APRILTAGPIPELINE = 0;
     public static final int NOTEPIPELINE = 1;
 
+    public static final int LIGHTS_0_ID = 0;
+
     // public static final int INTAKERIGHTID = 119;
-    public static final int PNEUMATICHUBID = 120;
+    // public static final int PNEUMATICHUBID = 120;
     // public static final double WBL = 0.58; //Wheelbase length 19.5in 0.50m
     // public static final double WBW = 0.50; //Wheelbase width 23.0in 0.58m
     // public static final double WBR = Math.sqrt(Math.pow(WBL, 2) + Math.pow(WBW, 2)); //Wheelbase diameter
