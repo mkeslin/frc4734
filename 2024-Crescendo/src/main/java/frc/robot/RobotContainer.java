@@ -98,10 +98,10 @@ public class RobotContainer {
         // VerticalElevatorBindings.configureBindings(mechanismController, verticalElevator);
 
         // configure bindings for mechanisms
-        // configureMechanismBindings();
+        configureMechanismBindings();
 
         // lights
-        configureLightsBindings();
+        // configureLightsBindings();
 
         // command tests
         // m_driveController.rightBumper().onTrue(acquireNoteCommand);
