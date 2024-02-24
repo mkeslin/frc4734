@@ -59,7 +59,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Command commandStartIn() {
-        return Commands.runOnce(() -> this.startIn());
+        return Commands.runOnce(() -> this.startIn(-.55));
     }
 
     public Command commandStartOut() {
@@ -78,11 +78,9 @@ public class Intake extends SubsystemBase {
         return m_roller.get();
     }
 
-    public void startIn() {
-        m_roller.set(-.55);
-        m_shooterIn.set(-.55);
-
-        SmartDashboard.putNumber("Intake speed setpoint", 1);
+    public void startIn(double s) {
+        m_roller.set(s);
+        m_shooterIn.set(s);
     }
 
     public void startOut() {

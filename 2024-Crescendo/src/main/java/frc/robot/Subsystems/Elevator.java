@@ -19,7 +19,7 @@ public class Elevator extends SubsystemBase {
     private TalonFX m_elevatorPivot;
     private TalonFX m_elevator;
 
-    private double STOWED_ENCODER_VAL = 31; //Actual Stowed Value: 32.38
+    private double STOWED_ENCODER_VAL = 36; //Actual Stowed Value: 36.4
     private double DEPLOYED_ENCODER_VAL = 1; //Actual Deploy Value: 0
 
     private double RETRACT_ENCODER_VAL = -320; //Actual Stowed Value: -334
@@ -89,13 +89,13 @@ public class Elevator extends SubsystemBase {
         // elevatorMovingOut = false;
     }
 
-    public Command CommandExtend() {
+   /* public Command CommandExtend() {
         return Commands.runOnce(() -> Extend());
     }
 
     public Command CommandRetract() {
         return Commands.runOnce(() -> Retract());
-    }
+    }*/
 
     public Command CommandFullExtend() {
         return Commands.runOnce(() -> m_eElevatorExtendCommand.schedule());

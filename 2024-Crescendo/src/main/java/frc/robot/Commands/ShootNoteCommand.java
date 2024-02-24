@@ -33,7 +33,7 @@ public class ShootNoteCommand extends Command {
                 m_intake.stopRoller();
             }
             else {
-                m_intake.startIn();
+                m_intake.startIn(-0.85);
             }
         }
     }

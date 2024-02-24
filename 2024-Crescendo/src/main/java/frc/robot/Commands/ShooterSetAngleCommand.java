@@ -54,6 +54,11 @@ public class ShooterSetAngleCommand extends Command {
     // Called once after isFinished returns true
     @Override
     public void end(boolean interrupted) {
-        m_shooter.stopPivot();
+        if(target_val < 1) {
+            m_shooter.stopPivot();
+        } else {
+            m_shooter.holdPivot();
+        }
+        
     }
 }

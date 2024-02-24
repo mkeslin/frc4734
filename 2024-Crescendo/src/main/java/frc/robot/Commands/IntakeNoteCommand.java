@@ -22,7 +22,7 @@ public class IntakeNoteCommand extends Command {
 
     @Override
     public void execute() {
-        m_intake.startIn();
+        m_intake.startIn(-.55);
         if(m_intake.noteIsSeen() && t2.get() == 0) {
             t2.start();
         }

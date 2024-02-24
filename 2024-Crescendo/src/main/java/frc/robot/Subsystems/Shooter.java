@@ -19,7 +19,7 @@ public class Shooter extends SubsystemBase {
     private TalonFX m_shooterOutBottom;
     private TalonFX m_shooterPivot;
 
-    private double MAX_PIVOT_ENCODER_VAL = 13.5; //Actual Max Value: 13.64
+    private double MAX_PIVOT_ENCODER_VAL = 6; //Actual Max Value: 6.9
 
     private ShooterSetAngleCommand m_shooterSetAngleCommand = new ShooterSetAngleCommand(this, MAX_PIVOT_ENCODER_VAL);
 
@@ -115,5 +115,9 @@ public class Shooter extends SubsystemBase {
 
     public void stopPivot() {
         setPivotMotor(0);
+    }
+
+    public void holdPivot() {
+        setPivotMotor(0.025);
     }
 }
