@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 public class IntakeNoteCommand extends Command {
     public Intake m_intake;
     public Timer t = new Timer();
+    public Timer t2 = new Timer();
 
     public IntakeNoteCommand(Intake intake) {
         m_intake = intake;
@@ -22,16 +23,16 @@ public class IntakeNoteCommand extends Command {
     @Override
     public void execute() {
         m_intake.startIn();
+        if(m_intake.noteIsSeen() && t2.get() == 0) {
+            t2.start();
+        }
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        if (t.hasElapsed(2)) { return true;}
-
-        // main finished condition
-        return m_intake.noteIsSeen();
+        return (t.hasElapsed(2) || t2.hasElapsed(0.2));
     }
 
     // Called once after isFinished returns true
@@ -40,5 +41,7 @@ public class IntakeNoteCommand extends Command {
         m_intake.stopRoller();
         t.stop();
         t.reset();
+        t2.stop();
+        t2.reset();
     }
 }

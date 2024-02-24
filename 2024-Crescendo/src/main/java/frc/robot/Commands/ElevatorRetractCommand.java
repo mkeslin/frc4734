@@ -6,7 +6,6 @@ import frc.robot.Subsystems.Elevator;
 public class ElevatorRetractCommand extends Command {
     public Elevator m_Elevator;
     public double target_val;
-    public double start_val;
     public double current_val;
     
 
@@ -20,16 +19,15 @@ public class ElevatorRetractCommand extends Command {
     @Override
     public void initialize() {
         current_val = m_Elevator.getExtendEncoderValue();
-        start_val = m_Elevator.getExtendEncoderValue();
     }
 
     @Override
     public void execute() {
         current_val = m_Elevator.getExtendEncoderValue();
-        if(current_val < start_val/2) {
-            m_Elevator.setExtendRetractMotor(-0.65);
+        if(current_val < target_val/2) {
+            m_Elevator.setExtendRetractMotor(-0.05);//m_Elevator.setExtendRetractMotor(-0.65);
         } else {
-            m_Elevator.setExtendRetractMotor(-0.85);
+            m_Elevator.setExtendRetractMotor(-0.1);//m_Elevator.setExtendRetractMotor(-0.85);
         }
     }
 

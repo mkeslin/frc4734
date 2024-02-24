@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommand;
 import frc.robot.Commands.CenterToTargetCommand;
+import frc.robot.Commands.IntakeNoteCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
 import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
@@ -81,6 +82,7 @@ public class RobotContainer {
         var shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
         var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
         var shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
+        var intakeNoteCommand = new IntakeNoteCommand(m_intake);
 
         // Register Named Commands
         NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
@@ -89,6 +91,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
         NamedCommands.registerCommand("shootSpeakerNoteCommand", shootSpeakerNoteCommand);
         NamedCommands.registerCommand("shootTrapNoteCommand", shootTrapNoteCommand);
+        NamedCommands.registerCommand("intakeNoteCommand", intakeNoteCommand);
         // var acquireNoteCommand = new AcquireNoteCommand(limelight, pathPlanner, intake, limelightAligner);
         // NamedCommands.registerCommand("acquireNote", acquireNoteCommand.schedule());
 
@@ -114,6 +117,9 @@ public class RobotContainer {
         // note alignment
         m_mechanismController.a().onTrue(acquireNoteCommand);
         m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
+
+        m_driveController.y().onTrue(intakeNoteCommand);
+        m_driveController.x().onTrue(shootAmpNoteCommand);
         //m_mechanismController.y().onTrue(m_shooter.commandSetAngle(13));
         //m_mechanismController.x().onTrue(m_shooter.commandSetAngle(0));
         //m_mechanismController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(m_shooter.commandSetAngle(13));
@@ -125,16 +131,16 @@ public class RobotContainer {
     private void configureMechanismBindings() {
         // intake
         // driveController.y().onTrue(intake.isOn() ? intake.commandStop() : intake.commandStartIn());
-        m_driveController.y().onTrue(m_intake.commandStartIn());
-        m_driveController.x().onTrue(m_intake.commandStopRoller());
+        //m_driveController.y().onTrue(m_intake.commandStartIn());
+        //m_driveController.x().onTrue(m_intake.commandStopRoller());
 
         m_driveController.leftBumper().onTrue(m_intake.commandStow());
         m_driveController.leftTrigger().onTrue(m_intake.commandDeploy());
         m_driveController.b().onTrue(m_intake.commandStopPivot());
 
         // shooter
-        m_driveController.y().onTrue(m_shooter.commandShoot());
-        m_driveController.x().onTrue(m_shooter.commandStop());
+        //m_driveController.y().onTrue(m_shooter.commandShoot());
+        //m_driveController.x().onTrue(m_shooter.commandStop());
 
         // elevator
         m_driveController.rightBumper().onTrue(m_elevator.CommandPivotStow());
@@ -142,13 +148,13 @@ public class RobotContainer {
         m_driveController.b().onTrue(m_elevator.CommandPivotStop());
 
         // LEFT STICK - Y - ELEVATOR EXTEND/RETRACT
-        m_mechanismController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(m_elevator.CommandExtend());
-        m_mechanismController.axisGreaterThan(ControllerButtons.CLY, 0.5).whileTrue(m_elevator.CommandRetract());
+        m_mechanismController.leftTrigger().onTrue(m_elevator.CommandExtend());
+        m_mechanismController.leftBumper().onTrue(m_elevator.CommandRetract());
         m_driveController.b().onTrue(m_elevator.CommandStopExtendRetract());
 
         // RIGHT STICK - Y - SHOOTER ANGLE
         m_mechanismController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(13));
-        m_mechanismController.axisGreaterThan(ControllerButtons.CRY, 0.5).whileTrue(m_shooter.commandSetAngle(0));
+        m_mechanismController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
 
         // RIGHT STICK - X - ELEVATOR ANGLE
         m_mechanismController.axisLessThan(ControllerButtons.CRX, -0.5).onTrue(m_elevator.CommandPivotDeploy());

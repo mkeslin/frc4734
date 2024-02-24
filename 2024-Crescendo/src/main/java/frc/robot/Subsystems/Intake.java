@@ -131,6 +131,6 @@ public class Intake extends SubsystemBase {
     // public void initDefaultCommand() {}
 
     public boolean noteIsSeen() {
-        return m_intakeSensor.get();
+        return !m_intakeSensor.get();
     }
 }
