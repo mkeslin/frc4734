@@ -90,10 +90,10 @@ public class AutoCommand extends SequentialCommandGroup {
         }
 
         return Commands.sequence(
-            Commands.print("Executing cycle for note " + noteNumber + "..."),
+            //Commands.print("Executing cycle for note " + noteNumber + "..."),
             moveToNoteCommand,
             acquireNoteCommand,
-            shootSpeakerNoteCommand,
+            shootSpeakerNoteCommand
 
             // m_intake.commandStartIn(),
             // Commands.waitSeconds(2),
@@ -102,7 +102,7 @@ public class AutoCommand extends SequentialCommandGroup {
             // Commands.waitSeconds(2),
             // m_shooter.commandStop(),
 
-            Commands.print("...finished executing cycle for note " + noteNumber)
+            //Commands.print("...finished executing cycle for note " + noteNumber)
         );
     }
 }

@@ -75,11 +75,11 @@ public class RobotContainer {
     // private LimelightAligner m_limelightAligner = new LimelightAligner(m_shooterLimelight, m_intakeLimelight, m_pathPlanner);
     // Commands
     public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-    public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0);
-    public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, 0);
+    //public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0);
+    //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, 0);
     public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter, m_elevator);
-    public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
-    public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
+    //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
+    //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
     public IntakeNoteCommand intakeNoteCommand = new IntakeNoteCommand(m_intake);
 
     public RobotContainer() {
@@ -87,12 +87,12 @@ public class RobotContainer {
 
         // Register Named Commands
         NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
-        NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
-        NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
+        //NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
+        //NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
         NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
-        NamedCommands.registerCommand("shootSpeakerNoteCommand", shootSpeakerNoteCommand);
-        NamedCommands.registerCommand("shootTrapNoteCommand", shootTrapNoteCommand);
-        NamedCommands.registerCommand("intakeNoteCommand", intakeNoteCommand);
+        //NamedCommands.registerCommand("shootSpeakerNoteCommand", shootSpeakerNoteCommand);
+        //NamedCommands.registerCommand("shootTrapNoteCommand", shootTrapNoteCommand);
+        //NamedCommands.registerCommand("intakeNoteCommand", intakeNoteCommand);
         // var acquireNoteCommand = new AcquireNoteCommand(limelight, pathPlanner, intake, limelightAligner);
         // NamedCommands.registerCommand("acquireNote", acquireNoteCommand.schedule());
 
@@ -118,10 +118,10 @@ public class RobotContainer {
 
         // note alignment
         m_mechanismController.a().onTrue(acquireNoteCommand);
-        m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
+        //m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
 
         m_driveController.y().onTrue(intakeNoteCommand);
-        m_driveController.x().onTrue(shootAmpNoteCommand);
+        //m_driveController.x().onTrue(shootAmpNoteCommand);
         //m_mechanismController.y().onTrue(m_shooter.commandSetAngle(7.5));
         //m_mechanismController.x().onTrue(m_shooter.commandSetAngle(0));
         //m_mechanismController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(m_shooter.commandSetAngle(7.5));
@@ -178,7 +178,7 @@ public class RobotContainer {
         m_arcadeController.leftTrigger().onTrue(m_elevator.CommandPivotStow());
         m_arcadeController.leftBumper().onTrue(m_elevator.CommandPivotDeploy());
 
-        m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(shootAmpNoteCommand);
+        //m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(shootAmpNoteCommand);
         m_arcadeController.axisGreaterThan(ControllerButtons.CLY, 0.5).onTrue(intakeNoteCommand);
 
         m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(7.5));

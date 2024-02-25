@@ -27,7 +27,7 @@ public class SwerveDrivetrainTelemetry {
      */
     public SwerveDrivetrainTelemetry(double maxSpeed) {
         MaxSpeed = maxSpeed;
-        SignalLogger.start();
+        //SignalLogger.start();
     }
 
     /* What to publish over networktables for telemetry */
@@ -106,10 +106,10 @@ public class SwerveDrivetrainTelemetry {
             m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
             m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
 
-            SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
+            //SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
         }
 
-        SignalLogger.writeDoubleArray("odometry", new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
-        SignalLogger.writeDouble("odom period", state.OdometryPeriod, "seconds");
+        //SignalLogger.writeDoubleArray("odometry", new double[] {pose.getX(), pose.getY(), pose.getRotation().getDegrees()});
+        //SignalLogger.writeDouble("odom period", state.OdometryPeriod, "seconds");
     }
 }
