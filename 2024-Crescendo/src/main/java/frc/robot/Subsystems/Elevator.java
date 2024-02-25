@@ -19,7 +19,7 @@ public class Elevator extends SubsystemBase {
     private TalonFX m_elevatorPivot;
     private TalonFX m_elevator;
 
-    private double STOWED_ENCODER_VAL = 36; //Actual Stowed Value: 36.4
+    private double STOWED_ENCODER_VAL = 37; //Actual Stowed Value: 36.4
     private double DEPLOYED_ENCODER_VAL = 1; //Actual Deploy Value: 0
 
     private double RETRACT_ENCODER_VAL = -320; //Actual Stowed Value: -334

@@ -8,12 +8,14 @@ import frc.robot.Subsystems.Shooter;
 public class ShootNoteCommand extends Command {
     public Intake m_intake;
     public Shooter m_shooter;
+    public double m_speed;
 
     public Timer t = new Timer();
 
-    public ShootNoteCommand(Intake intake, Shooter shooter) {
+    public ShootNoteCommand(Intake intake, Shooter shooter, double speed) {
         m_intake = intake;
         m_shooter = shooter;
+        m_speed = speed;
         addRequirements(m_intake, m_shooter);
     }
 
@@ -28,12 +30,12 @@ public class ShootNoteCommand extends Command {
         if(t.get() < 0.2) {
             m_intake.startOut();
         } else {
-            m_shooter.shoot();
+            m_shooter.shoot(m_speed);
             if(t.get() < 2) {
                 m_intake.stopRoller();
             }
             else {
-                m_intake.startIn(-0.85);
+                m_intake.startIn(-m_speed);
             }
         }
     }

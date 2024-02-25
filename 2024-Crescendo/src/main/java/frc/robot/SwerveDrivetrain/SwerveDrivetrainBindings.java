@@ -23,26 +23,25 @@ public class SwerveDrivetrainBindings {
     private static final SwerveRequest.RobotCentric m_forwardStraight = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     
     private static final SwerveDrivetrainTelemetry m_logger = new SwerveDrivetrainTelemetry(MaxSpeed);
-
+    
+    // flip the orientation for blue/red
+    private static final int coordinateOrientation = -1;
     public static void configureBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
         // Drivetrain will execute this command periodically
         // Sticks
-        drivetrain.setDefaultCommand(
-            drivetrain.applyRequest(() -> {
-                // flip the orientation for blue/red
-                var coordinateOrientation = -1;
-                // var alliance = DriverStation.getAlliance();
-                // if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-                //     coordinateOrientation = 1;
-                // }
+        // var alliance = DriverStation.getAlliance();
+        // if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+        //     coordinateOrientation = 1;
+        // }
 
+        drivetrain.setDefaultCommand(
+            drivetrain.applyRequest(() ->
                 m_drive
                     .withVelocityX(coordinateOrientation * driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(coordinateOrientation * driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driveController.getRightX() * MaxAngularRate); // Drive counterclockwise with negative X (left)
+                    .withRotationalRate(-driveController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
 
-                return m_drive;
-            }).ignoringDisable(true)
+            ).ignoringDisable(false)
         );
 
         // A Button: Brake
@@ -77,7 +76,7 @@ public class SwerveDrivetrainBindings {
         //     drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         // }
 
-        drivetrain.registerTelemetry(m_logger::telemeterize);
+        //drivetrain.registerTelemetry(m_logger::telemeterize);
 
         // driveController.pov(0).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
         // driveController.pov(180).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));

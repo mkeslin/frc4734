@@ -18,7 +18,7 @@ public class Climber extends SubsystemBase {
     private TalonFX m_climber_left;
     private TalonFX m_climber_right;
 
-    private double RETRACT_ENCODER_VAL = -140; //Actual Stowed Value: -142.47
+    private double RETRACT_ENCODER_VAL = -145; //Actual Stowed Value: -142.47
     private double EXTEND_ENCODER_VAL = 2; //Actual Deploy Value: 0
 
     private ClimberExtendCommand climberExtendCommand = new ClimberExtendCommand(this, EXTEND_ENCODER_VAL);

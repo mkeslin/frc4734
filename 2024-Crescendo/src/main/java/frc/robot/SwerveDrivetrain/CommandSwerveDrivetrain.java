@@ -92,7 +92,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
-        return run(() -> this.setControl(requestSupplier.get()));
+        return runOnce(() -> this.setControl(requestSupplier.get()));
     }
 
     public Command getAutoPath(String pathName) {

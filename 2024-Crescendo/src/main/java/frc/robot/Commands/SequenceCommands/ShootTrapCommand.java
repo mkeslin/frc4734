@@ -22,7 +22,7 @@ public class ShootTrapCommand extends SequentialCommandGroup {
         addCommands(
             // aim at speaker
             //
-            new ShootNoteCommand(m_Intake, m_Shooter)
+            new ShootNoteCommand(m_Intake, m_Shooter, -0.5)
         );
     }
 }

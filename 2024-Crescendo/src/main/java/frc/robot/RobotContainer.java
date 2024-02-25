@@ -77,7 +77,7 @@ public class RobotContainer {
     public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
     public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0);
     public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, 0);
-    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
+    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter, m_elevator);
     public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
     public IntakeNoteCommand intakeNoteCommand = new IntakeNoteCommand(m_intake);
@@ -98,8 +98,6 @@ public class RobotContainer {
 
         // configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
-        // HorizontalElevatorBindings.configureBindings(mechanismController, horizontalElevator);
-        // VerticalElevatorBindings.configureBindings(mechanismController, verticalElevator);
 
         // configure bindings for mechanisms
         configureMechanismBindings();
@@ -124,9 +122,9 @@ public class RobotContainer {
 
         m_driveController.y().onTrue(intakeNoteCommand);
         m_driveController.x().onTrue(shootAmpNoteCommand);
-        //m_mechanismController.y().onTrue(m_shooter.commandSetAngle(6));
+        //m_mechanismController.y().onTrue(m_shooter.commandSetAngle(7.5));
         //m_mechanismController.x().onTrue(m_shooter.commandSetAngle(0));
-        //m_mechanismController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(m_shooter.commandSetAngle(6));
+        //m_mechanismController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(m_shooter.commandSetAngle(7.5));
         //m_mechanismController.axisGreaterThan(ControllerButtons.CLY, 0.5).whileTrue(m_shooter.commandSetAngle(0));
         //m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
         //m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
@@ -156,7 +154,7 @@ public class RobotContainer {
         m_driveController.b().onTrue(m_elevator.CommandStopExtendRetract());
 
         // RIGHT STICK - Y - SHOOTER ANGLE
-        m_mechanismController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(6));
+        m_mechanismController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(7.5));
         m_mechanismController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
 
         // RIGHT STICK - X - ELEVATOR ANGLE
@@ -183,7 +181,7 @@ public class RobotContainer {
         m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(shootAmpNoteCommand);
         m_arcadeController.axisGreaterThan(ControllerButtons.CLY, 0.5).onTrue(intakeNoteCommand);
 
-        m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(6));
+        m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(7.5));
         m_arcadeController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
 
         m_arcadeController.start().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
