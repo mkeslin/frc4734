@@ -24,11 +24,6 @@ public class AutoCommand extends SequentialCommandGroup {
     private final Limelight m_intakeLimelight;
     private final Limelight m_shooterLimelight;
 
-    // commands
-    Command acquireNoteCommand;
-    Command shootSpeakerNoteCommand;
-
-    // public AutoCommand(PathPlanner pathPlanner, Intake intake, Shooter shooter, LimelightAligner limelightAligner, Limelight intakeLimelight, Limelight shooterLimelight, int[] noteOrder) {
     public AutoCommand(
         PathPlanner pathPlanner,
         Intake intake,
@@ -45,11 +40,6 @@ public class AutoCommand extends SequentialCommandGroup {
         m_shooterLimelight = shooterLimelight;
 
         addRequirements(m_pathPlanner, m_intake, m_shooter, m_intakeLimelight, m_shooterLimelight);
-
-        acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-        shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
-
-        // int[] noteOrder2 = { 1, 2, 3 };
 
         // load the commands for the specific notes
         List<Command> commands = new ArrayList<Command>();
@@ -89,18 +79,25 @@ public class AutoCommand extends SequentialCommandGroup {
                 break;
         }
 
+        var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
+        var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
+
         return Commands.sequence(
             //Commands.print("Executing cycle for note " + noteNumber + "..."),
             moveToNoteCommand,
-            acquireNoteCommand,
-            shootSpeakerNoteCommand
 
-            // m_intake.commandStartIn(),
-            // Commands.waitSeconds(2),
-            // m_intake.commandStopRoller(),
-            // m_shooter.commandShoot(),
-            // Commands.waitSeconds(2),
-            // m_shooter.commandStop(),
+            // acquireNoteCommand,
+            // shootSpeakerNoteCommand
+            
+            m_intake.commandStartIn(),
+            Commands.waitSeconds(1),
+            m_intake.commandStopRoller(),
+
+            m_pathPlanner.moveToOurSpeaker(),
+
+            m_shooter.commandShoot(),
+            Commands.waitSeconds(1),
+            m_shooter.commandStop()
 
             //Commands.print("...finished executing cycle for note " + noteNumber)
         );
