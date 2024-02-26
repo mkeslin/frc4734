@@ -42,7 +42,7 @@ public class Lights extends SubsystemBase {
     // public Lights(CommandXboxController joy) {
     public Lights() {
         // this.joystick = joy;
-        changeAnimation(AnimationTypes.SetAll);
+        // changeAnimation(AnimationTypes.SetAll);
         CANdleConfiguration configAll = new CANdleConfiguration();
         configAll.statusLedOffWhenActive = true;
         configAll.disableWhenLOS = false;
@@ -50,6 +50,9 @@ public class Lights extends SubsystemBase {
         configAll.brightnessScalar = 0.1;
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         m_candle.configAllSettings(configAll, 100);
+
+        // m_candle.animate(new TwinkleAnimation(30, 70, 60, 0, 0.4, LedCount, TwinklePercent.Percent18));
+        m_candle.animate(new RainbowAnimation(1, 0.1, LedCount));
     }
 
     public void incrementAnimation() {

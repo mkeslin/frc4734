@@ -162,6 +162,11 @@ public class Elevator extends SubsystemBase {
         var statusSignal = m_elevatorPivot.getPosition();
         return statusSignal.getValueAsDouble();
     }
+
+    public void zero() {
+        m_elevator.setPosition(0);
+        m_elevatorPivot.setPosition(0);
+    }
     
     // @Override
     // public void periodic() {

@@ -131,4 +131,8 @@ public class Intake extends SubsystemBase {
     public boolean noteIsSeen() {
         return !m_intakeSensor.get();
     }
+
+    public void zero() {
+        m_pivot.setPosition(0);
+    }
 }

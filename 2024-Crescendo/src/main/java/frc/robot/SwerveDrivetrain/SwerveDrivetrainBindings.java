@@ -25,14 +25,15 @@ public class SwerveDrivetrainBindings {
     private static final SwerveDrivetrainTelemetry m_logger = new SwerveDrivetrainTelemetry(MaxSpeed);
     
     // flip the orientation for blue/red
-    private static final int coordinateOrientation = -1;
+    private static int coordinateOrientation = -1;
+    public static void setAllianceOrientation(boolean isRed) {
+        coordinateOrientation = isRed ? 1 : -1;
+    }
+
     public static void configureBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
         // Drivetrain will execute this command periodically
         // Sticks
-        // var alliance = DriverStation.getAlliance();
-        // if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-        //     coordinateOrientation = 1;
-        // }
+        
 
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->

@@ -24,7 +24,8 @@ public class Landmarks {
     }
 
     public static Pose2d OurSpeaker() {
-        return isRedAlliance() ? RedLandmarks.Speaker : BlueLandmarks.Speaker;
+        // return isRedAlliance() ? RedLandmarks.Speaker : BlueLandmarks.Speaker;
+        return RedLandmarks.Speaker;
     }
 
     public static Pose2d OurSource() {
@@ -48,7 +49,8 @@ public class Landmarks {
     }
 
     public static Pose2d OurNote2() {
-        return isRedAlliance() ? RedLandmarks.Note2 : BlueLandmarks.Note2;
+        // return isRedAlliance() ? RedLandmarks.Note2 : BlueLandmarks.Note2;
+        return RedLandmarks.Note2;
     }
 
     public static Pose2d OurNote3() {

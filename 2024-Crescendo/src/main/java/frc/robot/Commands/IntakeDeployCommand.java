@@ -1,5 +1,6 @@
 package frc.robot.Commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Intake;
 
@@ -8,6 +9,7 @@ public class IntakeDeployCommand extends Command {
     public double target_val;
     public double current_val;
     
+    public Timer t = new Timer();
 
     public IntakeDeployCommand(Intake intake, double target) {
         m_intake = intake;
@@ -19,6 +21,8 @@ public class IntakeDeployCommand extends Command {
     @Override
     public void initialize() {
         current_val = m_intake.getEncoderValue();
+
+        t.start();
     }
 
     @Override
@@ -34,6 +38,8 @@ public class IntakeDeployCommand extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
+        if (t.hasElapsed(2)) { return true;}
+
         return current_val <= target_val;
     }
 
@@ -41,5 +47,8 @@ public class IntakeDeployCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         m_intake.stopPivot();
+
+        t.stop();
+        t.reset();
     }
 }

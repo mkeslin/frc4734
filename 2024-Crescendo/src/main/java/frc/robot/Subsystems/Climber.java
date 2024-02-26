@@ -72,4 +72,9 @@ public class Climber extends SubsystemBase {
         var statusSignal = m_climber_right.getPosition();
         return statusSignal.getValueAsDouble();
     }
+
+    public void zero() {
+        m_climber_left.setPosition(0);
+        m_climber_right.setPosition(0);
+    }
 }

@@ -7,6 +7,8 @@ import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Climber;
+import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
 import java.util.ArrayList;
@@ -20,7 +22,8 @@ public class AutoCommand extends SequentialCommandGroup {
     private final PathPlanner m_pathPlanner;
     private final Intake m_intake;
     private final Shooter m_shooter;
-    // private final LimelightAligner m_limelightAligner;
+    private final Climber m_climber;
+    private final Elevator m_elevator;
     private final Limelight m_intakeLimelight;
     private final Limelight m_shooterLimelight;
 
@@ -28,6 +31,8 @@ public class AutoCommand extends SequentialCommandGroup {
         PathPlanner pathPlanner,
         Intake intake,
         Shooter shooter,
+        Climber climber,
+        Elevator elevator,
         Limelight intakeLimelight,
         Limelight shooterLimelight,
         int[] noteOrder
@@ -35,18 +40,55 @@ public class AutoCommand extends SequentialCommandGroup {
         m_pathPlanner = pathPlanner;
         m_intake = intake;
         m_shooter = shooter;
-        // m_limelightAligner = limelightAligner;
+        m_climber = climber;
+        m_elevator = elevator;
         m_intakeLimelight = intakeLimelight;
         m_shooterLimelight = shooterLimelight;
 
-        addRequirements(m_pathPlanner, m_intake, m_shooter, m_intakeLimelight, m_shooterLimelight);
+        addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight, m_shooterLimelight);
 
-        // load the commands for the specific notes
-        List<Command> commands = new ArrayList<Command>();
-        for (Integer noteNumber : noteOrder) {
-            commands.add(moveAcquireShootCycle(noteNumber));
-        }
-        addCommands(commands.toArray(new Command[0]));
+        // // load the commands for the specific notes
+        // List<Command> commands = new ArrayList<Command>();
+        // for (Integer noteNumber : noteOrder) {
+        //     commands.add(moveAcquireShootCycle(noteNumber));
+        // }
+        // addCommands(commands.toArray(new Command[0]));
+
+        // test
+        addCommands(
+            // start sequence
+            // setStartConfiguration()
+            // commands
+            // m_pathPlanner.moveToTest1()
+            moveAcquireShootCycle(2)
+            // Commands.print("This is the auto command!!!!!!!!!!!!!!!")
+        );
+    }
+
+    private Command setStartConfiguration() {
+        // return Commands.sequence(
+        //     Commands.parallel(
+        //         // lower intake
+        //         m_intake.commandDeploy(),
+        //         // lower climbers
+        //         m_climber.CommandFullRetract(),
+        //         // retract elevator
+        //         m_elevator.CommandFullRetract()
+        //     ),
+        //     // pivot elevator down
+        //     m_elevator.CommandPivotStow()
+        // );
+
+        return Commands.sequence(
+            // lower intake
+            // m_intake.commandDeploy(),
+            // lower climbers
+            // m_climber.CommandFullRetract(),
+            // retract elevator
+            m_elevator.CommandFullRetract(),
+            // pivot elevator down
+            m_elevator.CommandPivotStow()
+        );
     }
 
     private Command moveAcquireShootCycle(int noteNumber) {
@@ -84,21 +126,29 @@ public class AutoCommand extends SequentialCommandGroup {
 
         return Commands.sequence(
             //Commands.print("Executing cycle for note " + noteNumber + "..."),
-            moveToNoteCommand,
+            // moveToNoteCommand,
+
+            // m_pathPlanner.moveToOurNote2(),
+
+            m_pathPlanner.moveToRedTest1(),
+            m_pathPlanner.moveToRedTest2(),
+            m_pathPlanner.moveToRedTest3(),
+            m_pathPlanner.moveToRedTest4()
 
             // acquireNoteCommand,
             // shootSpeakerNoteCommand
-            
-            m_intake.commandStartIn(),
-            Commands.waitSeconds(1),
-            m_intake.commandStopRoller(),
 
-            m_pathPlanner.moveToOurSpeaker(),
+            // m_intake.commandStartIn(),
+            // Commands.waitSeconds(2),
+            // m_intake.commandStopRoller(),
+            // m_pathPlanner.moveToOurSpeaker()
 
-            m_shooter.commandShoot(),
-            Commands.waitSeconds(1),
-            m_shooter.commandStop()
+            // m_pathPlanner.moveToTest4(),
 
+            // shootSpeakerNoteCommand
+            // m_shooter.commandShoot(),
+            // Commands.waitSeconds(2),
+            // m_shooter.commandStop()
             //Commands.print("...finished executing cycle for note " + noteNumber)
         );
     }

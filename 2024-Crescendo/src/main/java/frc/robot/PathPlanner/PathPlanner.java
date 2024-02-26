@@ -47,12 +47,18 @@ public class PathPlanner extends SubsystemBase {
         // SmartDashboard.putData("On-the-fly path", moveRelative(2.0, 0.0));
     }
 
+    public void resetPose(Pose2d pose) {
+        m_drivetrain.resetPose(pose);
+    }
+
     public Command moveToPose(Pose2d pose) {
         var constraints = new PathConstraints(
             DrivetrainConstants.MaxSpeed,
             DrivetrainConstants.MaxAcceleration,
-            Units.degreesToRadians(360),
-            Units.degreesToRadians(540)
+            Units.degreesToRadians(100),
+            Units.degreesToRadians(90)
+            // Units.degreesToRadians(360),
+            // Units.degreesToRadians(540)
         );
         return AutoBuilder.pathfindToPose(pose, constraints, 0, 0);
     }
@@ -166,5 +172,37 @@ public class PathPlanner extends SubsystemBase {
 
     public Command moveToOurNote8() {
         return moveToPose(Landmarks.OurNote8());
+    }
+
+    public Command moveToBlueTest1() {
+        return moveToPose(new Pose2d(2.25, 5.5, Rotation2d.fromDegrees(0)));
+    }
+
+    public Command moveToBlueTest2() {
+        return moveToPose(new Pose2d(2.25, 6.5, Rotation2d.fromDegrees(0)));
+    }
+
+    public Command moveToBlueTest3() {
+        return moveToPose(new Pose2d(1.25, 6.5, Rotation2d.fromDegrees(0)));
+    }
+
+    public Command moveToBlueTest4() {
+        return moveToPose(new Pose2d(1.25, 5.5, Rotation2d.fromDegrees(0)));
+    }
+
+    public Command moveToRedTest1() {
+        return moveToPose(new Pose2d(14.2, 5.5, Rotation2d.fromDegrees(180)));
+    }
+
+    public Command moveToRedTest2() {
+        return moveToPose(new Pose2d(14.2, 4.5, Rotation2d.fromDegrees(180)));
+    }
+
+    public Command moveToRedTest3() {
+        return moveToPose(new Pose2d(15.2, 4.5, Rotation2d.fromDegrees(180)));
+    }
+
+    public Command moveToRedTest4() {
+        return moveToPose(new Pose2d(15.2, 5.5, Rotation2d.fromDegrees(180)));
     }
 }
