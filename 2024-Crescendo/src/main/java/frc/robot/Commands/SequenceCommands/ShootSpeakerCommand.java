@@ -22,7 +22,7 @@ public class ShootSpeakerCommand extends SequentialCommandGroup {
             // shooter.commandSetAngle(7.5),
             // shoot
             Commands.print("-> Shoot note..."),
-            new ShootNoteCommand(intake, shooter, .1)
+            new ShootNoteCommand(intake, shooter, .4)
         );
     }
 }

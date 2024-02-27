@@ -32,7 +32,7 @@ public class IntakeNoteCommand extends Command {
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        return (t.hasElapsed(2) || t2.hasElapsed(0.2));
+        return (t.hasElapsed(3) || t2.hasElapsed(0.2));
     }
 
     // Called once after isFinished returns true

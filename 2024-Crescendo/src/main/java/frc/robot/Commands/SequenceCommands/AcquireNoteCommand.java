@@ -20,19 +20,17 @@ import frc.robot.Subsystems.Intake;
  */
 
 public class AcquireNoteCommand extends SequentialCommandGroup {
-    public AcquireNoteCommand(
-        Limelight intakeLimelight,
-        PathPlanner pathPlanner, 
-        Intake intake
-    ) {
+
+    public AcquireNoteCommand(Limelight intakeLimelight, PathPlanner pathPlanner, Intake intake) {
         addCommands(
-            Commands.print("-> Center to note..."),
-            new CenterToTargetCommand(intakeLimelight, pathPlanner, intake, 0),
             Commands.parallel(
-                Commands.print("-> Move to note..."),
-                new MoveToNoteCommand(intakeLimelight, pathPlanner, intake),
+                Commands.print("-> Center to note..."),
+                new CenterToTargetCommand(intakeLimelight, pathPlanner, intake, 0),
+                // Commands.print("-> Move to note..."),
+                // new MoveToNoteCommand(intakeLimelight, pathPlanner, intake),
                 Commands.print("-> Intake note..."),
-                new IntakeNoteCommand(intake))
+                new IntakeNoteCommand(intake)
+            )
         );
     }
 }

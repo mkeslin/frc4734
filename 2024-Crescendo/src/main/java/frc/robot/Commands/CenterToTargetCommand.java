@@ -64,7 +64,7 @@ public class CenterToTargetCommand extends Command {
 
         // if acquiring note, move up to 1 meter forward to "chase" it
         // if aligning to april tag, don't move forward, just strafe
-        var forwardDistance = m_target == 0 ? 1 : 0;
+        var forwardDistance = m_target == 0 ? .75 : 0;
         m_PathPlanner.moveRelative(forwardDistance, wheelStrafe, 0);
     }
 

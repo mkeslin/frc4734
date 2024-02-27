@@ -16,8 +16,6 @@ import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
  * Command that executes during autonomous mode
@@ -52,6 +50,8 @@ public class AutoCommand extends SequentialCommandGroup {
 
         addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight, m_shooterLimelight);
 
+        var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, 7.5);
+
         // // load the commands for the specific notes
         // List<Command> commands = new ArrayList<Command>();
         // for (Integer noteNumber : noteOrder) {
@@ -61,8 +61,9 @@ public class AutoCommand extends SequentialCommandGroup {
 
         // test
         addCommands(
+            // shooterSetAngleCommand,
             // start sequence
-            shootPreloadedNote(),
+            // shootPreloadedNote(),
             // commands
             moveAcquireShootCycle(2)
         );
@@ -73,7 +74,7 @@ public class AutoCommand extends SequentialCommandGroup {
         var intakeDeployCommand = new IntakeDeployCommand(m_intake, m_intake.getDeployedEncoderValue());
         var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
         // var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, 7.5);
-        var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, .10);
+        var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, .4);
 
         return Commands.sequence(
             // raise elevator pivot
@@ -125,33 +126,27 @@ public class AutoCommand extends SequentialCommandGroup {
         var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
         var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
 
+        // debug
+        // return Commands.sequence(
+        //     m_pathPlanner.moveToRedTest1(),
+        //     m_pathPlanner.moveToRedTest2(),
+        //     m_pathPlanner.moveToRedTest3(),
+        //     m_pathPlanner.moveToRedTest4()
+        // );
+
         return Commands.sequence(
             Commands.print("Executing cycle for note " + noteNumber + "..."),
             moveToNoteCommand,
-            // m_pathPlanner.moveToOurNote2(),
-
-            // m_pathPlanner.moveToRedTest1(),
-            // m_pathPlanner.moveToRedTest2(),
-            // m_pathPlanner.moveToRedTest3(),
-            // m_pathPlanner.moveToRedTest4()
 
             Commands.print("Acquire note..."),
             acquireNoteCommand,
 
+            Commands.print("-> Move to speaker..."),
+            m_pathPlanner.moveToOurSpeaker(),
+
             Commands.print("Move to speaker and shoot..."),
-            shootSpeakerNoteCommand
-            // m_intake.commandStartIn(),
-            // Commands.waitSeconds(2),
-            // m_intake.commandStopRoller(),
-            // m_pathPlanner.moveToOurSpeaker()
-
-            // m_pathPlanner.moveToTest4(),
-
-            // shootSpeakerNoteCommand
-            // m_shooter.commandShoot(),
-            // Commands.waitSeconds(2),
-            // m_shooter.commandStop()
-            //Commands.print("...finished executing cycle for note " + noteNumber)
+            shootSpeakerNoteCommand,
+            Commands.print("...finished executing cycle for note " + noteNumber)
         );
     }
 }
