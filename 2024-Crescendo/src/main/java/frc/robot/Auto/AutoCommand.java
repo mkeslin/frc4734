@@ -12,6 +12,7 @@ import frc.robot.Commands.IntakeDeployCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
 import frc.robot.Commands.ShootNoteCommand;
+import frc.robot.Commands.ShooterSetAngleCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Climber;
@@ -72,7 +73,8 @@ public class AutoCommand extends SequentialCommandGroup {
         var elevatorDeployCommand = new ElevatorDeployCommand(m_elevator, 20);
         var intakeDeployCommand = new IntakeDeployCommand(m_intake, m_intake.getDeployedEncoderValue());
         var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
-        // var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, MAX_PIVOT_ENCODER_VAL);
+        var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
+        shooterSetAngleCommand.setTarget(Shooter.START_AUTO_PIVOT_ENCODER_VAL);
         var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, .4);
 
         return Commands.sequence(
@@ -82,10 +84,9 @@ public class AutoCommand extends SequentialCommandGroup {
             intakeDeployCommand,
             Commands.parallel(
                 // pivot elevator down
-                elevatorStowCommand
+                elevatorStowCommand,
                 // raise shooter
-                // shooterSetAngleCommand
-                // m_shooter.commandSetAngle(MAX_PIVOT_ENCODER_VAL)
+                shooterSetAngleCommand
             ),
             // shoot
             shootNoteCommand

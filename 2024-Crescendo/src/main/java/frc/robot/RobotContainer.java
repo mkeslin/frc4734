@@ -183,10 +183,12 @@ public class RobotContainer {
         m_arcadeController.leftBumper().onTrue(m_elevator.CommandPivotDeploy());
 
         // m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(shootAmpNoteCommand);
-        m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(shootNoteCommand);
-        m_arcadeController.axisGreaterThan(ControllerButtons.CLY, 0.5).onTrue(intakeNoteCommand);
+        m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(Commands.sequence(shootNoteCommand, m_shooter.commandSetAngle(1)));
+        m_arcadeController
+            .axisGreaterThan(ControllerButtons.CLY, 0.5)
+            .onTrue(Commands.sequence(intakeNoteCommand, m_shooter.commandSetAngle(Shooter.SPEAKER_PIVOT_ENCODER_VAL)));
 
-        m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(Shooter.MAX_PIVOT_ENCODER_VAL));
+        m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(Shooter.SPEAKER_PIVOT_ENCODER_VAL));
         m_arcadeController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
 
         m_arcadeController.start().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
