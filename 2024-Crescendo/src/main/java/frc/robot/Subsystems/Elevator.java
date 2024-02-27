@@ -2,6 +2,7 @@ package frc.robot.Subsystems;
 
 import static frc.robot.Constants.Constants.ELEVATOR_ID;
 import static frc.robot.Constants.Constants.ELEVATOR_PIVOT_ID;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -9,10 +10,10 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Commands.ElevatorStowCommand;
 import frc.robot.Commands.ElevatorDeployCommand;
 import frc.robot.Commands.ElevatorExtendCommand;
 import frc.robot.Commands.ElevatorRetractCommand;
+import frc.robot.Commands.ElevatorStowCommand;
 
 public class Elevator extends SubsystemBase {
 
@@ -78,7 +79,6 @@ public class Elevator extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_elevator.getConfigurator().apply(configs2);
-
         // zeroValue = zero;
         // halfValue = half;
         // fullValue = full;
@@ -89,7 +89,7 @@ public class Elevator extends SubsystemBase {
         // elevatorMovingOut = false;
     }
 
-   /* public Command CommandExtend() {
+    /* public Command CommandExtend() {
         return Commands.runOnce(() -> Extend());
     }
 
@@ -153,6 +153,10 @@ public class Elevator extends SubsystemBase {
         setPivot(0);
     }
 
+    public double getStowedEncoderValue() {
+        return STOWED_ENCODER_VAL;
+    }
+
     public double getDeployVal() {
         return DEPLOYED_ENCODER_VAL;
     }
@@ -171,7 +175,6 @@ public class Elevator extends SubsystemBase {
         m_elevator.setPosition(0);
         m_elevatorPivot.setPosition(0);
     }
-    
     // @Override
     // public void periodic() {
     //     // This method will be called once per scheduler run
