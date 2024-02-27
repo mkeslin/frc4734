@@ -61,7 +61,11 @@ public class CenterToTargetCommand extends Command {
             SmartDashboard.putString("node-pose", "none");
         }
         wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (offset/MAX_CAMERA_X + 1));
-        m_PathPlanner.moveRelative(1, wheelStrafe, 0);
+
+        // if acquiring note, move up to 1 meter forward to "chase" it
+        // if aligning to april tag, don't move forward, just strafe
+        var forwardDistance = m_target == 0 ? 1 : 0;
+        m_PathPlanner.moveRelative(forwardDistance, wheelStrafe, 0);
     }
 
     // Make this return true when this Command no longer needs to run execute()

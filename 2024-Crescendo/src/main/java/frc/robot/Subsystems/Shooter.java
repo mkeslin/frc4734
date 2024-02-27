@@ -120,4 +120,9 @@ public class Shooter extends SubsystemBase {
     public void holdPivot() {
         setPivotMotor(0.025);
     }
+
+    @Override
+    public void periodic() {
+        holdPivot();
+    }
 }

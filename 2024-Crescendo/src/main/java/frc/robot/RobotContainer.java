@@ -135,40 +135,40 @@ public class RobotContainer {
         //m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
     }
 
-    private void configureMechanismBindings() {
-        // intake
-        // driveController.y().onTrue(intake.isOn() ? intake.commandStop() : intake.commandStartIn());
-        //m_driveController.y().onTrue(m_intake.commandStartIn());
-        //m_driveController.x().onTrue(m_intake.commandStopRoller());
+    // private void configureMechanismBindings() {
+    //     // intake
+    //     // driveController.y().onTrue(intake.isOn() ? intake.commandStop() : intake.commandStartIn());
+    //     //m_driveController.y().onTrue(m_intake.commandStartIn());
+    //     //m_driveController.x().onTrue(m_intake.commandStopRoller());
 
-        m_driveController.leftBumper().onTrue(m_intake.commandStow());
-        m_driveController.leftTrigger().onTrue(m_intake.commandDeploy());
-        m_driveController.b().onTrue(m_intake.commandStopPivot());
-        // shooter
-        //m_driveController.y().onTrue(m_shooter.commandShoot());
-        //m_driveController.x().onTrue(m_shooter.commandStop());
+    //     m_driveController.leftBumper().onTrue(m_intake.commandStow());
+    //     m_driveController.leftTrigger().onTrue(m_intake.commandDeploy());
+    //     m_driveController.b().onTrue(m_intake.commandStopPivot());
+    //     // shooter
+    //     //m_driveController.y().onTrue(m_shooter.commandShoot());
+    //     //m_driveController.x().onTrue(m_shooter.commandStop());
 
-        // elevator
-        m_driveController.rightBumper().onTrue(m_elevator.CommandPivotStow());
-        m_driveController.rightTrigger().onTrue(m_elevator.CommandPivotDeploy());
-        m_driveController.b().onTrue(m_elevator.CommandPivotStop());
+    //     // elevator
+    //     m_driveController.rightBumper().onTrue(m_elevator.CommandPivotStow());
+    //     m_driveController.rightTrigger().onTrue(m_elevator.CommandPivotDeploy());
+    //     m_driveController.b().onTrue(m_elevator.CommandPivotStop());
 
-        // // LEFT STICK - Y - ELEVATOR EXTEND/RETRACT
-        // m_mechanismController.leftTrigger().onTrue(m_elevator.CommandFullExtend());
-        // m_mechanismController.leftBumper().onTrue(m_elevator.CommandFullRetract());
-        // m_driveController.b().onTrue(m_elevator.CommandStopExtendRetract());
+    //     // // LEFT STICK - Y - ELEVATOR EXTEND/RETRACT
+    //     // m_mechanismController.leftTrigger().onTrue(m_elevator.CommandFullExtend());
+    //     // m_mechanismController.leftBumper().onTrue(m_elevator.CommandFullRetract());
+    //     // m_driveController.b().onTrue(m_elevator.CommandStopExtendRetract());
 
-        // // RIGHT STICK - Y - SHOOTER ANGLE
-        // m_mechanismController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(7.5));
-        // m_mechanismController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
+    //     // // RIGHT STICK - Y - SHOOTER ANGLE
+    //     // m_mechanismController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(7.5));
+    //     // m_mechanismController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
 
-        // // RIGHT STICK - X - ELEVATOR ANGLE
-        // m_mechanismController.axisLessThan(ControllerButtons.CRX, -0.5).onTrue(m_elevator.CommandPivotDeploy());
-        // m_mechanismController.axisGreaterThan(ControllerButtons.CRX, 0.5).onTrue(m_elevator.CommandPivotStow());
+    //     // // RIGHT STICK - X - ELEVATOR ANGLE
+    //     // m_mechanismController.axisLessThan(ControllerButtons.CRX, -0.5).onTrue(m_elevator.CommandPivotDeploy());
+    //     // m_mechanismController.axisGreaterThan(ControllerButtons.CRX, 0.5).onTrue(m_elevator.CommandPivotStow());
 
-        // m_mechanismController.x().onTrue(m_climber.CommandFullRetract());
-        // m_mechanismController.y().onTrue(m_climber.CommandFullExtend());
-    }
+    //     // m_mechanismController.x().onTrue(m_climber.CommandFullRetract());
+    //     // m_mechanismController.y().onTrue(m_climber.CommandFullExtend());
+    // }
 
     public void configureArcadeBindings() {
         m_arcadeController.a().onTrue(m_intake.commandDeploy());

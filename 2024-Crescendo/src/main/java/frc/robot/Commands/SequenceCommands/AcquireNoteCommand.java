@@ -20,40 +20,19 @@ import frc.robot.Subsystems.Intake;
  */
 
 public class AcquireNoteCommand extends SequentialCommandGroup {
-
-    private final Limelight m_intakeLimelight;
-    private final PathPlanner m_pathPlanner;
-    private final Intake m_intake;
-
     public AcquireNoteCommand(
         Limelight intakeLimelight,
         PathPlanner pathPlanner, 
         Intake intake
     ) {
-        m_intakeLimelight = intakeLimelight;
-        m_pathPlanner = pathPlanner;
-        m_intake = intake;
-
         addCommands(
-            new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0),
+            Commands.print("-> Center to note..."),
+            new CenterToTargetCommand(intakeLimelight, pathPlanner, intake, 0),
             Commands.parallel(
-                new MoveToNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake),
-                new IntakeNoteCommand(m_intake))
+                Commands.print("-> Move to note..."),
+                new MoveToNoteCommand(intakeLimelight, pathPlanner, intake),
+                Commands.print("-> Intake note..."),
+                new IntakeNoteCommand(intake))
         );
     }
-    
-    // Called just before this Command runs the first time
-    // @Override
-    // public void initialize() {}
-
-    // Make this return true when this Command no longer needs to run execute()
-    // @Override
-    // public boolean isFinished() {
-    //     // return m_claw.isGrabbing();
-    //     return true;
-    // }
-
-    // Called once after isFinished returns true
-    // @Override
-    // public void end(boolean interrupted) {}
 }
