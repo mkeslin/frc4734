@@ -8,7 +8,7 @@ public class RedLandmarks {
     public static final Pose2d StartA = getPose(15.2, 5.5, 0);
 
     public static final Pose2d Amp = getPose(14.8, 7.5, 90.0);
-    public static final Pose2d Speaker = getPose(15.2, 5.5, 180);
+    public static final Pose2d Speaker = getPose(15, 5.5, 180);
     public static final Pose2d Source = getPose(1.3, 1.3, -60.0);
 
     public static final Pose2d Stage1 = getPose(12.2, 5.0, -60.0);

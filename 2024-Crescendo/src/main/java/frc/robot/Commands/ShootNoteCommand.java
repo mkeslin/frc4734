@@ -31,7 +31,7 @@ public class ShootNoteCommand extends Command {
             m_intake.startOut();
         } else {
             m_shooter.shoot(m_speed);
-            if(t.get() < 1) {
+            if(t.get() < 1.5) {
                 m_intake.stopRoller();
             }
             else {

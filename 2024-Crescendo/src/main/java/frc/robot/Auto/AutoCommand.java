@@ -1,5 +1,8 @@
 package frc.robot.Auto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -9,7 +12,6 @@ import frc.robot.Commands.IntakeDeployCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
 import frc.robot.Commands.ShootNoteCommand;
-import frc.robot.Commands.ShooterSetAngleCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Climber;
@@ -50,22 +52,19 @@ public class AutoCommand extends SequentialCommandGroup {
 
         addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight, m_shooterLimelight);
 
-        var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, 7.5);
+        // var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, MAX_PIVOT_ENCODER_VAL);
 
-        // // load the commands for the specific notes
-        // List<Command> commands = new ArrayList<Command>();
-        // for (Integer noteNumber : noteOrder) {
-        //     commands.add(moveAcquireShootCycle(noteNumber));
-        // }
-        // addCommands(commands.toArray(new Command[0]));
-
-        // test
+        // load the commands for the specific notes
+        List<Command> commands = new ArrayList<Command>();
+        for (Integer noteNumber : noteOrder) {
+            commands.add(moveAcquireShootCycle(noteNumber));
+        }
         addCommands(
             // shooterSetAngleCommand,
             // start sequence
             // shootPreloadedNote(),
             // commands
-            moveAcquireShootCycle(2)
+            commands.toArray(new Command[0])
         );
     }
 
@@ -73,7 +72,7 @@ public class AutoCommand extends SequentialCommandGroup {
         var elevatorDeployCommand = new ElevatorDeployCommand(m_elevator, 20);
         var intakeDeployCommand = new IntakeDeployCommand(m_intake, m_intake.getDeployedEncoderValue());
         var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
-        // var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, 7.5);
+        // var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, MAX_PIVOT_ENCODER_VAL);
         var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, .4);
 
         return Commands.sequence(
@@ -86,7 +85,7 @@ public class AutoCommand extends SequentialCommandGroup {
                 elevatorStowCommand
                 // raise shooter
                 // shooterSetAngleCommand
-                // m_shooter.commandSetAngle(7.5)
+                // m_shooter.commandSetAngle(MAX_PIVOT_ENCODER_VAL)
             ),
             // shoot
             shootNoteCommand

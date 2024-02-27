@@ -19,7 +19,7 @@ public class ShootSpeakerCommand extends SequentialCommandGroup {
             // align to tag
             // new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, AprilTags.OurSpeakerLeft()),
             // adjust shooter
-            // shooter.commandSetAngle(7.5),
+            // shooter.commandSetAngle(MAX_PIVOT_ENCODER_VAL),
             // shoot
             Commands.print("-> Shoot note..."),
             new ShootNoteCommand(intake, shooter, .4)

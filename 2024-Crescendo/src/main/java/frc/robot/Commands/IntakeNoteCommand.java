@@ -1,10 +1,11 @@
 package frc.robot.Commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Intake;
-import edu.wpi.first.wpilibj.Timer;
 
 public class IntakeNoteCommand extends Command {
+
     public Intake m_intake;
     public Timer t = new Timer();
     public Timer t2 = new Timer();
@@ -23,7 +24,7 @@ public class IntakeNoteCommand extends Command {
     @Override
     public void execute() {
         m_intake.startIn(-.55);
-        if(m_intake.noteIsSeen() && t2.get() == 0) {
+        if (m_intake.noteIsSeen() && t2.get() == 0) {
             t2.start();
         }
     }
@@ -32,7 +33,7 @@ public class IntakeNoteCommand extends Command {
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        return (t.hasElapsed(3) || t2.hasElapsed(0.2));
+        return (t.hasElapsed(3) || t2.hasElapsed(0.175));
     }
 
     // Called once after isFinished returns true
