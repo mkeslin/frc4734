@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommand;
 import frc.robot.Commands.IntakeNoteCommand;
 import frc.robot.Commands.ShootNoteCommand;
+import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
 import frc.robot.Controllers.ControllerButtons;
@@ -78,9 +79,9 @@ public class RobotContainer {
     // private LimelightAligner m_limelightAligner = new LimelightAligner(m_shooterLimelight, m_intakeLimelight, m_pathPlanner);
     // Commands
     public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-    //public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, 0);
-    //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, 0);
-    // public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter, m_elevator);
+    public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
+    public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
+    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter, m_elevator);
     public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
@@ -90,13 +91,13 @@ public class RobotContainer {
         
 
         // Register Named Commands
-        // NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
-        //NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
-        //NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
-        // NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
+        NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
+        NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
+        NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
+        NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
         //NamedCommands.registerCommand("shootSpeakerNoteCommand", shootSpeakerNoteCommand);
         //NamedCommands.registerCommand("shootTrapNoteCommand", shootTrapNoteCommand);
-        //NamedCommands.registerCommand("intakeNoteCommand", intakeNoteCommand);
+        NamedCommands.registerCommand("intakeNoteCommand", intakeNoteCommand);
         // var acquireNoteCommand = new AcquireNoteCommand(limelight, pathPlanner, intake, limelightAligner);
         // NamedCommands.registerCommand("acquireNote", acquireNoteCommand.schedule());
 
@@ -113,7 +114,7 @@ public class RobotContainer {
         // configureLightsBindings();
 
         // command tests
-        // m_driveController.rightBumper().onTrue(acquireNoteCommand);
+        m_driveController.rightBumper().onTrue(shootAmpNoteCommand);
 
         // PathPlanner
         m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");

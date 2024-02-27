@@ -25,9 +25,9 @@ public class ElevatorRetractCommand extends Command {
     public void execute() {
         current_val = m_Elevator.getExtendEncoderValue();
         if(Math.abs(current_val) >= Math.abs(target_val/2)) {
-            m_Elevator.setExtendRetractMotor(-0.3);//m_Elevator.setExtendRetractMotor(-0.65);
+            m_Elevator.setExtendRetractMotor(-0.65);
         } else {
-            m_Elevator.setExtendRetractMotor(-0.4);//m_Elevator.setExtendRetractMotor(-0.85);
+            m_Elevator.setExtendRetractMotor(-0.85);
         }
     }
 

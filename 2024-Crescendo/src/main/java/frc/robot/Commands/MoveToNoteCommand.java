@@ -2,19 +2,21 @@ package frc.robot.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.PathPlanner.PathPlanner;
+import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Cameras.Limelight;
 import edu.wpi.first.wpilibj.Timer;
 
 public class MoveToNoteCommand extends Command {
     public Limelight m_limelight;
     public PathPlanner m_PathPlanner;
+    public Intake m_Intake;
 
     public Timer t = new Timer();
 
-    public MoveToNoteCommand(Limelight limelight, PathPlanner pathPlanner) {
+    public MoveToNoteCommand(Limelight limelight, PathPlanner pathPlanner, Intake intake) {
         m_limelight = limelight;
         m_PathPlanner = pathPlanner;
-
+        m_Intake = intake;
         addRequirements(m_limelight, m_PathPlanner);
     }
 
@@ -33,7 +35,7 @@ public class MoveToNoteCommand extends Command {
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        if (t.hasElapsed(2)) { return true;}
+        if (t.hasElapsed(2) || m_Intake.noteIsSeen()) { return true;}
         
         return (m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getY()) < -16);
     }

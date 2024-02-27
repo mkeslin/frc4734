@@ -33,9 +33,9 @@ public class ElevatorRaiseToAmpCommand extends Command {
     public void execute() {
         current_val = m_Elevator.getExtendEncoderValue();
         if(Math.abs(current_val) < Math.abs(start_val * 0.75)) {
-            m_Elevator.setExtendRetractMotor(sign * 0.3);//m_Elevator.setExtendRetractMotor(0.65);
+            m_Elevator.setExtendRetractMotor(sign * 0.65);
         } else {
-            m_Elevator.setExtendRetractMotor(sign * 0.4);//m_Elevator.setExtendRetractMotor(0.85);
+            m_Elevator.setExtendRetractMotor(sign * 0.85);
         }
     }
 

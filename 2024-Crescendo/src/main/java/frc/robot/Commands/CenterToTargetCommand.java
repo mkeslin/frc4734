@@ -3,24 +3,28 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.PathPlanner.PathPlanner;
+import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Cameras.Limelight;
 
 public class CenterToTargetCommand extends Command {
     public Limelight m_limelight;
     public PathPlanner m_PathPlanner;
+    public Intake m_Intake;
     public int m_target;
 
     private double MAX_WHEEL_STRAFE = 1;
     private double MAX_CAMERA_X = 30;
 
     private double offset;
+    public double target_offset;
     private double wheelStrafe;
 
     public Timer t = new Timer();
 
-    public CenterToTargetCommand(Limelight limelight, PathPlanner pathPlanner, int target) {
+    public CenterToTargetCommand(Limelight limelight, PathPlanner pathPlanner, Intake intake, int target) {
         m_limelight = limelight;
         m_PathPlanner = pathPlanner;
+        m_Intake = intake;
         m_target = target; //target should be 0 for Note alignment
 
         addRequirements(m_limelight, m_PathPlanner);
@@ -30,8 +34,10 @@ public class CenterToTargetCommand extends Command {
     @Override
     public void initialize() {
         offset = 0;
-
         t.start();
+        if(m_target < 1) {
+            m_Intake.startIn(-.55);
+        }
     }
 
     @Override
@@ -45,7 +51,12 @@ public class CenterToTargetCommand extends Command {
             } else if(m_limelight.getX() > 0) { //otherwise if the target is to the right
                 SmartDashboard.putString("node-pose", "right");
             }
-            offset = Math.round(m_limelight.getX() * 100)/100;
+            target_offset = m_limelight.getX();
+            if(target_offset > 0.1) {
+                offset += 0.1;
+            } else if (target_offset < -0.1){
+                offset -= 0.1;
+            }
         } else {
             SmartDashboard.putString("node-pose", "none");
         }
@@ -57,7 +68,7 @@ public class CenterToTargetCommand extends Command {
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        if (t.hasElapsed(5)) { return true;}
+        if (t.hasElapsed(5) || m_Intake.noteIsSeen()) { return true;}
 
         return m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 2;
     }
@@ -67,5 +78,6 @@ public class CenterToTargetCommand extends Command {
     public void end(boolean interrupted) {
         t.stop();
         t.reset();
+        m_Intake.stopRoller();
     }
 }

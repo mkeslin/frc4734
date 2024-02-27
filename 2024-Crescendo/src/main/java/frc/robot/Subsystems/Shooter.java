@@ -95,13 +95,13 @@ public class Shooter extends SubsystemBase {
     public void shoot(double speed) {
         m_shooterOutTop.set(speed);
         m_shooterOutBottom.set(speed);
-        m_shooterIn.set(-speed);
+        //m_shooterIn.set(-speed);
     }
 
     public void stopShoot() {
         m_shooterOutTop.set(0);
         m_shooterOutBottom.set(0);
-        m_shooterIn.set(0);
+        //m_shooterIn.set(0);
     }
 
     public double getPivotEncoderValue() {
