@@ -1,18 +1,24 @@
 package frc.robot.Auto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Commands.ElevatorDeployCommand;
+import frc.robot.Commands.ElevatorStowCommand;
+import frc.robot.Commands.IntakeDeployCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
+import frc.robot.Commands.ShootNoteCommand;
+import frc.robot.Commands.ShooterSetAngleCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
  * Command that executes during autonomous mode
@@ -47,47 +53,43 @@ public class AutoCommand extends SequentialCommandGroup {
 
         addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight/*, m_shooterLimelight*/);
 
-        // // load the commands for the specific notes
-        // List<Command> commands = new ArrayList<Command>();
-        // for (Integer noteNumber : noteOrder) {
-        //     commands.add(moveAcquireShootCycle(noteNumber));
-        // }
-        // addCommands(commands.toArray(new Command[0]));
+        // var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, MAX_PIVOT_ENCODER_VAL);
 
-        // test
+        // load the commands for the specific notes
+        List<Command> commands = new ArrayList<Command>();
+        for (Integer noteNumber : noteOrder) {
+            commands.add(moveAcquireShootCycle(noteNumber));
+        }
         addCommands(
+            // shooterSetAngleCommand,
             // start sequence
-            // setStartConfiguration()
+            // shootPreloadedNote(),
             // commands
-            // m_pathPlanner.moveToTest1()
-            moveAcquireShootCycle(2)
-            // Commands.print("This is the auto command!!!!!!!!!!!!!!!")
+            commands.toArray(new Command[0])
         );
     }
 
-    private Command setStartConfiguration() {
-        // return Commands.sequence(
-        //     Commands.parallel(
-        //         // lower intake
-        //         m_intake.commandDeploy(),
-        //         // lower climbers
-        //         m_climber.CommandFullRetract(),
-        //         // retract elevator
-        //         m_elevator.CommandFullRetract()
-        //     ),
-        //     // pivot elevator down
-        //     m_elevator.CommandPivotStow()
-        // );
+    private Command shootPreloadedNote() {
+        var elevatorDeployCommand = new ElevatorDeployCommand(m_elevator, 20);
+        var intakeDeployCommand = new IntakeDeployCommand(m_intake, m_intake.getDeployedEncoderValue());
+        var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
+        var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
+        shooterSetAngleCommand.setTarget(Shooter.START_AUTO_PIVOT_ENCODER_VAL);
+        var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, .4);
 
         return Commands.sequence(
+            // raise elevator pivot
+            elevatorDeployCommand,
             // lower intake
-            // m_intake.commandDeploy(),
-            // lower climbers
-            // m_climber.CommandFullRetract(),
-            // retract elevator
-            m_elevator.CommandFullRetract(),
-            // pivot elevator down
-            m_elevator.CommandPivotStow()
+            intakeDeployCommand,
+            Commands.parallel(
+                // pivot elevator down
+                elevatorStowCommand,
+                // raise shooter
+                shooterSetAngleCommand
+            ),
+            // shoot
+            shootNoteCommand
         );
     }
 
@@ -124,32 +126,27 @@ public class AutoCommand extends SequentialCommandGroup {
         var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
         var shootSpeakerNoteCommand = new ShootSpeakerCommand(/*m_shooterLimelight,*/ m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
 
+        // debug
+        // return Commands.sequence(
+        //     m_pathPlanner.moveToRedTest1(),
+        //     m_pathPlanner.moveToRedTest2(),
+        //     m_pathPlanner.moveToRedTest3(),
+        //     m_pathPlanner.moveToRedTest4()
+        // );
+
         return Commands.sequence(
-            //Commands.print("Executing cycle for note " + noteNumber + "..."),
-            // moveToNoteCommand,
+            Commands.print("Executing cycle for note " + noteNumber + "..."),
+            moveToNoteCommand,
 
-            // m_pathPlanner.moveToOurNote2(),
+            Commands.print("Acquire note..."),
+            acquireNoteCommand,
 
-            m_pathPlanner.moveToRedTest1(),
-            m_pathPlanner.moveToRedTest2(),
-            m_pathPlanner.moveToRedTest3(),
-            m_pathPlanner.moveToRedTest4()
+            Commands.print("-> Move to speaker..."),
+            m_pathPlanner.moveToOurSpeaker(),
 
-            // acquireNoteCommand,
-            // shootSpeakerNoteCommand
-
-            // m_intake.commandStartIn(),
-            // Commands.waitSeconds(2),
-            // m_intake.commandStopRoller(),
-            // m_pathPlanner.moveToOurSpeaker()
-
-            // m_pathPlanner.moveToTest4(),
-
-            // shootSpeakerNoteCommand
-            // m_shooter.commandShoot(),
-            // Commands.waitSeconds(2),
-            // m_shooter.commandStop()
-            //Commands.print("...finished executing cycle for note " + noteNumber)
+            Commands.print("Move to speaker and shoot..."),
+            shootSpeakerNoteCommand,
+            Commands.print("...finished executing cycle for note " + noteNumber)
         );
     }
 }

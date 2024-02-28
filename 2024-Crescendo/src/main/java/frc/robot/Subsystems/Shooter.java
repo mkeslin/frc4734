@@ -19,9 +19,11 @@ public class Shooter extends SubsystemBase {
     private TalonFX m_shooterOutBottom;
     private TalonFX m_shooterPivot;
 
-    private double MAX_PIVOT_ENCODER_VAL = 8.5; //Actual Max Value: 6.9
+    public static double MAX_PIVOT_ENCODER_VAL = 8.5; //Actual Max Value: 6.9
+    public static double SPEAKER_PIVOT_ENCODER_VAL = 7.25; //Actual Max Value: 6.9
+    public static double START_AUTO_PIVOT_ENCODER_VAL = 7.5;
 
-    private ShooterSetAngleCommand m_shooterSetAngleCommand = new ShooterSetAngleCommand(this, MAX_PIVOT_ENCODER_VAL);
+    private ShooterSetAngleCommand m_shooterSetAngleCommand = new ShooterSetAngleCommand(this, SPEAKER_PIVOT_ENCODER_VAL);
 
     public Shooter() {
         m_shooterIn = new TalonFX(SHOOTER_IN_ID);
@@ -118,6 +120,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public void holdPivot() {
-        setPivotMotor(0.025);
+        setPivotMotor(0.0275);
     }
+
+    // @Override
+    // public void periodic() {
+    //     holdPivot();
+    // }
 }

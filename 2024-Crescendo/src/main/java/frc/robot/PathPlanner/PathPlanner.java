@@ -53,10 +53,10 @@ public class PathPlanner extends SubsystemBase {
 
     public Command moveToPose(Pose2d pose) {
         var constraints = new PathConstraints(
-            DrivetrainConstants.MaxSpeed,
-            DrivetrainConstants.MaxAcceleration,
-            Units.degreesToRadians(100),
-            Units.degreesToRadians(90)
+            1.0, //DrivetrainConstants.MaxSpeed,
+            .4, //DrivetrainConstants.MaxAcceleration,
+            Units.degreesToRadians(80),
+            Units.degreesToRadians(50)
             // Units.degreesToRadians(360),
             // Units.degreesToRadians(540)
         );

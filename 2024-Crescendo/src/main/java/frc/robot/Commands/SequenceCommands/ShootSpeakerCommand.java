@@ -1,9 +1,9 @@
 package frc.robot.Commands.SequenceCommands;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.ShootNoteCommand;
-import frc.robot.PathPlanner.AprilTags.AprilTags;
+import frc.robot.Commands.ShooterSetAngleCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Intake;
@@ -22,17 +22,20 @@ public class ShootSpeakerCommand extends SequentialCommandGroup {
         m_pathPlanner = pathPlanner;
         m_shooter = shooter;
         m_intake = intake;
+        var shooterSetAngleCommand = new ShooterSetAngleCommand(shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
+        shooterSetAngleCommand.setTarget(Shooter.SPEAKER_PIVOT_ENCODER_VAL);
 
         addCommands(
             // move/rotate to speaker
+            Commands.print("-> Move to speaker..."),
             pathPlanner.moveToOurSpeaker(),
             // align to tag
-            new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, AprilTags.OurSpeakerLeft()),
+            // new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, AprilTags.OurSpeakerLeft()),
             // adjust shooter
-            // shooter.commandSetAngle(0),
-            shooter.commandSetAngle(7.5),
+            shooterSetAngleCommand,
             // shoot
-            new ShootNoteCommand(m_intake, m_shooter, -1)
+            Commands.print("-> Shoot note..."),
+            new ShootNoteCommand(intake, shooter, .4)
         );
     }
 }
