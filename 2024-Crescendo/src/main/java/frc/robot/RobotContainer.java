@@ -23,6 +23,7 @@ import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
 import frc.robot.Controllers.ControllerButtons;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.PathPlanner;
+import frc.robot.Subsystems.Cameras.LifeCam;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Elevator;
@@ -69,7 +70,8 @@ public class RobotContainer {
 
     // SUBSYSTEMS
     //private Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
-    private Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
+    private static Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
+    private static LifeCam m_LifeCam = new LifeCam(0);
     private Intake m_intake = new Intake();
     private Shooter m_shooter = new Shooter();
     private Elevator m_elevator = new Elevator();
@@ -114,7 +116,7 @@ public class RobotContainer {
         // configureLightsBindings();
 
         // command tests
-        m_driveController.rightBumper().onTrue(shootAmpNoteCommand);
+        m_driveController.rightBumper().onTrue(acquireNoteCommand);
 
         // PathPlanner
         m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
@@ -203,6 +205,18 @@ public class RobotContainer {
         );
 
         m_driveController.y().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(),m_lights));
+    }
+
+    public boolean hasCameras() {
+        return m_LifeCam.isLive();
+    }
+
+    public void startCamera() {
+        m_LifeCam.startStream();
+    }
+
+    public void stopCamera() {
+        m_LifeCam.stopStream();
     }
 
     public Command getAutonomousCommand() {

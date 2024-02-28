@@ -20,6 +20,7 @@ public class CenterToTargetCommand extends Command {
     private double wheelStrafe;
 
     public Timer t = new Timer();
+    public Timer t2 = new Timer();
 
     public CenterToTargetCommand(Limelight limelight, PathPlanner pathPlanner, Intake intake, int target) {
         m_limelight = limelight;
@@ -62,13 +63,16 @@ public class CenterToTargetCommand extends Command {
         }
         wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (offset/MAX_CAMERA_X + 1));
         m_PathPlanner.moveRelative(1, wheelStrafe, 0);
+        if(m_Intake.noteIsSeen() && t2.get() == 0) {
+            t2.start();
+        }
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        if (t.hasElapsed(5) || m_Intake.noteIsSeen()) { return true;}
+        if (t.hasElapsed(5) || t2.hasElapsed(0.2)) { return true;}
 
         return m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 2;
     }

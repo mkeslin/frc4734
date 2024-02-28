@@ -12,6 +12,7 @@ public class MoveToNoteCommand extends Command {
     public Intake m_Intake;
 
     public Timer t = new Timer();
+    public Timer t2 = new Timer();
 
     public MoveToNoteCommand(Limelight limelight, PathPlanner pathPlanner, Intake intake) {
         m_limelight = limelight;
@@ -29,13 +30,16 @@ public class MoveToNoteCommand extends Command {
     @Override
     public void execute() {
         m_PathPlanner.moveRelative(1, 0, 0);
+        if(m_Intake.noteIsSeen() && t2.get() == 0) {
+            t2.start();
+        }
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        if (t.hasElapsed(2) || m_Intake.noteIsSeen()) { return true;}
+        if (t.hasElapsed(2) || t2.hasElapsed(0.2)) { return true;}
         
         return (m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getY()) < -16);
     }

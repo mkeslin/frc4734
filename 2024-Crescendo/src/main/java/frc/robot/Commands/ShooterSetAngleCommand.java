@@ -32,15 +32,15 @@ public class ShooterSetAngleCommand extends Command {
         current_val = m_shooter.getPivotEncoderValue();
         if(target_val > start_val) {
             if(current_val > start_val + (target_val - start_val)/2 && target_val - start_val > 1) {
-                m_shooter.setPivotMotor(0.05);
-            } else {
                 m_shooter.setPivotMotor(0.1);
+            } else {
+                m_shooter.setPivotMotor(0.2);
             }
         } else {
             if(current_val < start_val + (target_val - start_val)/2 && target_val - start_val < 1) {
-                m_shooter.setPivotMotor(-0.05);
-            } else {
                 m_shooter.setPivotMotor(-0.1);
+            } else {
+                m_shooter.setPivotMotor(-0.2);
             }
         }
     }
