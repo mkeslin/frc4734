@@ -21,6 +21,7 @@ import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
 import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.Controllers.ControllerButtons;
 import frc.robot.Controllers.ControllerIds;
+import frc.robot.PathPlanner.Landmarks;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.LifeCam;
 import frc.robot.Subsystems.Cameras.Limelight;
@@ -34,6 +35,21 @@ import frc.robot.SwerveDrivetrain.*;
 public class RobotContainer {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // AUTO NOTE ORDER
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //   |(4)|    | \    (3)  || Driver Station 3
+    //   |(5)|    |   >  (2)  || Driver Station 2
+    //   |(6)|    | /    (1)  || Driver Station 1
+    //   |(7)|                ||
+    //   |(8)|                ||
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    public final int[] m_autoNoteOrder = { 3, 2, 1 };
+    // public final int[] m_autoNoteOrder = { 1, 2, 3 };
+
+    public final int m_autoStartingPosition = 3;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // DRIVETRAIN
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Drivetrain A is the 2024 robot
@@ -41,19 +57,6 @@ public class RobotContainer {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.DriveTrain;
     // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // AUTO NOTE ORDER
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //   |(4)|    | \    (3)  ||
-    //   |(5)|    |  >   (2)  || Driver Station
-    //   |(6)|    | /    (1)  ||
-    //   |(7)|                ||
-    //   |(8)|                ||
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public final int[] m_autoNoteOrder = { 1, 2, 3 };
-    // public final int[] m_autoNoteOrder = { 3, 2, 1 };
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // CONTROLLERS
@@ -82,7 +85,7 @@ public class RobotContainer {
     public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
     public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
     //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
-    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(/*m_shooterLimelight,*/ m_pathPlanner, m_intake, m_shooter, m_elevator);
+    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(/*m_shooterLimelight,*/m_pathPlanner, m_intake, m_shooter, m_elevator);
     public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
@@ -220,10 +223,30 @@ public class RobotContainer {
         m_LifeCam.stopStream();
     }
 
+    public void initializeAuto() {
+        // set alliance
+        var isRedAlliance = isRedAlliance();
+        SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
+
+        m_drivetrain.seedFieldRelative();
+
+        // set position
+        resetPose();
+    } 
+
     public Command getAutonomousCommand() {
         // return m_autoChooser.getSelected();
-        // var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_shooter, m_limelightAligner, m_intakeLimelight, m_shooterLimelight, m_autoNoteOrder);
-        var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight, /*m_shooterLimelight,*/ m_autoNoteOrder);
+        var autoCommand = new AutoCommand(
+            m_pathPlanner,
+            m_intake,
+            m_shooter,
+            m_climber,
+            m_elevator,
+            m_intakeLimelight,
+            // m_shooterLimelight,
+            m_autoNoteOrder,
+            m_autoStartingPosition
+        );
         return autoCommand;
         // return runAuto;
 
@@ -236,10 +259,10 @@ public class RobotContainer {
         // return AutoBuilder.followPath(path);
     }
 
-    public void initialize() {
+    public void initializeTest() {
         // set alliance
-        var alliance = DriverStation.getAlliance();
-        SwerveDrivetrainBindings.setAllianceOrientation(alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red);
+        var isRedAlliance = isRedAlliance();
+        SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
 
         m_drivetrain.seedFieldRelative();
 
@@ -254,13 +277,26 @@ public class RobotContainer {
         resetPose();
     }
 
+    private boolean isRedAlliance() {
+        var alliance = DriverStation.getAlliance();
+        var isRedAlliance = alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+        return isRedAlliance;
+    }
+
     private void resetPose() {
-        // var startingPosition = new Pose2d(1.25, 5.5, Rotation2d.fromDegrees(0));
-
-        var red1 = new Pose2d(15, 7, Rotation2d.fromDegrees(180));
-        var red2 = new Pose2d(15, 5.5, Rotation2d.fromDegrees(180));
-        var red3 = new Pose2d(15, 4, Rotation2d.fromDegrees(180));
-
-        m_pathPlanner.resetPose(red1);
+        Pose2d startingPosition;
+        switch (m_autoStartingPosition) {
+            case 3:
+                startingPosition = Landmarks.OurStart3();
+                break;
+            default:
+            case 2:
+                startingPosition = Landmarks.OurStart2();
+                break;
+            case 1:
+                startingPosition = Landmarks.OurStart1();
+                break;
+        }
+        m_pathPlanner.resetPose(startingPosition);
     }
 }

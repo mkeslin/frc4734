@@ -5,19 +5,21 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class BlueLandmarks {
 
-    public static final Pose2d StartA = getPose(1.2, 5.5, 0);
+    public static final Pose2d Start3 = getPose(1.25, 7, 0);
+    public static final Pose2d Start2 = getPose(1.25, 5.5, 0);
+    public static final Pose2d Start1 = getPose(1.25, 4, 0);
 
     public static final Pose2d Amp = getPose(1.8, 7.5, 90.0);
-    public static final Pose2d Speaker = getPose(1.2, 5.5, 180);
+    public static final Pose2d Speaker = getPose(1.25, 5.5, 180);
     public static final Pose2d Source = getPose(15.3, 1.3, -60.0);
 
     public static final Pose2d Stage1 = getPose(4.3, 5.0, -60.0);
     public static final Pose2d Stage2 = getPose(5.9, 4.1, 180.0);
     public static final Pose2d Stage3 = getPose(4.3, 3.2, 60.0);
 
-    public static final Pose2d Note1 = getPose(2.3, 7.0, 60.0);
+    public static final Pose2d Note3 = getPose(2.3, 7.0, 60.0);
     public static final Pose2d Note2 = getPose(2.3, 5.5, 60.0);
-    public static final Pose2d Note3 = getPose(2.3, 4.0, 60.0);
+    public static final Pose2d Note1 = getPose(2.3, 4.0, 60.0);
     
     public static final Pose2d Note4 = getPose(7.6, 7.4, 60.0);
     public static final Pose2d Note5 = getPose(7.6, 5.7, 60.0);

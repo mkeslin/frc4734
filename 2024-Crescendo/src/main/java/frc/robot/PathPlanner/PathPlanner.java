@@ -1,8 +1,5 @@
 package frc.robot.PathPlanner;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -12,7 +9,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -115,8 +111,16 @@ public class PathPlanner extends SubsystemBase {
     }
 
     // Hard-coded
-    public Command moveToOurStartA() {
-        return moveToPose(Landmarks.OurStartA());
+    public Command moveToOurStart1() {
+        return moveToPose(Landmarks.OurStart1());
+    }
+
+    public Command moveToOurStart2() {
+        return moveToPose(Landmarks.OurStart2());
+    }
+
+    public Command moveToOurStart3() {
+        return moveToPose(Landmarks.OurStart3());
     }
 
     public Command moveToOurAmp() {
@@ -174,6 +178,7 @@ public class PathPlanner extends SubsystemBase {
         return moveToPose(Landmarks.OurNote8());
     }
 
+    // test locations make a square
     public Command moveToBlueTest1() {
         return moveToPose(new Pose2d(2.25, 5.5, Rotation2d.fromDegrees(0)));
     }

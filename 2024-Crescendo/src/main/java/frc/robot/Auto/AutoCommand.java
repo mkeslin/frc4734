@@ -33,6 +33,9 @@ public class AutoCommand extends SequentialCommandGroup {
     private final Limelight m_intakeLimelight;
     //private final Limelight m_shooterLimelight;
 
+    private final int[] m_noteOrder;
+    private final int m_startingPosition;
+
     public AutoCommand(
         PathPlanner pathPlanner,
         Intake intake,
@@ -41,7 +44,8 @@ public class AutoCommand extends SequentialCommandGroup {
         Elevator elevator,
         Limelight intakeLimelight,
         //Limelight shooterLimelight,
-        int[] noteOrder
+        int[] noteOrder,
+        int startingPosition
     ) {
         m_pathPlanner = pathPlanner;
         m_intake = intake;
@@ -51,13 +55,16 @@ public class AutoCommand extends SequentialCommandGroup {
         m_intakeLimelight = intakeLimelight;
         //m_shooterLimelight = shooterLimelight;
 
+        m_noteOrder = noteOrder;
+        m_startingPosition = startingPosition;
+
         addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight/*, m_shooterLimelight*/);
 
         // var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, MAX_PIVOT_ENCODER_VAL);
 
         // load the commands for the specific notes
         List<Command> commands = new ArrayList<Command>();
-        for (Integer noteNumber : noteOrder) {
+        for (Integer noteNumber : m_noteOrder) {
             commands.add(moveAcquireShootCycle(noteNumber));
         }
         addCommands(

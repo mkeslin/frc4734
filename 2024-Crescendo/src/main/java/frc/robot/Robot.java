@@ -37,6 +37,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        m_robotContainer.initializeAuto();
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {
@@ -70,7 +71,7 @@ public class Robot extends TimedRobot {
     public void testInit() {
         CommandScheduler.getInstance().cancelAll();
 
-        m_robotContainer.initialize();
+        m_robotContainer.initializeTest();
     }
 
     @Override

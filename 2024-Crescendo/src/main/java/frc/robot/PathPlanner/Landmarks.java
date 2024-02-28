@@ -15,8 +15,16 @@ public class Landmarks {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public static Pose2d OurStartA() {
-        return isRedAlliance() ? RedLandmarks.StartA : BlueLandmarks.StartA;
+    public static Pose2d OurStart1() {
+        return isRedAlliance() ? RedLandmarks.Start1 : BlueLandmarks.Start1;
+    }
+
+    public static Pose2d OurStart2() {
+        return isRedAlliance() ? RedLandmarks.Start2 : BlueLandmarks.Start2;
+    }
+
+    public static Pose2d OurStart3() {
+        return isRedAlliance() ? RedLandmarks.Start3 : BlueLandmarks.Start3;
     }
 
     public static Pose2d OurAmp() {
