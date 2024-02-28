@@ -6,7 +6,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,10 +19,10 @@ public class Shooter extends SubsystemBase {
     private TalonFX m_shooterPivot;
 
     public static double MAX_PIVOT_ENCODER_VAL = 8.5; //Actual Max Value: 6.9
-    public static double SPEAKER_PIVOT_ENCODER_VAL = 7.25; //Actual Max Value: 6.9
-    public static double START_AUTO_PIVOT_ENCODER_VAL = 7.5;
+    public static double TELEOP_SPEAKER_PIVOT_ENCODER_VAL = 7.25;
+    public static double AUTO_SPEAKER_PIVOT_ENCODER_VAL = 7.5;
 
-    private ShooterSetAngleCommand m_shooterSetAngleCommand = new ShooterSetAngleCommand(this, SPEAKER_PIVOT_ENCODER_VAL);
+    private ShooterSetAngleCommand m_shooterSetAngleCommand = new ShooterSetAngleCommand(this, TELEOP_SPEAKER_PIVOT_ENCODER_VAL);
 
     public Shooter() {
         m_shooterIn = new TalonFX(SHOOTER_IN_ID);
@@ -122,9 +121,4 @@ public class Shooter extends SubsystemBase {
     public void holdPivot() {
         setPivotMotor(0.0275);
     }
-
-    // @Override
-    // public void periodic() {
-    //     holdPivot();
-    // }
 }

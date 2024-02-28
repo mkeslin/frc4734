@@ -7,8 +7,6 @@ package frc.robot.Commands.SequenceCommands;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Commands.CenterToTargetCommand;
-import frc.robot.Commands.IntakeNoteCommand;
-import frc.robot.Commands.MoveToNoteCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Intake;
@@ -25,11 +23,14 @@ public class AcquireNoteCommand extends SequentialCommandGroup {
         addCommands(
             Commands.parallel(
                 Commands.print("-> Center to note..."),
-                new CenterToTargetCommand(intakeLimelight, pathPlanner, intake, 0),
+                new CenterToTargetCommand(intakeLimelight, pathPlanner, intake, 0)
+                // I don't think this is needed, since the above command also moves towards note
                 // Commands.print("-> Move to note..."),
                 // new MoveToNoteCommand(intakeLimelight, pathPlanner, intake),
-                Commands.print("-> Intake note..."),
-                new IntakeNoteCommand(intake)
+
+                // first command also starts intake
+                // Commands.print("-> Intake note..."),
+                // new IntakeNoteCommand(intake)
             )
         );
     }

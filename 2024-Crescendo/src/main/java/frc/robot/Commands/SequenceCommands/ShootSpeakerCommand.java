@@ -1,6 +1,5 @@
 package frc.robot.Commands.SequenceCommands;
 
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.Commands.ShooterSetAngleCommand;
@@ -23,18 +22,18 @@ public class ShootSpeakerCommand extends SequentialCommandGroup {
         m_shooter = shooter;
         m_intake = intake;
         var shooterSetAngleCommand = new ShooterSetAngleCommand(shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
-        shooterSetAngleCommand.setTarget(Shooter.SPEAKER_PIVOT_ENCODER_VAL);
+        shooterSetAngleCommand.setTarget(Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL);
 
         addCommands(
             // move/rotate to speaker
-            Commands.print("-> Move to speaker..."),
+            // Commands.print("-> Move to speaker..."),
             pathPlanner.moveToOurSpeaker(),
             // align to tag
             // new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, AprilTags.OurSpeakerLeft()),
             // adjust shooter
             shooterSetAngleCommand,
             // shoot
-            Commands.print("-> Shoot note..."),
+            // Commands.print("-> Shoot note..."),
             new ShootNoteCommand(intake, shooter, .4)
         );
     }

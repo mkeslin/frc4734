@@ -1,8 +1,5 @@
 package frc.robot.Auto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -19,6 +16,8 @@ import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * Command that executes during autonomous mode
@@ -35,6 +34,7 @@ public class AutoCommand extends SequentialCommandGroup {
 
     private final int[] m_noteOrder;
     private final int m_startingPosition;
+    private final boolean m_isRedAlliance;
 
     public AutoCommand(
         PathPlanner pathPlanner,
@@ -45,7 +45,8 @@ public class AutoCommand extends SequentialCommandGroup {
         Limelight intakeLimelight,
         //Limelight shooterLimelight,
         int[] noteOrder,
-        int startingPosition
+        int startingPosition,
+        boolean isRedAlliance
     ) {
         m_pathPlanner = pathPlanner;
         m_intake = intake;
@@ -57,23 +58,23 @@ public class AutoCommand extends SequentialCommandGroup {
 
         m_noteOrder = noteOrder;
         m_startingPosition = startingPosition;
+        m_isRedAlliance = isRedAlliance;
 
         addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight/*, m_shooterLimelight*/);
 
-        // var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, MAX_PIVOT_ENCODER_VAL);
-
-        // load the commands for the specific notes
+        // list of commands to be executed
         List<Command> commands = new ArrayList<Command>();
+
+        // commands to shoot preloaded note
+        commands.add(shootPreloadedNote());
+
+        // commands for the specific note cycles
         for (Integer noteNumber : m_noteOrder) {
             commands.add(moveAcquireShootCycle(noteNumber));
         }
-        addCommands(
-            // shooterSetAngleCommand,
-            // start sequence
-            // shootPreloadedNote(),
-            // commands
-            commands.toArray(new Command[0])
-        );
+
+        // set commands
+        addCommands(commands.toArray(new Command[0]));
     }
 
     private Command shootPreloadedNote() {
@@ -81,19 +82,41 @@ public class AutoCommand extends SequentialCommandGroup {
         var intakeDeployCommand = new IntakeDeployCommand(m_intake, m_intake.getDeployedEncoderValue());
         var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
         var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
-        shooterSetAngleCommand.setTarget(Shooter.START_AUTO_PIVOT_ENCODER_VAL);
-        var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, .4);
+        var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, .8);
+
+        double preloadedShooterAngle = 0;
+        int preloadedShootRotation = 0;
+        switch (m_startingPosition) {
+            case 3:
+                preloadedShooterAngle = 7.5;
+                preloadedShootRotation = m_isRedAlliance ? 126 : 60;
+                break;
+            default:
+            case 2:
+                preloadedShooterAngle = Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL;
+                preloadedShootRotation = m_isRedAlliance ? 180 : 0;
+                break;
+            case 1:
+                preloadedShooterAngle = 7.5;
+                preloadedShootRotation = m_isRedAlliance ? 236 : -60;
+                break;
+        }
+
+        // set shooter angle
+        shooterSetAngleCommand.setTarget(preloadedShooterAngle);
 
         return Commands.sequence(
             // raise elevator pivot
             elevatorDeployCommand,
-            // lower intake
-            intakeDeployCommand,
             Commands.parallel(
+                // lower intake
+                intakeDeployCommand,
                 // pivot elevator down
                 elevatorStowCommand,
                 // raise shooter
-                shooterSetAngleCommand
+                shooterSetAngleCommand,
+                // rotate shooter to speaker
+                m_pathPlanner.rotateToAngle(preloadedShootRotation)
             ),
             // shoot
             shootNoteCommand
@@ -131,7 +154,7 @@ public class AutoCommand extends SequentialCommandGroup {
         }
 
         var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-        var shootSpeakerNoteCommand = new ShootSpeakerCommand(/*m_shooterLimelight,*/ m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
+        var shootSpeakerNoteCommand = new ShootSpeakerCommand(/*m_shooterLimelight,*/m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
 
         // debug
         // return Commands.sequence(
@@ -142,18 +165,15 @@ public class AutoCommand extends SequentialCommandGroup {
         // );
 
         return Commands.sequence(
-            Commands.print("Executing cycle for note " + noteNumber + "..."),
+            // Commands.print("Executing cycle for note " + noteNumber + "..."),
             moveToNoteCommand,
-
-            Commands.print("Acquire note..."),
+            // Commands.print("Acquire note..."),
             acquireNoteCommand,
-
-            Commands.print("-> Move to speaker..."),
+            // Commands.print("-> Move to speaker..."),
             m_pathPlanner.moveToOurSpeaker(),
-
-            Commands.print("Move to speaker and shoot..."),
-            shootSpeakerNoteCommand,
-            Commands.print("...finished executing cycle for note " + noteNumber)
+            // Commands.print("Move to speaker and shoot..."),
+            shootSpeakerNoteCommand
+            // Commands.print("...finished executing cycle for note " + noteNumber)
         );
     }
 }

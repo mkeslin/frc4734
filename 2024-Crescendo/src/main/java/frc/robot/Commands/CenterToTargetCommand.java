@@ -8,8 +8,8 @@ import frc.robot.Subsystems.Cameras.Limelight;
 
 public class CenterToTargetCommand extends Command {
     public Limelight m_limelight;
-    public PathPlanner m_PathPlanner;
-    public Intake m_Intake;
+    public PathPlanner m_pathPlanner;
+    public Intake m_intake;
     public int m_target;
 
     private double MAX_WHEEL_STRAFE = 1;
@@ -24,11 +24,11 @@ public class CenterToTargetCommand extends Command {
 
     public CenterToTargetCommand(Limelight limelight, PathPlanner pathPlanner, Intake intake, int target) {
         m_limelight = limelight;
-        m_PathPlanner = pathPlanner;
-        m_Intake = intake;
+        m_pathPlanner = pathPlanner;
+        m_intake = intake;
         m_target = target; //target should be 0 for Note alignment
 
-        addRequirements(m_limelight, m_PathPlanner);
+        addRequirements(m_limelight, m_pathPlanner);
     }
 
     // Called just before this Command runs the first time
@@ -37,7 +37,7 @@ public class CenterToTargetCommand extends Command {
         offset = 0;
         t.start();
         if(m_target < 1) {
-            m_Intake.startIn(-.55);
+            m_intake.startIn(-.55);
         }
     }
 
@@ -66,8 +66,8 @@ public class CenterToTargetCommand extends Command {
         // if acquiring note, move up to 1 meter forward to "chase" it
         // if aligning to april tag, don't move forward, just strafe
         var forwardDistance = m_target == 0 ? .75 : 0;
-        m_PathPlanner.moveRelative(forwardDistance, wheelStrafe, 0);
-        if(m_Intake.noteIsSeen() && t2.get() == 0) {
+        m_pathPlanner.moveRelative(forwardDistance, wheelStrafe, 0);
+        if(m_intake.noteIsSeen() && t2.get() == 0) {
             t2.start();
         }
     }
@@ -86,6 +86,7 @@ public class CenterToTargetCommand extends Command {
     public void end(boolean interrupted) {
         t.stop();
         t.reset();
-        m_Intake.stopRoller();
+        
+        m_intake.stopRoller();
     }
 }

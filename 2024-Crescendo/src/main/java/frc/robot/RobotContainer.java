@@ -1,12 +1,11 @@
 package frc.robot;
 
-import static frc.robot.Constants.Constants.APRILTAGPIPELINE;
+// import static frc.robot.Constants.Constants.APRILTAGPIPELINE;
 import static frc.robot.Constants.Constants.NOTEPIPELINE;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -43,7 +42,8 @@ public class RobotContainer {
     //   |(7)|                ||
     //   |(8)|                ||
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public final int[] m_autoNoteOrder = { 3, 2, 1 };
+    public final int[] m_autoNoteOrder = { 3 };
+    // public final int[] m_autoNoteOrder = { 3, 2, 1 };
     // public final int[] m_autoNoteOrder = { 1, 2, 3 };
 
     public final int m_autoStartingPosition = 3;
@@ -191,9 +191,9 @@ public class RobotContainer {
         m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(Commands.sequence(shootNoteCommand, m_shooter.commandSetAngle(1)));
         m_arcadeController
             .axisGreaterThan(ControllerButtons.CLY, 0.5)
-            .onTrue(Commands.sequence(intakeNoteCommand, m_shooter.commandSetAngle(Shooter.SPEAKER_PIVOT_ENCODER_VAL)));
+            .onTrue(Commands.sequence(intakeNoteCommand, m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL)));
 
-        m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(Shooter.SPEAKER_PIVOT_ENCODER_VAL));
+        m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
         m_arcadeController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
 
         m_arcadeController.start().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
@@ -245,7 +245,8 @@ public class RobotContainer {
             m_intakeLimelight,
             // m_shooterLimelight,
             m_autoNoteOrder,
-            m_autoStartingPosition
+            m_autoStartingPosition,
+            isRedAlliance()
         );
         return autoCommand;
         // return runAuto;
