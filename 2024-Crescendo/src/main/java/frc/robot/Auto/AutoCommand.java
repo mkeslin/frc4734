@@ -6,12 +6,14 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Commands.ElevatorDeployCommand;
 import frc.robot.Commands.ElevatorStowCommand;
 import frc.robot.Commands.IntakeDeployCommand;
+import frc.robot.Commands.RobotRotateCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
 import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.Commands.ShooterSetAngleCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
@@ -24,6 +26,7 @@ import java.util.List;
  */
 public class AutoCommand extends SequentialCommandGroup {
 
+    private final CommandSwerveDrivetrain m_drivetrain;
     private final PathPlanner m_pathPlanner;
     private final Intake m_intake;
     private final Shooter m_shooter;
@@ -37,6 +40,7 @@ public class AutoCommand extends SequentialCommandGroup {
     private final boolean m_isRedAlliance;
 
     public AutoCommand(
+        CommandSwerveDrivetrain drivetrain,
         PathPlanner pathPlanner,
         Intake intake,
         Shooter shooter,
@@ -48,6 +52,7 @@ public class AutoCommand extends SequentialCommandGroup {
         int startingPosition,
         boolean isRedAlliance
     ) {
+        m_drivetrain = drivetrain;
         m_pathPlanner = pathPlanner;
         m_intake = intake;
         m_shooter = shooter;
@@ -88,7 +93,7 @@ public class AutoCommand extends SequentialCommandGroup {
         int preloadedShootRotation = 0;
         switch (m_startingPosition) {
             case 3:
-                preloadedShooterAngle = 7.5;
+                preloadedShooterAngle = 6.5;
                 preloadedShootRotation = m_isRedAlliance ? 126 : 60;
                 break;
             default:
@@ -97,31 +102,31 @@ public class AutoCommand extends SequentialCommandGroup {
                 preloadedShootRotation = m_isRedAlliance ? 180 : 0;
                 break;
             case 1:
-                preloadedShooterAngle = 7.5;
-                preloadedShootRotation = m_isRedAlliance ? 236 : -60;
+                preloadedShooterAngle = 6.5;
+                preloadedShootRotation = m_isRedAlliance ? 222 : -60;
                 break;
         }
 
         // set shooter angle
         shooterSetAngleCommand.setTarget(preloadedShooterAngle);
 
-        return Commands.sequence(   
+        // var robotRotateCommand = new RobotRotateCommand(m_pathPlanner, preloadedShootRotation);
+        var robotRotateCommand = new RobotRotateCommand(m_drivetrain, preloadedShootRotation);
+
+        return Commands.sequence(
             // raise elevator pivot
             Commands.print("pivot elevator up"),
-            elevatorDeployCommand,
-            Commands.parallel(
+            // elevatorDeployCommand,
+            Commands.sequence(
                 // lower intake
                 Commands.print("deploy intake"),
-                intakeDeployCommand,
+                // intakeDeployCommand,
                 // pivot elevator down
                 Commands.print("pivot elevator down"),
-                elevatorStowCommand
-                // // raise shooter
-                // Commands.print("adjust shoot angle"),
-                // shooterSetAngleCommand
+                // elevatorStowCommand,
                 // rotate shooter to speaker
-                // Commands.print("rotate to speaker"),
-                // m_pathPlanner.rotateToAngle(preloadedShootRotation)
+                Commands.print("rotate to speaker"),
+                robotRotateCommand
             ),
             // raise shooter
             Commands.print("adjust shoot angle"),
@@ -179,7 +184,7 @@ public class AutoCommand extends SequentialCommandGroup {
             // Commands.print("Acquire note..."),
             acquireNoteCommand,
             // Commands.print("-> Move to speaker..."),
-            m_pathPlanner.moveToOurSpeaker(),
+            // m_pathPlanner.moveToOurSpeaker(),
             // Commands.print("Move to speaker and shoot..."),
             shootSpeakerNoteCommand
             // Commands.print("...finished executing cycle for note " + noteNumber)
