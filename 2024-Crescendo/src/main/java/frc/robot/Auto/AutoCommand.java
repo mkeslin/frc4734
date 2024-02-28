@@ -70,7 +70,7 @@ public class AutoCommand extends SequentialCommandGroup {
 
         // commands for the specific note cycles
         for (Integer noteNumber : m_noteOrder) {
-            commands.add(moveAcquireShootCycle(noteNumber));
+            // commands.add(moveAcquireShootCycle(noteNumber));
         }
 
         // set commands
@@ -78,11 +78,11 @@ public class AutoCommand extends SequentialCommandGroup {
     }
 
     private Command shootPreloadedNote() {
-        var elevatorDeployCommand = new ElevatorDeployCommand(m_elevator, 20);
+        var elevatorDeployCommand = new ElevatorDeployCommand(m_elevator, 18);
         var intakeDeployCommand = new IntakeDeployCommand(m_intake, m_intake.getDeployedEncoderValue());
         var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
         var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
-        var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, .8);
+        var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
 
         double preloadedShooterAngle = 0;
         int preloadedShootRotation = 0;
@@ -105,20 +105,29 @@ public class AutoCommand extends SequentialCommandGroup {
         // set shooter angle
         shooterSetAngleCommand.setTarget(preloadedShooterAngle);
 
-        return Commands.sequence(
+        return Commands.sequence(   
             // raise elevator pivot
+            Commands.print("pivot elevator up"),
             elevatorDeployCommand,
             Commands.parallel(
                 // lower intake
+                Commands.print("deploy intake"),
                 intakeDeployCommand,
                 // pivot elevator down
-                elevatorStowCommand,
-                // raise shooter
-                shooterSetAngleCommand,
+                Commands.print("pivot elevator down"),
+                elevatorStowCommand
+                // // raise shooter
+                // Commands.print("adjust shoot angle"),
+                // shooterSetAngleCommand
                 // rotate shooter to speaker
-                m_pathPlanner.rotateToAngle(preloadedShootRotation)
+                // Commands.print("rotate to speaker"),
+                // m_pathPlanner.rotateToAngle(preloadedShootRotation)
             ),
+            // raise shooter
+            Commands.print("adjust shoot angle"),
+            shooterSetAngleCommand,
             // shoot
+            Commands.print("shoot preloaded note"),
             shootNoteCommand
         );
     }

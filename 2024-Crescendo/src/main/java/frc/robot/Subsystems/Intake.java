@@ -51,14 +51,14 @@ public class Intake extends SubsystemBase {
         m_roller.getConfigurator().apply(configs);
 
         m_pivot = new TalonFX(INTAKE_PIVOT_ID);
-        m_pivot.setInverted(false);
-        m_pivot.setNeutralMode(NeutralModeValue.Brake);
-        m_pivot.setPosition(0);
-        var configs2 = new TalonFXConfiguration();
-        configs2.CurrentLimits = new CurrentLimitsConfigs();
-        // configs.CurrentLimits.SupplyCurrentLimit = 20;
-        // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        m_pivot.getConfigurator().apply(configs2);
+        // m_pivot.setInverted(false);
+        // m_pivot.setNeutralMode(NeutralModeValue.Brake);
+        // m_pivot.setPosition(0);
+        // var configs2 = new TalonFXConfiguration();
+        // configs2.CurrentLimits = new CurrentLimitsConfigs();
+        // // configs.CurrentLimits.SupplyCurrentLimit = 20;
+        // // configs.CurrentLimits.SupplyCurrentLimit = 40;
+        // m_pivot.getConfigurator().apply(configs2);
     }
 
     public Command commandStartIn() {
@@ -136,6 +136,13 @@ public class Intake extends SubsystemBase {
     }
 
     public void zero() {
+        m_pivot.setInverted(false);
+        m_pivot.setNeutralMode(NeutralModeValue.Brake);
         m_pivot.setPosition(0);
+        var configs2 = new TalonFXConfiguration();
+        configs2.CurrentLimits = new CurrentLimitsConfigs();
+        // configs.CurrentLimits.SupplyCurrentLimit = 20;
+        // configs.CurrentLimits.SupplyCurrentLimit = 40;
+        m_pivot.getConfigurator().apply(configs2);
     }
 }

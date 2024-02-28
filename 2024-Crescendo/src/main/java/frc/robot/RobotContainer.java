@@ -42,11 +42,11 @@ public class RobotContainer {
     //   |(7)|                ||
     //   |(8)|                ||
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public int[] m_autoNoteOrder = { 3 };
+    public int[] m_autoNoteOrder = { 2 };
     // public final int[] m_autoNoteOrder = { 3, 2, 1 };
     // public final int[] m_autoNoteOrder = { 1, 2, 3 };
 
-    public int m_autoStarPosition = 3;
+    public int m_autoStarPosition = 2;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,7 +146,7 @@ public class RobotContainer {
         m_autoStartChooser.setDefaultOption("Driver Station 3", 3);
         m_autoStartChooser.addOption("Driver Station 2", 2);
         m_autoStartChooser.addOption("Driver Station 1", 1);
-        SmartDashboard.putData("Auto Driver Station", m_autoStartChooser);
+        SmartDashboard.putData("Auto Start Position", m_autoStartChooser);
 
         m_autoFirstNoteChooser.setDefaultOption("3", 3);
         m_autoFirstNoteChooser.addOption("2", 2);
@@ -162,6 +162,17 @@ public class RobotContainer {
         m_autoThirdNoteChooser.addOption("2", 2);
         m_autoThirdNoteChooser.addOption("1", 1);
         SmartDashboard.putData("Auto Third Note", m_autoThirdNoteChooser);
+
+        // init
+
+        // set alliance
+        var isRedAlliance = isRedAlliance();
+        SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
+
+        m_drivetrain.seedFieldRelative();
+
+        // set position
+        // resetPose();
     }
 
     private void configureMechanismBindings() {
@@ -263,11 +274,11 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         // get data from choosers
-        m_autoStarPosition = m_autoStartChooser.getSelected();
-        var firstNote = m_autoFirstNoteChooser.getSelected();
-        var secondNote = m_autoSecondNoteChooser.getSelected();
-        var thirdNote = m_autoThirdNoteChooser.getSelected();
-        m_autoNoteOrder = new int[] { firstNote, secondNote, thirdNote };
+        // m_autoStarPosition = m_autoStartChooser.getSelected();
+        // var firstNote = m_autoFirstNoteChooser.getSelected();
+        // var secondNote = m_autoSecondNoteChooser.getSelected();
+        // var thirdNote = m_autoThirdNoteChooser.getSelected();
+        // m_autoNoteOrder = new int[] { firstNote, secondNote, thirdNote };
 
         // return m_autoChooser.getSelected();
         var autoCommand = new AutoCommand(
