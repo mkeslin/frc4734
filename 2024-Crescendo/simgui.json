@@ -17,7 +17,11 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Pose": "Field2d",
+      "/SmartDashboard/Auto Driver Station": "String Chooser",
+      "/SmartDashboard/Auto First Note": "String Chooser",
       "/SmartDashboard/Auto Mode": "String Chooser",
+      "/SmartDashboard/Auto Second Note": "String Chooser",
+      "/SmartDashboard/Auto Third Note": "String Chooser",
       "/SmartDashboard/Go to Amp": "Command",
       "/SmartDashboard/Go to Source": "Command",
       "/SmartDashboard/Go to Speaker": "Command",

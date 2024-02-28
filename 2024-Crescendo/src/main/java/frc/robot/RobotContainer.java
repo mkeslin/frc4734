@@ -42,11 +42,11 @@ public class RobotContainer {
     //   |(7)|                ||
     //   |(8)|                ||
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public final int[] m_autoNoteOrder = { 3 };
+    public int[] m_autoNoteOrder = { 3 };
     // public final int[] m_autoNoteOrder = { 3, 2, 1 };
     // public final int[] m_autoNoteOrder = { 1, 2, 3 };
 
-    public final int m_autoStartingPosition = 3;
+    public int m_autoStarPosition = 3;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -90,6 +90,12 @@ public class RobotContainer {
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
     public IntakeNoteCommand intakeNoteCommand = new IntakeNoteCommand(m_intake);
+
+    // auto choosers
+    private final SendableChooser<Integer> m_autoStartChooser = new SendableChooser<>();
+    private final SendableChooser<Integer> m_autoFirstNoteChooser = new SendableChooser<>();
+    private final SendableChooser<Integer> m_autoSecondNoteChooser = new SendableChooser<>();
+    private final SendableChooser<Integer> m_autoThirdNoteChooser = new SendableChooser<>();
 
     public RobotContainer() {
         // Register Named Commands
@@ -135,6 +141,27 @@ public class RobotContainer {
         //m_mechanismController.axisGreaterThan(ControllerButtons.CLY, 0.5).whileTrue(m_shooter.commandSetAngle(0));
         //m_mechanismController.a().onTrue(m_limelightAligner.alignToNote());
         //m_mechanismController.b().onTrue(m_limelightAligner.alignToTag(1));
+
+        // auto choosers
+        m_autoStartChooser.setDefaultOption("Driver Station 3", 3);
+        m_autoStartChooser.addOption("Driver Station 2", 2);
+        m_autoStartChooser.addOption("Driver Station 1", 1);
+        SmartDashboard.putData("Auto Driver Station", m_autoStartChooser);
+
+        m_autoFirstNoteChooser.setDefaultOption("3", 3);
+        m_autoFirstNoteChooser.addOption("2", 2);
+        m_autoFirstNoteChooser.addOption("1", 1);
+        SmartDashboard.putData("Auto First Note", m_autoFirstNoteChooser);
+
+        m_autoSecondNoteChooser.setDefaultOption("3", 3);
+        m_autoSecondNoteChooser.addOption("2", 2);
+        m_autoSecondNoteChooser.addOption("1", 1);
+        SmartDashboard.putData("Auto Second Note", m_autoSecondNoteChooser);
+
+        m_autoThirdNoteChooser.setDefaultOption("3", 3);
+        m_autoThirdNoteChooser.addOption("2", 2);
+        m_autoThirdNoteChooser.addOption("1", 1);
+        SmartDashboard.putData("Auto Third Note", m_autoThirdNoteChooser);
     }
 
     private void configureMechanismBindings() {
@@ -232,9 +259,16 @@ public class RobotContainer {
 
         // set position
         resetPose();
-    } 
+    }
 
     public Command getAutonomousCommand() {
+        // get data from choosers
+        m_autoStarPosition = m_autoStartChooser.getSelected();
+        var firstNote = m_autoFirstNoteChooser.getSelected();
+        var secondNote = m_autoSecondNoteChooser.getSelected();
+        var thirdNote = m_autoThirdNoteChooser.getSelected();
+        m_autoNoteOrder = new int[] { firstNote, secondNote, thirdNote };
+
         // return m_autoChooser.getSelected();
         var autoCommand = new AutoCommand(
             m_pathPlanner,
@@ -245,7 +279,7 @@ public class RobotContainer {
             m_intakeLimelight,
             // m_shooterLimelight,
             m_autoNoteOrder,
-            m_autoStartingPosition,
+            m_autoStarPosition,
             isRedAlliance()
         );
         return autoCommand;
@@ -286,7 +320,7 @@ public class RobotContainer {
 
     private void resetPose() {
         Pose2d startingPosition;
-        switch (m_autoStartingPosition) {
+        switch (m_autoStarPosition) {
             case 3:
                 startingPosition = Landmarks.OurStart3();
                 break;
