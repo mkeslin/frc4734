@@ -25,7 +25,7 @@ public class AutoCommand extends SequentialCommandGroup {
     private final Climber m_climber;
     private final Elevator m_elevator;
     private final Limelight m_intakeLimelight;
-    private final Limelight m_shooterLimelight;
+    //private final Limelight m_shooterLimelight;
 
     public AutoCommand(
         PathPlanner pathPlanner,
@@ -34,7 +34,7 @@ public class AutoCommand extends SequentialCommandGroup {
         Climber climber,
         Elevator elevator,
         Limelight intakeLimelight,
-        Limelight shooterLimelight,
+        //Limelight shooterLimelight,
         int[] noteOrder
     ) {
         m_pathPlanner = pathPlanner;
@@ -43,9 +43,9 @@ public class AutoCommand extends SequentialCommandGroup {
         m_climber = climber;
         m_elevator = elevator;
         m_intakeLimelight = intakeLimelight;
-        m_shooterLimelight = shooterLimelight;
+        //m_shooterLimelight = shooterLimelight;
 
-        addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight, m_shooterLimelight);
+        addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight/*, m_shooterLimelight*/);
 
         // // load the commands for the specific notes
         // List<Command> commands = new ArrayList<Command>();
@@ -122,7 +122,7 @@ public class AutoCommand extends SequentialCommandGroup {
         }
 
         var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-        var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
+        var shootSpeakerNoteCommand = new ShootSpeakerCommand(/*m_shooterLimelight,*/ m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
 
         return Commands.sequence(
             //Commands.print("Executing cycle for note " + noteNumber + "..."),

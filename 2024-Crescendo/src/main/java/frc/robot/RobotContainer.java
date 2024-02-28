@@ -68,7 +68,7 @@ public class RobotContainer {
     // private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
 
     // SUBSYSTEMS
-    private Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
+    //private Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
     private Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
     private Intake m_intake = new Intake();
     private Shooter m_shooter = new Shooter();
@@ -80,8 +80,8 @@ public class RobotContainer {
     // Commands
     public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
     public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
-    public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
-    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter, m_elevator);
+    //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
+    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(/*m_shooterLimelight,*/ m_pathPlanner, m_intake, m_shooter, m_elevator);
     public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
@@ -93,7 +93,7 @@ public class RobotContainer {
         // Register Named Commands
         NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
         NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
-        NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
+        //NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
         NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
         //NamedCommands.registerCommand("shootSpeakerNoteCommand", shootSpeakerNoteCommand);
         //NamedCommands.registerCommand("shootTrapNoteCommand", shootTrapNoteCommand);
@@ -208,7 +208,7 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         // return m_autoChooser.getSelected();
         // var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_shooter, m_limelightAligner, m_intakeLimelight, m_shooterLimelight, m_autoNoteOrder);
-        var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight, m_shooterLimelight, m_autoNoteOrder);
+        var autoCommand = new AutoCommand(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight, /*m_shooterLimelight,*/ m_autoNoteOrder);
         return autoCommand;
         // return runAuto;
 

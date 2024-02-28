@@ -12,7 +12,7 @@ import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.Commands.ShooterSetAngleCommand;
 
 public class ShootAmpCommand extends SequentialCommandGroup {
-    public final Limelight m_Limelight;
+    //public final Limelight m_Limelight;
     public final PathPlanner m_PathPlanner;
     public final Intake m_Intake;
     public final Shooter m_Shooter;
@@ -20,8 +20,8 @@ public class ShootAmpCommand extends SequentialCommandGroup {
     public ShooterSetAngleCommand shooterSetAngleCommand;
 
 
-    public ShootAmpCommand(Limelight limelight, PathPlanner pathPlanner, Intake intake, Shooter shooter, Elevator elevator) {
-        m_Limelight = limelight;
+    public ShootAmpCommand(/*Limelight limelight,*/ PathPlanner pathPlanner, Intake intake, Shooter shooter, Elevator elevator) {
+        //m_Limelight = limelight;
         m_PathPlanner = pathPlanner;
         m_Intake = intake;
         m_Shooter = shooter;
