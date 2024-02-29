@@ -133,7 +133,7 @@ public class RobotContainer {
         // m_mechanismController.a().onTrue(acquireNoteCommand);
         //m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
 
-        m_driveController.y().onTrue(intakeNoteCommand);
+        m_driveController.y().onTrue(shootAmpNoteCommand);
         //m_driveController.x().onTrue(shootAmpNoteCommand);
         //m_mechanismController.y().onTrue(m_shooter.commandSetAngle(MAX_PIVOT_ENCODER_VAL));
         //m_mechanismController.x().onTrue(m_shooter.commandSetAngle(0));
@@ -305,6 +305,7 @@ public class RobotContainer {
         m_intake.zero();
         m_climber.zero();
         m_elevator.zero();
+        m_shooter.zero();
         // move everything to starting position
         // todo
 
