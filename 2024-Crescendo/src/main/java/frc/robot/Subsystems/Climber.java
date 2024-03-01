@@ -18,11 +18,12 @@ public class Climber extends SubsystemBase {
     private TalonFX m_climber_left;
     private TalonFX m_climber_right;
 
-    private double RETRACT_ENCODER_VAL = -29; //Actual Stowed Value: -29.32
-    private double EXTEND_ENCODER_VAL = 135; //Actual Deploy Value: 135.2
+    private double RETRACT_ENCODER_VAL = -22.5; //Actual Stowed Value: -22.48
+    private double EXTEND_ENCODER_VAL = 110; //Actual Deploy Value: 114.65
 
     private ClimberExtendCommand climberExtendCommand = new ClimberExtendCommand(this, EXTEND_ENCODER_VAL);
-    private ClimberRetractCommand climberRetractCommand = new ClimberRetractCommand(this, RETRACT_ENCODER_VAL);
+    private ClimberRetractCommand climberRetractCommand = new ClimberRetractCommand(this, 5);
+    private ClimberRetractCommand climberClimbCommand = new ClimberRetractCommand(this, RETRACT_ENCODER_VAL);
 
     public Climber() {
         m_climber_left = new TalonFX(CLIMBER_LEFT_ID, "Canivore");
@@ -52,6 +53,10 @@ public class Climber extends SubsystemBase {
 
     public Command CommandFullRetract() {
         return Commands.runOnce(() -> climberRetractCommand.schedule());
+    }
+
+    public Command CommandClimb() {
+        return Commands.runOnce(() -> climberClimbCommand.schedule());
     }
 
     public Command CommandStopExtendRetract() {

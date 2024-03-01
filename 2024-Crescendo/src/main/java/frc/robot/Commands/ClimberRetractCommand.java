@@ -42,7 +42,10 @@ public class ClimberRetractCommand extends Command {
     // Called once after isFinished returns true
     @Override
     public void end(boolean interrupted) {
-        //m_Climber.setClimberMotors(-0.04);
-        m_Climber.stopClimberMotors();
+        if(target_val < 0) {
+            m_Climber.setClimberMotors(-0.04);
+        } else {
+            m_Climber.stopClimberMotors();
+        }  
     }
 }

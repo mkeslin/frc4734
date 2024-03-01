@@ -75,7 +75,7 @@ public class AutoCommand extends SequentialCommandGroup {
 
         // commands for the specific note cycles
         for (Integer noteNumber : m_noteOrder) {
-            commands.add(moveAcquireShootCycle(noteNumber));
+            // commands.add(moveAcquireShootCycle(noteNumber));
         }
 
         // set commands

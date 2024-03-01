@@ -131,6 +131,7 @@ public class RobotContainer {
         // m_mechanismController.a().onTrue(acquireNoteCommand);
         //m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
 
+        m_driveController.x().onTrue(m_climber.CommandClimb());
         m_driveController.y().onTrue(shootAmpNoteCommand);
         //m_driveController.x().onTrue(shootAmpNoteCommand);
         //m_mechanismController.y().onTrue(m_shooter.commandSetAngle(MAX_PIVOT_ENCODER_VAL));
