@@ -14,14 +14,18 @@ public class RobotRotateCommand extends Command {
     public double target_val;
     public double current_val;
 
+    public boolean m_rotateCCW;
+
     public Timer t = new Timer();
 
     private static final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // field-centric driving in open loop
 
-    public RobotRotateCommand(CommandSwerveDrivetrain drivetrain, int degrees) {
+    public RobotRotateCommand(CommandSwerveDrivetrain drivetrain, int degrees, boolean rotateCCW) {
         m_drivetrain = drivetrain;
         target_val = degrees;
+
+        m_rotateCCW = rotateCCW;
 
         while (target_val < 0) {
             target_val += 360;
@@ -45,7 +49,8 @@ public class RobotRotateCommand extends Command {
 
     @Override
     public void execute() {
-        m_drivetrain.setControl(m_drive.withVelocityX(0).withVelocityY(0).withRotationalRate(DrivetrainConstants.MaxAngularRate));
+        var direction = m_rotateCCW ? 1 : -1;
+        m_drivetrain.setControl(m_drive.withVelocityX(0).withVelocityY(0).withRotationalRate(direction * DrivetrainConstants.MaxAngularRate));
     }
 
     // Make this return true when this Command no longer needs to run execute()

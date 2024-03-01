@@ -91,19 +91,23 @@ public class AutoCommand extends SequentialCommandGroup {
 
         double preloadedShooterAngle = 0;
         int preloadedShootRotation = 0;
+        boolean rotateCCW = true;
         switch (m_startingPosition) {
             case 3:
-                preloadedShooterAngle = 6.5;
-                preloadedShootRotation = m_isRedAlliance ? 126 : 60;
+                preloadedShooterAngle = 6.0;
+                preloadedShootRotation = m_isRedAlliance ? 146 : 60;
+                rotateCCW = false;
                 break;
             default:
             case 2:
                 preloadedShooterAngle = Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL;
                 preloadedShootRotation = m_isRedAlliance ? 180 : 0;
+                rotateCCW = true;
                 break;
             case 1:
                 preloadedShooterAngle = 6.5;
                 preloadedShootRotation = m_isRedAlliance ? 222 : -60;
+                rotateCCW = true;
                 break;
         }
 
@@ -111,7 +115,7 @@ public class AutoCommand extends SequentialCommandGroup {
         shooterSetAngleCommand.setTarget(preloadedShooterAngle);
 
         // var robotRotateCommand = new RobotRotateCommand(m_pathPlanner, preloadedShootRotation);
-        var robotRotateCommand = new RobotRotateCommand(m_drivetrain, preloadedShootRotation);
+        var robotRotateCommand = new RobotRotateCommand(m_drivetrain, preloadedShootRotation, rotateCCW);
 
         return Commands.sequence(
             // raise elevator pivot

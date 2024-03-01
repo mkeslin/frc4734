@@ -42,11 +42,11 @@ public class RobotContainer {
     //   |(7)|                ||
     //   |(8)|                ||
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public int[] m_autoNoteOrder = { 1 };
+    public int[] m_autoNoteOrder = { 3 };
     // public int[] m_autoNoteOrder = { 3, 2, 1 };
     // public int[] m_autoNoteOrder = { 1, 2, 3 };
 
-    public int m_autoStarPosition = 1;
+    public int m_autoStarPosition = 3;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
