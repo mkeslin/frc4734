@@ -75,7 +75,7 @@ public class AutoCommand extends SequentialCommandGroup {
 
         // commands for the specific note cycles
         for (Integer noteNumber : m_noteOrder) {
-            // commands.add(moveAcquireShootCycle(noteNumber));
+            commands.add(moveAcquireShootCycle(noteNumber));
         }
 
         // set commands
@@ -86,8 +86,9 @@ public class AutoCommand extends SequentialCommandGroup {
         var elevatorDeployCommand = new ElevatorDeployCommand(m_elevator, 18);
         var intakeDeployCommand = new IntakeDeployCommand(m_intake, m_intake.getDeployedEncoderValue());
         var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
-        var shooterSetAngleCommand = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
+        var shooterSetAngleCommandHigh = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
         var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
+        var shooterSetAngleCommandLow = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
 
         double preloadedShooterAngle = 0;
         int preloadedShootRotation = 0;
@@ -95,8 +96,8 @@ public class AutoCommand extends SequentialCommandGroup {
         switch (m_startingPosition) {
             case 3:
                 preloadedShooterAngle = 6.0;
-                preloadedShootRotation = m_isRedAlliance ? 146 : 60;
-                rotateCCW = false;
+                preloadedShootRotation = m_isRedAlliance ? 146 : 34;
+                rotateCCW = m_isRedAlliance ? false : true;
                 break;
             default:
             case 2:
@@ -106,13 +107,14 @@ public class AutoCommand extends SequentialCommandGroup {
                 break;
             case 1:
                 preloadedShooterAngle = 6.5;
-                preloadedShootRotation = m_isRedAlliance ? 222 : -60;
-                rotateCCW = true;
+                preloadedShootRotation = m_isRedAlliance ? 222 : -42;
+                rotateCCW = m_isRedAlliance ? true : false;
                 break;
         }
 
         // set shooter angle
-        shooterSetAngleCommand.setTarget(preloadedShooterAngle);
+        shooterSetAngleCommandHigh.setTarget(preloadedShooterAngle);
+        shooterSetAngleCommandLow.setTarget(0);
 
         // var robotRotateCommand = new RobotRotateCommand(m_pathPlanner, preloadedShootRotation);
         var robotRotateCommand = new RobotRotateCommand(m_drivetrain, preloadedShootRotation, rotateCCW);
@@ -120,24 +122,27 @@ public class AutoCommand extends SequentialCommandGroup {
         return Commands.sequence(
             // raise elevator pivot
             Commands.print("pivot elevator up"),
-            // elevatorDeployCommand,
+            elevatorDeployCommand,
             Commands.sequence(
                 // lower intake
                 Commands.print("deploy intake"),
-                // intakeDeployCommand,
+                intakeDeployCommand,
                 // pivot elevator down
                 Commands.print("pivot elevator down"),
-                // elevatorStowCommand,
+                elevatorStowCommand,
                 // rotate shooter to speaker
                 Commands.print("rotate to speaker"),
                 robotRotateCommand
             ),
             // raise shooter
-            Commands.print("adjust shoot angle"),
-            shooterSetAngleCommand,
+            Commands.print("raise shoot angle"),
+            shooterSetAngleCommandHigh,
             // shoot
             Commands.print("shoot preloaded note"),
-            shootNoteCommand
+            shootNoteCommand,
+            // lower shooter
+            Commands.print("lower shoot angle"),
+            shooterSetAngleCommandLow
         );
     }
 
@@ -183,15 +188,15 @@ public class AutoCommand extends SequentialCommandGroup {
         // );
 
         return Commands.sequence(
-            // Commands.print("Executing cycle for note " + noteNumber + "..."),
+            Commands.print("Executing cycle for note " + noteNumber + "..."),
             moveToNoteCommand,
-            // Commands.print("Acquire note..."),
+            Commands.print("Acquire note..."),
             acquireNoteCommand,
             // Commands.print("-> Move to speaker..."),
             // m_pathPlanner.moveToOurSpeaker(),
-            // Commands.print("Move to speaker and shoot..."),
-            shootSpeakerNoteCommand
-            // Commands.print("...finished executing cycle for note " + noteNumber)
+            Commands.print("Move to speaker and shoot..."),
+            shootSpeakerNoteCommand,
+            Commands.print("...finished executing cycle for note " + noteNumber)
         );
     }
 }
