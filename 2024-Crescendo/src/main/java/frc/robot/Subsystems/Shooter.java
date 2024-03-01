@@ -60,7 +60,7 @@ public class Shooter extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_shooterPivot.getConfigurator().apply(configs4);
-        m_shooterPivot.setPosition(0);
+        // m_shooterPivot.setPosition(0);
     }
 
     public Command commandShoot() {
@@ -120,5 +120,9 @@ public class Shooter extends SubsystemBase {
 
     public void holdPivot() {
         setPivotMotor(0.0275);
+    }
+
+    public void zero() {
+        m_shooterPivot.setPosition(0);
     }
 }

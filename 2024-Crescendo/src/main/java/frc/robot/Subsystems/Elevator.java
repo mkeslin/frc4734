@@ -23,8 +23,8 @@ public class Elevator extends SubsystemBase {
     private double STOWED_ENCODER_VAL = 37; //Actual Stowed Value: 36.4
     private double DEPLOYED_ENCODER_VAL = 3; //Actual Deploy Value: 0
 
-    private double RETRACT_ENCODER_VAL = -320; //Actual Stowed Value: -334
-    private double EXTEND_ENCODER_VAL = 5; //Actual Deploy Value: 0
+    private double RETRACT_ENCODER_VAL = 5; //Actual Stowed Value: 0
+    private double EXTEND_ENCODER_VAL = 320; //Actual Deploy Value: 320
 
     private ElevatorStowCommand m_elevatorStowCommand = new ElevatorStowCommand(this, STOWED_ENCODER_VAL);
     private ElevatorDeployCommand m_elevatorDeployCommand = new ElevatorDeployCommand(this, DEPLOYED_ENCODER_VAL);
@@ -61,24 +61,24 @@ public class Elevator extends SubsystemBase {
         // motor2.configMotionAcceleration(369, 0);
 
         m_elevatorPivot = new TalonFX(ELEVATOR_PIVOT_ID);
-        // m_elevatorPivot.setInverted(false);
-        // m_elevatorPivot.setNeutralMode(NeutralModeValue.Brake);
-        // m_elevatorPivot.setPosition(0);
-        // var configs1 = new TalonFXConfiguration();
-        // configs1.CurrentLimits = new CurrentLimitsConfigs();
-        // // configs.CurrentLimits.SupplyCurrentLimit = 20;
-        // // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        // m_elevatorPivot.getConfigurator().apply(configs1);
+        m_elevatorPivot.setInverted(false);
+        m_elevatorPivot.setNeutralMode(NeutralModeValue.Brake);
+        //m_elevatorPivot.setPosition(0);
+        var configs1 = new TalonFXConfiguration();
+        configs1.CurrentLimits = new CurrentLimitsConfigs();
+        // configs.CurrentLimits.SupplyCurrentLimit = 20;
+        // configs.CurrentLimits.SupplyCurrentLimit = 40;
+        m_elevatorPivot.getConfigurator().apply(configs1);
 
         m_elevator = new TalonFX(ELEVATOR_ID);
-        // m_elevator.setInverted(false);
-        // m_elevator.setNeutralMode(NeutralModeValue.Brake);
-        // m_elevator.setPosition(0);
-        // var configs2 = new TalonFXConfiguration();
-        // configs2.CurrentLimits = new CurrentLimitsConfigs();
-        // // configs.CurrentLimits.SupplyCurrentLimit = 20;
-        // // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        // m_elevator.getConfigurator().apply(configs2);
+        m_elevator.setInverted(false);
+        m_elevator.setNeutralMode(NeutralModeValue.Brake);
+        //m_elevator.setPosition(0);
+        var configs2 = new TalonFXConfiguration();
+        configs2.CurrentLimits = new CurrentLimitsConfigs();
+        // configs.CurrentLimits.SupplyCurrentLimit = 20;
+        // configs.CurrentLimits.SupplyCurrentLimit = 40;
+        m_elevator.getConfigurator().apply(configs2);
         // zeroValue = zero;
         // halfValue = half;
         // fullValue = full;
@@ -172,22 +172,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public void zero() {
-        m_elevator.setInverted(false);
-        m_elevator.setNeutralMode(NeutralModeValue.Brake);
         m_elevator.setPosition(0);
-        var configs2 = new TalonFXConfiguration();
-        configs2.CurrentLimits = new CurrentLimitsConfigs();
-        // configs.CurrentLimits.SupplyCurrentLimit = 20;
-        // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        m_elevator.getConfigurator().apply(configs2);
-
-        m_elevatorPivot.setInverted(false);
-        m_elevatorPivot.setNeutralMode(NeutralModeValue.Brake);
         m_elevatorPivot.setPosition(0);
-        var configs1 = new TalonFXConfiguration();
-        configs1.CurrentLimits = new CurrentLimitsConfigs();
-        // configs.CurrentLimits.SupplyCurrentLimit = 20;
-        // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        m_elevatorPivot.getConfigurator().apply(configs1);
     }
 }

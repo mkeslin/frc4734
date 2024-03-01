@@ -33,7 +33,7 @@ public class ShootAmpCommand extends SequentialCommandGroup {
             // aim at speaker
             //
             new ElevatorDeployCommand(m_Elevator, m_Elevator.getDeployVal()),
-            new ElevatorRaiseToAmpCommand(m_Elevator, -54),
+            new ElevatorRaiseToAmpCommand(m_Elevator, 266),
             shooterSetAngleCommand,
             new ShootNoteCommand(m_Intake, m_Shooter, 0.5)
         );

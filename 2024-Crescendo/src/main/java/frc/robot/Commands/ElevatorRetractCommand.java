@@ -7,6 +7,7 @@ public class ElevatorRetractCommand extends Command {
     public Elevator m_Elevator;
     public double target_val;
     public double current_val;
+    public double start_val;
     
 
     public ElevatorRetractCommand(Elevator elevator, double target) {
@@ -19,22 +20,23 @@ public class ElevatorRetractCommand extends Command {
     @Override
     public void initialize() {
         current_val = m_Elevator.getExtendEncoderValue();
+        start_val = m_Elevator.getExtendEncoderValue();
     }
 
     @Override
     public void execute() {
         current_val = m_Elevator.getExtendEncoderValue();
-        if(Math.abs(current_val) >= Math.abs(target_val/2)) {
-            m_Elevator.setExtendRetractMotor(-0.65);
+        if(Math.abs(current_val) < Math.abs(start_val * 0.25)) {
+            m_Elevator.setExtendRetractMotor(-0.3);//m_Elevator.setExtendRetractMotor(-0.65);
         } else {
-            m_Elevator.setExtendRetractMotor(-0.85);
+            m_Elevator.setExtendRetractMotor(-0.4);//m_Elevator.setExtendRetractMotor(-0.85);
         }
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return Math.abs(current_val) >= Math.abs(target_val);
+        return Math.abs(current_val) <= Math.abs(target_val);
     }
 
     // Called once after isFinished returns true
