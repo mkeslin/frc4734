@@ -27,7 +27,6 @@ import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
-import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.*;
 
@@ -42,11 +41,11 @@ public class RobotContainer {
     //   |(7)|                ||
     //   |(8)|                ||
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public int[] m_autoNoteOrder = { 3 };
+    public int[] m_autoNoteOrder = { 1 };
     // public int[] m_autoNoteOrder = { 3, 2, 1 };
     // public int[] m_autoNoteOrder = { 1, 2, 3 };
 
-    public int m_autoStarPosition = 3;
+    public int m_autoStarPosition = 1;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,7 +77,7 @@ public class RobotContainer {
     private Shooter m_shooter = new Shooter();
     private Elevator m_elevator = new Elevator();
     private Climber m_climber = new Climber();
-    private Lights m_lights = new Lights();
+    // private Lights m_lights = new Lights();
 
     // private LimelightAligner m_limelightAligner = new LimelightAligner(m_shooterLimelight, m_intakeLimelight, m_pathPlanner);
     // Commands
@@ -122,7 +121,7 @@ public class RobotContainer {
         // configureLightsBindings();
 
         // command tests
-        m_driveController.rightBumper().onTrue(acquireNoteCommand);
+        // m_driveController.rightBumper().onTrue(acquireNoteCommand);
 
         // PathPlanner
         m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
@@ -234,19 +233,19 @@ public class RobotContainer {
         m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
         m_arcadeController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
 
-        m_arcadeController.start().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
+        // m_arcadeController.start().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
     }
 
     public void configureLightsBindings() {
-        m_lights.setDefaultCommand(
-            m_lights.setColors(
-                (int) (m_driveController.getLeftTriggerAxis() * 255),
-                (int) (m_driveController.getRightTriggerAxis() * 255),
-                (int) (m_driveController.getLeftX() * 255)
-            )
-        );
+        // m_lights.setDefaultCommand(
+        //     m_lights.setColors(
+        //         (int) (m_driveController.getLeftTriggerAxis() * 255),
+        //         (int) (m_driveController.getRightTriggerAxis() * 255),
+        //         (int) (m_driveController.getLeftX() * 255)
+        //     )
+        // );
 
-        m_driveController.y().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
+        // m_driveController.y().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
     }
 
     public boolean hasCameras() {
