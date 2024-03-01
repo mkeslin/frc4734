@@ -63,7 +63,7 @@ public class CenterToTargetCommand extends Command {
         }
         wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (offset/MAX_CAMERA_X + 1));
 
-        // if acquiring note, move up to 1 meter forward to "chase" it
+        // if acquiring note, move forward to "chase" it
         // if aligning to april tag, don't move forward, just strafe
         var forwardDistance = m_target == 0 ? .75 : 0;
         m_pathPlanner.moveRelative(forwardDistance, wheelStrafe, 0);

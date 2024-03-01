@@ -20,9 +20,9 @@ public class SwerveDrivetrainBindings {
     private static final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
     
     // robot-centric
-    private static final SwerveRequest.RobotCentric m_forwardStraight = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    // private static final SwerveRequest.RobotCentric m_forwardStraight = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     
-    private static final SwerveDrivetrainTelemetry m_logger = new SwerveDrivetrainTelemetry(MaxSpeed);
+    // private static final SwerveDrivetrainTelemetry m_logger = new SwerveDrivetrainTelemetry(MaxSpeed);
     
     // flip the orientation for blue/red
     private static int coordinateOrientation = -1;

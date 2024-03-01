@@ -22,7 +22,7 @@ public class AcquireNoteCommand extends SequentialCommandGroup {
     public AcquireNoteCommand(Limelight intakeLimelight, PathPlanner pathPlanner, Intake intake) {
         addCommands(
             Commands.parallel(
-                Commands.print("-> Center to note..."),
+                Commands.print("-> Center to note and acquire..."),
                 new CenterToTargetCommand(intakeLimelight, pathPlanner, intake, 0)
                 // I don't think this is needed, since the above command also moves towards note
                 // Commands.print("-> Move to note..."),
