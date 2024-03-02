@@ -27,9 +27,9 @@ public class ElevatorStowCommand extends Command {
     public void execute() {
         current_val = m_elevator.getPivotEncoderValue();
         if(current_val > start_val * 0.3) {
-            m_elevator.setPivot(0.2);
+            m_elevator.setPivot(0.3);
         } else {
-            m_elevator.setPivot(0.25);
+            m_elevator.setPivot(0.35);
         }
     }
 

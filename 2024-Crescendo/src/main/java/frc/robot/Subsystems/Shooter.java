@@ -20,7 +20,7 @@ public class Shooter extends SubsystemBase {
 
     public static double MAX_PIVOT_ENCODER_VAL = 8.5; //Actual Max Value: 6.9
     public static double TELEOP_SPEAKER_PIVOT_ENCODER_VAL = 7.25;
-    public static double AUTO_SPEAKER_PIVOT_ENCODER_VAL = 7.5;
+    public static double AUTO_SPEAKER_PIVOT_ENCODER_VAL = 6.9;
 
     private ShooterSetAngleCommand m_shooterSetAngleCommand = new ShooterSetAngleCommand(this, TELEOP_SPEAKER_PIVOT_ENCODER_VAL);
 

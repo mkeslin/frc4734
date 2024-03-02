@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommand;
 import frc.robot.Commands.CenterToTargetCommand;
+import frc.robot.Commands.IntakeEjectCommand;
 import frc.robot.Commands.IntakeNoteCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
@@ -41,11 +42,11 @@ public class RobotContainer {
     //   |(7)|                ||
     //   |(8)|                ||
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public int[] m_autoNoteOrder = { 1 };
+    public int[] m_autoNoteOrder = { 2 };
     // public int[] m_autoNoteOrder = { 3, 2, 1 };
     // public int[] m_autoNoteOrder = { 1, 2, 3 };
 
-    public int m_autoStarPosition = 1;
+    public int m_autoStartPosition = 2;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,6 +89,7 @@ public class RobotContainer {
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
     public IntakeNoteCommand intakeNoteCommand = new IntakeNoteCommand(m_intake);
+    public IntakeEjectCommand intakeEjectCommand = new IntakeEjectCommand(m_intake);
 
     // auto choosers
     private final SendableChooser<Integer> m_autoStartChooser = new SendableChooser<>();
@@ -133,6 +135,7 @@ public class RobotContainer {
 
         m_driveController.x().onTrue(m_climber.CommandClimb());
         m_driveController.y().onTrue(shootAmpNoteCommand);
+        m_driveController.b().onTrue(intakeEjectCommand);
         //m_driveController.x().onTrue(shootAmpNoteCommand);
         //m_mechanismController.y().onTrue(m_shooter.commandSetAngle(MAX_PIVOT_ENCODER_VAL));
         //m_mechanismController.x().onTrue(m_shooter.commandSetAngle(0));
@@ -228,7 +231,7 @@ public class RobotContainer {
         m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(Commands.sequence(shootNoteCommand, m_shooter.commandSetAngle(1)));
         m_arcadeController
             .axisGreaterThan(ControllerButtons.CLY, 0.5)
-            .onTrue(Commands.sequence(intakeNoteCommand, m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL)));
+            .onTrue(intakeNoteCommand);
 
         m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
         m_arcadeController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
@@ -290,7 +293,7 @@ public class RobotContainer {
             m_intakeLimelight,
             // m_shooterLimelight,
             m_autoNoteOrder,
-            m_autoStarPosition,
+            m_autoStartPosition,
             isRedAlliance()
         );
         return autoCommand;
@@ -332,7 +335,7 @@ public class RobotContainer {
 
     private void resetPose() {
         Pose2d startingPosition;
-        switch (m_autoStarPosition) {
+        switch (m_autoStartPosition) {
             case 3:
                 startingPosition = Landmarks.OurStart3();
                 break;

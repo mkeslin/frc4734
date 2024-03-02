@@ -49,11 +49,11 @@ public class SwerveDrivetrainBindings {
         driveController.a().whileTrue(drivetrain.applyRequest(() -> m_brake));
 
         // B Button
-        driveController
+        /*driveController
             .b()
             .whileTrue(
                 drivetrain.applyRequest(() -> m_point.withModuleDirection(new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX())))
-            );
+            );*/
 
         // LEFT BUMPER: Reset the field-centric heading
         driveController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));

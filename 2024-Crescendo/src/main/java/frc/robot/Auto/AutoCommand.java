@@ -95,8 +95,8 @@ public class AutoCommand extends SequentialCommandGroup {
         boolean rotateCCW = true;
         switch (m_startingPosition) {
             case 3:
-                preloadedShooterAngle = 6.0;
-                preloadedShootRotation = m_isRedAlliance ? 146 : 34;
+                preloadedShooterAngle = 5.95;
+                preloadedShootRotation = m_isRedAlliance ? 146 : 44;
                 rotateCCW = m_isRedAlliance ? false : true;
                 break;
             default:
@@ -106,7 +106,7 @@ public class AutoCommand extends SequentialCommandGroup {
                 rotateCCW = true;
                 break;
             case 1:
-                preloadedShooterAngle = 6.5;
+                preloadedShooterAngle = 5.95;
                 preloadedShootRotation = m_isRedAlliance ? 222 : -42;
                 rotateCCW = m_isRedAlliance ? true : false;
                 break;
