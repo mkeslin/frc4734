@@ -36,6 +36,7 @@ public class IntakeEjectCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         m_intake.stopRoller();
+        
         t.stop();
         t.reset();
     }

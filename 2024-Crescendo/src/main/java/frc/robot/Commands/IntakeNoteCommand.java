@@ -40,8 +40,10 @@ public class IntakeNoteCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         m_intake.stopRoller();
+
         t.stop();
         t.reset();
+        
         t2.stop();
         t2.reset();
     }

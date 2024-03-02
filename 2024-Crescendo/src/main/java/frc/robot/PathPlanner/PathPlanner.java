@@ -49,8 +49,8 @@ public class PathPlanner extends SubsystemBase {
 
     public Command moveToPose(Pose2d pose) {
         var constraints = new PathConstraints(
-            1.0, //DrivetrainConstants.MaxSpeed,
-            .4, //DrivetrainConstants.MaxAcceleration,
+            DrivetrainConstants.MaxSpeed,
+            DrivetrainConstants.MaxAcceleration,
             Units.degreesToRadians(80),
             Units.degreesToRadians(50)
             // Units.degreesToRadians(360),
@@ -58,6 +58,12 @@ public class PathPlanner extends SubsystemBase {
         );
         return AutoBuilder.pathfindToPose(pose, constraints, 0, 0);
     }
+
+    // public Command rotateToAngle(int degrees) {
+    //     var currentPose = m_drivetrain.getPose();
+    //     var newPose = new Pose2d(currentPose.getX(), currentPose.getY(), Rotation2d.fromDegrees(degrees));
+    //     return moveToPose(newPose);
+    // }
 
     public void moveRelative(double x, double y, double rot) {
         // return Commands.runOnce(() -> {

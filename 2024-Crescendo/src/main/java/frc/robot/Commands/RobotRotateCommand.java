@@ -84,6 +84,7 @@ public class RobotRotateCommand extends Command {
     public void end(boolean interrupted) {
         m_drivetrain.setControl(m_drive.withVelocityX(0).withVelocityY(0).withRotationalRate(0));
 
+        t.stop();
         t.reset();
     }
 }
