@@ -1,4 +1,6 @@
 package frc.robot.Commands;
+import static frc.robot.Constants.Constants.INTAKE_SENSOR_DELAY;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -76,7 +78,7 @@ public class CenterToTargetCommand extends Command {
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        if (t.hasElapsed(5) || t2.hasElapsed(0.2)) { return true;}
+        if (t.hasElapsed(5) || t2.hasElapsed(INTAKE_SENSOR_DELAY)) { return true;}
 
         return m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 2;
     }

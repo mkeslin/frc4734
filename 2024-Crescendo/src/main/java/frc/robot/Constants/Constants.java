@@ -47,6 +47,8 @@ public class Constants {
 
     public static final int LIGHTS_0_ID = 0;
 
+    public static final double INTAKE_SENSOR_DELAY = 0.2;
+
     // public static final int INTAKERIGHTID = 119;
     // public static final int PNEUMATICHUBID = 120;
     // public static final double WBL = 0.58; //Wheelbase length 19.5in 0.50m

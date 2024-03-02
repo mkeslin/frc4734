@@ -18,7 +18,7 @@ public class Climber extends SubsystemBase {
     private TalonFX m_climber_left;
     private TalonFX m_climber_right;
 
-    private double RETRACT_ENCODER_VAL = -24; //Actual Stowed Value: -22.48
+    private double RETRACT_ENCODER_VAL = -25; //Actual Stowed Value: -22.48
     private double EXTEND_ENCODER_VAL = 110; //Actual Deploy Value: 114.65
 
     private ClimberExtendCommand climberExtendCommand = new ClimberExtendCommand(this, EXTEND_ENCODER_VAL);
@@ -26,7 +26,7 @@ public class Climber extends SubsystemBase {
     private ClimberRetractCommand climberClimbCommand = new ClimberRetractCommand(this, RETRACT_ENCODER_VAL);
 
     public Climber() {
-        m_climber_left = new TalonFX(CLIMBER_LEFT_ID, "Canivore");
+        m_climber_left = new TalonFX(CLIMBER_LEFT_ID);
         m_climber_left.setInverted(false);
         m_climber_left.setNeutralMode(NeutralModeValue.Brake);
         //m_climber_left.setPosition(0);
@@ -36,7 +36,7 @@ public class Climber extends SubsystemBase {
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_climber_left.getConfigurator().apply(configs1);
 
-        m_climber_right = new TalonFX(CLIMBER_RIGHT_ID, "Canivore");
+        m_climber_right = new TalonFX(CLIMBER_RIGHT_ID);
         m_climber_right.setInverted(false);
         m_climber_right.setNeutralMode(NeutralModeValue.Brake);
         //m_climber_right.setPosition(0);
