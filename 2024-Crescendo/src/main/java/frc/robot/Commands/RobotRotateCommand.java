@@ -13,37 +13,42 @@ public class RobotRotateCommand extends Command {
 
     public double target_val;
     public double current_val;
-
     public boolean m_rotateCCW;
 
     public Timer t = new Timer();
 
-    private static final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // field-centric driving in open loop
+    private static final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage); // field-centric driving in open loop
 
-    public RobotRotateCommand(CommandSwerveDrivetrain drivetrain, int degrees, boolean rotateCCW) {
+    public RobotRotateCommand(CommandSwerveDrivetrain drivetrain, int degrees) {
         m_drivetrain = drivetrain;
         target_val = degrees;
 
-        m_rotateCCW = rotateCCW;
+        // set target and noralize
+        target_val = normalizeAngle(target_val);
 
-        while (target_val < 0) {
-            target_val += 360;
-        }
-        while (target_val >= 360) {
-            target_val -= 360;
-        }
+        // get current and normalize
+        var currentPose = m_drivetrain.getPose();
+        var currentDegrees = currentPose.getRotation().getDegrees();
+        current_val = normalizeAngle(currentDegrees);
+
+        // get rotation direction
+        var normalizedDelta = normalizeAngle(target_val - current_val);
+        m_rotateCCW = normalizedDelta <= 180;
 
         addRequirements(drivetrain);
+    }
+
+    private double normalizeAngle(double degrees) {
+        var normalizedAngle = degrees % 360;
+        if (normalizedAngle < 0) {
+            normalizedAngle += 360;
+        }
+        return normalizedAngle;
     }
 
     // Called just before this Command runs the first time
     @Override
     public void initialize() {
-        var currentPose = m_drivetrain.getPose();
-        var currentDegrees = currentPose.getRotation().getDegrees();
-        current_val = currentDegrees % 360;
-
         t.start();
     }
 
@@ -56,26 +61,29 @@ public class RobotRotateCommand extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        if (t.hasElapsed(4.5)) {
+        if (t.hasElapsed(4)) {
             return true;
         }
 
         var currentPose = m_drivetrain.getPose();
-        var current_val = currentPose.getRotation().getDegrees();
-
-        while (current_val < 0) {
-            current_val += 360;
-        }
-        while (current_val >= 360) {
-            current_val -= 360;
-        }
+        var currentDegrees = currentPose.getRotation().getDegrees();
+        current_val = normalizeAngle(currentDegrees);
 
         // Commands.print("target: " + target_val).schedule();
         // Commands.print("current: " + current_val).schedule();
 
-        var isFinished = (current_val <= target_val + 4) && (current_val >= target_val - 4);
+        // var isFinished = (current_val <= target_val + 4) && (current_val >= target_val - 4);
+
+        var isFinished = false;
+        if (m_rotateCCW) {
+            isFinished = current_val >= target_val;
+        } else {
+            isFinished = current_val <= target_val;
+        }
+
         // Commands.print("current2: " + current_val).schedule();
         // Commands.print("is finished: " + isFinished).schedule();
+
         return isFinished;
     }
 
