@@ -24,9 +24,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledInit() {
-        if(m_robotContainer.hasCameras()) {
+        /*if(m_robotContainer.hasCameras()) {
             m_robotContainer.stopCamera();
-        }
+        }*/
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
-        m_robotContainer.startCamera();
+        //m_robotContainer.startCamera();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopExit() {
-        m_robotContainer.stopCamera();
+        //m_robotContainer.stopCamera();
     }
 
     @Override

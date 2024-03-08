@@ -31,9 +31,9 @@ public class AutoCommand extends SequentialCommandGroup {
     private final Intake m_intake;
     private final Shooter m_shooter;
     private final Climber m_climber;
-    private final Elevator m_elevator;
+    //private final Elevator m_elevator;
     private final Limelight m_intakeLimelight;
-    //private final Limelight m_shooterLimelight;
+    private final Limelight m_shooterLimelight;
 
     private final int[] m_noteOrder;
     private final int m_startingPosition;
@@ -45,9 +45,9 @@ public class AutoCommand extends SequentialCommandGroup {
         Intake intake,
         Shooter shooter,
         Climber climber,
-        Elevator elevator,
+        //Elevator elevator,
         Limelight intakeLimelight,
-        //Limelight shooterLimelight,
+        Limelight shooterLimelight,
         int[] noteOrder,
         int startingPosition,
         boolean isRedAlliance
@@ -57,15 +57,15 @@ public class AutoCommand extends SequentialCommandGroup {
         m_intake = intake;
         m_shooter = shooter;
         m_climber = climber;
-        m_elevator = elevator;
+        //m_elevator = elevator;
         m_intakeLimelight = intakeLimelight;
-        //m_shooterLimelight = shooterLimelight;
+        m_shooterLimelight = shooterLimelight;
 
         m_noteOrder = noteOrder;
         m_startingPosition = startingPosition;
         m_isRedAlliance = isRedAlliance;
 
-        addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, m_elevator, m_intakeLimelight/*, m_shooterLimelight*/);
+        addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, /*m_elevator,*/ m_intakeLimelight/*, m_shooterLimelight*/);
 
         // list of commands to be executed
         List<Command> commands = new ArrayList<Command>();
@@ -83,9 +83,9 @@ public class AutoCommand extends SequentialCommandGroup {
     }
 
     private Command shootPreloadedNote() {
-        var elevatorDeployCommand = new ElevatorDeployCommand(m_elevator, 18);
+        //var elevatorDeployCommand = new ElevatorDeployCommand(m_elevator, 18);
         var intakeDeployCommand = new IntakeDeployCommand(m_intake, m_intake.getDeployedEncoderValue());
-        var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
+        //var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
         var shooterSetAngleCommandHigh = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
         var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
         var shooterSetAngleCommandLow = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
@@ -122,14 +122,14 @@ public class AutoCommand extends SequentialCommandGroup {
         return Commands.sequence(
             // raise elevator pivot
             Commands.print("pivot elevator up"),
-            elevatorDeployCommand,
+            //elevatorDeployCommand,
             Commands.sequence(
                 // lower intake
                 Commands.print("deploy intake"),
                 intakeDeployCommand,
                 // pivot elevator down
                 Commands.print("pivot elevator down"),
-                elevatorStowCommand,
+                //elevatorStowCommand,
                 // rotate shooter to speaker
                 Commands.print("rotate to speaker"),
                 robotRotateCommand
@@ -177,7 +177,7 @@ public class AutoCommand extends SequentialCommandGroup {
         }
 
         var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-        var shootSpeakerNoteCommand = new ShootSpeakerCommand(/*m_shooterLimelight,*/m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
+        var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
 
         // debug
         // return Commands.sequence(
