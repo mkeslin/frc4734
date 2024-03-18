@@ -69,7 +69,7 @@ public class CenterToTargetCommand extends Command {
         // if aligning to april tag, don't move forward, just strafe
         var forwardDistance = m_target == 0 ? .85 : 0;
         m_pathPlanner.moveRelative(forwardDistance, wheelStrafe, 0);
-        if(m_intake.noteIsSeen() && t2.get() == 0) {
+        if(m_target < 1 && m_intake.noteIsSeen() && t2.get() == 0) {
             t2.start();
         }
     }
