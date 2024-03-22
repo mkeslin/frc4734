@@ -5,9 +5,9 @@ import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
-import frc.robot.Subsystems.Elevator;
-import frc.robot.Commands.ElevatorDeployCommand;
-import frc.robot.Commands.ElevatorRaiseToAmpCommand;
+//import frc.robot.Subsystems.Elevator;
+//import frc.robot.Commands.ElevatorDeployCommand;
+//import frc.robot.Commands.ElevatorRaiseToAmpCommand;
 import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.Commands.ShooterSetAngleCommand;
 
