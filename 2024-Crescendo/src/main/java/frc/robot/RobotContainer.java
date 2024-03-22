@@ -1,6 +1,6 @@
 package frc.robot;
 
-// import static frc.robot.Constants.Constants.APRILTAGPIPELINE;
+import static frc.robot.Constants.Constants.APRILTAGPIPELINE;
 import static frc.robot.Constants.Constants.NOTEPIPELINE;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -26,7 +26,7 @@ import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.LifeCam;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Climber;
-import frc.robot.Subsystems.Elevator;
+//import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.*;
@@ -71,12 +71,12 @@ public class RobotContainer {
     // private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
 
     // SUBSYSTEMS
-    //private Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
+    private static Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
     private static Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
-    private static LifeCam m_LifeCam = new LifeCam(0);
+    //private static LifeCam m_LifeCam = new LifeCam(0);
     private Intake m_intake = new Intake();
     private Shooter m_shooter = new Shooter();
-    private Elevator m_elevator = new Elevator();
+    //private Elevator m_elevator = new Elevator();
     private Climber m_climber = new Climber();
     // private Lights m_lights = new Lights();
 
@@ -84,7 +84,7 @@ public class RobotContainer {
     public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
     public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
     //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
-    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(/*m_shooterLimelight,*/m_pathPlanner, m_intake, m_shooter, m_elevator);
+    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
     public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
@@ -221,11 +221,11 @@ public class RobotContainer {
         m_arcadeController.b().onTrue(m_climber.CommandFullRetract());
         m_arcadeController.y().onTrue(m_climber.CommandFullExtend());
 
-        m_arcadeController.rightTrigger().onTrue(m_elevator.CommandFullRetract());
-        m_arcadeController.rightBumper().onTrue(m_elevator.CommandFullExtend());
+        //m_arcadeController.rightTrigger().onTrue(m_elevator.CommandFullRetract());
+        //m_arcadeController.rightBumper().onTrue(m_elevator.CommandFullExtend());
 
-        m_arcadeController.leftTrigger().onTrue(m_elevator.CommandPivotStow());
-        m_arcadeController.leftBumper().onTrue(m_elevator.CommandPivotDeploy());
+        //m_arcadeController.leftTrigger().onTrue(m_elevator.CommandPivotStow());
+        //m_arcadeController.leftBumper().onTrue(m_elevator.CommandPivotDeploy());
 
         // m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(shootAmpNoteCommand);
         m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(Commands.sequence(shootNoteCommand, m_shooter.commandSetAngle(1)));
@@ -252,7 +252,7 @@ public class RobotContainer {
         // m_driveController.y().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
     }
 
-    public boolean hasCameras() {
+    /*public boolean hasCameras() {
         return m_LifeCam.isLive();
     }
 
@@ -262,7 +262,7 @@ public class RobotContainer {
 
     public void stopCamera() {
         m_LifeCam.stopStream();
-    }
+    }*/
 
     public void initializeAuto() {
         // set alliance
@@ -290,9 +290,9 @@ public class RobotContainer {
             m_intake,
             m_shooter,
             m_climber,
-            m_elevator,
+            //m_elevator,
             m_intakeLimelight,
-            // m_shooterLimelight,
+            m_shooterLimelight,
             m_autoNoteOrder,
             m_autoStartPosition,
             isRedAlliance()
@@ -319,7 +319,7 @@ public class RobotContainer {
         // zero all mechanisms
         m_intake.zero();
         m_climber.zero();
-        m_elevator.zero();
+        //m_elevator.zero();
         m_shooter.zero();
         // move everything to starting position
         // todo

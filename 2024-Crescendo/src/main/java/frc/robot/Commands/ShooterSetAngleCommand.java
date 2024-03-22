@@ -1,22 +1,29 @@
 package frc.robot.Commands;
 
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Shooter;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 public class ShooterSetAngleCommand extends Command {
 
     public Shooter m_shooter;
+    public TalonFX m_motor;
     public double target_val;
     public double max_val;
     public double start_val;
     public double current_val;
+    public MotionMagicVoltage m_request;
 
     // public Timer t = new Timer();
 
     public ShooterSetAngleCommand(Shooter shooter, double max) {
         m_shooter = shooter;
         max_val = max;
+        m_motor = shooter.getPivotTalon();
+        m_request = new MotionMagicVoltage(0);
         addRequirements(m_shooter);
     }
 
@@ -34,6 +41,7 @@ public class ShooterSetAngleCommand extends Command {
 
     @Override
     public void execute() {
+        //m_motor.setControl(m_request.withPosition(target_val));
         current_val = m_shooter.getPivotEncoderValue();
         if(target_val > start_val) {
             if(current_val > start_val + (target_val - start_val)/2 && target_val - start_val > 1) {

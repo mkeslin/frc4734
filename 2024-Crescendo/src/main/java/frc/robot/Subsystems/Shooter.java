@@ -110,6 +110,10 @@ public class Shooter extends SubsystemBase {
         return statusSignal.getValueAsDouble();
     }
 
+    public TalonFX getPivotTalon() {
+        return m_shooterPivot;
+    }
+
     public void setPivotMotor(double s) {
         m_shooterPivot.set(s);
     }
