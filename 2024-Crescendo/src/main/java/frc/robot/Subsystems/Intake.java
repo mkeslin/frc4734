@@ -22,6 +22,7 @@ public class Intake extends SubsystemBase {
     private TalonFX m_pivot;
 
     private DigitalInput m_intakeSensor = new DigitalInput(INTAKE_SENSOR);
+    private DigitalInput m_shooterSensor = new DigitalInput(SHOOTER_SENSOR);
 
     private double STOWED_ENCODER_VAL = 0.5; //Actual Stowed Value: 0
     private double DEPLOYED_ENCODER_VAL = 4.5; //Actual Deploy Value: -5.175
@@ -131,8 +132,12 @@ public class Intake extends SubsystemBase {
     // @Override
     // public void initDefaultCommand() {}
 
-    public boolean noteIsSeen() {
+    public boolean noteIsSeenIntake() {
         return !m_intakeSensor.get();
+    }
+
+    public boolean noteIsSeenShooter() {
+        return !m_shooterSensor.get();
     }
 
     public void zero() {

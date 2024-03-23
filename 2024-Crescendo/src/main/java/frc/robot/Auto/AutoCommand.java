@@ -13,12 +13,12 @@ import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.Commands.ShooterSetAngleCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Climber;
 //import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
-import frc.robot.Subsystems.River;
 import frc.robot.Subsystems.Shooter;
-import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
+import frc.robot.Subsystems.River;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +69,7 @@ public class AutoCommand extends SequentialCommandGroup {
         m_startingPosition = startingPosition;
         m_isRedAlliance = isRedAlliance;
 
-        addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, /*m_elevator,*/m_intakeLimelight/*, m_shooterLimelight*/);
+        addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, /*m_elevator,*/ m_intakeLimelight/*, m_shooterLimelight*/);
 
         // list of commands to be executed
         List<Command> commands = new ArrayList<Command>();
@@ -103,7 +103,7 @@ public class AutoCommand extends SequentialCommandGroup {
         //         break;
         //     default:
         //     case 2:
-        // preloadedShooterAngle = Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL;
+                // preloadedShooterAngle = Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL;
         //         preloadedShootRotation = m_isRedAlliance ? 180 : 0;
         //         break;
         //     case 1:

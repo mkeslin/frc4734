@@ -19,8 +19,8 @@ public class Shooter extends SubsystemBase {
     private TalonFX m_shooterPivot;
 
     public static double MAX_PIVOT_ENCODER_VAL = -1.2; //Actual Max Value: -1.23
-    public static double TELEOP_SPEAKER_PIVOT_ENCODER_VAL = -0.6;
-    public static double AUTO_SPEAKER_PIVOT_ENCODER_VAL = -0.6;
+    public static double TELEOP_SPEAKER_PIVOT_ENCODER_VAL = -0.5;
+    public static double AUTO_SPEAKER_PIVOT_ENCODER_VAL = -0.5;
 
     private ShooterSetAngleCommand m_shooterSetAngleCommand = new ShooterSetAngleCommand(this, TELEOP_SPEAKER_PIVOT_ENCODER_VAL);
 

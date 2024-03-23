@@ -48,6 +48,10 @@ public class PathPlanner extends SubsystemBase {
     }
 
     public Command moveToPose(Pose2d pose) {
+        return moveToPose(pose, 0);
+    }
+
+    public Command moveToPose(Pose2d pose, double goalEndVelocity) {
         var constraints = new PathConstraints(
             DrivetrainConstants.MaxSpeed,
             DrivetrainConstants.MaxAcceleration,
@@ -56,7 +60,7 @@ public class PathPlanner extends SubsystemBase {
             // Units.degreesToRadians(360),
             // Units.degreesToRadians(540)
         );
-        return AutoBuilder.pathfindToPose(pose, constraints, 0, 0);
+        return AutoBuilder.pathfindToPose(pose, constraints, goalEndVelocity, 0);
     }
 
     // public Command rotateToAngle(int degrees) {
@@ -152,16 +156,18 @@ public class PathPlanner extends SubsystemBase {
         return moveToPose(Landmarks.OurStage3());
     }
 
+    private static final double endNoteSpeed = 1.0;
+
     public Command moveToOurNote1() {
-        return moveToPose(Landmarks.OurNote1());
+        return moveToPose(Landmarks.OurNote1(), endNoteSpeed);
     }
 
     public Command moveToOurNote2() {
-        return moveToPose(Landmarks.OurNote2());
+        return moveToPose(Landmarks.OurNote2(), endNoteSpeed);
     }
 
     public Command moveToOurNote3() {
-        return moveToPose(Landmarks.OurNote3());
+        return moveToPose(Landmarks.OurNote3(), endNoteSpeed);
     }
 
     public Command moveToOurNote4() {

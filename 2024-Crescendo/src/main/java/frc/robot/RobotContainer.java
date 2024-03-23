@@ -91,7 +91,7 @@ public class RobotContainer {
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
     public IntakeNoteCommand intakeNoteCommand = new IntakeNoteCommand(m_intake, m_river);
-    public IntakeEjectCommand intakeEjectCommand = new IntakeEjectCommand(m_intake);
+    public IntakeEjectCommand intakeEjectCommand = new IntakeEjectCommand(m_intake, m_river);
 
     // auto choosers
     private final SendableChooser<Integer> m_autoStartChooser = new SendableChooser<>();

@@ -1,6 +1,7 @@
 package frc.robot.Commands;
 
 import static frc.robot.Constants.Constants.INTAKE_SENSOR_DELAY;
+import static frc.robot.Constants.Constants.SHOOTER_SENSOR_DELAY;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,6 +14,7 @@ public class IntakeNoteCommand extends Command {
     public River m_river;
     public Timer t = new Timer();
     public Timer t2 = new Timer();
+    public Timer t3 = new Timer();
 
     public IntakeNoteCommand(Intake intake, River river) {
         m_intake = intake;
@@ -30,8 +32,11 @@ public class IntakeNoteCommand extends Command {
     public void execute() {
         m_intake.startIn(-.55);
         m_river.startIn(.55);
-        if (m_intake.noteIsSeen() && t2.get() == 0) {
+        if (m_intake.noteIsSeenIntake() && t2.get() == 0) {
             t2.start();
+        }
+        if (m_intake.noteIsSeenShooter() && t3.get() == 0) {
+            t3.start();
         }
     }
 
@@ -39,7 +44,7 @@ public class IntakeNoteCommand extends Command {
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        return (t.hasElapsed(3) || t2.hasElapsed(INTAKE_SENSOR_DELAY));
+        return (t.hasElapsed(3) || t2.hasElapsed(INTAKE_SENSOR_DELAY) || t3.hasElapsed(SHOOTER_SENSOR_DELAY));
     }
 
     // Called once after isFinished returns true
@@ -53,5 +58,8 @@ public class IntakeNoteCommand extends Command {
         
         t2.stop();
         t2.reset();
+
+        t3.stop();
+        t3.reset();
     }
 }

@@ -1,5 +1,6 @@
 package frc.robot.Commands;
 import static frc.robot.Constants.Constants.INTAKE_SENSOR_DELAY;
+import static frc.robot.Constants.Constants.SHOOTER_SENSOR_DELAY;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,6 +24,7 @@ public class CenterToTargetCommand extends Command {
 
     public Timer t = new Timer();
     public Timer t2 = new Timer();
+    public Timer t3 = new Timer();
 
     public CenterToTargetCommand(Limelight limelight, PathPlanner pathPlanner, Intake intake, int target) {
         m_limelight = limelight;
@@ -69,8 +71,11 @@ public class CenterToTargetCommand extends Command {
         // if aligning to april tag, don't move forward, just strafe
         var forwardDistance = m_target == 0 ? .85 : 0;
         m_pathPlanner.moveRelative(forwardDistance, wheelStrafe, 0);
-        if(m_target < 1 && m_intake.noteIsSeen() && t2.get() == 0) {
+        if(m_target < 1 && m_intake.noteIsSeenIntake() && t2.get() == 0) {
             t2.start();
+        }
+        if(m_target < 1 && m_intake.noteIsSeenShooter() && t3.get() == 0) {
+            t3.start();
         }
     }
 
@@ -78,7 +83,7 @@ public class CenterToTargetCommand extends Command {
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        if (t.hasElapsed(5) || t2.hasElapsed(INTAKE_SENSOR_DELAY)) { return true;}
+        if (t.hasElapsed(5) || t2.hasElapsed(INTAKE_SENSOR_DELAY) || t3.hasElapsed(SHOOTER_SENSOR_DELAY)) { return true;}
 
         return m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 2;
     }
@@ -88,6 +93,12 @@ public class CenterToTargetCommand extends Command {
     public void end(boolean interrupted) {
         t.stop();
         t.reset();
+
+        t2.stop();
+        t2.reset();
+        
+        t3.stop();
+        t3.reset();
         
         m_intake.stopRoller();
     }
