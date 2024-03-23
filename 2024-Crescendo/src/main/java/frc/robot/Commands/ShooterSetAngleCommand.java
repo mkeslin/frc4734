@@ -44,13 +44,13 @@ public class ShooterSetAngleCommand extends Command {
         //m_motor.setControl(m_request.withPosition(target_val));
         current_val = m_shooter.getPivotEncoderValue();
         if(target_val > start_val) {
-            if(current_val > start_val + (target_val - start_val)/2 && target_val - start_val > 1) {
+            if(current_val > start_val + (target_val - start_val)/2 && target_val - start_val > 0.3) {
                 m_shooter.setPivotMotor(0.1);
             } else {
                 m_shooter.setPivotMotor(0.2);
             }
         } else {
-            if(current_val < start_val + (target_val - start_val)/2 && target_val - start_val < 1) {
+            if(current_val < start_val + (target_val - start_val)/2 && target_val - start_val < 0.3) {
                 m_shooter.setPivotMotor(-0.1);
             } else {
                 m_shooter.setPivotMotor(-0.2);
@@ -64,8 +64,8 @@ public class ShooterSetAngleCommand extends Command {
         // if (t.hasElapsed(3)) { return true;}
 
         return (
-            (target_val > max_val) ||
-            (target_val < 0) ||
+            (target_val < max_val) ||
+            (target_val > 0) ||
             (target_val >= start_val && current_val >= target_val) ||
             (target_val <= start_val && current_val <= target_val)
         );

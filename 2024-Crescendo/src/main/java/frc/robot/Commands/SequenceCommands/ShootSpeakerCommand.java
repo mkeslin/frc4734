@@ -8,6 +8,7 @@ import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.River;
 
 public class ShootSpeakerCommand extends SequentialCommandGroup {
     public final Limelight m_shooterLimelight;
@@ -15,13 +16,15 @@ public class ShootSpeakerCommand extends SequentialCommandGroup {
     public final PathPlanner m_pathPlanner;
     public final Shooter m_shooter;
     public final Intake m_intake;
+    public final River m_river;
 
-    public ShootSpeakerCommand(Limelight shooterLimelight, Limelight intakeLimelight, PathPlanner pathPlanner, Intake intake, Shooter shooter) {
+    public ShootSpeakerCommand(Limelight shooterLimelight, Limelight intakeLimelight, PathPlanner pathPlanner, Intake intake, Shooter shooter, River river) {
         m_shooterLimelight = shooterLimelight;
         m_intakeLimelight = intakeLimelight;
         m_pathPlanner = pathPlanner;
         m_shooter = shooter;
         m_intake = intake;
+        m_river = river;
 
         var shooterSetAngleCommandHigh = new ShooterSetAngleCommand(shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
         shooterSetAngleCommandHigh.setTarget(Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL);
@@ -40,7 +43,7 @@ public class ShootSpeakerCommand extends SequentialCommandGroup {
             shooterSetAngleCommandHigh,
             // shoot
             Commands.print("-> Shoot note..."),
-            new ShootNoteCommand(intake, shooter, 1.0),
+            new ShootNoteCommand(intake, shooter, m_river, 1.0),
             // lower shoot angle
             Commands.print("-> Lower shooter angle..."),
             shooterSetAngleCommandLow

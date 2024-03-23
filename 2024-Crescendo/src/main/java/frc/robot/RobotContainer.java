@@ -23,7 +23,7 @@ import frc.robot.Controllers.ControllerButtons;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.Landmarks;
 import frc.robot.PathPlanner.PathPlanner;
-import frc.robot.Subsystems.Cameras.LifeCam;
+// import frc.robot.Subsystems.Cameras.LifeCam;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Climber;
 //import frc.robot.Subsystems.Elevator;
@@ -86,8 +86,8 @@ public class RobotContainer {
     public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
     public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
     //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
-    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
-    public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
+    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter, m_river);
+    public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, m_river, 1.0);
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
     public IntakeNoteCommand intakeNoteCommand = new IntakeNoteCommand(m_intake, m_river);
@@ -292,6 +292,7 @@ public class RobotContainer {
             m_intake,
             m_shooter,
             m_climber,
+            m_river,
             //m_elevator,
             m_intakeLimelight,
             m_shooterLimelight,
