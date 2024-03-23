@@ -25,6 +25,6 @@ public class Constants {
 
     public static final int LIGHTS_0_ID = 0;
 
-    public static final double INTAKE_SENSOR_DELAY = 1;
-    public static final double SHOOTER_SENSOR_DELAY = 0.1;
+    public static final double INTAKE_SENSOR_DELAY = 1.5;
+    public static final double SHOOTER_SENSOR_DELAY = 0.2;
 }

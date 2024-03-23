@@ -10,7 +10,7 @@ import frc.robot.Commands.RobotRotateCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
 import frc.robot.Commands.ShootNoteCommand;
-import frc.robot.Commands.ShooterSetAngleCommand;
+//import frc.robot.Commands.ShooterSetAngleCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -35,7 +35,7 @@ public class AutoCommand extends SequentialCommandGroup {
     private final River m_river;
     //private final Elevator m_elevator;
     private final Limelight m_intakeLimelight;
-    private final Limelight m_shooterLimelight;
+    //private final Limelight m_shooterLimelight;
 
     private final int[] m_noteOrder;
     private final int m_startingPosition;
@@ -50,7 +50,7 @@ public class AutoCommand extends SequentialCommandGroup {
         River river,
         //Elevator elevator,
         Limelight intakeLimelight,
-        Limelight shooterLimelight,
+        //Limelight shooterLimelight,
         int[] noteOrder,
         int startingPosition,
         boolean isRedAlliance
@@ -63,7 +63,7 @@ public class AutoCommand extends SequentialCommandGroup {
         m_river = river;
         //m_elevator = elevator;
         m_intakeLimelight = intakeLimelight;
-        m_shooterLimelight = shooterLimelight;
+        //m_shooterLimelight = shooterLimelight;
 
         m_noteOrder = noteOrder;
         m_startingPosition = startingPosition;
@@ -90,9 +90,9 @@ public class AutoCommand extends SequentialCommandGroup {
         //var elevatorDeployCommand = new ElevatorDeployCommand(m_elevator, 18);
         var intakeDeployCommand = new IntakeDeployCommand(m_intake, m_intake.getDeployedEncoderValue());
         //var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
-        var shooterSetAngleCommandHigh = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
+        //var shooterSetAngleCommandHigh = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
         var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, m_river, 1.0);
-        var shooterSetAngleCommandLow = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
+        //var shooterSetAngleCommandLow = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
 
         // double preloadedShooterAngle = 0;
         // int preloadedShootRotation = 0;
@@ -113,7 +113,7 @@ public class AutoCommand extends SequentialCommandGroup {
         // }
 
         // set shooter angle
-        shooterSetAngleCommandHigh.setTarget(Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL);
+        //shooterSetAngleCommandHigh.setTarget(Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL);
         // shooterSetAngleCommandLow.setTarget(0);
 
         // var robotRotateCommand = new RobotRotateCommand(m_drivetrain, preloadedShootRotation);
@@ -124,15 +124,15 @@ public class AutoCommand extends SequentialCommandGroup {
                 Commands.print("deploy intake"),
                 intakeDeployCommand,
                 // raise shooter
-                Commands.print("raise shoot angle"),
-                shooterSetAngleCommandHigh
+                Commands.print("raise shoot angle")
+                //shooterSetAngleCommandHigh
             ),
             // shoot
             Commands.print("shoot preloaded note"),
             shootNoteCommand,
             // lower shooter
-            Commands.print("lower shoot angle"),
-            shooterSetAngleCommandLow
+            Commands.print("lower shoot angle")
+            //shooterSetAngleCommandLow
         );
     }
 
@@ -167,7 +167,7 @@ public class AutoCommand extends SequentialCommandGroup {
         }
 
         var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-        var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter, m_river);
+        var shootSpeakerNoteCommand = new ShootSpeakerCommand(/*m_shooterLimelight,*/ m_intakeLimelight, m_pathPlanner, m_intake, m_shooter, m_river);
 
         // debug
         // return Commands.sequence(

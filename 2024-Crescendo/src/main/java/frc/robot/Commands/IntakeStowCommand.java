@@ -27,9 +27,9 @@ public class IntakeStowCommand extends Command {
     public void execute() {
         current_val = m_intake.getEncoderValue();
         if(current_val < start_val/2) {
-            m_intake.setPivotMotor(-0.16);
+            m_intake.setPivotMotor(-0.1);
         } else {
-            m_intake.setPivotMotor(-0.25);
+            m_intake.setPivotMotor(-0.2);
         }
     }
 

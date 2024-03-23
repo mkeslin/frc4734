@@ -72,7 +72,7 @@ public class RobotContainer {
     // private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
 
     // SUBSYSTEMS
-    private static Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
+    //private static Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
     private static Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
     //private static LifeCam m_LifeCam = new LifeCam(0);
     private Intake m_intake = new Intake();
@@ -86,7 +86,7 @@ public class RobotContainer {
     public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
     public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
     //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
-    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter, m_river);
+    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(/*m_shooterLimelight,*/ m_pathPlanner, m_intake, m_shooter, m_river);
     public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, m_river, 1.0);
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
@@ -230,14 +230,14 @@ public class RobotContainer {
         //m_arcadeController.leftBumper().onTrue(m_elevator.CommandPivotDeploy());
 
         // m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(shootAmpNoteCommand);
-        m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(Commands.sequence(shootNoteCommand, m_shooter.commandSetAngle(1)));
+        m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(shootNoteCommand/*Commands.sequence(shootNoteCommand, m_shooter.commandSetAngle(1))*/);
         m_arcadeController
             .axisGreaterThan(ControllerButtons.CLY, 0.5)
             .onTrue(intakeNoteCommand);
 
-        m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
-        m_arcadeController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
-        m_arcadeController.start().onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
+        //m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
+        //m_arcadeController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
+        //m_arcadeController.start().onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
 
         // m_arcadeController.start().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
     }
@@ -295,7 +295,7 @@ public class RobotContainer {
             m_river,
             //m_elevator,
             m_intakeLimelight,
-            m_shooterLimelight,
+            //m_shooterLimelight,
             m_autoNoteOrder,
             m_autoStartPosition,
             isRedAlliance()

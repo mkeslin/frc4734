@@ -30,11 +30,11 @@ public class ShootNoteCommand extends Command {
 
     @Override
     public void execute() {
-        if(t.get() < 0.2) {
+        if(t.get() < 0.1) {
             m_intake.startOut();
         } else {
             m_shooter.shoot(m_speed);
-            if(t.get() < 1.5) {
+            if(t.get() < 1.1) {
                 m_intake.stopRoller();
             }
             else {
@@ -47,7 +47,7 @@ public class ShootNoteCommand extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return t.hasElapsed(2);
+        return t.hasElapsed(1.5);
     }
 
     // Called once after isFinished returns true
