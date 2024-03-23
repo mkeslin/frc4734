@@ -29,6 +29,7 @@ import frc.robot.Subsystems.Climber;
 //import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.River;
 import frc.robot.SwerveDrivetrain.*;
 
 public class RobotContainer {
@@ -79,6 +80,7 @@ public class RobotContainer {
     //private Elevator m_elevator = new Elevator();
     private Climber m_climber = new Climber();
     // private Lights m_lights = new Lights();
+    private River m_river = new River();
 
     // Commands
     public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
@@ -88,7 +90,7 @@ public class RobotContainer {
     public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
-    public IntakeNoteCommand intakeNoteCommand = new IntakeNoteCommand(m_intake);
+    public IntakeNoteCommand intakeNoteCommand = new IntakeNoteCommand(m_intake, m_river);
     public IntakeEjectCommand intakeEjectCommand = new IntakeEjectCommand(m_intake);
 
     // auto choosers

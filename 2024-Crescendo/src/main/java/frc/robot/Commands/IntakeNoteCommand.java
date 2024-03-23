@@ -5,16 +5,19 @@ import static frc.robot.Constants.Constants.INTAKE_SENSOR_DELAY;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.River;
 
 public class IntakeNoteCommand extends Command {
 
     public Intake m_intake;
+    public River m_river;
     public Timer t = new Timer();
     public Timer t2 = new Timer();
 
-    public IntakeNoteCommand(Intake intake) {
+    public IntakeNoteCommand(Intake intake, River river) {
         m_intake = intake;
-        addRequirements(m_intake);
+        m_river = river;
+        addRequirements(m_intake, m_river);
     }
 
     // Called just before this Command runs the first time
@@ -26,6 +29,7 @@ public class IntakeNoteCommand extends Command {
     @Override
     public void execute() {
         m_intake.startIn(-.55);
+        m_river.startIn(.55);
         if (m_intake.noteIsSeen() && t2.get() == 0) {
             t2.start();
         }
@@ -42,6 +46,7 @@ public class IntakeNoteCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         m_intake.stopRoller();
+        m_river.stopRiver();
 
         t.stop();
         t.reset();

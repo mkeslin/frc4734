@@ -28,10 +28,10 @@ public class IntakeDeployCommand extends Command {
     @Override
     public void execute() {
         current_val = m_intake.getEncoderValue();
-        if(current_val < target_val/2) {
-            m_intake.setPivotMotor(-0.05);
+        if(current_val > target_val/2) {
+            m_intake.setPivotMotor(0.05);
         } else {
-            m_intake.setPivotMotor(-0.125);
+            m_intake.setPivotMotor(0.125);
         }
     }
 
@@ -40,7 +40,7 @@ public class IntakeDeployCommand extends Command {
     public boolean isFinished() {
         if (t.hasElapsed(2)) { return true;}
 
-        return current_val <= target_val;
+        return current_val >= target_val;
     }
 
     // Called once after isFinished returns true

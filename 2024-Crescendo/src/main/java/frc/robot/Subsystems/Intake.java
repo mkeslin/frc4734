@@ -23,8 +23,8 @@ public class Intake extends SubsystemBase {
 
     private DigitalInput m_intakeSensor = new DigitalInput(INTAKE_SENSOR);
 
-    private double STOWED_ENCODER_VAL = -0.5; //Actual Stowed Value: 0
-    private double DEPLOYED_ENCODER_VAL = -4.5; //Actual Deploy Value: -5.175
+    private double STOWED_ENCODER_VAL = 0.5; //Actual Stowed Value: 0
+    private double DEPLOYED_ENCODER_VAL = 4.5; //Actual Deploy Value: -5.175
 
     public double getStowedEncoderValue() { return STOWED_ENCODER_VAL; }
     public double getDeployedEncoderValue() { return DEPLOYED_ENCODER_VAL; }
