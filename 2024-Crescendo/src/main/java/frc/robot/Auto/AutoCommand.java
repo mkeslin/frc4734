@@ -90,45 +90,45 @@ public class AutoCommand extends SequentialCommandGroup {
         var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
         var shooterSetAngleCommandLow = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
 
-        double preloadedShooterAngle = 0;
-        int preloadedShootRotation = 0;
-        switch (m_startingPosition) {
-            case 3:
-                preloadedShooterAngle = 5.95;
-                preloadedShootRotation = m_isRedAlliance ? 138 : 42;
-                break;
-            default:
-            case 2:
-                preloadedShooterAngle = Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL;
-                preloadedShootRotation = m_isRedAlliance ? 180 : 0;
-                break;
-            case 1:
-                preloadedShooterAngle = 5.95;
-                preloadedShootRotation = m_isRedAlliance ? 222 : -42;
-                break;
-        }
+        // double preloadedShooterAngle = 0;
+        // int preloadedShootRotation = 0;
+        // switch (m_startingPosition) {
+        //     case 3:
+        //         preloadedShooterAngle = 5.95;
+        //         preloadedShootRotation = m_isRedAlliance ? 138 : 42;
+        //         break;
+        //     default:
+        //     case 2:
+        //         preloadedShooterAngle = Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL;
+        //         preloadedShootRotation = m_isRedAlliance ? 180 : 0;
+        //         break;
+        //     case 1:
+        //         preloadedShooterAngle = 5.95;
+        //         preloadedShootRotation = m_isRedAlliance ? 222 : -42;
+        //         break;
+        // }
 
         // set shooter angle
-        shooterSetAngleCommandHigh.setTarget(preloadedShooterAngle);
-        shooterSetAngleCommandLow.setTarget(0);
+        // shooterSetAngleCommandHigh.setTarget(preloadedShooterAngle);
+        // shooterSetAngleCommandLow.setTarget(0);
 
-        var robotRotateCommand = new RobotRotateCommand(m_drivetrain, preloadedShootRotation);
+        // var robotRotateCommand = new RobotRotateCommand(m_drivetrain, preloadedShootRotation);
 
         return Commands.sequence(
             // raise elevator pivot
-            Commands.print("pivot elevator up"),
+            // Commands.print("pivot elevator up"),
             //elevatorDeployCommand,
-            Commands.sequence(
+            // Commands.sequence(
                 // lower intake
                 Commands.print("deploy intake"),
                 intakeDeployCommand,
                 // pivot elevator down
-                Commands.print("pivot elevator down"),
+                // Commands.print("pivot elevator down"),
                 //elevatorStowCommand,
                 // rotate shooter to speaker
-                Commands.print("rotate to speaker"),
-                robotRotateCommand
-            ),
+                // Commands.print("rotate to speaker"),
+                // robotRotateCommand
+            // ),
             // raise shooter
             Commands.print("raise shoot angle"),
             shooterSetAngleCommandHigh,
