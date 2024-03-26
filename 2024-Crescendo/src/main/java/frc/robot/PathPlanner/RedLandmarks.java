@@ -5,12 +5,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class RedLandmarks {
 
-    public static final Pose2d Start3 = getPose(15, 7, 180);
+    public static final Pose2d Start3 = getPose(15, 7, 120);
     public static final Pose2d Start2 = getPose(15, 5.5, 180);
-    public static final Pose2d Start1 = getPose(15, 4, 180);
+    public static final Pose2d Start1 = getPose(15, 4, 240);
 
     public static final Pose2d Amp = getPose(14.8, 7.5, 90.0);
-    public static final Pose2d Speaker = getPose(15, 5.5, 180);
+    public static final Pose2d Speaker = getPose(14.4, 5.5, 180);
     public static final Pose2d Source = getPose(1.3, 1.3, -60.0);
 
     public static final Pose2d Stage1 = getPose(12.2, 5.0, -60.0);

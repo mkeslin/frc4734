@@ -166,7 +166,7 @@ public class AutoCommand extends SequentialCommandGroup {
                 break;
         }
 
-        var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
+        var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake, m_river);
         var shootSpeakerNoteCommand = new ShootSpeakerCommand(/*m_shooterLimelight,*/ m_intakeLimelight, m_pathPlanner, m_intake, m_shooter, m_river);
 
         // debug

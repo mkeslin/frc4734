@@ -159,7 +159,7 @@ public class PathPlanner extends SubsystemBase {
     private static final double endNoteSpeed = 1.0;
 
     public Command moveToOurNote1() {
-        return moveToPose(Landmarks.OurNote1(), endNoteSpeed);
+        return moveToPose(Landmarks.OurNote1()); // end velocity needs to be 0, due to stage leg
     }
 
     public Command moveToOurNote2() {
