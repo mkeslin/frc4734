@@ -73,7 +73,7 @@ public class CenterToTargetCommand extends Command {
 
         // if acquiring note, move forward to "chase" it
         // if aligning to april tag, don't move forward, just strafe
-        var forwardDistance = (m_target == 0 && !m_intake.noteIsSeenIntake()) ? .85 : 0;
+        var forwardDistance = (m_target == 0 && t2.get() < 0.2) ? .5 : 0;
         m_pathPlanner.moveRelative(forwardDistance, wheelStrafe, 0);
         if(m_target < 1 && m_intake.noteIsSeenIntake() && t2.get() == 0) {
             t2.start();
@@ -87,7 +87,7 @@ public class CenterToTargetCommand extends Command {
     @Override
     public boolean isFinished() {
         // set a time failsafe
-        return (t.hasElapsed(5) || t2.hasElapsed(INTAKE_SENSOR_DELAY) || t3.hasElapsed(SHOOTER_SENSOR_DELAY));
+        return (t.hasElapsed(5) || t2.hasElapsed(INTAKE_SENSOR_DELAY) || t3.hasElapsed(SHOOTER_SENSOR_DELAY) || (t.get() == 0 && m_intake.noteIsSeenShooter()));
 
         //return m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 2;
     }
