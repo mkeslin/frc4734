@@ -16,6 +16,7 @@ public class CenterToTargetCommand extends Command {
     public Intake m_intake;
     public River m_river;
     public int m_target;
+    public double m_speed;
 
     private double MAX_WHEEL_STRAFE = 1;
     private double MAX_CAMERA_X = 30;
@@ -28,12 +29,13 @@ public class CenterToTargetCommand extends Command {
     public Timer t2 = new Timer();
     public Timer t3 = new Timer();
 
-    public CenterToTargetCommand(Limelight limelight, PathPlanner pathPlanner, Intake intake, River river, int target) {
+    public CenterToTargetCommand(Limelight limelight, PathPlanner pathPlanner, Intake intake, River river, int target, double speed) {
         m_limelight = limelight;
         m_pathPlanner = pathPlanner;
         m_intake = intake;
         m_river = river;
         m_target = target; //target should be 0 for Note alignment
+        m_speed = speed;
 
         addRequirements(m_limelight, m_pathPlanner);
     }
@@ -73,7 +75,7 @@ public class CenterToTargetCommand extends Command {
 
         // if acquiring note, move forward to "chase" it
         // if aligning to april tag, don't move forward, just strafe
-        var forwardDistance = (m_target == 0 && t2.get() < 0.2) ? .5 : 0;
+        var forwardDistance = (m_target == 0 && t2.get() < 0.2) ? m_speed : 0;
         m_pathPlanner.moveRelative(forwardDistance, wheelStrafe, 0);
         if(m_target < 1 && m_intake.noteIsSeenIntake() && t2.get() == 0) {
             t2.start();

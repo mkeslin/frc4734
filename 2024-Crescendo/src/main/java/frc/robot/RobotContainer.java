@@ -43,11 +43,11 @@ public class RobotContainer {
     //   |(7)|                ||
     //   |(8)|                ||
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public int[] m_autoNoteOrder = { 2, 1 };
+    public int[] m_autoNoteOrder = { 3, 2 };
     // public int[] m_autoNoteOrder = { 3, 2, 1 };
     // public int[] m_autoNoteOrder = { 1, 2, 3 };
 
-    public int m_autoStartPosition = 2;
+    public int m_autoStartPosition = 3;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,8 +83,8 @@ public class RobotContainer {
     private River m_river = new River();
 
     // Commands
-    public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake, m_river);
-    public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, m_river, 0);
+    public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake, m_river, 0.5);
+    public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, m_river, 0, 0.5);
     //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
     //public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(/*m_shooterLimelight,*/ m_pathPlanner, m_intake, m_shooter, m_river);
     public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, m_river, 1.0);

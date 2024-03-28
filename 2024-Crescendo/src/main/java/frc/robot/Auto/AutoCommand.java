@@ -138,10 +138,12 @@ public class AutoCommand extends SequentialCommandGroup {
 
     private Command moveAcquireShootCycle(int noteNumber) {
         Command moveToNoteCommand;
+        double m_speed = 0.8;
         switch (noteNumber) {
             default:
             case 1:
                 moveToNoteCommand = m_pathPlanner.moveToOurNote1();
+                m_speed = 0.5;
                 break;
             case 2:
                 moveToNoteCommand = m_pathPlanner.moveToOurNote2();
@@ -166,7 +168,7 @@ public class AutoCommand extends SequentialCommandGroup {
                 break;
         }
 
-        var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake, m_river);
+        var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake, m_river, m_speed);
         var shootSpeakerNoteCommand = new ShootSpeakerCommand(/*m_shooterLimelight,*/ m_intakeLimelight, m_pathPlanner, m_intake, m_shooter, m_river);
 
         // debug
