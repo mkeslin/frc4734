@@ -55,10 +55,10 @@ public class PathPlanner extends SubsystemBase {
         var constraints = new PathConstraints(
             DrivetrainConstants.MaxSpeed,
             DrivetrainConstants.MaxAcceleration,
-            Units.degreesToRadians(80),
-            Units.degreesToRadians(50)
-            // Units.degreesToRadians(360),
-            // Units.degreesToRadians(540)
+            // Units.degreesToRadians(80),
+            // Units.degreesToRadians(50)
+            Units.degreesToRadians(360),
+            Units.degreesToRadians(540)
         );
         return AutoBuilder.pathfindToPose(pose, constraints, goalEndVelocity, 0);
     }
