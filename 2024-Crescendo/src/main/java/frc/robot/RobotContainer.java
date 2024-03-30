@@ -43,11 +43,11 @@ public class RobotContainer {
     //   |(7)|                ||
     //   |(8)|                ||
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public int[] m_autoNoteOrder = { 3, 2 };
+    public int[] m_autoNoteOrder = { 1 };
     // public int[] m_autoNoteOrder = { 3, 2, 1 };
     // public int[] m_autoNoteOrder = { 1, 2, 3 };
 
-    public int m_autoStartPosition = 3;
+    public int m_autoStartPosition = 1;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,7 +73,7 @@ public class RobotContainer {
 
     // SUBSYSTEMS
     //private static Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
-    private static Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
+    private static Limelight m_intakeLimelight = new Limelight("limelight", NOTEPIPELINE);
     //private static LifeCam m_LifeCam = new LifeCam(0);
     private Intake m_intake = new Intake();
     private Shooter m_shooter = new Shooter();
