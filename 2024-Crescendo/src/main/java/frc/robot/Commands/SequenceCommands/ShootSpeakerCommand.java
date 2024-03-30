@@ -34,18 +34,23 @@ public class ShootSpeakerCommand extends SequentialCommandGroup {
 
         addCommands(
             // move/rotate to speaker
-            Commands.print("-> Move to speaker..."),
-            pathPlanner.moveToOurSpeaker(),
+
+            // QUALIFICATION CODE
+            // Commands.print("-> Move to speaker..."),
+            // pathPlanner.moveToOurSpeaker(),
+
+            pathPlanner.moveToOurStart3(),
+
             // align to tag
             // new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, AprilTags.OurSpeakerLeft()),
             // raise shooter angle
-            Commands.print("-> Raise shooter angle..."),
+            // Commands.print("-> Raise shooter angle..."),
             //shooterSetAngleCommandHigh,
             // shoot
             Commands.print("-> Shoot note..."),
-            new ShootNoteCommand(intake, shooter, m_river, 1.0),
+            new ShootNoteCommand(intake, shooter, m_river, 1.0)
             // lower shoot angle
-            Commands.print("-> Lower shooter angle...")
+            // Commands.print("-> Lower shooter angle...")
             //shooterSetAngleCommandLow
         );
     }

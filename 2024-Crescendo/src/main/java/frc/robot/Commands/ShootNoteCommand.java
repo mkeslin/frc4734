@@ -32,10 +32,12 @@ public class ShootNoteCommand extends Command {
     public void execute() {
         if(t.get() < 0.1) {
             m_intake.startOut();
+            m_river.startOut();
         } else {
             m_shooter.shoot(m_speed);
             if(t.get() < 1.4) {
                 m_intake.stopRoller();
+                m_river.stopRiver();
             }
             else {
                 m_intake.startIn(-m_speed);

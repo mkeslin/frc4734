@@ -184,8 +184,12 @@ public class AutoCommand extends SequentialCommandGroup {
             moveToNoteCommand,
             Commands.print("Acquire note..."),
             acquireNoteCommand,
-            Commands.print("Move to speaker..."),
-            m_pathPlanner.moveToOurSpeaker(),
+
+            // Commands.print("Move to speaker..."),
+            // m_pathPlanner.moveToOurSpeaker(),
+
+            m_pathPlanner.moveToOurStart1(),
+
             Commands.print("Move to speaker and shoot..."),
             shootSpeakerNoteCommand,
             Commands.print("...finished executing cycle for note " + noteNumber)
