@@ -21,7 +21,7 @@ public class RedLandmarks {
     public static final Pose2d Note2 = getPose(14.4, 5.55, 180.0);
     public static final Pose2d Note1 = getPose(14.6, 4.1, 180.0);
 
-    public static final Pose2d Note4 = getPose(8.9, 7.4, 180.0);
+    public static final Pose2d Note4 = getPose(13.8, 2.3, 180.0);
     public static final Pose2d Note5 = getPose(8.9, 5.7, 180.0);
     public static final Pose2d Note6 = getPose(8.9, 4.0, 180.0);
     public static final Pose2d Note7 = getPose(8.9, 2.4, 180.0);
