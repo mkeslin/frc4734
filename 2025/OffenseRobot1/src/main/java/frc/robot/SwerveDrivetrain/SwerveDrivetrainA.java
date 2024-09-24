@@ -72,7 +72,7 @@ public class SwerveDrivetrainA {
     private static final boolean kInvertRightSide = true;
 
     private static final String kCANbusName = "";
-    private static final int kPigeonId = 0;
+    private static final int kPigeonId = 30;
 
 
     // These are only used for simulation
@@ -109,9 +109,9 @@ public class SwerveDrivetrainA {
 
 
     // Front Left
-    private static final int kFrontLeftDriveMotorId = 3;
-    private static final int kFrontLeftSteerMotorId = 4;
-    private static final int kFrontLeftEncoderId = 41;
+    private static final int kFrontLeftDriveMotorId = 0;
+    private static final int kFrontLeftSteerMotorId = 10;
+    private static final int kFrontLeftEncoderId = 20;
     private static final double kFrontLeftEncoderOffset = -0.364990234375;
     private static final boolean kFrontLeftSteerInvert = true;
 
@@ -119,9 +119,9 @@ public class SwerveDrivetrainA {
     private static final double kFrontLeftYPosInches = 10.25;
 
     // Front Right
-    private static final int kFrontRightDriveMotorId = 6;
-    private static final int kFrontRightSteerMotorId = 60;
-    private static final int kFrontRightEncoderId = 42;
+    private static final int kFrontRightDriveMotorId = 1;
+    private static final int kFrontRightSteerMotorId = 11;
+    private static final int kFrontRightEncoderId = 21;
     private static final double kFrontRightEncoderOffset = 0.382080078125;
     private static final boolean kFrontRightSteerInvert = true;
 
@@ -129,9 +129,9 @@ public class SwerveDrivetrainA {
     private static final double kFrontRightYPosInches = -10.25;
 
     // Back Left
-    private static final int kBackLeftDriveMotorId = 0;
-    private static final int kBackLeftSteerMotorId = 15;
-    private static final int kBackLeftEncoderId = 39;
+    private static final int kBackLeftDriveMotorId = 2;
+    private static final int kBackLeftSteerMotorId = 12;
+    private static final int kBackLeftEncoderId = 22;
     private static final double kBackLeftEncoderOffset = 0.025634765625;
     private static final boolean kBackLeftSteerInvert = true;
 
@@ -139,9 +139,9 @@ public class SwerveDrivetrainA {
     private static final double kBackLeftYPosInches = 10.25;
 
     // Back Right
-    private static final int kBackRightDriveMotorId = 32;
-    private static final int kBackRightSteerMotorId = 2;
-    private static final int kBackRightEncoderId = 40;
+    private static final int kBackRightDriveMotorId = 3;
+    private static final int kBackRightSteerMotorId = 13;
+    private static final int kBackRightEncoderId = 23;
     private static final double kBackRightEncoderOffset = 0.3505859375;
     private static final boolean kBackRightSteerInvert = true;
 
