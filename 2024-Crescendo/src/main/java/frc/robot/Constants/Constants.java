@@ -4,6 +4,7 @@ public class Constants {
     public static final int INTAKE_ID = 30;
     public static final int INTAKE_PIVOT_ID = 31;
     public static final int INTAKE_SENSOR = 0;
+    public static final int SHOOTER_SENSOR = 1;
 
     public static final int SHOOTER_IN_ID = 40;
     public static final int SHOOTER_OUT_BOTTOM_ID = 41;
@@ -24,5 +25,6 @@ public class Constants {
 
     public static final int LIGHTS_0_ID = 0;
 
-    public static final double INTAKE_SENSOR_DELAY = 0.4;
+    public static final double INTAKE_SENSOR_DELAY = 1.5;
+    public static final double SHOOTER_SENSOR_DELAY = 0.2;
 }

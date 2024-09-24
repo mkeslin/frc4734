@@ -10,7 +10,7 @@ import frc.robot.Commands.RobotRotateCommand;
 import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
 import frc.robot.Commands.ShootNoteCommand;
-import frc.robot.Commands.ShooterSetAngleCommand;
+//import frc.robot.Commands.ShooterSetAngleCommand;
 import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -18,6 +18,7 @@ import frc.robot.Subsystems.Climber;
 //import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.River;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +32,10 @@ public class AutoCommand extends SequentialCommandGroup {
     private final Intake m_intake;
     private final Shooter m_shooter;
     private final Climber m_climber;
+    private final River m_river;
     //private final Elevator m_elevator;
     private final Limelight m_intakeLimelight;
-    private final Limelight m_shooterLimelight;
+    //private final Limelight m_shooterLimelight;
 
     private final int[] m_noteOrder;
     private final int m_startingPosition;
@@ -45,9 +47,10 @@ public class AutoCommand extends SequentialCommandGroup {
         Intake intake,
         Shooter shooter,
         Climber climber,
+        River river,
         //Elevator elevator,
         Limelight intakeLimelight,
-        Limelight shooterLimelight,
+        //Limelight shooterLimelight,
         int[] noteOrder,
         int startingPosition,
         boolean isRedAlliance
@@ -57,9 +60,10 @@ public class AutoCommand extends SequentialCommandGroup {
         m_intake = intake;
         m_shooter = shooter;
         m_climber = climber;
+        m_river = river;
         //m_elevator = elevator;
         m_intakeLimelight = intakeLimelight;
-        m_shooterLimelight = shooterLimelight;
+        //m_shooterLimelight = shooterLimelight;
 
         m_noteOrder = noteOrder;
         m_startingPosition = startingPosition;
@@ -86,9 +90,9 @@ public class AutoCommand extends SequentialCommandGroup {
         //var elevatorDeployCommand = new ElevatorDeployCommand(m_elevator, 18);
         var intakeDeployCommand = new IntakeDeployCommand(m_intake, m_intake.getDeployedEncoderValue());
         //var elevatorStowCommand = new ElevatorStowCommand(m_elevator, m_elevator.getStowedEncoderValue());
-        var shooterSetAngleCommandHigh = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
-        var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
-        var shooterSetAngleCommandLow = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
+        //var shooterSetAngleCommandHigh = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
+        var shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, m_river, 1.0);
+        //var shooterSetAngleCommandLow = new ShooterSetAngleCommand(m_shooter, Shooter.MAX_PIVOT_ENCODER_VAL);
 
         // double preloadedShooterAngle = 0;
         // int preloadedShootRotation = 0;
@@ -99,7 +103,7 @@ public class AutoCommand extends SequentialCommandGroup {
         //         break;
         //     default:
         //     case 2:
-        //         preloadedShooterAngle = Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL;
+                // preloadedShooterAngle = Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL;
         //         preloadedShootRotation = m_isRedAlliance ? 180 : 0;
         //         break;
         //     case 1:
@@ -109,44 +113,37 @@ public class AutoCommand extends SequentialCommandGroup {
         // }
 
         // set shooter angle
-        // shooterSetAngleCommandHigh.setTarget(preloadedShooterAngle);
+        //shooterSetAngleCommandHigh.setTarget(Shooter.AUTO_SPEAKER_PIVOT_ENCODER_VAL);
         // shooterSetAngleCommandLow.setTarget(0);
 
         // var robotRotateCommand = new RobotRotateCommand(m_drivetrain, preloadedShootRotation);
 
         return Commands.sequence(
-            // raise elevator pivot
-            // Commands.print("pivot elevator up"),
-            //elevatorDeployCommand,
-            // Commands.sequence(
+            Commands.parallel(
                 // lower intake
                 Commands.print("deploy intake"),
                 intakeDeployCommand,
-                // pivot elevator down
-                // Commands.print("pivot elevator down"),
-                //elevatorStowCommand,
-                // rotate shooter to speaker
-                // Commands.print("rotate to speaker"),
-                // robotRotateCommand
-            // ),
-            // raise shooter
-            Commands.print("raise shoot angle"),
-            shooterSetAngleCommandHigh,
+                // raise shooter
+                Commands.print("raise shoot angle")
+                //shooterSetAngleCommandHigh
+            ),
             // shoot
             Commands.print("shoot preloaded note"),
             shootNoteCommand,
             // lower shooter
-            Commands.print("lower shoot angle"),
-            shooterSetAngleCommandLow
+            Commands.print("lower shoot angle")
+            //shooterSetAngleCommandLow
         );
     }
 
     private Command moveAcquireShootCycle(int noteNumber) {
         Command moveToNoteCommand;
+        double m_speed = 0.8;
         switch (noteNumber) {
             default:
             case 1:
                 moveToNoteCommand = m_pathPlanner.moveToOurNote1();
+                m_speed = 0.5;
                 break;
             case 2:
                 moveToNoteCommand = m_pathPlanner.moveToOurNote2();
@@ -171,8 +168,8 @@ public class AutoCommand extends SequentialCommandGroup {
                 break;
         }
 
-        var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-        var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
+        var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake, m_river, m_speed);
+        var shootSpeakerNoteCommand = new ShootSpeakerCommand(/*m_shooterLimelight,*/ m_intakeLimelight, m_pathPlanner, m_intake, m_shooter, m_river);
 
         // debug
         // return Commands.sequence(
@@ -187,8 +184,12 @@ public class AutoCommand extends SequentialCommandGroup {
             moveToNoteCommand,
             Commands.print("Acquire note..."),
             acquireNoteCommand,
-            Commands.print("Move to speaker..."),
-            m_pathPlanner.moveToOurSpeaker(),
+
+            // Commands.print("Move to speaker..."),
+            // m_pathPlanner.moveToOurSpeaker(),
+
+            m_pathPlanner.moveToOurStart1(),
+
             Commands.print("Move to speaker and shoot..."),
             shootSpeakerNoteCommand,
             Commands.print("...finished executing cycle for note " + noteNumber)

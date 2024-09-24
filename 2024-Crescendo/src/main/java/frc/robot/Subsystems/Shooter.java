@@ -9,7 +9,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Commands.ShooterSetAngleCommand;
+//import frc.robot.Commands.ShooterSetAngleCommand;
 
 public class Shooter extends SubsystemBase {
 
@@ -18,11 +18,11 @@ public class Shooter extends SubsystemBase {
     private TalonFX m_shooterOutBottom;
     private TalonFX m_shooterPivot;
 
-    public static double MAX_PIVOT_ENCODER_VAL = 4; //Actual Max Value: 4.235
-    public static double TELEOP_SPEAKER_PIVOT_ENCODER_VAL = 2;
-    public static double AUTO_SPEAKER_PIVOT_ENCODER_VAL = 2;
+    public static double MAX_PIVOT_ENCODER_VAL = -1.2; //Actual Max Value: -1.23
+    public static double TELEOP_SPEAKER_PIVOT_ENCODER_VAL = -0.5;
+    public static double AUTO_SPEAKER_PIVOT_ENCODER_VAL = -0.5;
 
-    private ShooterSetAngleCommand m_shooterSetAngleCommand = new ShooterSetAngleCommand(this, TELEOP_SPEAKER_PIVOT_ENCODER_VAL);
+    //private ShooterSetAngleCommand m_shooterSetAngleCommand = new ShooterSetAngleCommand(this, TELEOP_SPEAKER_PIVOT_ENCODER_VAL);
 
     public Shooter() {
         m_shooterIn = new TalonFX(SHOOTER_IN_ID);
@@ -77,8 +77,8 @@ public class Shooter extends SubsystemBase {
 
     public Command commandSetAngle(double a) {
         return Commands.runOnce(() -> {
-            m_shooterSetAngleCommand.setTarget(a);
-            m_shooterSetAngleCommand.schedule();
+            //m_shooterSetAngleCommand.setTarget(a);
+            //m_shooterSetAngleCommand.schedule();
         });
     }
 

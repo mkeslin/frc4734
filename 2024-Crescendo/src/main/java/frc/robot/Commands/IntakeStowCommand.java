@@ -26,10 +26,10 @@ public class IntakeStowCommand extends Command {
     @Override
     public void execute() {
         current_val = m_intake.getEncoderValue();
-        if(current_val < start_val/2) {
-            m_intake.setPivotMotor(-0.1);
+        if(current_val < start_val * 0.25) {
+            m_intake.setPivotMotor(-0.15);
         } else {
-            m_intake.setPivotMotor(-0.2);
+            m_intake.setPivotMotor(-0.25);
         }
     }
 
