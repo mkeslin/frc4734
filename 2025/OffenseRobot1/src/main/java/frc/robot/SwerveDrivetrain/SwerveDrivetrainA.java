@@ -120,7 +120,7 @@ public class SwerveDrivetrainA {
 
     // Front Right
     private static final int kFrontRightDriveMotorId = 6;
-    private static final int kFrontRightSteerMotorId = 42;
+    private static final int kFrontRightSteerMotorId = 60;
     private static final int kFrontRightEncoderId = 42;
     private static final double kFrontRightEncoderOffset = 0.382080078125;
     private static final boolean kFrontRightSteerInvert = true;
