@@ -84,8 +84,8 @@ public class SwerveDrivetrainA {
 
     private static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
             .withCANbusName(kCANbusName)
-            .withPigeon2Id(kPigeonId);
-            //.withPigeon2Configs(pigeonConfigs);
+            .withPigeon2Id(kPigeonId)
+            .withPigeon2Configs(pigeonConfigs);
 
     private static final SwerveModuleConstantsFactory ConstantCreator = new SwerveModuleConstantsFactory()
             .withDriveMotorGearRatio(kDriveGearRatio)
@@ -102,10 +102,10 @@ public class SwerveDrivetrainA {
             .withSteerFrictionVoltage(kSteerFrictionVoltage)
             .withDriveFrictionVoltage(kDriveFrictionVoltage)
             .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
-            .withCouplingGearRatio(kCoupleRatio);
-            //.withDriveMotorInitialConfigs(driveInitialConfigs)
-            //.withSteerMotorInitialConfigs(steerInitialConfigs)
-            //.withCANcoderInitialConfigs(cancoderInitialConfigs);
+            .withCouplingGearRatio(kCoupleRatio)
+            .withDriveMotorInitialConfigs(driveInitialConfigs)
+            .withSteerMotorInitialConfigs(steerInitialConfigs)
+            .withCANcoderInitialConfigs(cancoderInitialConfigs);
 
 
     // Front Left
