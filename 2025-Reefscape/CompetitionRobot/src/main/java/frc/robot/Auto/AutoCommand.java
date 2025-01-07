@@ -6,12 +6,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 //import frc.robot.Commands.ElevatorDeployCommand;
 //import frc.robot.Commands.ElevatorStowCommand;
 import frc.robot.Commands.IntakeDeployCommand;
-import frc.robot.Commands.RobotRotateCommand;
-import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
-import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
+// import frc.robot.Commands.RobotRotateCommand;
+// import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
+// import frc.robot.Commands.SequenceCommands.ShootSpeakerCommand;
 import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.Commands.ShooterSetAngleCommand;
-import frc.robot.PathPlanner.PathPlanner;
+// import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Climber;
@@ -27,7 +27,7 @@ import java.util.List;
 public class AutoCommand extends SequentialCommandGroup {
 
     private final CommandSwerveDrivetrain m_drivetrain;
-    private final PathPlanner m_pathPlanner;
+    // private final PathPlanner m_pathPlanner;
     private final Intake m_intake;
     private final Shooter m_shooter;
     private final Climber m_climber;
@@ -41,31 +41,38 @@ public class AutoCommand extends SequentialCommandGroup {
 
     public AutoCommand(
         CommandSwerveDrivetrain drivetrain,
-        PathPlanner pathPlanner,
-        Intake intake,
-        Shooter shooter,
-        Climber climber,
-        //Elevator elevator,
-        Limelight intakeLimelight,
-        Limelight shooterLimelight,
+        // PathPlanner pathPlanner,
+        // Intake intake,
+        // Shooter shooter,
+        // Climber climber,
+        // //Elevator elevator,
+        // Limelight intakeLimelight,
+        // Limelight shooterLimelight,
         int[] noteOrder,
         int startingPosition,
         boolean isRedAlliance
     ) {
         m_drivetrain = drivetrain;
-        m_pathPlanner = pathPlanner;
-        m_intake = intake;
-        m_shooter = shooter;
-        m_climber = climber;
+        // m_pathPlanner = pathPlanner;
+        // m_intake = intake;
+        // m_shooter = shooter;
+        // m_climber = climber;
+        // //m_elevator = elevator;
+        // m_intakeLimelight = intakeLimelight;
+        // m_shooterLimelight = shooterLimelight;
+        m_intake = null;
+        m_shooter = null;
+        m_climber = null;
         //m_elevator = elevator;
-        m_intakeLimelight = intakeLimelight;
-        m_shooterLimelight = shooterLimelight;
+        m_intakeLimelight = null;
+        m_shooterLimelight = null;
 
         m_noteOrder = noteOrder;
         m_startingPosition = startingPosition;
         m_isRedAlliance = isRedAlliance;
 
-        addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, /*m_elevator,*/ m_intakeLimelight/*, m_shooterLimelight*/);
+        // addRequirements(m_pathPlanner, m_intake, m_shooter, m_climber, /*m_elevator,*/ m_intakeLimelight/*, m_shooterLimelight*/);
+        addRequirements(m_intake, m_shooter, m_climber, /*m_elevator,*/ m_intakeLimelight/*, m_shooterLimelight*/);
 
         // list of commands to be executed
         List<Command> commands = new ArrayList<Command>();
@@ -143,36 +150,36 @@ public class AutoCommand extends SequentialCommandGroup {
 
     private Command moveAcquireShootCycle(int noteNumber) {
         Command moveToNoteCommand;
-        switch (noteNumber) {
-            default:
-            case 1:
-                moveToNoteCommand = m_pathPlanner.moveToOurNote1();
-                break;
-            case 2:
-                moveToNoteCommand = m_pathPlanner.moveToOurNote2();
-                break;
-            case 3:
-                moveToNoteCommand = m_pathPlanner.moveToOurNote3();
-                break;
-            case 4:
-                moveToNoteCommand = m_pathPlanner.moveToOurNote4();
-                break;
-            case 5:
-                moveToNoteCommand = m_pathPlanner.moveToOurNote5();
-                break;
-            case 6:
-                moveToNoteCommand = m_pathPlanner.moveToOurNote6();
-                break;
-            case 7:
-                moveToNoteCommand = m_pathPlanner.moveToOurNote7();
-                break;
-            case 8:
-                moveToNoteCommand = m_pathPlanner.moveToOurNote8();
-                break;
-        }
+        // switch (noteNumber) {
+        //     default:
+        //     case 1:
+        //         moveToNoteCommand = m_pathPlanner.moveToOurNote1();
+        //         break;
+        //     case 2:
+        //         moveToNoteCommand = m_pathPlanner.moveToOurNote2();
+        //         break;
+        //     case 3:
+        //         moveToNoteCommand = m_pathPlanner.moveToOurNote3();
+        //         break;
+        //     case 4:
+        //         moveToNoteCommand = m_pathPlanner.moveToOurNote4();
+        //         break;
+        //     case 5:
+        //         moveToNoteCommand = m_pathPlanner.moveToOurNote5();
+        //         break;
+        //     case 6:
+        //         moveToNoteCommand = m_pathPlanner.moveToOurNote6();
+        //         break;
+        //     case 7:
+        //         moveToNoteCommand = m_pathPlanner.moveToOurNote7();
+        //         break;
+        //     case 8:
+        //         moveToNoteCommand = m_pathPlanner.moveToOurNote8();
+        //         break;
+        // }
 
-        var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-        var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
+        // var acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
+        // var shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
 
         // debug
         // return Commands.sequence(
@@ -184,13 +191,13 @@ public class AutoCommand extends SequentialCommandGroup {
 
         return Commands.sequence(
             Commands.print("Executing cycle for note " + noteNumber + "..."),
-            moveToNoteCommand,
+            // moveToNoteCommand,
             Commands.print("Acquire note..."),
-            acquireNoteCommand,
+            // acquireNoteCommand,
             Commands.print("Move to speaker..."),
-            m_pathPlanner.moveToOurSpeaker(),
+            // m_pathPlanner.moveToOurSpeaker(),
             Commands.print("Move to speaker and shoot..."),
-            shootSpeakerNoteCommand,
+            // shootSpeakerNoteCommand,
             Commands.print("...finished executing cycle for note " + noteNumber)
         );
     }

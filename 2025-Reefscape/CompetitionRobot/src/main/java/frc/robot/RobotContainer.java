@@ -13,16 +13,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommand;
-import frc.robot.Commands.CenterToTargetCommand;
+// import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.IntakeEjectCommand;
 import frc.robot.Commands.IntakeNoteCommand;
-import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
-import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
+// import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
+// import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
 import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.Controllers.ControllerButtons;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.Landmarks;
-import frc.robot.PathPlanner.PathPlanner;
+// import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.LifeCam;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Climber;
@@ -66,32 +66,32 @@ public class RobotContainer {
     private final CommandXboxController m_arcadeController = new CommandXboxController(ControllerIds.XC3ID);
 
     // PATHPLANNER
-    private final PathPlanner m_pathPlanner = new PathPlanner(m_drivetrain);
+    // private final PathPlanner m_pathPlanner = new PathPlanner(m_drivetrain);
     private final SendableChooser<Command> m_autoChooser;
 
     // private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
 
     // SUBSYSTEMS
-    private static Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
-    private static Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
+    // private static Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
+    // private static Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
     //private static LifeCam m_LifeCam = new LifeCam(0);
-    private Intake m_intake = new Intake();
-    private Shooter m_shooter = new Shooter();
+    // private Intake m_intake = new Intake();
+    // private Shooter m_shooter = new Shooter();
     //private Elevator m_elevator = new Elevator();
-    private Climber m_climber = new Climber();
+    // private Climber m_climber = new Climber();
     // private Lights m_lights = new Lights();
-    private River m_river = new River();
+    // private River m_river = new River();
 
     // Commands
-    public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-    public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
+    // public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
+    // public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
     //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
-    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
-    public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
+    // public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
+    // public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
-    public IntakeNoteCommand intakeNoteCommand = new IntakeNoteCommand(m_intake, m_river);
-    public IntakeEjectCommand intakeEjectCommand = new IntakeEjectCommand(m_intake);
+    // public IntakeNoteCommand intakeNoteCommand = new IntakeNoteCommand(m_intake, m_river);
+    // public IntakeEjectCommand intakeEjectCommand = new IntakeEjectCommand(m_intake);
 
     // auto choosers
     private final SendableChooser<Integer> m_autoStartChooser = new SendableChooser<>();
@@ -101,13 +101,13 @@ public class RobotContainer {
 
     public RobotContainer() {
         // Register Named Commands
-        NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
-        NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
+        // NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
+        // NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
         //NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
-        NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
+        // NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
         //NamedCommands.registerCommand("shootSpeakerNoteCommand", shootSpeakerNoteCommand);
         //NamedCommands.registerCommand("shootTrapNoteCommand", shootTrapNoteCommand);
-        NamedCommands.registerCommand("intakeNoteCommand", intakeNoteCommand);
+        // NamedCommands.registerCommand("intakeNoteCommand", intakeNoteCommand);
         // var acquireNoteCommand = new AcquireNoteCommand(limelight, pathPlanner, intake, limelightAligner);
         // NamedCommands.registerCommand("acquireNote", acquireNoteCommand.schedule());
 
@@ -129,15 +129,15 @@ public class RobotContainer {
         // PathPlanner
         m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
         SmartDashboard.putData("Auto Mode", m_autoChooser);
-        m_pathPlanner.configure();
+        // m_pathPlanner.configure();
 
         // note alignment
         // m_mechanismController.a().onTrue(acquireNoteCommand);
         //m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
 
-        m_driveController.x().onTrue(m_climber.CommandClimb());
-        m_driveController.y().onTrue(shootAmpNoteCommand);
-        m_driveController.b().onTrue(intakeEjectCommand);
+        // m_driveController.x().onTrue(m_climber.CommandClimb());
+        // m_driveController.y().onTrue(shootAmpNoteCommand);
+        // m_driveController.b().onTrue(intakeEjectCommand);
         //m_driveController.x().onTrue(shootAmpNoteCommand);
         //m_mechanismController.y().onTrue(m_shooter.commandSetAngle(MAX_PIVOT_ENCODER_VAL));
         //m_mechanismController.x().onTrue(m_shooter.commandSetAngle(0));
@@ -173,7 +173,7 @@ public class RobotContainer {
         var isRedAlliance = isRedAlliance();
         SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
 
-        m_drivetrain.seedFieldRelative();
+        m_drivetrain.seedFieldCentric();
 
         // set position
         // resetPose();
@@ -217,11 +217,11 @@ public class RobotContainer {
     }
 
     public void configureArcadeBindings() {
-        m_arcadeController.a().onTrue(m_intake.commandDeploy());
-        m_arcadeController.x().onTrue(m_intake.commandStow());
+        // m_arcadeController.a().onTrue(m_intake.commandDeploy());
+        // m_arcadeController.x().onTrue(m_intake.commandStow());
 
-        m_arcadeController.b().onTrue(m_climber.CommandFullRetract());
-        m_arcadeController.y().onTrue(m_climber.CommandFullExtend());
+        // m_arcadeController.b().onTrue(m_climber.CommandFullRetract());
+        // m_arcadeController.y().onTrue(m_climber.CommandFullExtend());
 
         //m_arcadeController.rightTrigger().onTrue(m_elevator.CommandFullRetract());
         //m_arcadeController.rightBumper().onTrue(m_elevator.CommandFullExtend());
@@ -230,14 +230,14 @@ public class RobotContainer {
         //m_arcadeController.leftBumper().onTrue(m_elevator.CommandPivotDeploy());
 
         // m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(shootAmpNoteCommand);
-        m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(Commands.sequence(shootNoteCommand, m_shooter.commandSetAngle(1)));
-        m_arcadeController
-            .axisGreaterThan(ControllerButtons.CLY, 0.5)
-            .onTrue(intakeNoteCommand);
+        // m_arcadeController.axisLessThan(ControllerButtons.CLY, -0.5).onTrue(Commands.sequence(shootNoteCommand, m_shooter.commandSetAngle(1)));
+        // m_arcadeController
+        //     .axisGreaterThan(ControllerButtons.CLY, 0.5)
+        //     .onTrue(intakeNoteCommand);
 
-        m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
-        m_arcadeController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
-        m_arcadeController.start().onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
+        // m_arcadeController.axisLessThan(ControllerButtons.CRY, -0.5).onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
+        // m_arcadeController.axisGreaterThan(ControllerButtons.CRY, 0.5).onTrue(m_shooter.commandSetAngle(0));
+        // m_arcadeController.start().onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
 
         // m_arcadeController.start().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
     }
@@ -271,7 +271,7 @@ public class RobotContainer {
         var isRedAlliance = isRedAlliance();
         SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
 
-        m_drivetrain.seedFieldRelative();
+        m_drivetrain.seedFieldCentric();
 
         // set position
         resetPose();
@@ -288,13 +288,13 @@ public class RobotContainer {
         // return m_autoChooser.getSelected();
         var autoCommand = new AutoCommand(
             m_drivetrain,
-            m_pathPlanner,
-            m_intake,
-            m_shooter,
-            m_climber,
-            //m_elevator,
-            m_intakeLimelight,
-            m_shooterLimelight,
+            // m_pathPlanner,
+            // m_intake,
+            // m_shooter,
+            // m_climber,
+            // //m_elevator,
+            // m_intakeLimelight,
+            // m_shooterLimelight,
             m_autoNoteOrder,
             m_autoStartPosition,
             isRedAlliance()
@@ -316,13 +316,13 @@ public class RobotContainer {
         var isRedAlliance = isRedAlliance();
         SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
 
-        m_drivetrain.seedFieldRelative();
+        m_drivetrain.seedFieldCentric();
 
         // zero all mechanisms
-        m_intake.zero();
-        m_climber.zero();
+        // m_intake.zero();
+        // m_climber.zero();
         //m_elevator.zero();
-        m_shooter.zero();
+        // m_shooter.zero();
         // move everything to starting position
         // todo
 
@@ -350,6 +350,6 @@ public class RobotContainer {
                 startingPosition = Landmarks.OurStart1();
                 break;
         }
-        m_pathPlanner.resetPose(startingPosition);
+        // m_pathPlanner.resetPose(startingPosition);
     }
 }

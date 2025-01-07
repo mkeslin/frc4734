@@ -10,11 +10,8 @@ public class Robot extends TimedRobot {
 
     private RobotContainer m_robotContainer;
 
-    @Override
-    public void robotInit() {
+    public Robot() {
         m_robotContainer = new RobotContainer();
-
-        m_robotContainer.m_drivetrain.getDaqThread().setThreadPriority(99);
     }
 
     @Override
@@ -24,16 +21,20 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledInit() {
-        /*if(m_robotContainer.hasCameras()) {
-            m_robotContainer.stopCamera();
-        }*/
+        /*
+         * if(m_robotContainer.hasCameras()) {
+         * m_robotContainer.stopCamera();
+         * }
+         */
     }
 
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+    }
 
     @Override
-    public void disabledExit() {}
+    public void disabledExit() {
+    }
 
     @Override
     public void autonomousInit() {
@@ -46,25 +47,28 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void autonomousPeriodic() {}
+    public void autonomousPeriodic() {
+    }
 
     @Override
-    public void autonomousExit() {}
+    public void autonomousExit() {
+    }
 
     @Override
     public void teleopInit() {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
-        //m_robotContainer.startCamera();
+        // m_robotContainer.startCamera();
     }
 
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+    }
 
     @Override
     public void teleopExit() {
-        //m_robotContainer.stopCamera();
+        // m_robotContainer.stopCamera();
     }
 
     @Override
@@ -75,11 +79,14 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void testPeriodic() {}
+    public void testPeriodic() {
+    }
 
     @Override
-    public void testExit() {}
+    public void testExit() {
+    }
 
     @Override
-    public void simulationPeriodic() {}
+    public void simulationPeriodic() {
+    }
 }

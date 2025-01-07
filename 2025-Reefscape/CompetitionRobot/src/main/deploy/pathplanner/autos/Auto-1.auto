@@ -1,12 +1,5 @@
 {
-  "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 1.4,
-      "y": 4.1
-    },
-    "rotation": 0.0
-  },
+  "version": "2025.0",
   "command": {
     "type": "sequential",
     "data": {
@@ -14,30 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start-2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "acquireNote"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "acquireNote"
+            "pathName": "SimplePath"
           }
         }
       ]
     }
   },
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }
