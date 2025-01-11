@@ -13,6 +13,12 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import edu.wpi.first.math.Matrix;
 // import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -20,9 +26,11 @@ import edu.wpi.first.math.Matrix;
 // import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -32,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA.TunerSwerveDrivetrain;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
@@ -236,7 +245,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     /**
-     * Returns a command that applies the specified control request to this swerve drivetrain.
+     * Returns a command that applies the specified control request to this swerve
+     * drivetrain.
      *
      * @param request Function returning the request to apply
      * @return Command to run
@@ -267,22 +277,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
-     @Override
+    @Override
     public void periodic() {
         /*
          * Periodically try to apply the operator perspective.
-         * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
-         * This allows us to correct the perspective in case the robot code restarts mid-match.
-         * Otherwise, only check and apply the operator perspective if the DS is disabled.
-         * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
+         * If we haven't applied the operator perspective before, then we should apply
+         * it regardless of DS state.
+         * This allows us to correct the perspective in case the robot code restarts
+         * mid-match.
+         * Otherwise, only check and apply the operator perspective if the DS is
+         * disabled.
+         * This ensures driving behavior doesn't change until an explicit disable event
+         * occurs during testing.
          */
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(
-                    allianceColor == Alliance.Red
-                        ? m_redAlliancePerspectiveRotation
-                        : m_blueAlliancePerspectiveRotation
-                );
+                        allianceColor == Alliance.Red
+                                ? m_redAlliancePerspectiveRotation
+                                : m_blueAlliancePerspectiveRotation);
                 m_hasAppliedOperatorPerspective = true;
             });
         }
@@ -307,51 +320,102 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // For use with PathPlanner
 
     // public Pose2d getPose() {
-    //     return this.getState().Pose;
+    // return this.getState().Pose;
     // }
 
     // public void resetPose(Pose2d pose) {
-    //     this.seedFieldRelative(pose);
+    // this.seedFieldRelative(pose);
     // }
 
     // public ChassisSpeeds getRobotRelativeSpeeds() {
-    //     return this.m_kinematics.toChassisSpeeds(this.getState().ModuleStates);
+    // return this.m_kinematics.toChassisSpeeds(this.getState().ModuleStates);
     // }
 
     // public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
-    //     this.setControl(m_autoRequest.withSpeeds(chassisSpeeds));
+    // this.setControl(m_autoRequest.withSpeeds(chassisSpeeds));
     // }
+
+    public void moveRelative(double x, double y, double rot) {
+        // return Commands.runOnce(() -> {
+        Pose2d currentPose = getState().Pose;
+
+        // The rotation component in these poses represents the direction of travel
+        // Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
+        Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(x, y)),
+                new Rotation2d().plus(new Rotation2d(rot)));
+
+        // List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startPos,
+        // endPos);
+        // PathPlannerPath path = new PathPlannerPath(
+        // waypoints,
+        // new PathConstraints(
+        // DrivetrainConstants.MaxSpeed,
+        // DrivetrainConstants.MaxAcceleration,
+        // Units.degreesToRadians(360),
+        // Units.degreesToRadians(540)),
+        // new IdealStartingState(0, new Rotation2d()),
+        // new GoalEndState(0.0, currentPose.getRotation()));
+
+        // Prevent this path from being flipped on the red alliance, since the given
+        // positions are already correct
+        // path.preventFlipping = true;
+
+        AutoBuilder.pathfindToPose(endPos,
+                new PathConstraints(
+                        DrivetrainConstants.MaxSpeed,
+                        DrivetrainConstants.MaxAcceleration,
+                        Units.degreesToRadians(360),
+                        Units.degreesToRadians(540)),
+                // new IdealStartingState(0, new Rotation2d()),
+                0);
+
+        // SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
+        // .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric
+        // driving in open loop
+        // .withSteerRequestType(SteerRequestType.MotionMagicExpo);
+
+        // m_drivetrain.driveRobotRelative(new ChassisSpeeds(x, y, rot));
+
+        // m_drivetrain.applyRequest(() -> {
+        // driveRequest.withVelocityX(x) // Drive forward with negative Y (forward)
+        // .withVelocityY(y) // Drive left with negative X (left)
+        // .withRotationalRate(rot); // Drive counterclockwise with negative X (left)
+
+        // return driveRequest;
+        // });
+    }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // @Override
     // public void periodic() {
-    //     /* Periodically try to apply the operator perspective */
-    //     /*
-    //      * If we haven't applied the operator perspective before, then we should apply
-    //      * it regardless of DS state
-    //      */
-    //     /*
-    //      * This allows us to correct the perspective in case the robot code restarts
-    //      * mid-match
-    //      */
-    //     /*
-    //      * Otherwise, only check and apply the operator perspective if the DS is
-    //      * disabled
-    //      */
-    //     /*
-    //      * This ensures driving behavior doesn't change until an explicit disable event
-    //      * occurs during testing
-    //      */
-    //     if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-    //         DriverStation
-    //                 .getAlliance()
-    //                 .ifPresent(allianceColor -> {
-    //                     this.setOperatorPerspectiveForward(
-    //                             allianceColor == Alliance.Red ? m_redAlliancePerspectiveRotation
-    //                                     : m_blueAlliancePerspectiveRotation);
-    //                     m_hasAppliedOperatorPerspective = true;
-    //                 });
-    //     }
+    // /* Periodically try to apply the operator perspective */
+    // /*
+    // * If we haven't applied the operator perspective before, then we should apply
+    // * it regardless of DS state
+    // */
+    // /*
+    // * This allows us to correct the perspective in case the robot code restarts
+    // * mid-match
+    // */
+    // /*
+    // * Otherwise, only check and apply the operator perspective if the DS is
+    // * disabled
+    // */
+    // /*
+    // * This ensures driving behavior doesn't change until an explicit disable
+    // event
+    // * occurs during testing
+    // */
+    // if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
+    // DriverStation
+    // .getAlliance()
+    // .ifPresent(allianceColor -> {
+    // this.setOperatorPerspectiveForward(
+    // allianceColor == Alliance.Red ? m_redAlliancePerspectiveRotation
+    // : m_blueAlliancePerspectiveRotation);
+    // m_hasAppliedOperatorPerspective = true;
+    // });
+    // }
     // }
 }
