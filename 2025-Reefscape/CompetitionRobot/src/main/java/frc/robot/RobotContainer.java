@@ -3,6 +3,8 @@ package frc.robot;
 import static frc.robot.Constants.Constants.APRILTAGPIPELINE;
 import static frc.robot.Constants.Constants.NOTEPIPELINE;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 // import com.pathplanner.lib.auto.AutoBuilder;
 // import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -67,7 +69,7 @@ public class RobotContainer {
 
     // PATHPLANNER
     // private final PathPlanner m_pathPlanner = new PathPlanner(m_drivetrain);
-    // private final SendableChooser<Command> m_autoChooser;
+    private final SendableChooser<Command> m_autoChooser;
 
     // private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
 
@@ -127,8 +129,8 @@ public class RobotContainer {
         // m_driveController.rightBumper().onTrue(acquireNoteCommand);
 
         // PathPlanner
-        // m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
-        // SmartDashboard.putData("Auto Mode", m_autoChooser);
+        m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
+        SmartDashboard.putData("Auto Mode", m_autoChooser);
         // m_pathPlanner.configure();
 
         // note alignment
