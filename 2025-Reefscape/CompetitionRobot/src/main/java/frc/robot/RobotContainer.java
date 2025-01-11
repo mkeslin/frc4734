@@ -280,28 +280,31 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        // get data from choosers
-        // m_autoStarPosition = m_autoStartChooser.getSelected();
-        // var firstNote = m_autoFirstNoteChooser.getSelected();
-        // var secondNote = m_autoSecondNoteChooser.getSelected();
-        // var thirdNote = m_autoThirdNoteChooser.getSelected();
-        // m_autoNoteOrder = new int[] { firstNote, secondNote, thirdNote };
+            /* Run the path selected from the auto chooser */
+            return m_autoChooser.getSelected();
 
-        // return m_autoChooser.getSelected();
-        var autoCommand = new AutoCommand(
-            m_drivetrain,
-            // m_pathPlanner,
-            // m_intake,
-            // m_shooter,
-            // m_climber,
-            // //m_elevator,
-            // m_intakeLimelight,
-            // m_shooterLimelight,
-            m_autoNoteOrder,
-            m_autoStartPosition,
-            isRedAlliance()
-        );
-        return autoCommand;
+        // // get data from choosers
+        // // m_autoStarPosition = m_autoStartChooser.getSelected();
+        // // var firstNote = m_autoFirstNoteChooser.getSelected();
+        // // var secondNote = m_autoSecondNoteChooser.getSelected();
+        // // var thirdNote = m_autoThirdNoteChooser.getSelected();
+        // // m_autoNoteOrder = new int[] { firstNote, secondNote, thirdNote };
+
+        // // return m_autoChooser.getSelected();
+        // var autoCommand = new AutoCommand(
+        //     m_drivetrain,
+        //     // m_pathPlanner,
+        //     // m_intake,
+        //     // m_shooter,
+        //     // m_climber,
+        //     // //m_elevator,
+        //     // m_intakeLimelight,
+        //     // m_shooterLimelight,
+        //     m_autoNoteOrder,
+        //     m_autoStartPosition,
+        //     isRedAlliance()
+        // );
+        // return autoCommand;
         // return runAuto;
 
         // return Commands.print("No autonomous command configured");
