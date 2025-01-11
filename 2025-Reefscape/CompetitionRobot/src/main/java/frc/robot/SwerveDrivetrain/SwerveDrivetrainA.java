@@ -158,7 +158,7 @@ public class SwerveDrivetrainA {
     private static final int kFrontLeftEncoderId = 1;
     // private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.996826171875);
     // private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.746826171875);
-    private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.496826171875);
+    private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.996826171875);
     private static final boolean kFrontLeftSteerMotorInverted = true;
     private static final boolean kFrontLeftEncoderInverted = false;
 
@@ -172,7 +172,7 @@ public class SwerveDrivetrainA {
     // private static final Angle kFrontRightEncoderOffset = Rotations.of(0.19140625);
     // private static final Angle kFrontRightEncoderOffset = Rotations.of(0.31640625);
     // private static final Angle kFrontRightEncoderOffset = Rotations.of(0.1982421875);
-    private static final Angle kFrontRightEncoderOffset = Rotations.of(0.1982421875);
+    private static final Angle kFrontRightEncoderOffset = Rotations.of(0.6982421875);
     private static final boolean kFrontRightSteerMotorInverted = true;
     private static final boolean kFrontRightEncoderInverted = false;
 
