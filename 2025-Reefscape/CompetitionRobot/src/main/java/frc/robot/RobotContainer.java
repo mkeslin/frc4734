@@ -1,7 +1,7 @@
 package frc.robot;
 
-import static frc.robot.Constants.Constants.APRILTAGPIPELINE;
-import static frc.robot.Constants.Constants.NOTEPIPELINE;
+// import static frc.robot.Constants.Constants.APRILTAGPIPELINE;
+// import static frc.robot.Constants.Constants.NOTEPIPELINE;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -14,24 +14,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Auto.AutoCommand;
+import frc.robot.Auto.AutoCommandA;
 // import frc.robot.Commands.CenterToTargetCommand;
-import frc.robot.Commands.IntakeEjectCommand;
-import frc.robot.Commands.IntakeNoteCommand;
+// import frc.robot.Commands.IntakeEjectCommand;
+// import frc.robot.Commands.IntakeNoteCommand;
 // import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
 // import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
-import frc.robot.Commands.ShootNoteCommand;
+// import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.Controllers.ControllerButtons;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.Landmarks;
 // import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.LifeCam;
 import frc.robot.Subsystems.Cameras.Limelight;
-import frc.robot.Subsystems.Climber;
+// import frc.robot.Subsystems.Climber;
 //import frc.robot.Subsystems.Elevator;
-import frc.robot.Subsystems.Intake;
-import frc.robot.Subsystems.Shooter;
-import frc.robot.Subsystems.River;
+// import frc.robot.Subsystems.Intake;
+// import frc.robot.Subsystems.Shooter;
+// import frc.robot.Subsystems.River;
 import frc.robot.SwerveDrivetrain.*;
 
 public class RobotContainer {

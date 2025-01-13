@@ -10,6 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -386,6 +387,50 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public Command followPathCommand(PathPlannerPath path) {
+        return AutoBuilder
+            .followPath(path)
+            // .andThen(this::stop, this)
+            .withName("drivetrain.followPath");
+    }
+
+    public Command moveToPose(Pose2d pose) {
+        var constraints = new PathConstraints(
+            DrivetrainConstants.MaxSpeed,
+            DrivetrainConstants.MaxAcceleration,
+            Units.degreesToRadians(80),
+            Units.degreesToRadians(50)
+            // Units.degreesToRadians(360),
+            // Units.degreesToRadians(540)
+        );
+        return AutoBuilder.pathfindToPose(pose, constraints, 0);
+    }
+
+    public void moveForwardRobot(double distance) {
+        moveRelative(distance, 0, 0);
+    }
+
+    public Command moveVoltageTimeCommand(double voltage, double time) {
+        return run(() -> setVoltage(voltage)).andThen(this::stop).withTimeout(time);
+    }
+
+    private void setVoltage(double volts) {
+        // leftPrimaryMotor.setVoltage(volts);
+        // rightPrimaryMotor.setVoltage(volts);
+    }
+
+    public void stop() {
+        // leftPrimaryMotor.setVoltage(0);
+        // leftSecondaryMotor.setVoltage(0);
+        // rightPrimaryMotor.setVoltage(0);
+        // rightSecondaryMotor.setVoltage(0);
+    }
+
+    // public void stop() {
+    //     var brake = new SwerveRequest.SwerveDriveBrake();
+    //     applyRequest(() -> brake);
+    // }
 
     // @Override
     // public void periodic() {
