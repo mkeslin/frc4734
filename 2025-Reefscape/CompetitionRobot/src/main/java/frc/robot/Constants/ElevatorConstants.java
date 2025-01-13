@@ -44,17 +44,17 @@ public class ElevatorConstants {
 
     // public static final int CURRENT_LIMIT = 60;
 
-    // public static final double kP = 50; // TODO
-    // public static final double kI = 0; // TODO
-    // public static final double kD = 5; // TODO
-    // public static final double kS = 0.095388; // TODO
-    // public static final double kG = 0.54402; // TODO
-    // public static final double kV = 7.43; // TODO
-    // public static final double kA = 1.0; // TODO
+    public static final double kP = 50; // TODO
+    public static final double kI = 0; // TODO
+    public static final double kD = 5; // TODO
+    public static final double kS = 0.095388; // TODO
+    public static final double kG = 0.54402; // TODO
+    public static final double kV = 7.43; // TODO
+    public static final double kA = 1.0; // TODO
     // public static final double TOLERANCE = 0.02;
 
-    // public static final double MAX_VELOCITY_METERS_PER_SECOND = 1.3; // TODO
-    // public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; // TODO
-    // public static final TrapezoidProfile.Constraints MOVEMENT_CONSTRAINTS = new TrapezoidProfile.Constraints(
-    //         MAX_VELOCITY_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    public static final double MAX_VELOCITY_METERS_PER_SECOND = 1.3; // TODO
+    public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; // TODO
+    public static final TrapezoidProfile.Constraints MOVEMENT_CONSTRAINTS = 
+        new TrapezoidProfile.Constraints(MAX_VELOCITY_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 }

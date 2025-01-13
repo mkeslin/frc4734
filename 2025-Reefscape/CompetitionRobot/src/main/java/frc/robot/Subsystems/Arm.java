@@ -2,64 +2,38 @@ package frc.robot.Subsystems;
 
 import java.util.function.Supplier;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-// import com.revrobotics.CANSparkBase.IdleMode;
-// import com.revrobotics.CANSparkLowLevel.MotorType;
-// import com.revrobotics.CANSparkMax;
-// import com.techhounds.houndutil.houndlib.SparkConfigurator;
-// import com.techhounds.houndutil.houndlib.Utils;
-// import com.techhounds.houndutil.houndlib.subsystems.BaseSingleJointedArm;
-// import com.techhounds.houndutil.houndlog.annotations.Log;
-// import com.techhounds.houndutil.houndlog.annotations.LoggedObject;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.util.Units;
-// import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-// import edu.wpi.first.units.Velocity;
-// import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.GlobalStates;
-// import frc.robot.Constants;
 import frc.robot.PositionTracker;
 import frc.robot.Utils;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmConstants.ArmPosition;
 import frc.robot.Constants.ElevatorConstants;
-// import frc.robot.Constants.Arm.ArmPosition;
-// import frc.robot.GlobalStates;
-// import frc.robot.Constants.Constants.ArmPosition;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
-// import static frc.robot.Constants.Arm.*;
-
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-
 import static frc.robot.Constants.Constants.IDs.ARM_ID;
+
+import static frc.robot.Constants.ArmConstants.kP;
+import static frc.robot.Constants.ArmConstants.kI;
+import static frc.robot.Constants.ArmConstants.kD;
+import static frc.robot.Constants.ArmConstants.kS;
+import static frc.robot.Constants.ArmConstants.kG;
+import static frc.robot.Constants.ArmConstants.kV;
+import static frc.robot.Constants.ArmConstants.kA;
+import static frc.robot.Constants.ArmConstants.MOVEMENT_CONSTRAINTS;
 
 // @LoggedObject
 public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPosition> {
@@ -67,11 +41,10 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     // private final CANSparkMax motor;
 
     // @Log(groups = "control")
-    // private final ProfiledPIDController pidController = new ProfiledPIDController(kP, kI, kD, MOVEMENT_CONSTRAINTS);
+    private final ProfiledPIDController pidController = new ProfiledPIDController(kP, kI, kD, MOVEMENT_CONSTRAINTS);
 
     // @Log(groups = "control")
-    // private final ArmFeedforward feedforwardController = new ArmFeedforward(kS,
-    //         kG, kV, kA);
+    private final ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
 
     /**
      * The representation of the "elevator" for simulation. (even though this is a
@@ -89,9 +62,9 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     //         ArmPosition.TOP.value);
 
     // @Log(groups = "control")
-    // private double feedbackVoltage = 0;
+    private double feedbackVoltage = 0;
     // @Log(groups = "control")
-    // private double feedforwardVoltage = 0;
+    private double feedforwardVoltage = 0;
 
     private double simVelocity = 0.0;
 
@@ -230,49 +203,45 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     @Override
     public Command moveToCurrentGoalCommand() {
-        return null;
-        // return run(() -> {
-        //     feedbackVoltage = pidController.calculate(getPosition());
-        //     // not the setpoint position, as smart people found that using the current
-        //     // position for kG works best
-        //     feedforwardVoltage = feedforwardController.calculate(getPosition(), pidController.getSetpoint().velocity);
-        //     setVoltage(feedbackVoltage + feedforwardVoltage);
-        // }).withName("arm.moveToCurrentGoal");
+        return run(() -> {
+            feedbackVoltage = pidController.calculate(getPosition());
+            // not the setpoint position, as smart people found that using the current
+            // position for kG works best
+            feedforwardVoltage = feedforwardController.calculate(getPosition(), pidController.getSetpoint().velocity);
+            setVoltage(feedbackVoltage + feedforwardVoltage);
+        }).withName("arm.moveToCurrentGoal");
     }
 
     @Override
     public Command moveToPositionCommand(Supplier<ArmPosition> goalPositionSupplier) {
-        return null;
-        // return Commands.sequence(
-        //         runOnce(() -> pidController.reset(getPosition())),
-        //         runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
-        //         moveToCurrentGoalCommand()
-        //                 .until(() -> pidController.atGoal()))
-        //         .withTimeout(3)
-        //         .withName("arm.moveToPosition");
+        // return null;
+        return Commands.sequence(
+                runOnce(() -> pidController.reset(getPosition())),
+                runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
+                moveToCurrentGoalCommand()
+                        .until(() -> pidController.atGoal()))
+                .withTimeout(3)
+                .withName("arm.moveToPosition");
     }
 
     @Override
     public Command moveToArbitraryPositionCommand(Supplier<Double> goalPositionSupplier) {
-        return null;
-    //     return Commands.sequence(
-    //             runOnce(() -> pidController.reset(getPosition())),
-    //             runOnce(() -> pidController.setGoal(goalPositionSupplier.get())),
-    //             moveToCurrentGoalCommand().until(this::atGoal)).withName("arm.moveToArbitraryPosition");
+        return Commands.sequence(
+                runOnce(() -> pidController.reset(getPosition())),
+                runOnce(() -> pidController.setGoal(goalPositionSupplier.get())),
+                moveToCurrentGoalCommand().until(this::atGoal)).withName("arm.moveToArbitraryPosition");
     }
 
     @Override
     public Command movePositionDeltaCommand(Supplier<Double> delta) {
-        return null;
-    //     return moveToArbitraryPositionCommand(() -> pidController.getGoal().position + delta.get())
-    //             .withName("arm.movePositionDelta");
+        return moveToArbitraryPositionCommand(() -> pidController.getGoal().position + delta.get())
+                .withName("arm.movePositionDelta");
     }
 
     @Override
     public Command holdCurrentPositionCommand() {
-        return null;
-    //     return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
-    //             .withName("arm.holdCurrentPosition");
+        return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
+                .withName("arm.holdCurrentPosition");
     }
 
     @Override
@@ -288,14 +257,14 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     @Override
     public Command coastMotorsCommand() {
-        return null;
-    //     return runOnce(motor::stopMotor)
-    //             .andThen(() -> motor.setIdleMode(IdleMode.kCoast))
-    //             .finallyDo((d) -> {
-    //                 motor.setIdleMode(IdleMode.kBrake);
-    //                 pidController.reset(getPosition());
-    //             }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-    //             .withName("arm.coastMotorsCommand");
+        // return null;
+        return runOnce(m_arm::stopMotor)
+                // .andThen(() -> m_arm.setIdleMode(IdleMode.kCoast))
+                .finallyDo((d) -> {
+                    // m_arm.setIdleMode(IdleMode.kBrake);
+                    pidController.reset(getPosition());
+                }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                .withName("arm.coastMotorsCommand");
     }
 
     // public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {
@@ -311,7 +280,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     //             .andThen(Commands.runOnce(() -> pidController.setGoal(getPosition())));
     // }
 
-    // public boolean atGoal() {
-    //     return pidController.atGoal();
-    // }
+    public boolean atGoal() {
+        return pidController.atGoal();
+    }
 }

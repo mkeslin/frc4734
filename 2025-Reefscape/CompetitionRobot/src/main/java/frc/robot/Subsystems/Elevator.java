@@ -1,34 +1,37 @@
 package frc.robot.Subsystems;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.GlobalStates;
 import frc.robot.PositionTracker;
 import frc.robot.Utils;
-import frc.robot.Constants.Constants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
 
 import static frc.robot.Constants.Constants.IDs.ELEVATOR_1_ID;
 import static frc.robot.Constants.Constants.IDs.ELEVATOR_2_ID;
+
+import static frc.robot.Constants.ElevatorConstants.kP;
+import static frc.robot.Constants.ElevatorConstants.kI;
+import static frc.robot.Constants.ElevatorConstants.kD;
+import static frc.robot.Constants.ElevatorConstants.kS;
+import static frc.robot.Constants.ElevatorConstants.kG;
+import static frc.robot.Constants.ElevatorConstants.kV;
+import static frc.robot.Constants.ElevatorConstants.kA;
+import static frc.robot.Constants.ElevatorConstants.MOVEMENT_CONSTRAINTS;
 
 import java.util.function.Supplier;
 
@@ -39,7 +42,13 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     private double simVelocity = 0.0;
 
-    private double RETRACT_ENCODER_VAL = 2; //Actual Stowed Value: 0
+    // @Log(groups = "control")
+    private final ProfiledPIDController pidController = new ProfiledPIDController(kP, kI, kD, MOVEMENT_CONSTRAINTS);
+
+    // @Log(groups = "control")
+    private final ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
+
+    // private double RETRACT_ENCODER_VAL = 2; //Actual Stowed Value: 0
     // private double EXTEND_L1_ENCODER_VAL = 300; //Actual Deploy Value: 320
     // private double EXTEND_L2_ENCODER_VAL = 300; //Actual Deploy Value: 320
     // private double EXTEND_L3_ENCODER_VAL = 300; //Actual Deploy Value: 320
@@ -47,6 +56,11 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     private final PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
+
+    // @Log(groups = "control")
+    private double feedbackVoltage = 0;
+    // @Log(groups = "control")
+    private double feedforwardVoltage = 0;
 
     // @Log
     private boolean initialized;
@@ -293,47 +307,42 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     @Override
     public Command moveToCurrentGoalCommand() {
-        return null;
-        // return run(() -> {
-        //     feedbackVoltage = pidController.calculate(getPosition());
-        //     feedforwardVoltage = feedforwardController.calculate(pidController.getSetpoint().velocity);
-        //     setVoltage(feedbackVoltage + feedforwardVoltage);
-        // }).withName("elevator.moveToCurrentGoal");
+        return run(() -> {
+            feedbackVoltage = pidController.calculate(getPosition());
+            feedforwardVoltage = feedforwardController.calculate(getPosition(), pidController.getSetpoint().velocity);
+            setVoltage(feedbackVoltage + feedforwardVoltage);
+        }).withName("elevator.moveToCurrentGoal");
     }
 
     @Override
     public Command moveToPositionCommand(Supplier<ElevatorPosition> goalPositionSupplier) {
-        return null;
-        // return Commands.sequence(
-        //         runOnce(() -> pidController.reset(getPosition())),
-        //         runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
-        //         moveToCurrentGoalCommand()
-        //                 .until(() -> pidController.atGoal()))
-        //         .withTimeout(3)
-        //         .withName("elevator.moveToPosition");
+        return Commands.sequence(
+                runOnce(() -> pidController.reset(getPosition())),
+                runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
+                moveToCurrentGoalCommand()
+                        .until(() -> pidController.atGoal()))
+                .withTimeout(3)
+                .withName("elevator.moveToPosition");
     }
 
     @Override
     public Command moveToArbitraryPositionCommand(Supplier<Double> goalPositionSupplier) {
-        return null;
-        // return Commands.sequence(
-        //         runOnce(() -> pidController.reset(getPosition())),
-        //         runOnce(() -> pidController.setGoal(goalPositionSupplier.get())),
-        //         moveToCurrentGoalCommand().until(this::atGoal)).withName("elevator.moveToArbitraryPosition");
+        return Commands.sequence(
+                runOnce(() -> pidController.reset(getPosition())),
+                runOnce(() -> pidController.setGoal(goalPositionSupplier.get())),
+                moveToCurrentGoalCommand().until(this::atGoal)).withName("elevator.moveToArbitraryPosition");
     }
 
     @Override
     public Command movePositionDeltaCommand(Supplier<Double> delta) {
-        return null;
-        // return moveToArbitraryPositionCommand(() -> pidController.getGoal().position + delta.get())
-        //         .withName("elevator.movePositionDelta");
+        return moveToArbitraryPositionCommand(() -> pidController.getGoal().position + delta.get())
+                .withName("elevator.movePositionDelta");
     }
 
     @Override
     public Command holdCurrentPositionCommand() {
-        return null;
-        // return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
-        //         .withName("elevator.holdCurrentPosition");
+        return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
+                .withName("elevator.holdCurrentPosition");
     }
 
     @Override
@@ -349,14 +358,13 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     @Override
     public Command coastMotorsCommand() {
-        return null;
-        // return runOnce(m_elevator1::stopMotor)
-        //         .andThen(() -> motor.setIdleMode(IdleMode.kCoast))
-        //         .finallyDo((d) -> {
-        //             motor.setIdleMode(IdleMode.kBrake);
-        //             pidController.reset(getPosition());
-        //         }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        //         .withName("elevator.coastMotorsCommand");
+        return runOnce(m_elevator1::stopMotor)
+                // .andThen(() -> motor.setIdleMode(IdleMode.kCoast))
+                .finallyDo((d) -> {
+                    // motor.setIdleMode(IdleMode.kBrake);
+                    pidController.reset(getPosition());
+                }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                .withName("elevator.coastMotorsCommand");
     }
 
     // public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {
@@ -372,7 +380,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     //             .andThen(Commands.runOnce(() -> pidController.setGoal(getPosition())));
     // }
 
-    // public boolean atGoal() {
-    //     return pidController.atGoal();
-    // }
+    public boolean atGoal() {
+        return pidController.atGoal();
+    }
 }

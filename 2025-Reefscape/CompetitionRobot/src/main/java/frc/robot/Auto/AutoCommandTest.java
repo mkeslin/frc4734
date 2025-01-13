@@ -19,9 +19,9 @@ import java.util.List;
  * Command that executes during autonomous mode
  */
 public class AutoCommandTest {
-    // public static AutoRoutine testPath(CommandSwerveDrivetrain drivetrain) {
-    //     PathPlannerPath path = PathPlannerPath.fromPathFile("testPath");
-    //     Command command = drivetrain.followPathCommand(path);
-    //     return new AutoRoutine("testPath", command, List.of(path), path.getStartingDifferentialPose());
-    // }
+    public static AutoRoutine testPath(CommandSwerveDrivetrain drivetrain) {
+        PathPlannerPath path = null; //PathPlannerPath.fromPathFile("testPath");
+        Command command = drivetrain.followPathCommand(path);
+        return new AutoRoutine("testPath", command, List.of(path), path.getStartingDifferentialPose());
+    }
 }

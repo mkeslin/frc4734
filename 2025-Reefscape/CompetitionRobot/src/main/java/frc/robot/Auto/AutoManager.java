@@ -10,11 +10,6 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
-// import com.techhounds.houndutil.houndlog.LogType;
-// import com.techhounds.houndutil.houndlog.LoggingManager;
-// import com.techhounds.houndutil.houndlog.loggers.DoubleLogItem;
-// import com.techhounds.houndutil.houndlog.loggers.LogGroup;
-// import com.techhounds.houndutil.houndlog.loggers.SendableLogItem;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
