@@ -1,0 +1,267 @@
+{
+  "hubs": [
+    {
+      "x": 0,
+      "y": 43,
+      "width": 1800,
+      "height": 1126,
+      "state": {
+        "sidebar": {
+          "width": 342,
+          "expanded": [
+            "/HoundLog",
+            "/HoundLog/drivetrain/leftVelocityController",
+            "/HoundLog/drivetrain/rightVelocityController",
+            "/HoundLog/drivetrain/rotationController",
+            "/HoundLog/drivetrain/gyro",
+            "/NT/URCL",
+            "/NT/URCL/Raw",
+            "/NT/HoundLog",
+            "/NT/HoundLog/drivetrain",
+            "/NT/HoundLog/drivetrain/leftPrimaryMotor",
+            "/HoundLog/drivetrain/leftPrimaryMotor",
+            "/HoundLog/drivetrain/rightPrimaryMotor",
+            "/HoundLog/elevator/control",
+            "/HoundLog/elevator/components",
+            "/HoundLog/arm/components",
+            "/HoundLog/elevator/motor",
+            "/HoundLog/autonomous/field",
+            "/HoundLog/autonomous/field/Robot",
+            "/HoundLog/coralSim",
+            "/HoundLog/elevator",
+            "/HoundLog/arm",
+            "/HoundLog/autonomous"
+          ]
+        },
+        "tabs": {
+          "selected": 4,
+          "tabs": [
+            {
+              "type": 0,
+              "path": "../docs/INDEX.md"
+            },
+            {
+              "type": 1,
+              "legendHeight": 0.3,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/HoundLog/drivetrain/feedbackVoltages/left",
+                      "color": "#2b66a2",
+                      "show": false
+                    },
+                    {
+                      "key": "NT:/HoundLog/drivetrain/feedbackVoltages/right",
+                      "color": "#e5b31b",
+                      "show": false
+                    },
+                    {
+                      "key": "NT:/HoundLog/drivetrain/leftPrimaryMotor/outputVoltage",
+                      "color": "#af2437",
+                      "show": false
+                    },
+                    {
+                      "key": "NT:/HoundLog/drivetrain/rightPrimaryMotor/outputVoltage",
+                      "color": "#80588e",
+                      "show": false
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": []
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/HoundLog/drivetrain/feedforwardVoltages/left",
+                      "color": "#e48b32",
+                      "show": true
+                    },
+                    {
+                      "key": "NT:/HoundLog/drivetrain/feedforwardVoltages/right",
+                      "color": "#aacaee",
+                      "show": true
+                    }
+                  ]
+                }
+              },
+              "title": "Line Graph"
+            },
+            {
+              "type": 5,
+              "uuid": "rbasfjdpnp1eyegk2vmxjs9sqd8758tc",
+              "fields": [],
+              "listFields": [
+                [
+                  {
+                    "type": "Robot",
+                    "key": "NT:/HoundLog/autonomous/field/Robot",
+                    "sourceTypeIndex": 0,
+                    "sourceType": 5
+                  },
+                  {
+                    "type": "Trajectory",
+                    "key": "NT:/HoundLog/autonomous/field/trajectory",
+                    "sourceTypeIndex": 0,
+                    "sourceType": 5
+                  }
+                ]
+              ],
+              "options": {
+                "game": "2025 Field",
+                "unitDistance": "meters",
+                "unitRotation": "degrees",
+                "origin": "right",
+                "size": 0.75,
+                "allianceBumpers": "auto",
+                "allianceOrigin": "blue",
+                "orientation": "blue left, red right"
+              },
+              "configHidden": false,
+              "visualizer": null,
+              "title": "Odometry"
+            },
+            {
+              "type": 1,
+              "legendHeight": 0.3,
+              "legends": {
+                "left": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/HoundLog/elevator/motor/encoderPosition",
+                      "color": "#2b66a2",
+                      "show": true
+                    }
+                  ]
+                },
+                "discrete": {
+                  "fields": []
+                },
+                "right": {
+                  "lockedRange": null,
+                  "unitConversion": {
+                    "type": null,
+                    "factor": 1
+                  },
+                  "fields": [
+                    {
+                      "key": "NT:/HoundLog/arm/position",
+                      "color": "#e5b31b",
+                      "show": true
+                    }
+                  ]
+                }
+              },
+              "title": "Line Graph"
+            },
+            {
+              "type": 6,
+              "uuid": "btz3xzh649888uufrt7637m914iagg1u",
+              "fields": [],
+              "listFields": [
+                [
+                  {
+                    "type": "Component (Robot)",
+                    "key": "NT:/HoundLog/elevator/components/frameComponentPose",
+                    "sourceTypeIndex": 1,
+                    "sourceType": "Pose3d"
+                  },
+                  {
+                    "type": "Component (Robot)",
+                    "key": "NT:/HoundLog/elevator/components/stageComponentPose",
+                    "sourceTypeIndex": 1,
+                    "sourceType": "Pose3d"
+                  },
+                  {
+                    "type": "Component (Robot)",
+                    "key": "NT:/HoundLog/elevator/components/carriageComponentPose",
+                    "sourceTypeIndex": 1,
+                    "sourceType": "Pose3d"
+                  },
+                  {
+                    "type": "Component (Robot)",
+                    "key": "NT:/HoundLog/arm/components/armComponentPose",
+                    "sourceTypeIndex": 1,
+                    "sourceType": "Pose3d"
+                  },
+                  {
+                    "type": "Component (Robot)",
+                    "key": "NT:/HoundLog/arm/components/clawComponentPose",
+                    "sourceTypeIndex": 1,
+                    "sourceType": "Pose3d"
+                  },
+                  {
+                    "type": "Game Piece 0",
+                    "key": "NT:/HoundLog/coralSim/pose",
+                    "sourceTypeIndex": 1,
+                    "sourceType": "Pose3d"
+                  }
+                ],
+                [
+                  {
+                    "type": "Robot",
+                    "key": "NT:/HoundLog/autonomous/field/Robot",
+                    "sourceTypeIndex": 0,
+                    "sourceType": 5
+                  },
+                  {
+                    "type": "Trajectory",
+                    "key": "NT:/HoundLog/autonomous/field/trajectory",
+                    "sourceTypeIndex": 0,
+                    "sourceType": 5
+                  }
+                ]
+              ],
+              "options": {
+                "field": "2025 Field",
+                "alliance": "blue",
+                "robot": "2025-Ri3D",
+                "unitDistance": "meters",
+                "unitRotation": "degrees"
+              },
+              "configHidden": false,
+              "visualizer": {
+                "cameraIndex": -1,
+                "orbitFov": 50,
+                "cameraPosition": [
+                  6.71254557334314,
+                  4.600870230490412,
+                  -3.595689139686253
+                ],
+                "cameraTarget": [
+                  5.142708895663802,
+                  0.8468065019538449,
+                  -1.6845323201071287
+                ]
+              },
+              "title": "3D Field"
+            },
+            {
+              "type": 3,
+              "field": "NT:/HoundLog/drivetrain/wheelPositions",
+              "title": "Console"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": [],
+  "version": "3.2.1"
+}
