@@ -12,17 +12,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Auto.AutoCommand;
-import frc.robot.Commands.CenterToTargetCommand;
+// import frc.robot.Auto.AutoCommand;
+// import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.IntakeEjectCommand;
 import frc.robot.Commands.IntakeNoteCommand;
-import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
-import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
+// import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
+// import frc.robot.Commands.SequenceCommands.ShootAmpCommand;
 import frc.robot.Commands.ShootNoteCommand;
 import frc.robot.Controllers.ControllerButtons;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.Landmarks;
-import frc.robot.PathPlanner.PathPlanner;
+// import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.LifeCam;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.Subsystems.Climber;
@@ -56,7 +56,7 @@ public class RobotContainer {
     // Drivetrain A is the 2024 robot
     // Drivetrain B is the practice swerve robot
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.DriveTrain;
+    public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.createDrivetrain();
     // private final CommandSwerveDrivetrain drivetrain = SwerveDrivetrainB.DriveTrain;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -66,7 +66,7 @@ public class RobotContainer {
     private final CommandXboxController m_arcadeController = new CommandXboxController(ControllerIds.XC3ID);
 
     // PATHPLANNER
-    private final PathPlanner m_pathPlanner = new PathPlanner(m_drivetrain);
+    // private final PathPlanner m_pathPlanner = new PathPlanner(m_drivetrain);
     private final SendableChooser<Command> m_autoChooser;
 
     // private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
@@ -83,10 +83,10 @@ public class RobotContainer {
     private River m_river = new River();
 
     // Commands
-    public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
-    public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
+    // public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
+    // public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
     //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
-    public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
+    // public ShootAmpCommand shootAmpNoteCommand = new ShootAmpCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
     public ShootNoteCommand shootNoteCommand = new ShootNoteCommand(m_intake, m_shooter, 1.0);
     //public ShootSpeakerCommand shootSpeakerNoteCommand = new ShootSpeakerCommand(m_shooterLimelight, m_intakeLimelight, m_pathPlanner, m_intake, m_shooter);
     //public ShootTrapCommand shootTrapNoteCommand = new ShootTrapCommand(m_shooterLimelight, m_pathPlanner, m_intake, m_shooter);
@@ -101,10 +101,10 @@ public class RobotContainer {
 
     public RobotContainer() {
         // Register Named Commands
-        NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
-        NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
+        // NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
+        // NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
         //NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
-        NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
+        // NamedCommands.registerCommand("shootAmpNoteCommand", shootAmpNoteCommand);
         //NamedCommands.registerCommand("shootSpeakerNoteCommand", shootSpeakerNoteCommand);
         //NamedCommands.registerCommand("shootTrapNoteCommand", shootTrapNoteCommand);
         NamedCommands.registerCommand("intakeNoteCommand", intakeNoteCommand);
@@ -129,14 +129,14 @@ public class RobotContainer {
         // PathPlanner
         m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
         SmartDashboard.putData("Auto Mode", m_autoChooser);
-        m_pathPlanner.configure();
+        // m_pathPlanner.configure();
 
         // note alignment
         // m_mechanismController.a().onTrue(acquireNoteCommand);
         //m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
 
         m_driveController.x().onTrue(m_climber.CommandClimb());
-        m_driveController.y().onTrue(shootAmpNoteCommand);
+        // m_driveController.y().onTrue(shootAmpNoteCommand);
         m_driveController.b().onTrue(intakeEjectCommand);
         //m_driveController.x().onTrue(shootAmpNoteCommand);
         //m_mechanismController.y().onTrue(m_shooter.commandSetAngle(MAX_PIVOT_ENCODER_VAL));
@@ -173,7 +173,7 @@ public class RobotContainer {
         var isRedAlliance = isRedAlliance();
         SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
 
-        m_drivetrain.seedFieldRelative();
+        m_drivetrain.seedFieldCentric();
 
         // set position
         // resetPose();
@@ -271,13 +271,15 @@ public class RobotContainer {
         var isRedAlliance = isRedAlliance();
         SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
 
-        m_drivetrain.seedFieldRelative();
+        m_drivetrain.seedFieldCentric();
 
         // set position
         resetPose();
     }
 
     public Command getAutonomousCommand() {
+        return null;
+
         // get data from choosers
         // m_autoStarPosition = m_autoStartChooser.getSelected();
         // var firstNote = m_autoFirstNoteChooser.getSelected();
@@ -286,20 +288,20 @@ public class RobotContainer {
         // m_autoNoteOrder = new int[] { firstNote, secondNote, thirdNote };
 
         // return m_autoChooser.getSelected();
-        var autoCommand = new AutoCommand(
-            m_drivetrain,
-            m_pathPlanner,
-            m_intake,
-            m_shooter,
-            m_climber,
-            //m_elevator,
-            m_intakeLimelight,
-            m_shooterLimelight,
-            m_autoNoteOrder,
-            m_autoStartPosition,
-            isRedAlliance()
-        );
-        return autoCommand;
+        // var autoCommand = new AutoCommand(
+        //     m_drivetrain,
+        //     m_pathPlanner,
+        //     m_intake,
+        //     m_shooter,
+        //     m_climber,
+        //     //m_elevator,
+        //     m_intakeLimelight,
+        //     m_shooterLimelight,
+        //     m_autoNoteOrder,
+        //     m_autoStartPosition,
+        //     isRedAlliance()
+        // );
+        // return autoCommand;
         // return runAuto;
 
         // return Commands.print("No autonomous command configured");
@@ -316,7 +318,7 @@ public class RobotContainer {
         var isRedAlliance = isRedAlliance();
         SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
 
-        m_drivetrain.seedFieldRelative();
+        m_drivetrain.seedFieldCentric();
 
         // zero all mechanisms
         m_intake.zero();
@@ -350,6 +352,6 @@ public class RobotContainer {
                 startingPosition = Landmarks.OurStart1();
                 break;
         }
-        m_pathPlanner.resetPose(startingPosition);
+        // m_pathPlanner.resetPose(startingPosition);
     }
 }
