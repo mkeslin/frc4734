@@ -22,7 +22,7 @@ public class SwerveDrivetrainBindings {
     // robot-centric
     // private static final SwerveRequest.RobotCentric m_forwardStraight = new SwerveRequest.RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
     
-    // private static final SwerveDrivetrainTelemetry m_logger = new SwerveDrivetrainTelemetry(MaxSpeed);
+    private static final SwerveDrivetrainTelemetry m_logger = new SwerveDrivetrainTelemetry(MaxSpeed);
     
     // flip the orientation for blue/red
     private static int coordinateOrientation = -1;
@@ -75,7 +75,7 @@ public class SwerveDrivetrainBindings {
         //     drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         // }
 
-        // drivetrain.registerTelemetry(m_logger::telemeterize);
+        drivetrain.registerTelemetry(m_logger::telemeterize);
 
         // driveController.pov(0).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
         // driveController.pov(180).whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
