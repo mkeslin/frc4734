@@ -7,12 +7,12 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,7 +37,10 @@ public class SwerveDrivetrainTelemetry {
 
     /* Robot pose for field positioning */
     private final NetworkTable table = inst.getTable("Pose");
-    private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
+    // private final DoubleArrayPublisher fieldPub =
+    // table.getDoubleArrayTopic("robotPose").publish();
+    // private final StructArrayPublisher<Pose3d> fieldPub = table.getStructArrayTopic("Robot Pose", Pose3d.struct).publish();
+    private final StructPublisher<Pose2d> fieldPub = table.getStructTopic("Robot Pose", Pose2d.struct).publish();
     private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
     private final StructArrayPublisher<SwerveModuleState> swervePub = table
             .getStructArrayTopic("Swerve States", SwerveModuleState.struct).publish();
@@ -84,11 +87,12 @@ public class SwerveDrivetrainTelemetry {
         /* Telemeterize the pose */
         Pose2d pose = state.Pose;
         fieldTypePub.set("Field2d");
-        fieldPub.set(new double[] {
-                pose.getX(),
-                pose.getY(),
-                pose.getRotation().getDegrees()
-        });
+        // fieldPub.set(new double[] {
+        // pose.getX(),
+        // pose.getY(),
+        // pose.getRotation().getDegrees()
+        // });
+        fieldPub.set(pose);
 
         /* Telemeterize the robot's general speeds */
         double currentTime = Utils.getCurrentTimeSeconds();
@@ -106,7 +110,7 @@ public class SwerveDrivetrainTelemetry {
 
         /* Telemeterize the module's states */
         for (int i = 0; i < 4; ++i) {
-            m_moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);           
+            m_moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);
             m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
             m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
 
