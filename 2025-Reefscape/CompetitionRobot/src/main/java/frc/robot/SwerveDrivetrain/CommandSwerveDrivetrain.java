@@ -57,8 +57,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
-    // private final SwerveRequest.ApplyChassisSpeeds m_autoRequest = new
-    // SwerveRequest.ApplyChassisSpeeds();
+    private final SwerveRequest.ApplyRobotSpeeds m_autoRequest = new SwerveRequest.ApplyRobotSpeeds();
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
 
     /* Swerve requests to apply during SysId characterization */
@@ -338,12 +337,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public void moveRelative(double x, double y, double rot) {
         // return Commands.runOnce(() -> {
-        Pose2d currentPose = getState().Pose;
+        // Pose2d currentPose = getState().Pose;
 
         // The rotation component in these poses represents the direction of travel
         // Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
-        Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(x, y)),
-                new Rotation2d().plus(new Rotation2d(rot)));
+        // Pose2d endPose = new Pose2d(currentPose.getTranslation().plus(new Translation2d(x, y)),
+        //         new Rotation2d().plus(new Rotation2d(rot)));
 
         // List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startPos,
         // endPos);
@@ -361,14 +360,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // positions are already correct
         // path.preventFlipping = true;
 
-        AutoBuilder.pathfindToPose(endPos,
-                new PathConstraints(
-                        DrivetrainConstants.MaxSpeed,
-                        DrivetrainConstants.MaxAcceleration,
-                        Units.degreesToRadians(360),
-                        Units.degreesToRadians(540)),
-                // new IdealStartingState(0, new Rotation2d()),
-                0);
+        // Commands.run(() -> AutoBuilder.pathfindToPose(endPos,
+        // new PathConstraints(
+        // DrivetrainConstants.MaxSpeed,
+        // DrivetrainConstants.MaxAcceleration,
+        // Units.degreesToRadians(360),
+        // Units.degreesToRadians(540)),
+        // // new IdealStartingState(0, new Rotation2d()),
+        // 0), this);
+
+        // List<Waypoint> bezierPoints = PathPlannerPath.waypointsFromPoses(currentPose, endPose);
+        // PathPlannerPath path = new PathPlannerPath(
+        //         bezierPoints,
+        //         new PathConstraints(
+        //                 DrivetrainConstants.MaxSpeed,
+        //                 DrivetrainConstants.MaxAcceleration,
+        //                 Units.degreesToRadians(360),
+        //                 Units.degreesToRadians(540)),
+        //         new IdealStartingState(0, new Rotation2d()),
+        //         new GoalEndState(0.0, currentPose.getRotation()));
 
         // SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
         // .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric
@@ -376,6 +386,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // .withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
         // m_drivetrain.driveRobotRelative(new ChassisSpeeds(x, y, rot));
+        var chassisSpeeds = new ChassisSpeeds(x, y, rot);
+        this.setControl(m_autoRequest.withSpeeds(chassisSpeeds));
 
         // m_drivetrain.applyRequest(() -> {
         // driveRequest.withVelocityX(x) // Drive forward with negative Y (forward)
@@ -390,19 +402,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Command followPathCommand(PathPlannerPath path) {
         return AutoBuilder
-            .followPath(path)
-            // .andThen(this::stop, this)
-            .withName("drivetrain.followPath");
+                .followPath(path)
+                // .andThen(this::stop, this)
+                .withName("drivetrain.followPath");
     }
 
     public Command moveToPose(Pose2d pose) {
         var constraints = new PathConstraints(
-            DrivetrainConstants.MaxSpeed,
-            DrivetrainConstants.MaxAcceleration,
-            Units.degreesToRadians(80),
-            Units.degreesToRadians(50)
-            // Units.degreesToRadians(360),
-            // Units.degreesToRadians(540)
+                DrivetrainConstants.MaxSpeed,
+                DrivetrainConstants.MaxAcceleration,
+                Units.degreesToRadians(80),
+                Units.degreesToRadians(50)
+        // Units.degreesToRadians(360),
+        // Units.degreesToRadians(540)
         );
         return AutoBuilder.pathfindToPose(pose, constraints, 0);
     }
@@ -428,8 +440,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // public void stop() {
-    //     var brake = new SwerveRequest.SwerveDriveBrake();
-    //     applyRequest(() -> brake);
+    // var brake = new SwerveRequest.SwerveDriveBrake();
+    // applyRequest(() -> brake);
     // }
 
     // @Override

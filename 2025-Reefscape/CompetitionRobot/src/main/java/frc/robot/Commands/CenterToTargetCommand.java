@@ -62,13 +62,17 @@ public class CenterToTargetCommand extends Command {
         // if aligning to april tag, don't move forward, just strafe
         //var forwardDistance = .85;//m_target == 0 ? .85 : 0;
         //m_drivetrain.moveRelative(forwardDistance, wheelStrafe, 0);
+        m_drivetrain.moveRelative(0, wheelStrafe, 0);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        // set a time failsafe
-        return (t.hasElapsed(5)) || (m_limelight.getArea() > 0.05 && Math.abs(m_limelight.getX()) < 2);
+        // use time as failsafe
+        var area = m_limelight.getArea();
+        var offset = Math.abs(m_limelight.getX());
+        return t.hasElapsed(5) || (area > 0.05 && offset < 2);
+        // return (area > 0.05 && offset < 2);
     }
 
     // Called once after isFinished returns true
