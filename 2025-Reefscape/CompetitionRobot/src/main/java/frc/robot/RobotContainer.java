@@ -4,9 +4,7 @@ package frc.robot;
 // import static frc.robot.Constants.Constants.NOTEPIPELINE;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-
-// import com.pathplanner.lib.auto.AutoBuilder;
-// import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -15,7 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommandA;
-// import frc.robot.Commands.CenterToTargetCommand;
+
+import frc.robot.Commands.CenterToTargetCommand;
 // import frc.robot.Commands.IntakeEjectCommand;
 // import frc.robot.Commands.IntakeNoteCommand;
 // import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
@@ -64,7 +63,7 @@ public class RobotContainer {
 
     // CONTROLLERS
     private final CommandXboxController m_driveController = new CommandXboxController(ControllerIds.XC1ID);
-    // private final CommandXboxController m_mechanismController = new CommandXboxController(ControllerIds.XC2ID);
+    private final CommandXboxController m_mechanismController = new CommandXboxController(ControllerIds.XC2ID);
     private final CommandXboxController m_arcadeController = new CommandXboxController(ControllerIds.XC3ID);
 
     // PATHPLANNER
@@ -74,7 +73,7 @@ public class RobotContainer {
     // private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
 
     // SUBSYSTEMS
-    // private static Limelight m_shooterLimelight = new Limelight("limelight-one", APRILTAGPIPELINE);
+    private static Limelight m_limelight = new Limelight("limelight", 0);
     // private static Limelight m_intakeLimelight = new Limelight("limelight-two", NOTEPIPELINE);
     //private static LifeCam m_LifeCam = new LifeCam(0);
     // private Intake m_intake = new Intake();
@@ -85,6 +84,7 @@ public class RobotContainer {
     // private River m_river = new River();
 
     // Commands
+    public CenterToTargetCommand centerToAprilTagCommand = new CenterToTargetCommand(m_limelight, m_drivetrain);
     // public AcquireNoteCommand acquireNoteCommand = new AcquireNoteCommand(m_intakeLimelight, m_pathPlanner, m_intake);
     // public CenterToTargetCommand centerIntakeToTargetCommand = new CenterToTargetCommand(m_intakeLimelight, m_pathPlanner, m_intake, 0);
     //public CenterToTargetCommand centerShooterToTargetCommand = new CenterToTargetCommand(m_shooterLimelight, m_pathPlanner, m_intake, 0);
@@ -103,6 +103,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         // Register Named Commands
+        NamedCommands.registerCommand("centerIntakeToTargetCommand", centerToAprilTagCommand);
         // NamedCommands.registerCommand("acquireNote", acquireNoteCommand);
         // NamedCommands.registerCommand("centerIntakeToTargetCommand", centerIntakeToTargetCommand);
         //NamedCommands.registerCommand("centerShooterToTargetCommand", centerShooterToTargetCommand);
@@ -134,7 +135,7 @@ public class RobotContainer {
         // m_pathPlanner.configure();
 
         // note alignment
-        // m_mechanismController.a().onTrue(acquireNoteCommand);
+        m_mechanismController.a().onTrue(centerToAprilTagCommand);
         //m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
 
         // m_driveController.x().onTrue(m_climber.CommandClimb());
