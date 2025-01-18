@@ -5,7 +5,10 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -303,6 +306,27 @@ public class RobotContainer {
      * m_LifeCam.stopStream();
      * }
      */
+
+    public void localizeRobotPose() {
+        boolean doRejectUpdate = false;
+        LimelightHelpers.SetRobotOrientation("limelight",
+                // m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 
+                Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()), 
+                0, 0, 0, 0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+
+        // if our angular velocity is greater than 720 degrees per second, ignore vision
+        // updates
+        if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
+            doRejectUpdate = true;
+        }
+        if (!doRejectUpdate) {
+            m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.6, .6, 9999999));
+            m_drivetrain.addVisionMeasurement(
+                    mt2.pose,
+                    mt2.timestampSeconds);
+        }
+    }
 
     public void initializeAuto() {
         // set alliance

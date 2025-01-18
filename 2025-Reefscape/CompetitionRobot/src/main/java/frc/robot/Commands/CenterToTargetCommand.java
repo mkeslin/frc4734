@@ -53,6 +53,7 @@ public class CenterToTargetCommand extends Command {
             } else if (target_offset < -0.1){
                 offset -= 0.1;
             }
+            SmartDashboard.putNumber("node-area", m_limelight.getArea());
         } else {
             SmartDashboard.putString("node-pose", "none");
         }
@@ -60,8 +61,8 @@ public class CenterToTargetCommand extends Command {
 
         // if acquiring note, move forward to "chase" it
         // if aligning to april tag, don't move forward, just strafe
-        //var forwardDistance = .85;//m_target == 0 ? .85 : 0;
-        //m_drivetrain.moveRelative(forwardDistance, wheelStrafe, 0);
+        var forwardDistance = .85;//m_target == 0 ? .85 : 0;
+        m_drivetrain.moveRelative(forwardDistance, wheelStrafe, 0);
         m_drivetrain.moveRelative(0, wheelStrafe, 0);
     }
 
@@ -71,7 +72,7 @@ public class CenterToTargetCommand extends Command {
         // use time as failsafe
         var area = m_limelight.getArea();
         var offset = Math.abs(m_limelight.getX());
-        return t.hasElapsed(5) || (area > 0.05 && offset < 2);
+        return t.hasElapsed(5) || (area > 14 && offset < 2);
         // return (area > 0.05 && offset < 2);
     }
 

@@ -10,6 +10,7 @@ package frc.robot;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindingCommand;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -32,28 +33,34 @@ public class Robot extends TimedRobot {
     }
 
     // private void initLogging() {
-    //     Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+    // Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
-    //     if (isReal()) {
-    //         Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-    //         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-    //         new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
-    //     } else {
-    //         setUseTiming(false); // Run as fast as possible
-    //         String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the
-    //                                                       // user)
-    //         Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-    //         Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a
-    //                                                                                               // new log
-    //     }
+    // if (isReal()) {
+    // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+    // Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    // new PowerDistribution(1, ModuleType.kRev); // Enables power distribution
+    // logging
+    // } else {
+    // setUseTiming(false); // Run as fast as possible
+    // String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from
+    // AdvantageScope (or prompt the
+    // // user)
+    // Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+    // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath,
+    // "_sim"))); // Save outputs to a
+    // // new log
+    // }
 
-    //     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
-    //                     // be added.
+    // Logger.start(); // Start logging! No more data receivers, replay sources, or
+    // metadata values may
+    // // be added.
     // }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+
+        // m_robotContainer.localizeRobotPose();
     }
 
     @Override
