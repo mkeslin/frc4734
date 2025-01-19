@@ -6,6 +6,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.LimelightHelpers;
 
 public class Limelight extends SubsystemBase {
 
@@ -42,6 +43,13 @@ public class Limelight extends SubsystemBase {
      */
     public double getArea() {
         return (table.getEntry("ta").getDouble(0.0));
+    }
+
+    /**
+     * @return yaw (rotation relative to y-axis) of Limelight camera target in radians
+     */
+    public double getYaw() {
+        return LimelightHelpers.getTargetPose3d_CameraSpace("limelight").getRotation().getY();
     }
 
     /**

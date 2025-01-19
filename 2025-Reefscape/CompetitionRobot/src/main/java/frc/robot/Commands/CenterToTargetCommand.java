@@ -14,8 +14,9 @@ public class CenterToTargetCommand extends Command {
     private double MAX_WHEEL_STRAFE = 1;
     private double MAX_CAMERA_X = 30;
 
-    private double offset;
-    public double target_offset;
+    private double x_offset;
+    public double target_x_offset;
+    private double target_yaw;
     private double wheelStrafe;
 
     public Timer t = new Timer();
@@ -32,7 +33,7 @@ public class CenterToTargetCommand extends Command {
     // Called just before this Command runs the first time
     @Override
     public void initialize() {
-        offset = 0;
+        x_offset = 0;
         t.start();
     }
 
@@ -47,23 +48,22 @@ public class CenterToTargetCommand extends Command {
             } else if(m_limelight.getX() > 0) { //otherwise if the target is to the right
                 SmartDashboard.putString("node-pose", "right");
             }
-            target_offset = m_limelight.getX();
-            if(target_offset > 0.1) {
-                offset += 0.1;
-            } else if (target_offset < -0.1){
-                offset -= 0.1;
+            target_x_offset = m_limelight.getX();
+            if(target_x_offset > 0.1) {
+                x_offset += 0.1;
+            } else if (target_x_offset < -0.1){
+                x_offset -= 0.1;
             }
-            SmartDashboard.putNumber("node-area", m_limelight.getArea());
         } else {
             SmartDashboard.putString("node-pose", "none");
         }
-        wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (offset/MAX_CAMERA_X + 1));
+        wheelStrafe = MAX_WHEEL_STRAFE * Math.sin(Math.PI * (x_offset/MAX_CAMERA_X + 1));
+        target_yaw = -m_limelight.getYaw();
 
         // if acquiring note, move forward to "chase" it
         // if aligning to april tag, don't move forward, just strafe
         var forwardDistance = .85;//m_target == 0 ? .85 : 0;
-        m_drivetrain.moveRelative(forwardDistance, wheelStrafe, 0);
-        m_drivetrain.moveRelative(0, wheelStrafe, 0);
+        m_drivetrain.moveRelative(forwardDistance, wheelStrafe, target_yaw);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -71,9 +71,10 @@ public class CenterToTargetCommand extends Command {
     public boolean isFinished() {
         // use time as failsafe
         var area = m_limelight.getArea();
-        var offset = Math.abs(m_limelight.getX());
-        return t.hasElapsed(5) || (area > 14 && offset < 2);
-        // return (area > 0.05 && offset < 2);
+        var x_offset = Math.abs(m_limelight.getX());
+        var yaw_degrees = Math.abs(m_limelight.getYaw() * 180/Math.PI);
+        return t.hasElapsed(5) || (area > 14 && x_offset < 2 && yaw_degrees < 2);
+        // return (area > 0.05 && x_offset < 2);
     }
 
     // Called once after isFinished returns true
