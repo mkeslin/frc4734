@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommandA;
-
+import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToTargetCommand;
 // import frc.robot.Commands.IntakeEjectCommand;
 // import frc.robot.Commands.IntakeNoteCommand;
@@ -26,6 +26,9 @@ import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Controllers.ControllerButtons;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.Landmarks;
+import frc.robot.Subsystems.Arm;
+import frc.robot.Subsystems.CoralSim;
+import frc.robot.Subsystems.Elevator;
 // import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.LifeCam;
 import frc.robot.Subsystems.Cameras.Limelight;
@@ -76,6 +79,8 @@ public class RobotContainer {
 
     // private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
 
+    private PositionTracker m_positionTracker = new PositionTracker();
+
     // SUBSYSTEMS
     private static Limelight m_limelight = new Limelight("limelight", 0);
     // private static Limelight m_intakeLimelight = new Limelight("limelight-two",
@@ -83,10 +88,12 @@ public class RobotContainer {
     // private static LifeCam m_LifeCam = new LifeCam(0);
     // private Intake m_intake = new Intake();
     // private Shooter m_shooter = new Shooter();
-    // private Elevator m_elevator = new Elevator();
+    private Elevator m_elevator = new Elevator(m_positionTracker);
+    private Arm m_arm = new Arm(m_positionTracker, m_elevator::getCarriageComponentPose);
     // private Climber m_climber = new Climber();
     // private Lights m_lights = new Lights();
     // private River m_river = new River();
+    private CoralSim m_coralSim = new CoralSim(m_drivetrain::getPose, m_arm::getClawComponentPose);
 
     // Commands
     public CenterToTargetCommand centerToAprilTagCommand = new CenterToTargetCommand(m_limelight, m_drivetrain);
@@ -141,6 +148,8 @@ public class RobotContainer {
 
         // configure bindings for arcade/debug
         configureArcadeBindings();
+
+        configureAuto();
 
         // lights
         // configureLightsBindings();
@@ -337,6 +346,11 @@ public class RobotContainer {
 
         // set position
         resetPose();
+    }
+
+    public void configureAuto() {
+        // AutoManager.getInstance().addRoutine(AutoCommandA.testPath(m_drivetrain));
+        AutoManager.getInstance().addRoutine(AutoCommandA.GDC(m_drivetrain, m_elevator, m_arm, m_coralSim));
     }
 
     public Command getAutonomousCommand() {

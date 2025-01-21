@@ -11,6 +11,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -77,7 +80,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     private final PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
-    // private final Supplier<Pose3d> carriagePoseSupplier;
+    private final Supplier<Pose3d> carriagePoseSupplier;
 
     private TalonFX m_arm;
 
@@ -88,7 +91,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     // @Log
     private boolean initialized;
 
-    public Arm(PositionTracker positionTracker/*, MechanismLigament2d ligament, Supplier<Pose3d> carriagePoseSupplier*/) {
+    public Arm(PositionTracker positionTracker/*, MechanismLigament2d ligament*/, Supplier<Pose3d> carriagePoseSupplier) {
         // m_arm = TalonFXConfigurator.MOTOR_ID, MotorType.kBrushless, MOTOR_INVERTED,
         //         (s) -> s.setIdleMode(IdleMode.kBrake),
         //         (s) -> s.setSmartCurrentLimit(CURRENT_LIMIT),
@@ -112,7 +115,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
         m_positionTracker = positionTracker;
         // this.ligament = ligament;
-        // this.carriagePoseSupplier = carriagePoseSupplier;
+        this.carriagePoseSupplier = carriagePoseSupplier;
 
         m_positionTracker.setArmAngleSupplier(this::getPosition);
 
@@ -152,16 +155,16 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     // -0.083
 
     // @Log(groups = "components")
-    // public Pose3d getArmComponentPose() {
-    //     return carriagePoseSupplier.get()
-    //             .plus(new Transform3d(0.083, 0, 0, new Rotation3d()))
-    //             .plus(new Transform3d(0, 0, 0, new Rotation3d(0, -getPosition(), 0)));
-    // }
+    public Pose3d getArmComponentPose() {
+        return carriagePoseSupplier.get()
+                .plus(new Transform3d(0.083, 0, 0, new Rotation3d()))
+                .plus(new Transform3d(0, 0, 0, new Rotation3d(0, -getPosition(), 0)));
+    }
 
     // @Log(groups = "components")
-    // public Pose3d getClawComponentPose() {
-    //     return getArmComponentPose().plus(new Transform3d(0.2585, 0, 0, new Rotation3d()));
-    // }
+    public Pose3d getClawComponentPose() {
+        return getArmComponentPose().plus(new Transform3d(0.2585, 0, 0, new Rotation3d()));
+    }
 
     // @Log
     @Override
