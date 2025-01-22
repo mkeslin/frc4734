@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Auto.AutoManager;
 
 public class Robot extends TimedRobot {
 
@@ -77,12 +78,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        // m_robotContainer.initializeAuto();
-        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+        // // m_robotContainer.initializeAuto();
+        // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.schedule();
-        }
+        // if (m_autonomousCommand != null) {
+        // m_autonomousCommand.schedule();
+        // }
+
+        AutoManager.getInstance().runSelectedRoutine();
     }
 
     @Override
@@ -91,6 +94,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousExit() {
+        AutoManager.getInstance().endRoutine();
     }
 
     @Override

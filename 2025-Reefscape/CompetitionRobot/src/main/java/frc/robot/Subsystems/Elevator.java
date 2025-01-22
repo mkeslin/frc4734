@@ -9,6 +9,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -264,9 +266,9 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     // }
 
     // @Log(groups = "components")
-    // public Pose3d getCarriageComponentPose() {
-    //     return new Pose3d(0.14, 0, 0.247 + getPosition(), new Rotation3d());
-    // }
+    public Pose3d getCarriageComponentPose() {
+        return new Pose3d(0.14, 0, 0.247 + getPosition(), new Rotation3d());
+    }
 
     @Override
     public double getPosition() {

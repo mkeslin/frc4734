@@ -16,8 +16,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommandA;
-
+import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToTargetCommand;
+import frc.robot.Commands.RobotCommands;
+import frc.robot.Constants.ScoreLevel;
 // import frc.robot.Commands.IntakeEjectCommand;
 // import frc.robot.Commands.IntakeNoteCommand;
 // import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
@@ -26,6 +28,9 @@ import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Controllers.ControllerButtons;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.PathPlanner.Landmarks;
+import frc.robot.Subsystems.Arm;
+import frc.robot.Subsystems.CoralSim;
+import frc.robot.Subsystems.Elevator;
 // import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.LifeCam;
 import frc.robot.Subsystems.Cameras.Limelight;
@@ -76,6 +81,8 @@ public class RobotContainer {
 
     // private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
 
+    private PositionTracker m_positionTracker = new PositionTracker();
+
     // SUBSYSTEMS
     private static Limelight m_limelight = new Limelight("limelight", 0);
     // private static Limelight m_intakeLimelight = new Limelight("limelight-two",
@@ -83,10 +90,12 @@ public class RobotContainer {
     // private static LifeCam m_LifeCam = new LifeCam(0);
     // private Intake m_intake = new Intake();
     // private Shooter m_shooter = new Shooter();
-    // private Elevator m_elevator = new Elevator();
+    private Elevator m_elevator = new Elevator(m_positionTracker);
+    private Arm m_arm = new Arm(m_positionTracker, m_elevator::getCarriageComponentPose);
     // private Climber m_climber = new Climber();
     // private Lights m_lights = new Lights();
     // private River m_river = new River();
+    private CoralSim m_coralSim = new CoralSim(m_drivetrain::getPose, m_arm::getClawComponentPose);
 
     // Commands
     public CenterToTargetCommand centerToAprilTagCommand = new CenterToTargetCommand(m_limelight, m_drivetrain);
@@ -111,10 +120,10 @@ public class RobotContainer {
     // IntakeEjectCommand(m_intake);
 
     // auto choosers
-    private final SendableChooser<Integer> m_autoStartChooser = new SendableChooser<>();
-    private final SendableChooser<Integer> m_autoFirstNoteChooser = new SendableChooser<>();
-    private final SendableChooser<Integer> m_autoSecondNoteChooser = new SendableChooser<>();
-    private final SendableChooser<Integer> m_autoThirdNoteChooser = new SendableChooser<>();
+    // private final SendableChooser<Integer> m_autoStartChooser = new SendableChooser<>();
+    // private final SendableChooser<Integer> m_autoFirstNoteChooser = new SendableChooser<>();
+    // private final SendableChooser<Integer> m_autoSecondNoteChooser = new SendableChooser<>();
+    // private final SendableChooser<Integer> m_autoThirdNoteChooser = new SendableChooser<>();
 
     public RobotContainer() {
         // Register Named Commands
@@ -141,6 +150,8 @@ public class RobotContainer {
 
         // configure bindings for arcade/debug
         configureArcadeBindings();
+
+        configureAuto();
 
         // lights
         // configureLightsBindings();
@@ -217,10 +228,13 @@ public class RobotContainer {
         // //m_driveController.y().onTrue(m_shooter.commandShoot());
         // //m_driveController.x().onTrue(m_shooter.commandStop());
 
-        // // elevator
-        // m_driveController.rightBumper().onTrue(m_elevator.CommandPivotStow());
-        // m_driveController.rightTrigger().onTrue(m_elevator.CommandPivotDeploy());
-        // m_driveController.b().onTrue(m_elevator.CommandPivotStop());
+        // elevator
+        m_mechanismController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1, m_elevator, m_arm, m_coralSim));
+        m_mechanismController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, m_elevator, m_arm, m_coralSim));
+        m_mechanismController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3, m_elevator, m_arm, m_coralSim));
+        m_mechanismController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, m_elevator, m_arm, m_coralSim));
+
+        m_mechanismController.a().onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim));
 
         // // // LEFT STICK - Y - ELEVATOR EXTEND/RETRACT
         // //
@@ -307,94 +321,99 @@ public class RobotContainer {
      * }
      */
 
-    public void localizeRobotPose() {
-        boolean doRejectUpdate = false;
-        LimelightHelpers.SetRobotOrientation("limelight",
-                // m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 
-                Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()), 
-                0, 0, 0, 0, 0);
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+    // public void localizeRobotPose() {
+    //     boolean doRejectUpdate = false;
+    //     LimelightHelpers.SetRobotOrientation("limelight",
+    //             // m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 
+    //             Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()), 
+    //             0, 0, 0, 0, 0);
+    //     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
 
-        // if our angular velocity is greater than 720 degrees per second, ignore vision
-        // updates
-        if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
-            doRejectUpdate = true;
-        }
-        if (!doRejectUpdate) {
-            m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.6, .6, 9999999));
-            m_drivetrain.addVisionMeasurement(
-                    mt2.pose,
-                    mt2.timestampSeconds);
-        }
+    //     // if our angular velocity is greater than 720 degrees per second, ignore vision
+    //     // updates
+    //     if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
+    //         doRejectUpdate = true;
+    //     }
+    //     if (!doRejectUpdate) {
+    //         m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.6, .6, 9999999));
+    //         m_drivetrain.addVisionMeasurement(
+    //                 mt2.pose,
+    //                 mt2.timestampSeconds);
+    //     }
+    // }
+
+    public void configureAuto() {
+        // AutoManager.getInstance().addRoutine(AutoCommandA.testPath(m_drivetrain));
+        AutoManager.getInstance().addRoutine(AutoCommandA.GDC(m_drivetrain, m_elevator, m_arm, m_coralSim));
     }
 
-    public void initializeAuto() {
-        // set alliance
-        var isRedAlliance = isRedAlliance();
-        SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
+    // public void initializeAuto() {
+    //     // set alliance
+    //     var isRedAlliance = isRedAlliance();
+    //     SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
 
-        m_drivetrain.seedFieldCentric();
+    //     m_drivetrain.seedFieldCentric();
 
-        // set position
-        resetPose();
-    }
+    //     // set position
+    //     resetPose();
+    // }
 
-    public Command getAutonomousCommand() {
-        /* Run the path selected from the auto chooser */
-        return m_autoChooser.getSelected();
+    // public Command getAutonomousCommand() {
+    //     /* Run the path selected from the auto chooser */
+    //     return m_autoChooser.getSelected();
 
-        // // get data from choosers
-        // // m_autoStarPosition = m_autoStartChooser.getSelected();
-        // // var firstNote = m_autoFirstNoteChooser.getSelected();
-        // // var secondNote = m_autoSecondNoteChooser.getSelected();
-        // // var thirdNote = m_autoThirdNoteChooser.getSelected();
-        // // m_autoNoteOrder = new int[] { firstNote, secondNote, thirdNote };
+    //     // // get data from choosers
+    //     // // m_autoStarPosition = m_autoStartChooser.getSelected();
+    //     // // var firstNote = m_autoFirstNoteChooser.getSelected();
+    //     // // var secondNote = m_autoSecondNoteChooser.getSelected();
+    //     // // var thirdNote = m_autoThirdNoteChooser.getSelected();
+    //     // // m_autoNoteOrder = new int[] { firstNote, secondNote, thirdNote };
 
-        // // return m_autoChooser.getSelected();
-        // var autoCommand = new AutoCommand(
-        // m_drivetrain,
-        // // m_pathPlanner,
-        // // m_intake,
-        // // m_shooter,
-        // // m_climber,
-        // // //m_elevator,
-        // // m_intakeLimelight,
-        // // m_shooterLimelight,
-        // m_autoNoteOrder,
-        // m_autoStartPosition,
-        // isRedAlliance()
-        // );
-        // return autoCommand;
-        // return runAuto;
+    //     // // return m_autoChooser.getSelected();
+    //     // var autoCommand = new AutoCommand(
+    //     // m_drivetrain,
+    //     // // m_pathPlanner,
+    //     // // m_intake,
+    //     // // m_shooter,
+    //     // // m_climber,
+    //     // // //m_elevator,
+    //     // // m_intakeLimelight,
+    //     // // m_shooterLimelight,
+    //     // m_autoNoteOrder,
+    //     // m_autoStartPosition,
+    //     // isRedAlliance()
+    //     // );
+    //     // return autoCommand;
+    //     // return runAuto;
 
-        // return Commands.print("No autonomous command configured");
+    //     // return Commands.print("No autonomous command configured");
 
-        // return new PathPlannerAuto("Example Auto");
-        // Load the path you want to follow using its name in the GUI
-        // var path = PathPlannerPath.fromPathFile("Auto-1");
-        // Create a path following command using AutoBuilder. This will also trigger
-        // event markers.
-        // return AutoBuilder.followPath(path);
-    }
+    //     // return new PathPlannerAuto("Example Auto");
+    //     // Load the path you want to follow using its name in the GUI
+    //     // var path = PathPlannerPath.fromPathFile("Auto-1");
+    //     // Create a path following command using AutoBuilder. This will also trigger
+    //     // event markers.
+    //     // return AutoBuilder.followPath(path);
+    // }
 
-    public void initializeTest() {
-        // set alliance
-        var isRedAlliance = isRedAlliance();
-        SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
+    // public void initializeTest() {
+    //     // set alliance
+    //     var isRedAlliance = isRedAlliance();
+    //     SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
 
-        m_drivetrain.seedFieldCentric();
+    //     m_drivetrain.seedFieldCentric();
 
-        // zero all mechanisms
-        // m_intake.zero();
-        // m_climber.zero();
-        // m_elevator.zero();
-        // m_shooter.zero();
-        // move everything to starting position
-        // todo
+    //     // zero all mechanisms
+    //     // m_intake.zero();
+    //     // m_climber.zero();
+    //     // m_elevator.zero();
+    //     // m_shooter.zero();
+    //     // move everything to starting position
+    //     // todo
 
-        // set position
-        resetPose();
-    }
+    //     // set position
+    //     resetPose();
+    // }
 
     private boolean isRedAlliance() {
         var alliance = DriverStation.getAlliance();
@@ -402,20 +421,20 @@ public class RobotContainer {
         return isRedAlliance;
     }
 
-    private void resetPose() {
-        Pose2d startingPosition;
-        switch (m_autoStartPosition) {
-            case 3:
-                startingPosition = Landmarks.OurStart3();
-                break;
-            default:
-            case 2:
-                startingPosition = Landmarks.OurStart2();
-                break;
-            case 1:
-                startingPosition = Landmarks.OurStart1();
-                break;
-        }
-        // m_pathPlanner.resetPose(startingPosition);
-    }
+    // private void resetPose() {
+    //     Pose2d startingPosition;
+    //     switch (m_autoStartPosition) {
+    //         case 3:
+    //             startingPosition = Landmarks.OurStart3();
+    //             break;
+    //         default:
+    //         case 2:
+    //             startingPosition = Landmarks.OurStart2();
+    //             break;
+    //         case 1:
+    //             startingPosition = Landmarks.OurStart1();
+    //             break;
+    //     }
+    //     // m_pathPlanner.resetPose(startingPosition);
+    // }
 }
