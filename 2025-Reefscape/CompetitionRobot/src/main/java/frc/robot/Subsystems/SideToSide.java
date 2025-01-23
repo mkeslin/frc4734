@@ -1,7 +1,10 @@
 package frc.robot.Subsystems;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -51,10 +54,10 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
     private double simVelocity = 0.0;
 
     // @Log(groups = "control")
-    private final ProfiledPIDController pidController = new ProfiledPIDController(kP, kI, kD, MOVEMENT_CONSTRAINTS);
+    // private final ProfiledPIDController pidController = new ProfiledPIDController(kP, kI, kD, MOVEMENT_CONSTRAINTS);
 
     // @Log(groups = "control")
-    private final ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
+    // private final ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
 
     // private double RETRACT_ENCODER_VAL = 2; //Actual Stowed Value: 0
     // private double EXTEND_L1_ENCODER_VAL = 300; //Actual Deploy Value: 320
@@ -66,40 +69,48 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
     // private final MechanismLigament2d ligament;
 
     // @Log(groups = "control")
-    private double feedbackVoltage = 0;
+    // private double feedbackVoltage = 0;
     // @Log(groups = "control")
-    private double feedforwardVoltage = 0;
+    // private double feedforwardVoltage = 0;
+
+    // private PositionVoltage m_positionVoltage = null;
+    private MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
     // @Log
     private boolean initialized;
 
+    private double m_goalPosition = 0;
+
     // private final ElevatorSim elevatorSim = new ElevatorSim(
-    //     MOTOR_GEARBOX_REPR,
-    //     GEARING,
-    //     MASS_KG,
-    //     DRUM_RADIUS_METERS,
-    //     MIN_HEIGHT_METERS,
-    //     MAX_HEIGHT_METERS,
-    //     true,
-    //     ElevatorPosition.BOTTOM.value);
+    // MOTOR_GEARBOX_REPR,
+    // GEARING,
+    // MASS_KG,
+    // DRUM_RADIUS_METERS,
+    // MIN_HEIGHT_METERS,
+    // MAX_HEIGHT_METERS,
+    // true,
+    // ElevatorPosition.BOTTOM.value);
 
     public SideToSide(PositionTracker positionTracker) {
         m_positionTracker = positionTracker;
         positionTracker.setSideToSidePositionSupplier(this::getPosition);
 
-        // // set slot 0 gains
-        // var slot0Configs = talonFXConfigs.Slot0;
-        // // slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
-        // // slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-        // // slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12 V output
-        // slot0Configs.kI = 0.001; // no output for integrated error
-        // slot0Configs.kD = 0.69; // A velocity error of 1 rps results in 0.1 V output
+        var talonFxConfigs = new TalonFXConfiguration();
 
-        // // set Motion Magic settings
-        // var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        // motionMagicConfigs.MotionMagicCruiseVelocity = 739; // Target cruise velocity of 80 rps
-        // motionMagicConfigs.MotionMagicAcceleration = 369; // Target acceleration of 160 rps/s (0.5 seconds)
-        // // motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
+        // set slot 0 gains
+        var slot0Configs = talonFxConfigs.Slot0;
+        slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
+        slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
+        slot0Configs.kA = 0.01; // A velocity target of 1 rps results in 0.12 V output
+        slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12 V output
+        slot0Configs.kI = 0.0; // no output for integrated error
+        slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
+
+        // set Motion Magic settings
+        var motionMagicConfigs = talonFxConfigs.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 80; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
+        motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
         // motor1.getConfigurator().apply(talonFXConfigs);
         // motor2.getConfigurator().apply(talonFXConfigs);
@@ -118,13 +129,14 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
         m_sideToSideMotor = new TalonFX(SIDE_TO_SIDE_ID);
         // m_elevator1.setInverted(false);
         m_sideToSideMotor.setNeutralMode(NeutralModeValue.Brake);
-        //m_elevatorPivot.setPosition(0);
-        var configs1 = new TalonFXConfiguration();
-        configs1.CurrentLimits = new CurrentLimitsConfigs();
-        configs1.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        // m_elevatorPivot.setPosition(0);
+
+        // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();
+        // talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        m_sideToSideMotor.getConfigurator().apply(configs1);
+        m_sideToSideMotor.getConfigurator().apply(talonFxConfigs);
+        // m_sideToSideMotor.getConfigurator().apply(slot0Configs);
 
         // zeroValue = zero;
         // halfValue = half;
@@ -154,16 +166,16 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
 
     // @Log(groups = "components")
     // public Pose3d getFrameComponentPose() {
-    //     return new Pose3d(0.14, 0, 0.13, new Rotation3d());
+    // return new Pose3d(0.14, 0, 0.13, new Rotation3d());
     // }
 
     // @Log(groups = "components")
     // public Pose3d getStageComponentPose() {
-    //     Transform3d transform = new Transform3d();
-    //     if (getPosition() > 0.706) {
-    //         transform = new Transform3d(0, 0, getPosition() - 0.706, new Rotation3d());
-    //     }
-    //     return new Pose3d(0.14, 0, 0.169, new Rotation3d()).plus(transform);
+    // Transform3d transform = new Transform3d();
+    // if (getPosition() > 0.706) {
+    // transform = new Transform3d(0, 0, getPosition() - 0.706, new Rotation3d());
+    // }
+    // return new Pose3d(0.14, 0, 0.169, new Rotation3d()).plus(transform);
     // }
 
     // @Log(groups = "components")
@@ -178,9 +190,9 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
 
     public double getVelocity() {
         // if (RobotBase.isReal())
-            return m_sideToSideMotor.getVelocity().getValueAsDouble();
+        return m_sideToSideMotor.getVelocity().getValueAsDouble();
         // else
-            // return simVelocity;
+        // return simVelocity;
     }
 
     @Override
@@ -193,7 +205,8 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
     @Override
     public void setVoltage(double voltage) {
         voltage = MathUtil.clamp(voltage, -12, 12);
-        voltage = Utils.applySoftStops(voltage, getPosition(), SideToSideConstants.MIN_HEIGHT_METERS, SideToSideConstants.MAX_HEIGHT_METERS);
+        voltage = Utils.applySoftStops(voltage, getPosition(), SideToSideConstants.MIN_HEIGHT_METERS,
+                SideToSideConstants.MAX_HEIGHT_METERS);
 
         if (voltage < 0
                 && m_positionTracker.getSideToSidePosition() < SideToSideConstants.MOTION_LIMIT
@@ -204,52 +217,71 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
         sideToSidePub.set(m_positionTracker.getSideToSidePosition());
 
         // if (!GlobalStates.INITIALIZED.enabled()) {
-        //     voltage = 0.0;
+        // voltage = 0.0;
         // }
 
         // voltage = .4;
 
-        m_sideToSideMotor.setVoltage(voltage);
+        // m_sideToSideMotor.setVoltage(voltage);
     }
 
     @Override
     public Command moveToCurrentGoalCommand() {
         return run(() -> {
-            feedbackVoltage = pidController.calculate(getPosition());
-            feedforwardVoltage = feedforwardController.calculate(getPosition(), pidController.getSetpoint().velocity);
-            setVoltage(feedbackVoltage + feedforwardVoltage);
+
+            // feedbackVoltage = pidController.calculate(getPosition());
+            // feedforwardVoltage = feedforwardController.calculate(getPosition(),
+            // pidController.getSetpoint().velocity);
+            // setVoltage(feedbackVoltage + feedforwardVoltage);
+
+            // m_positionVoltage = new PositionVoltage(0).withSlot(0);
+            // m_sideToSideMotor.setControl(m_positionVoltage.withPosition(getPosition()));
+
+            m_sideToSideMotor.setControl(m_request.withPosition(m_goalPosition));
+
+            sideToSidePub.set(m_positionTracker.getSideToSidePosition());
         }).withName("sideToSide.moveToCurrentGoal");
     }
 
     @Override
     public Command moveToPositionCommand(Supplier<SideToSidePosition> goalPositionSupplier) {
-        return Commands.sequence(
-                runOnce(() -> pidController.reset(getPosition())),
-                runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
-                moveToCurrentGoalCommand()
-                        .until(() -> pidController.atGoal()))
-                // .withTimeout(3)
-                .withName("sideToSide.moveToPosition");
+        // m_goalPosition = goalPositionSupplier.get().value;
+
+        return Commands.sequence(run(() -> {
+            // runOnce(() -> pidController.reset(getPosition())),
+            // runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
+            // moveToCurrentGoalCommand().until(() -> pidController.atGoal()))
+
+            m_sideToSideMotor.setControl(m_request.withPosition(goalPositionSupplier.get().value));
+
+            sideToSidePub.set(m_positionTracker.getSideToSidePosition());
+
+            // moveToCurrentGoalCommand())
+            // .withTimeout(3)
+        })).withName("sideToSide.moveToPosition");
     }
 
     @Override
     public Command moveToArbitraryPositionCommand(Supplier<Double> goalPositionSupplier) {
         return Commands.sequence(
-                runOnce(() -> pidController.reset(getPosition())),
-                runOnce(() -> pidController.setGoal(goalPositionSupplier.get())),
-                moveToCurrentGoalCommand().until(this::atGoal)).withName("sideToSide.moveToArbitraryPosition");
+                // runOnce(() -> pidController.reset(getPosition())),
+                // runOnce(() -> pidController.setGoal(goalPositionSupplier.get())),
+                // moveToCurrentGoalCommand().until(this::atGoal)).withName("sideToSide.moveToArbitraryPosition");
+                moveToCurrentGoalCommand()).withName("sideToSide.moveToArbitraryPosition");
     }
 
     @Override
     public Command movePositionDeltaCommand(Supplier<Double> delta) {
-        return moveToArbitraryPositionCommand(() -> pidController.getGoal().position + delta.get())
-                .withName("sideToSide.movePositionDelta");
+        // return moveToArbitraryPositionCommand(() -> pidController.getGoal().position + delta.get())
+        // .withName("sideToSide.movePositionDelta");
+        return null;
     }
 
     @Override
     public Command holdCurrentPositionCommand() {
-        return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
-                .withName("sideToSide.holdCurrentPosition");
+        // return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
+        // .withName("sideToSide.holdCurrentPosition");
+        return null;
     }
 
     @Override
@@ -259,39 +291,42 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
 
     @Override
     public Command setOverridenSpeedCommand(Supplier<Double> speed) {
-        return runEnd(() -> setVoltage(12.0 * speed.get()), () -> setVoltage(0))
-                .withName("sideToSide.setOverriddenSpeed");
+        // return runEnd(() -> setVoltage(12.0 * speed.get()), () -> setVoltage(0))
+        // .withName("sideToSide.setOverriddenSpeed");
+        return null;
     }
 
     @Override
     public Command coastMotorsCommand() {
-        return runOnce(this::stopMotors)
-                // .andThen(() -> motor.setIdleMode(IdleMode.kCoast))
-                .finallyDo((d) -> {
-                    // motor.setIdleMode(IdleMode.kBrake);
-                    pidController.reset(getPosition());
-                }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                .withName("sideToSide.coastMotorsCommand");
+        // return runOnce(this::stopMotors)
+        // // .andThen(() -> motor.setIdleMode(IdleMode.kCoast))
+        // .finallyDo((d) -> {
+        // // motor.setIdleMode(IdleMode.kBrake);
+        // pidController.reset(getPosition());
+        // }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        // .withName("sideToSide.coastMotorsCommand");
+        return null;
     }
 
-    private void stopMotors() {
-        m_sideToSideMotor.stopMotor();
-    }
+    // private void stopMotors() {
+    // m_sideToSideMotor.stopMotor();
+    // }
 
     // public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {
-    //     return sysIdRoutine.quasistatic(direction).withName("elevator.sysIdQuasistatic");
+    // return sysIdRoutine.quasistatic(direction).withName("elevator.sysIdQuasistatic");
     // }
 
     // public Command sysIdDynamicCommand(SysIdRoutine.Direction direction) {
-    //     return sysIdRoutine.dynamic(direction).withName("elevator.sysIdDynamic");
+    // return sysIdRoutine.dynamic(direction).withName("elevator.sysIdDynamic");
     // }
 
     // public Command resetControllersCommand() {
-    //     return Commands.runOnce(() -> pidController.reset(getPosition()))
-    //             .andThen(Commands.runOnce(() -> pidController.setGoal(getPosition())));
+    // return Commands.runOnce(() -> pidController.reset(getPosition()))
+    // .andThen(Commands.runOnce(() -> pidController.setGoal(getPosition())));
     // }
 
     public boolean atGoal() {
-        return pidController.atGoal();
+        // return pidController.atGoal();
+        return false;
     }
 }

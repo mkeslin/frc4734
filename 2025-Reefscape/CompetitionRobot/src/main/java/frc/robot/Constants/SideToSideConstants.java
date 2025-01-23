@@ -6,20 +6,13 @@ import edu.wpi.first.math.util.Units;
 
 public class SideToSideConstants {
     public static enum SideToSidePosition {
-        // BOTTOM(0.0698),
-        // INTAKE_PREP(0.55),
-        // INTAKE(0.355),
-        // ALGAE_L2(0.884),
-        // ALGAE_L3(1.234),
-
-        // L1(0.323),
-        // L2(0.31),
-        // L3(0.70),
-        // L4(1.27),
-        // TOP(1.57);
-
         LEFT(0),
-        RIGHT(1);
+        CENTER(-29.592773),
+        RIGHT(-61.065430);
+
+        // LEFT(-20),
+        // CENTER(-30),
+        // RIGHT(-40);
 
         public final double value;
 
