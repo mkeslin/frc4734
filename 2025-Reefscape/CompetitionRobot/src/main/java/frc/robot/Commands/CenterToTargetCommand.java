@@ -17,7 +17,7 @@ public class CenterToTargetCommand extends Command {
     private double FINAL_X_OFFSET = 2;
     private double FINAL_ANGLE_DEGREES = 3;
 
-    public double target_x_offset;
+    private double target_x_offset;
     private double target_yaw;
     private double target_area;
 

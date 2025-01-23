@@ -13,10 +13,10 @@ public class Constants {
 
         // public static final int RIVER_ID = 43;
 
-        public static final int ELEVATOR_1_ID = 50;
-        public static final int ELEVATOR_2_ID = 51;
-
-        public static final int ARM_ID = 40;
+        public static final int ELEVATOR_LEFT_ID = 20;
+        public static final int ELEVATOR_RIGHT_ID = 21;
+        public static final int SIDE_TO_SIDE_ID = 22;
+        public static final int ARM_ID = 23;
 
         // public static final int CLIMBER_RIGHT_ID = 60;
         // public static final int CLIMBER_LEFT_ID = 61;

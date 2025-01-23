@@ -286,4 +286,12 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     public boolean atGoal() {
         return pidController.atGoal();
     }
+
+    public void RaiseArm() {
+        m_arm.set(0.25);
+    }
+
+    public void LowerArm() {
+        m_arm.set(-0.25);
+    }
 }

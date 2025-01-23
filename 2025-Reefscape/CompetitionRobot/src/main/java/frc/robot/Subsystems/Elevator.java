@@ -23,8 +23,8 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
 
-import static frc.robot.Constants.Constants.IDs.ELEVATOR_1_ID;
-import static frc.robot.Constants.Constants.IDs.ELEVATOR_2_ID;
+import static frc.robot.Constants.Constants.IDs.ELEVATOR_LEFT_ID;
+import static frc.robot.Constants.Constants.IDs.ELEVATOR_RIGHT_ID;
 
 import static frc.robot.Constants.ElevatorConstants.kP;
 import static frc.robot.Constants.ElevatorConstants.kI;
@@ -114,7 +114,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         // motor1.configMotionAcceleration(369, 0);
         // motor2.configMotionAcceleration(369, 0);
 
-        m_elevator1 = new TalonFX(ELEVATOR_1_ID);
+        m_elevator1 = new TalonFX(ELEVATOR_LEFT_ID);
         // m_elevator1.setInverted(false);
         m_elevator1.setNeutralMode(NeutralModeValue.Brake);
         //m_elevatorPivot.setPosition(0);
@@ -125,7 +125,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_elevator1.getConfigurator().apply(configs1);
 
-        m_elevator2 = new TalonFX(ELEVATOR_2_ID);
+        m_elevator2 = new TalonFX(ELEVATOR_RIGHT_ID);
         // m_elevator2.setInverted(false);
         m_elevator2.setNeutralMode(NeutralModeValue.Brake);
         //m_elevator.setPosition(0);
@@ -178,21 +178,32 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 //         return Commands.runOnce(() -> StopPivot());
 //     }
 
-//     public void Extend() {
-//         m_elevator.set(-.85);
-//     }
+    public void Raise() {
+        m_elevator1.set(.25);
+        m_elevator2.set(-.25);
+    }
 
-//     public void Retract() {
-//         m_elevator.set(.85);
-//     }
+    public void Lower() {
+        m_elevator1.set(-.25);
+        m_elevator2.set(.25);
+    }
+
+    public void SideLeft() {
+        //set side-to-side motor to positive value
+    }
+
+    public void SideRight() {
+        //set side-to-side motor to negative value
+    }
 
 //     public void setExtendRetractMotor(double s) {
 //         m_elevator.set(s);
 //     }
 
-//     public void StopExtendRetract() {
-//         m_elevator.set(0);
-//     }
+    public void StopElevator() {
+        m_elevator1.set(0);
+        m_elevator2.set(0);
+    }
 
 //     public void setPivot(double s) {
 //         m_elevatorPivot.set(s);
