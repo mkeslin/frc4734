@@ -15,11 +15,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Auto.AutoCommandA;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ScoreLevel;
+import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
+import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 // import frc.robot.Commands.IntakeEjectCommand;
 // import frc.robot.Commands.IntakeNoteCommand;
 // import frc.robot.Commands.SequenceCommands.AcquireNoteCommand;
@@ -31,6 +34,7 @@ import frc.robot.PathPlanner.Landmarks;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.CoralSim;
 import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.SideToSide;
 // import frc.robot.PathPlanner.PathPlanner;
 import frc.robot.Subsystems.Cameras.LifeCam;
 import frc.robot.Subsystems.Cameras.Limelight;
@@ -92,6 +96,7 @@ public class RobotContainer {
     // private Shooter m_shooter = new Shooter();
     private Elevator m_elevator = new Elevator(m_positionTracker);
     private Arm m_arm = new Arm(m_positionTracker, m_elevator::getCarriageComponentPose);
+    private SideToSide m_sideToSide = new SideToSide(m_positionTracker);
     // private Climber m_climber = new Climber();
     // private Lights m_lights = new Lights();
     // private River m_river = new River();
@@ -164,8 +169,8 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Mode - 2025", m_autoChooser);
         // m_pathPlanner.configure();
 
-        // note alignment
-        m_mechanismController.a().onTrue(centerToAprilTagCommand);
+        // april tags
+        // m_mechanismController.a().onTrue(centerToAprilTagCommand);
         // m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
 
         // m_driveController.x().onTrue(m_climber.CommandClimb());
@@ -210,6 +215,13 @@ public class RobotContainer {
 
         m_drivetrain.seedFieldCentric();
 
+        // new Trigger(() -> {
+        //     return m_elevator.getInitialized()
+        //             && m_arm.getInitialized();
+        //             // && climber.getInitialized();
+        // }).onTrue(GlobalStates.INITIALIZED.enableCommand());
+        GlobalStates.INITIALIZED.enableCommand();
+
         // set position
         // resetPose();
     }
@@ -229,11 +241,17 @@ public class RobotContainer {
         // //m_driveController.x().onTrue(m_shooter.commandStop());
 
         // elevator
-        m_mechanismController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1, m_elevator, m_arm, m_coralSim));
-        m_mechanismController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, m_elevator, m_arm, m_coralSim));
+        // m_mechanismController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1, m_elevator, m_arm, m_coralSim));
+        // m_mechanismController.leftTrigger().onTrue(m_elevator.moveToPositionCommand(() -> ElevatorPosition.L2));
+        // m_mechanismController.leftTrigger().onTrue(Commands.run(() -> m_elevator.Raise()));
+        m_mechanismController.leftTrigger().onTrue(m_sideToSide.moveToPositionCommand(() -> SideToSidePosition.LEFT));
+        m_mechanismController.leftBumper().onTrue(m_sideToSide.moveToPositionCommand(() -> SideToSidePosition.RIGHT));
+
+        // m_mechanismController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, m_elevator, m_arm, m_coralSim));
         m_mechanismController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3, m_elevator, m_arm, m_coralSim));
         m_mechanismController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, m_elevator, m_arm, m_coralSim));
 
+        // m_mechanismController.b().onTrue(Commands.run(() -> System.out.printf("mechanism command called")));
         m_mechanismController.a().onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim));
 
         // // // LEFT STICK - Y - ELEVATOR EXTEND/RETRACT
@@ -344,7 +362,7 @@ public class RobotContainer {
 
     public void configureAuto() {
         // AutoManager.getInstance().addRoutine(AutoCommandA.testPath(m_drivetrain));
-        AutoManager.getInstance().addRoutine(AutoCommandA.GDC(m_drivetrain, m_elevator, m_arm, m_coralSim));
+        // AutoManager.getInstance().addRoutine(AutoCommandA.GDC(m_drivetrain, m_elevator, m_arm, m_coralSim));
     }
 
     // public void initializeAuto() {

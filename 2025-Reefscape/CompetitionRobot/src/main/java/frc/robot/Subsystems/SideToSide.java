@@ -11,6 +11,10 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -19,28 +23,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.GlobalStates;
 import frc.robot.PositionTracker;
 import frc.robot.Utils;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
+import frc.robot.Constants.SideToSideConstants;
+import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
 
-import static frc.robot.Constants.Constants.IDs.ELEVATOR_LEFT_ID;
-import static frc.robot.Constants.Constants.IDs.ELEVATOR_RIGHT_ID;
+import static frc.robot.Constants.Constants.IDs.SIDE_TO_SIDE_ID;
 
-import static frc.robot.Constants.ElevatorConstants.kP;
-import static frc.robot.Constants.ElevatorConstants.kI;
-import static frc.robot.Constants.ElevatorConstants.kD;
-import static frc.robot.Constants.ElevatorConstants.kS;
-import static frc.robot.Constants.ElevatorConstants.kG;
-import static frc.robot.Constants.ElevatorConstants.kV;
-import static frc.robot.Constants.ElevatorConstants.kA;
-import static frc.robot.Constants.ElevatorConstants.MOVEMENT_CONSTRAINTS;
+import static frc.robot.Constants.SideToSideConstants.kP;
+import static frc.robot.Constants.SideToSideConstants.kI;
+import static frc.robot.Constants.SideToSideConstants.kD;
+import static frc.robot.Constants.SideToSideConstants.kS;
+import static frc.robot.Constants.SideToSideConstants.kG;
+import static frc.robot.Constants.SideToSideConstants.kV;
+import static frc.robot.Constants.SideToSideConstants.kA;
+import static frc.robot.Constants.SideToSideConstants.MOVEMENT_CONSTRAINTS;
 
 import java.util.function.Supplier;
 
-public class Elevator extends SubsystemBase implements BaseLinearMechanism<ElevatorPosition> {
+public class SideToSide extends SubsystemBase implements BaseLinearMechanism<SideToSidePosition> {
+    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    private final NetworkTable table = inst.getTable("Mechanisms");
+    private final DoublePublisher sideToSidePub = table.getDoubleTopic("Side To Side").publish();
 
-    private TalonFX m_elevator1;
-    private TalonFX m_elevator2;
+    private TalonFX m_sideToSideMotor;
 
     private double simVelocity = 0.0;
 
@@ -67,11 +73,6 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     // @Log
     private boolean initialized;
 
-//     private ElevatorStowCommand m_elevatorStowCommand = new ElevatorStowCommand(this, STOWED_ENCODER_VAL);
-//     private ElevatorDeployCommand m_elevatorDeployCommand = new ElevatorDeployCommand(this, DEPLOYED_ENCODER_VAL);
-//     private ElevatorExtendCommand m_eElevatorExtendCommand = new ElevatorExtendCommand(this, EXTEND_ENCODER_VAL);
-//     private ElevatorRetractCommand m_elevatorRetractCommand = new ElevatorRetractCommand(this, RETRACT_ENCODER_VAL);
-
     // private final ElevatorSim elevatorSim = new ElevatorSim(
     //     MOTOR_GEARBOX_REPR,
     //     GEARING,
@@ -82,9 +83,9 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     //     true,
     //     ElevatorPosition.BOTTOM.value);
 
-    public Elevator(PositionTracker positionTracker) {
+    public SideToSide(PositionTracker positionTracker) {
         m_positionTracker = positionTracker;
-        positionTracker.setElevatorPositionSupplier(this::getPosition);
+        positionTracker.setSideToSidePositionSupplier(this::getPosition);
 
         // // set slot 0 gains
         // var slot0Configs = talonFXConfigs.Slot0;
@@ -114,27 +115,16 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         // motor1.configMotionAcceleration(369, 0);
         // motor2.configMotionAcceleration(369, 0);
 
-        m_elevator1 = new TalonFX(ELEVATOR_LEFT_ID);
+        m_sideToSideMotor = new TalonFX(SIDE_TO_SIDE_ID);
         // m_elevator1.setInverted(false);
-        m_elevator1.setNeutralMode(NeutralModeValue.Brake);
+        m_sideToSideMotor.setNeutralMode(NeutralModeValue.Brake);
         //m_elevatorPivot.setPosition(0);
         var configs1 = new TalonFXConfiguration();
         configs1.CurrentLimits = new CurrentLimitsConfigs();
         configs1.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        m_elevator1.getConfigurator().apply(configs1);
-
-        m_elevator2 = new TalonFX(ELEVATOR_RIGHT_ID);
-        // m_elevator2.setInverted(false);
-        m_elevator2.setNeutralMode(NeutralModeValue.Brake);
-        //m_elevator.setPosition(0);
-        var configs2 = new TalonFXConfiguration();
-        configs2.CurrentLimits = new CurrentLimitsConfigs();
-        configs1.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        // configs.CurrentLimits.SupplyCurrentLimit = 20;
-        // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        m_elevator2.getConfigurator().apply(configs2);
+        m_sideToSideMotor.getConfigurator().apply(configs1);
 
         // zeroValue = zero;
         // halfValue = half;
@@ -144,109 +134,9 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         // m2EncoderVal = 0;
         // elevatorMovingIn = false;
         // elevatorMovingOut = false;
+
+        resetPosition();
     }
-
-//     /* public Command CommandExtend() {
-//         return Commands.runOnce(() -> Extend());
-//     }
-
-//     public Command CommandRetract() {
-//         return Commands.runOnce(() -> Retract());
-//     }*/
-
-//     public Command CommandFullExtend() {
-//         return Commands.runOnce(() -> m_eElevatorExtendCommand.schedule());
-//     }
-
-//     public Command CommandFullRetract() {
-//         return Commands.runOnce(() -> m_elevatorRetractCommand.schedule());
-//     }
-
-//     public Command CommandStopExtendRetract() {
-//         return Commands.runOnce(() -> StopExtendRetract());
-//     }
-
-//     public Command CommandPivotDeploy() {
-//         return Commands.runOnce(() -> m_elevatorDeployCommand.schedule());
-//     }
-
-//     public Command CommandPivotStow() {
-//         return Commands.runOnce(() -> m_elevatorStowCommand.schedule());
-//     }
-
-//     public Command CommandPivotStop() {
-//         return Commands.runOnce(() -> StopPivot());
-//     }
-
-    public void Raise() {
-        m_elevator1.set(.25);
-        m_elevator2.set(-.25);
-    }
-
-//     public void Lower() {
-//         m_elevator1.set(-.25);
-//         m_elevator2.set(.25);
-//     }
-
-//     public void SideLeft() {
-//         //set side-to-side motor to positive value
-//     }
-
-//     public void SideRight() {
-//         //set side-to-side motor to negative value
-//     }
-
-// //     public void setExtendRetractMotor(double s) {
-// //         m_elevator.set(s);
-// //     }
-
-//     public void StopElevator() {
-//         m_elevator1.set(0);
-//         m_elevator2.set(0);
-//     }
-
-//     public void setPivot(double s) {
-//         m_elevatorPivot.set(s);
-//     }
-
-//     public void PivotOut() {
-//         setPivot(0.1);
-//     }
-
-//     public void PivotIn() {
-//         setPivot(-0.1);
-//     }
-
-//     public void StopPivot() {
-//         setPivot(0);
-//     }
-
-//     public double getStowedEncoderValue() {
-//         return STOWED_ENCODER_VAL;
-//     }
-
-//     public double getDeployVal() {
-//         return DEPLOYED_ENCODER_VAL;
-//     }
-
-//     public double getExtendEncoderValue() {
-//         var statusSignal = m_elevator.getPosition();
-//         return statusSignal.getValueAsDouble();
-//     }
-
-//     public double getPivotEncoderValue() {
-//         var statusSignal = m_elevatorPivot.getPosition();
-//         return statusSignal.getValueAsDouble();
-//     }
-
-    // public void zero() {
-    //     m_elevator1.setPosition(0);
-    //     m_elevator2.setPosition(0);
-    // }
-
-
-
-
 
     @Override
     public void simulationPeriodic() {
@@ -283,19 +173,19 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     @Override
     public double getPosition() {
-        return m_elevator1.getPosition().getValueAsDouble();
+        return m_sideToSideMotor.getPosition().getValueAsDouble();
     }
 
     public double getVelocity() {
         // if (RobotBase.isReal())
-            return m_elevator1.getVelocity().getValueAsDouble();
+            return m_sideToSideMotor.getVelocity().getValueAsDouble();
         // else
             // return simVelocity;
     }
 
     @Override
     public void resetPosition() {
-        m_elevator1.setPosition(ElevatorPosition.BOTTOM.value);
+        m_sideToSideMotor.setPosition(SideToSidePosition.LEFT.value);
 
         initialized = true;
     }
@@ -303,22 +193,23 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     @Override
     public void setVoltage(double voltage) {
         voltage = MathUtil.clamp(voltage, -12, 12);
-        voltage = Utils.applySoftStops(voltage, getPosition(), ElevatorConstants.MIN_HEIGHT_METERS, ElevatorConstants.MAX_HEIGHT_METERS);
+        voltage = Utils.applySoftStops(voltage, getPosition(), SideToSideConstants.MIN_HEIGHT_METERS, SideToSideConstants.MAX_HEIGHT_METERS);
 
         if (voltage < 0
-                && m_positionTracker.getElevatorPosition() < ElevatorConstants.MOTION_LIMIT
+                && m_positionTracker.getSideToSidePosition() < SideToSideConstants.MOTION_LIMIT
                 && m_positionTracker.getArmAngle() < 0) {
             voltage = 0;
         }
+
+        sideToSidePub.set(m_positionTracker.getSideToSidePosition());
 
         // if (!GlobalStates.INITIALIZED.enabled()) {
         //     voltage = 0.0;
         // }
 
-        voltage = .4;
+        // voltage = .4;
 
-        m_elevator1.setVoltage(voltage);
-        m_elevator2.setVoltage(voltage);
+        m_sideToSideMotor.setVoltage(voltage);
     }
 
     @Override
@@ -327,18 +218,18 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
             feedbackVoltage = pidController.calculate(getPosition());
             feedforwardVoltage = feedforwardController.calculate(getPosition(), pidController.getSetpoint().velocity);
             setVoltage(feedbackVoltage + feedforwardVoltage);
-        }).withName("elevator.moveToCurrentGoal");
+        }).withName("sideToSide.moveToCurrentGoal");
     }
 
     @Override
-    public Command moveToPositionCommand(Supplier<ElevatorPosition> goalPositionSupplier) {
+    public Command moveToPositionCommand(Supplier<SideToSidePosition> goalPositionSupplier) {
         return Commands.sequence(
                 runOnce(() -> pidController.reset(getPosition())),
                 runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
                 moveToCurrentGoalCommand()
                         .until(() -> pidController.atGoal()))
-                .withTimeout(3)
-                .withName("elevator.moveToPosition");
+                // .withTimeout(3)
+                .withName("sideToSide.moveToPosition");
     }
 
     @Override
@@ -346,30 +237,30 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         return Commands.sequence(
                 runOnce(() -> pidController.reset(getPosition())),
                 runOnce(() -> pidController.setGoal(goalPositionSupplier.get())),
-                moveToCurrentGoalCommand().until(this::atGoal)).withName("elevator.moveToArbitraryPosition");
+                moveToCurrentGoalCommand().until(this::atGoal)).withName("sideToSide.moveToArbitraryPosition");
     }
 
     @Override
     public Command movePositionDeltaCommand(Supplier<Double> delta) {
         return moveToArbitraryPositionCommand(() -> pidController.getGoal().position + delta.get())
-                .withName("elevator.movePositionDelta");
+                .withName("sideToSide.movePositionDelta");
     }
 
     @Override
     public Command holdCurrentPositionCommand() {
         return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
-                .withName("elevator.holdCurrentPosition");
+                .withName("sideToSide.holdCurrentPosition");
     }
 
     @Override
     public Command resetPositionCommand() {
-        return runOnce(this::resetPosition).withName("elevator.resetPosition");
+        return runOnce(this::resetPosition).withName("sideToSide.resetPosition");
     }
 
     @Override
     public Command setOverridenSpeedCommand(Supplier<Double> speed) {
         return runEnd(() -> setVoltage(12.0 * speed.get()), () -> setVoltage(0))
-                .withName("elevator.setOverriddenSpeed");
+                .withName("sideToSide.setOverriddenSpeed");
     }
 
     @Override
@@ -380,12 +271,11 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
                     // motor.setIdleMode(IdleMode.kBrake);
                     pidController.reset(getPosition());
                 }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                .withName("elevator.coastMotorsCommand");
+                .withName("sideToSide.coastMotorsCommand");
     }
 
     private void stopMotors() {
-        m_elevator1.stopMotor();
-        m_elevator2.stopMotor();
+        m_sideToSideMotor.stopMotor();
     }
 
     // public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {
