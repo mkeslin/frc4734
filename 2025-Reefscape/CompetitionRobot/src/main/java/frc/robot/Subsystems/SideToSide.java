@@ -75,7 +75,7 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
         m_sideToSideMotor.setNeutralMode(NeutralModeValue.Brake);
 
         // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();
-        talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        talonFxConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_sideToSideMotor.getConfigurator().apply(talonFxConfigs);
