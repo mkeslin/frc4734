@@ -38,7 +38,7 @@ public interface BaseLinearMechanism<T extends Enum<T>> {
      * 
      * @param voltage the voltage to apply to the motors, [-12, 12]
      */
-    public void setVoltage(double voltage);
+    // public void setVoltage(double voltage);
 
     /**
      * Creates a command that continuously applies voltage to the motor controllers
@@ -46,7 +46,7 @@ public interface BaseLinearMechanism<T extends Enum<T>> {
      * 
      * @return the command
      */
-    public Command moveToCurrentGoalCommand();
+    // public Command moveToPositionGoalCommand(double goalPosition);
 
     /**
      * Creates a command that sets the current goal position to the setpoint, and
@@ -58,7 +58,7 @@ public interface BaseLinearMechanism<T extends Enum<T>> {
      * @param goalPositionSupplier a supplier of an instance of the setpoint enum
      * @return the command
      */
-    public Command moveToPositionCommand(Supplier<T> goalPositionSupplier);
+    public Command moveToSetPositionCommand(Supplier<T> goalPositionSupplier);
 
     /**
      * Creates a command that sets the current goal position to the setpoint, and
@@ -92,7 +92,7 @@ public interface BaseLinearMechanism<T extends Enum<T>> {
      * 
      * @return the command
      */
-    public Command holdCurrentPositionCommand();
+    // public Command holdCurrentPositionCommand();
 
     /**
      * Creates an instantaneous command that resets the position of the linear
@@ -112,7 +112,7 @@ public interface BaseLinearMechanism<T extends Enum<T>> {
      * @param speed the speed [-1,1]
      * @return the command
      */
-    public Command setOverridenSpeedCommand(Supplier<Double> speed);
+    // public Command setOverridenSpeedCommand(Supplier<Double> speed);
 
     /**
      * Creates a command stops the motor and sets it to coast mode, to allow for

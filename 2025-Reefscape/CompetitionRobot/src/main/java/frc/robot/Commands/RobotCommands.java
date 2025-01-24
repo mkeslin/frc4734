@@ -9,19 +9,30 @@ import frc.robot.Constants.ArmConstants.ArmPosition;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Constants.ScoreLevel;
+import frc.robot.Constants.ScoreSide;
+import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.CoralSim;
 import frc.robot.Subsystems.CoralSim.CoralSimLocation;
 import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.SideToSide;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class RobotCommands {
-    public static ScoreLevel lastScore = ScoreLevel.None;
+    public static ScoreLevel lastScoreLevel = ScoreLevel.None;
+    public static ScoreSide lastScoreSide = ScoreSide.None;
 
-    public static Command prepareCoralScoreCommand(ScoreLevel level, Elevator elevator, Arm arm,
+    public static Command prepareCoralScoreCommand(
+            ScoreLevel level,
+            ScoreSide side,
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide,
             CoralSim coralSim) {
         ElevatorPosition elevatorPosition;
         ArmPosition armPosition;
+        SideToSidePosition sideToSidePosition;
+
         switch (level) {
             case L1 -> {
                 elevatorPosition = ElevatorPosition.L1;
@@ -44,18 +55,41 @@ public class RobotCommands {
             }
         }
 
+        switch (side) {
+            case Left -> {
+                sideToSidePosition = SideToSidePosition.LEFT;
+            }
+            case Right -> {
+                sideToSidePosition = SideToSidePosition.RIGHT;
+            }
+            default -> {
+                throw new IllegalArgumentException("Invalid ScoreSide");
+            }
+        }
+
         return Commands.runOnce(() -> {
-            lastScore = level;
-        }).andThen(Commands.parallel(
-                arm.moveToPositionCommand(() -> armPosition).asProxy(),
-                Commands.waitSeconds(0.5).andThen(
-                        elevator.moveToPositionCommand(() -> elevatorPosition).asProxy())));
+            lastScoreLevel = level;
+            lastScoreSide = side;
+        }).andThen(
+                Commands.parallel(
+                        arm.moveToSetPositionCommand(() -> armPosition).asProxy(),
+                        sideToSide.moveToSetPositionCommand(() -> sideToSidePosition).asProxy(),
+                        Commands
+                                .waitSeconds(0.5)
+                                .andThen(elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy())));
     }
 
-    public static Command autoPrepareCoralScoreCommand(ScoreLevel level, Elevator elevator, Arm arm,
+    public static Command autoPrepareCoralScoreCommand(
+            ScoreLevel level,
+            ScoreSide side,
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide,
             CoralSim coralSim) {
         ElevatorPosition elevatorPosition;
         ArmPosition armPosition;
+        SideToSidePosition sideToSidePosition;
+
         switch (level) {
             case L1 -> {
                 elevatorPosition = ElevatorPosition.L1;
@@ -78,82 +112,119 @@ public class RobotCommands {
             }
         }
 
+        switch (side) {
+            case Left -> {
+                sideToSidePosition = SideToSidePosition.LEFT;
+            }
+            case Right -> {
+                sideToSidePosition = SideToSidePosition.RIGHT;
+            }
+            default -> {
+                throw new IllegalArgumentException("Invalid ScoreSide");
+            }
+        }
+
         return Commands.runOnce(() -> {
-            lastScore = level;
-        }).andThen(Commands.parallel(
-                Commands.waitSeconds(0.5).andThen(arm.moveToPositionCommand(() -> armPosition))
-                        .asProxy(),
-                Commands.waitSeconds(0).andThen(
-                        elevator.moveToPositionCommand(() -> elevatorPosition).asProxy())));
+            lastScoreLevel = level;
+            lastScoreSide = side;
+        }).andThen(
+                Commands.parallel(
+                        Commands.waitSeconds(0.5)
+                                .andThen(arm.moveToSetPositionCommand(() -> armPosition)).asProxy(),
+                        Commands.waitSeconds(0)
+                                .andThen(sideToSide.moveToSetPositionCommand(() -> sideToSidePosition)).asProxy(),
+                        Commands.waitSeconds(0)
+                                .andThen(elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy())));
     }
 
-    public static Command scoreCoralCommand(CommandSwerveDrivetrain drivetrain, Elevator elevator,
-            Arm arm, CoralSim coralSim) {
+    public static Command scoreCoralCommand(
+            CommandSwerveDrivetrain drivetrain,
+            Elevator elevator,
+            Arm arm,
+            CoralSim coralSim) {
         Map<ScoreLevel, Command> commandMap = Map.ofEntries(
                 Map.entry(ScoreLevel.L1,
-                        Commands.parallel(drivetrain.moveVoltageTimeCommand(4, 0.5),
-                                elevator.movePositionDeltaCommand(
-                                        () -> ElevatorConstants.SCORING_MOVEMENT).asProxy())),
-                Map.entry(ScoreLevel.L2, Commands.parallel(arm
-                        .movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
-                Map.entry(ScoreLevel.L3, Commands.parallel(arm
-                        .movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
-                Map.entry(ScoreLevel.L4, Commands.parallel(
-                        arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy(),
-                        Commands.waitSeconds(0.5)
-                                .andThen(elevator.movePositionDeltaCommand(
-                                        () -> ElevatorConstants.SCORING_MOVEMENT))
-                                .asProxy())),
+                        Commands.parallel(
+                                // drivetrain.moveVoltageTimeCommand(4, 0.5),
+                                elevator.movePositionDeltaCommand(() -> ElevatorConstants.SCORING_MOVEMENT).asProxy())),
+                Map.entry(ScoreLevel.L2,
+                        Commands.parallel(
+                                arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
+                Map.entry(ScoreLevel.L3,
+                        Commands.parallel(
+                                arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
+                Map.entry(ScoreLevel.L4,
+                        Commands.parallel(
+                                arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy(),
+                                Commands.waitSeconds(0.5)
+                                        .andThen(
+                                                elevator.movePositionDeltaCommand(
+                                                        () -> ElevatorConstants.SCORING_MOVEMENT))
+                                        .asProxy())),
                 Map.entry(ScoreLevel.None, Commands.none()));
 
-        return Commands.select(commandMap, () -> lastScore);
+        return Commands.select(commandMap, () -> lastScoreLevel);
     }
 
-    public static Command prepareIntakeCoralCommand(Elevator elevator, Arm arm, CoralSim coralSim) {
-        return Commands.sequence(Commands.parallel(
-                elevator.moveToPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy(),
-                arm.moveToPositionCommand(() -> ArmPosition.BOTTOM).asProxy()));
-    }
-
-    public static Command intakeCoralCommand(Elevator elevator, Arm arm, CoralSim coralSim) {
-        return Commands
-                .sequence(prepareIntakeCoralCommand(elevator, arm, coralSim), Commands.parallel(
-                        elevator.moveToPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
-                        arm.moveToPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
-                        elevator.movePositionDeltaCommand(() -> 0.31).asProxy()
-                                .alongWith(Commands.waitSeconds(0.1).andThen(
-                                        coralSim.setLocationCommand(CoralSimLocation.CLAW))),
-                        Commands.parallel(
-                                Commands.waitSeconds(0.5)
-                                        .andThen(elevator.moveToPositionCommand(
-                                                () -> ElevatorPosition.BOTTOM).asProxy()),
-                                arm.moveToPositionCommand(() -> ArmPosition.TOP).asProxy()));
-    }
-
-    public static Command intakeIntoScoreCommand(ScoreLevel level, Elevator elevator, Arm arm,
+    public static Command prepareIntakeCoralCommand(
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide,
             CoralSim coralSim) {
-        return Commands
-                .sequence(
-                        Commands.parallel(
-                                elevator.moveToPositionCommand(() -> ElevatorPosition.INTAKE)
-                                        .asProxy(),
-                                arm.moveToPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
-                        autoPrepareCoralScoreCommand(level, elevator, arm, coralSim)
-                                .alongWith(Commands.waitSeconds(0.1).andThen(
-                                        coralSim.setLocationCommand(CoralSimLocation.CLAW))));
+        return Commands.sequence(
+                Commands.parallel(
+                        sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy(),
+                        elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy(),
+                        arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()));
     }
 
-    public static Command prepareAlgaeL2RemoveCommand(Elevator elevator, Arm arm) {
-        return Commands.sequence(Commands.parallel(
-                elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE_L2).asProxy(),
-                arm.moveToPositionCommand(() -> ArmPosition.HORIZONTAL).asProxy()));
+    public static Command intakeCoralCommand(
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide,
+            CoralSim coralSim) {
+        return Commands.sequence(
+                prepareIntakeCoralCommand(elevator, arm, sideToSide, coralSim),
+                Commands.parallel(
+                        elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
+                        arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
+                elevator.movePositionDeltaCommand(() -> 0.31).asProxy()
+                        .alongWith(Commands.waitSeconds(0.1).andThen(
+                                coralSim.setLocationCommand(CoralSimLocation.CLAW))),
+                Commands.parallel(
+                        Commands.waitSeconds(0.5)
+                                .andThen(elevator.moveToSetPositionCommand(
+                                        () -> ElevatorPosition.BOTTOM).asProxy()),
+                        arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()));
     }
 
-    public static Command prepareAlgaeL3RemoveCommand(Elevator elevator, Arm arm) {
-        return Commands.sequence(Commands.parallel(
-                elevator.moveToPositionCommand(() -> ElevatorPosition.ALGAE_L3).asProxy(),
-                arm.moveToPositionCommand(() -> ArmPosition.HORIZONTAL).asProxy()));
+    public static Command intakeAndScoreCommand(
+            ScoreLevel level,
+            ScoreSide side,
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide,
+            CoralSim coralSim) {
+        return Commands.sequence(
+                Commands.parallel(
+                        elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
+                        arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
+                autoPrepareCoralScoreCommand(level, side, elevator, arm, sideToSide, coralSim)
+                        .alongWith(Commands.waitSeconds(0.1).andThen(
+                                coralSim.setLocationCommand(CoralSimLocation.CLAW))));
     }
+
+    // public static Command prepareAlgaeL2RemoveCommand(Elevator elevator, Arm arm) {
+    // return Commands.sequence(Commands.parallel(
+    // elevator.moveToSetPositionCommand(() -> ElevatorPosition.ALGAE_L2).asProxy(),
+    // arm.moveToPositionCommand(() -> ArmPosition.HORIZONTAL).asProxy()));
+    // }
+
+    // public static Command prepareAlgaeL3RemoveCommand(Elevator elevator, Arm arm) {
+    // return Commands.sequence(Commands.parallel(
+    // elevator.moveToSetPositionCommand(() -> ElevatorPosition.ALGAE_L3).asProxy(),
+    // arm.moveToPositionCommand(() -> ArmPosition.HORIZONTAL).asProxy()));
+    // }
 
     // public static Command algaeRemoveCommand(Drivetrain drivetrain, Elevator
     // elevator, Arm arm) {
