@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ArmConstants.ArmPosition;
+import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
 import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
@@ -150,8 +151,10 @@ public class RobotContainer {
         
         // m_mechanismController.leftTrigger().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.LEFT));
         // m_mechanismController.leftBumper().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.RIGHT));
-        m_mechanismController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
-        m_mechanismController.rightBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L3));
+        // m_mechanismController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
+        // m_mechanismController.rightBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L3));
+        m_mechanismController.rightTrigger().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM));
+        m_mechanismController.rightBumper().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3));
 
         // m_mechanismController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, m_elevator,
         // m_arm, m_coralSim));

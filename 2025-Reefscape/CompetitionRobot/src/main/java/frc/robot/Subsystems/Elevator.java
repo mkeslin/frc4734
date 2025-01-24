@@ -7,8 +7,9 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.StrictFollower;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -73,15 +74,15 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         motionMagicConfigs.MotionMagicAcceleration = 200; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
+        talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
         m_elevatorLeftLeaderMotor = new TalonFX(ELEVATOR_LEFT_ID);
         m_elevatorLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
-        m_elevatorLeftLeaderMotor.setInverted(true);
         m_elevatorLeftLeaderMotor.getConfigurator().apply(talonFxConfigs);
 
         m_elevatorRightFollowerMotor = new TalonFX(ELEVATOR_RIGHT_ID);
         m_elevatorLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
-        m_elevatorRightFollowerMotor.setInverted(!m_elevatorLeftLeaderMotor.getInverted());
-        m_elevatorRightFollowerMotor.setControl(new StrictFollower(m_elevatorLeftLeaderMotor.getDeviceID()));
+        m_elevatorRightFollowerMotor.setControl(new Follower(m_elevatorLeftLeaderMotor.getDeviceID(), false));
 
         resetPosition();
     }
@@ -164,9 +165,8 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     // @Override
     private Command moveToPositionCommand(double goalPosition) {
         return run(() -> {
-            // m_elevatorLeftLeaderMotor.setControl(m_request.withPosition(goalPosition));
-            // // m_elevatorRightFollowerMotor.setControl(new StrictFollower(m_elevatorLeftLeaderMotor.getDeviceID()));
-            // elevatorPub.set(m_positionTracker.getElevatorPosition());
+            m_elevatorLeftLeaderMotor.setControl(m_request.withPosition(goalPosition));
+            elevatorPub.set(m_positionTracker.getElevatorPosition());
         }).withName("elevator.moveToPosition");
     }
 

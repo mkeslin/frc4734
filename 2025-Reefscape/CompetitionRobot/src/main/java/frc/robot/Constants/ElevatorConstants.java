@@ -2,15 +2,25 @@ package frc.robot.Constants;
 
 public class ElevatorConstants {
     public static enum ElevatorPosition {
-        BOTTOM(0.0698),
+        // BOTTOM(0.0698),
+        // INTAKE_PREP(0.55),
+        // INTAKE(0.355),
+        // ALGAE_L2(0.884),
+        // ALGAE_L3(1.234),
+        // L1(0.323),
+        // L2(0.31),
+        // L3(0.70),
+        // L4(1.27),
+        // TOP(1.57);
+
+        BOTTOM(0),
         INTAKE_PREP(0.55),
         INTAKE(0.355),
         ALGAE_L2(0.884),
         ALGAE_L3(1.234),
-
         L1(0.323),
         L2(0.31),
-        L3(0.70),
+        L3(100),               // 
         L4(1.27),
         TOP(1.57);
 
