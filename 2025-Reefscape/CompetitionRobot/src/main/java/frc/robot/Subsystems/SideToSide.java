@@ -53,33 +53,12 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
 
     private double simVelocity = 0.0;
 
-    // @Log(groups = "control")
-    // private final ProfiledPIDController pidController = new ProfiledPIDController(kP, kI, kD, MOVEMENT_CONSTRAINTS);
-
-    // @Log(groups = "control")
-    // private final ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
-
-    // private double RETRACT_ENCODER_VAL = 2; //Actual Stowed Value: 0
-    // private double EXTEND_L1_ENCODER_VAL = 300; //Actual Deploy Value: 320
-    // private double EXTEND_L2_ENCODER_VAL = 300; //Actual Deploy Value: 320
-    // private double EXTEND_L3_ENCODER_VAL = 300; //Actual Deploy Value: 320
-    // private double EXTEND_L4_ENCODER_VAL = 300; //Actual Deploy Value: 320
-
     private final PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
 
-    // @Log(groups = "control")
-    // private double feedbackVoltage = 0;
-    // @Log(groups = "control")
-    // private double feedforwardVoltage = 0;
-
-    // private PositionVoltage m_positionVoltage = null;
     private MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
-    // @Log
     private boolean initialized;
-
-    private double m_goalPosition = 0;
 
     // private final ElevatorSim elevatorSim = new ElevatorSim(
     // MOTOR_GEARBOX_REPR,
@@ -112,40 +91,14 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
         motionMagicConfigs.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-        // motor1.getConfigurator().apply(talonFXConfigs);
-        // motor2.getConfigurator().apply(talonFXConfigs);
-
-        // motor1.config_kD(0, 0.69, 0);
-        // motor2.config_kD(0, 0.69, 0);
-        // motor1.config_kI(0, 0.001, 0);
-        // motor2.config_kI(0, 0.001, 0);
-        // motor1.config_kF(0, 0.069, 0);
-        // motor2.config_kF(0, 0.069, 0);
-        // motor1.configMotionCruiseVelocity(739, 0);
-        // motor2.configMotionCruiseVelocity(739, 0);
-        // motor1.configMotionAcceleration(369, 0);
-        // motor2.configMotionAcceleration(369, 0);
-
         m_sideToSideMotor = new TalonFX(SIDE_TO_SIDE_ID);
-        // m_elevator1.setInverted(false);
         m_sideToSideMotor.setNeutralMode(NeutralModeValue.Brake);
-        // m_elevatorPivot.setPosition(0);
 
         // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();
         // talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_sideToSideMotor.getConfigurator().apply(talonFxConfigs);
-        // m_sideToSideMotor.getConfigurator().apply(slot0Configs);
-
-        // zeroValue = zero;
-        // halfValue = half;
-        // fullValue = full;
-        // name = n;
-        // m1EncoderVal = 0;
-        // m2EncoderVal = 0;
-        // elevatorMovingIn = false;
-        // elevatorMovingOut = false;
 
         resetPosition();
     }
@@ -202,111 +155,89 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
         initialized = true;
     }
 
-    @Override
-    public void setVoltage(double voltage) {
-        voltage = MathUtil.clamp(voltage, -12, 12);
-        voltage = Utils.applySoftStops(voltage, getPosition(), SideToSideConstants.MIN_HEIGHT_METERS,
-                SideToSideConstants.MAX_HEIGHT_METERS);
+    // @Override
+    // public void setVoltage(double voltage) {
+    //     voltage = MathUtil.clamp(voltage, -12, 12);
+    //     voltage = Utils.applySoftStops(voltage, getPosition(), SideToSideConstants.MIN_HEIGHT_METERS,
+    //             SideToSideConstants.MAX_HEIGHT_METERS);
 
-        if (voltage < 0
-                && m_positionTracker.getSideToSidePosition() < SideToSideConstants.MOTION_LIMIT
-                && m_positionTracker.getArmAngle() < 0) {
-            voltage = 0;
-        }
+    //     if (voltage < 0
+    //             && m_positionTracker.getSideToSidePosition() < SideToSideConstants.MOTION_LIMIT
+    //             && m_positionTracker.getArmAngle() < 0) {
+    //         voltage = 0;
+    //     }
 
-        sideToSidePub.set(m_positionTracker.getSideToSidePosition());
+    //     sideToSidePub.set(m_positionTracker.getSideToSidePosition());
 
-        // if (!GlobalStates.INITIALIZED.enabled()) {
-        // voltage = 0.0;
-        // }
+    //     // if (!GlobalStates.INITIALIZED.enabled()) {
+    //     // voltage = 0.0;
+    //     // }
 
-        // voltage = .4;
+    //     // m_sideToSideMotor.setVoltage(voltage);
+    // }
 
-        // m_sideToSideMotor.setVoltage(voltage);
-    }
-
-    @Override
-    public Command moveToCurrentGoalCommand() {
-        return run(() -> {
-
-            // feedbackVoltage = pidController.calculate(getPosition());
-            // feedforwardVoltage = feedforwardController.calculate(getPosition(),
-            // pidController.getSetpoint().velocity);
-            // setVoltage(feedbackVoltage + feedforwardVoltage);
-
-            // m_positionVoltage = new PositionVoltage(0).withSlot(0);
-            // m_sideToSideMotor.setControl(m_positionVoltage.withPosition(getPosition()));
-
-            m_sideToSideMotor.setControl(m_request.withPosition(m_goalPosition));
-
-            sideToSidePub.set(m_positionTracker.getSideToSidePosition());
-        }).withName("sideToSide.moveToCurrentGoal");
-    }
+    // @Override
+    // public Command moveToCurrentGoalCommand() {
+    //     return run(() -> {
+    //         m_sideToSideMotor.setControl(m_request.withPosition(m_goalPosition));
+    //         sideToSidePub.set(m_positionTracker.getSideToSidePosition());
+    //     }).withName("sideToSide.moveToCurrentGoal");
+    // }
 
     @Override
     public Command moveToPositionCommand(Supplier<SideToSidePosition> goalPositionSupplier) {
-        // m_goalPosition = goalPositionSupplier.get().value;
-
         return Commands.sequence(run(() -> {
-            // runOnce(() -> pidController.reset(getPosition())),
-            // runOnce(() -> pidController.setGoal(goalPositionSupplier.get().value)),
-            // moveToCurrentGoalCommand().until(() -> pidController.atGoal()))
-
             m_sideToSideMotor.setControl(m_request.withPosition(goalPositionSupplier.get().value));
-
             sideToSidePub.set(m_positionTracker.getSideToSidePosition());
-
-            // moveToCurrentGoalCommand())
-            // .withTimeout(3)
         })).withName("sideToSide.moveToPosition");
     }
 
     @Override
     public Command moveToArbitraryPositionCommand(Supplier<Double> goalPositionSupplier) {
-        return Commands.sequence(
-                // runOnce(() -> pidController.reset(getPosition())),
-                // runOnce(() -> pidController.setGoal(goalPositionSupplier.get())),
-                // moveToCurrentGoalCommand().until(this::atGoal)).withName("sideToSide.moveToArbitraryPosition");
-                moveToCurrentGoalCommand()).withName("sideToSide.moveToArbitraryPosition");
+        return Commands.sequence(run(() -> {
+            m_sideToSideMotor.setControl(m_request.withPosition(goalPositionSupplier.get().value));
+            sideToSidePub.set(m_positionTracker.getSideToSidePosition());
+        })).withName("sideToSide.moveToArbitraryPosition");
     }
 
     @Override
     public Command movePositionDeltaCommand(Supplier<Double> delta) {
-        // return moveToArbitraryPositionCommand(() -> pidController.getGoal().position + delta.get())
-        // .withName("sideToSide.movePositionDelta");
-        return null;
+        return Commands.sequence(run(() -> { 
+            moveToArbitraryPositionCommand(() -> getPosition() + delta.get().value);
+            sideToSidePub.set(m_positionTracker.getSideToSidePosition());
+        })).withName("sideToSide.movePositionDelta");
     }
 
-    @Override
-    public Command holdCurrentPositionCommand() {
-        // return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
-        // .withName("sideToSide.holdCurrentPosition");
-        return null;
-    }
+    // @Override
+    // public Command holdCurrentPositionCommand() {
+    //     // return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
+    //     // .withName("sideToSide.holdCurrentPosition");
+    //     return null;
+    // }
 
     @Override
     public Command resetPositionCommand() {
         return runOnce(this::resetPosition).withName("sideToSide.resetPosition");
     }
 
-    @Override
-    public Command setOverridenSpeedCommand(Supplier<Double> speed) {
-        // return runEnd(() -> setVoltage(12.0 * speed.get()), () -> setVoltage(0))
-        // .withName("sideToSide.setOverriddenSpeed");
-        return null;
-    }
+    // @Override
+    // public Command setOverridenSpeedCommand(Supplier<Double> speed) {
+    //     // return runEnd(() -> setVoltage(12.0 * speed.get()), () -> setVoltage(0))
+    //     // .withName("sideToSide.setOverriddenSpeed");
+    //     return null;
+    // }
 
-    @Override
-    public Command coastMotorsCommand() {
-        // return runOnce(this::stopMotors)
-        // // .andThen(() -> motor.setIdleMode(IdleMode.kCoast))
-        // .finallyDo((d) -> {
-        // // motor.setIdleMode(IdleMode.kBrake);
-        // pidController.reset(getPosition());
-        // }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-        // .withName("sideToSide.coastMotorsCommand");
-        return null;
-    }
+    // @Override
+    // public Command coastMotorsCommand() {
+    //     // return runOnce(this::stopMotors)
+    //     // // .andThen(() -> motor.setIdleMode(IdleMode.kCoast))
+    //     // .finallyDo((d) -> {
+    //     // // motor.setIdleMode(IdleMode.kBrake);
+    //     // pidController.reset(getPosition());
+    //     // }).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+    //     // .withName("sideToSide.coastMotorsCommand");
+    //     return null;
+    // }
 
     // private void stopMotors() {
     // m_sideToSideMotor.stopMotor();
@@ -325,8 +256,8 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
     // .andThen(Commands.runOnce(() -> pidController.setGoal(getPosition())));
     // }
 
-    public boolean atGoal() {
-        // return pidController.atGoal();
-        return false;
-    }
+    // public boolean atGoal() {
+    //     // return pidController.atGoal();
+    //     return false;
+    // }
 }
