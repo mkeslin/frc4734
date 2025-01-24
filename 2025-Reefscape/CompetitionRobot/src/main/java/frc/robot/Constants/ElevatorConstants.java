@@ -18,11 +18,11 @@ public class ElevatorConstants {
         INTAKE(0.355),
         // ALGAE_L2(0.884),
         // ALGAE_L3(1.234),
-        L1(0.323),
-        L2(0.31),
+        L1(1.275),
+        L2(2),
         L3(2.756836),               // 
-        L4(1.27),
-        TOP(1.57);
+        L4(2.756836),
+        TOP(2.756836);
 
         public final double value;
 
