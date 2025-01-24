@@ -17,10 +17,10 @@ public class ArmConstants {
 
         BOTTOM(0),
         HORIZONTAL(0),
-        L1(0),
-        L2(Units.degreesToRadians(55)), // reef angle
-        L3(8.860352),
-        L4(1.033),
+        L1(5),
+        L2(7), // reef angle
+        L3(9),
+        L4(10),
         TOP(2);
 
         public final double value;
