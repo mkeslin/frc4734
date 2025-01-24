@@ -110,8 +110,8 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFxConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 100; // Target cruise velocity of 80 rps
-        motionMagicConfigs.MotionMagicAcceleration = 200; // Target acceleration of 160 rps/s (0.5 seconds)
+        motionMagicConfigs.MotionMagicCruiseVelocity = 40; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicAcceleration = 80; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
         m_armMotor = new TalonFX(ARM_ID);
@@ -203,8 +203,8 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     // }
     private Command moveToPositionCommand(double goalPosition) {
         return run(() -> {
-            // m_armMotor.setControl(m_request.withPosition(goalPosition));
-            // armPub.set(m_positionTracker.getArmAngle());
+            m_armMotor.setControl(m_request.withPosition(goalPosition));
+            armPub.set(m_positionTracker.getArmAngle());
         }).withName("arm.moveToPosition");
     }
 

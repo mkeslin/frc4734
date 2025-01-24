@@ -7,13 +7,21 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class ArmConstants {
     public static enum ArmPosition {
-        BOTTOM(-Math.PI / 2.0 + Units.degreesToRadians(5)),
+        // BOTTOM(-Math.PI / 2.0 + Units.degreesToRadians(5)),
+        // HORIZONTAL(0),
+        // L1(0),
+        // L2(Units.degreesToRadians(55)), // reef angle
+        // L3(Units.degreesToRadians(55)),
+        // L4(1.033),
+        // TOP(Math.PI / 2.0);
+
+        BOTTOM(0),
         HORIZONTAL(0),
         L1(0),
         L2(Units.degreesToRadians(55)), // reef angle
-        L3(Units.degreesToRadians(55)),
+        L3(8.860352),
         L4(1.033),
-        TOP(Math.PI / 2.0);
+        TOP(2);
 
         public final double value;
 
