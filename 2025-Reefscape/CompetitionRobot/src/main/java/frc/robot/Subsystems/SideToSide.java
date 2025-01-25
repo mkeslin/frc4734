@@ -130,7 +130,7 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
 
     @Override
     public void resetPosition() {
-        m_sideToSideMotor.setPosition(SideToSidePosition.LEFT.value);
+        m_sideToSideMotor.setPosition(SideToSidePosition.CENTER.value);
 
         initialized = true;
     }

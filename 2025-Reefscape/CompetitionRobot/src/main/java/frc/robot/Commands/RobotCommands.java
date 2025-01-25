@@ -72,11 +72,15 @@ public class RobotCommands {
             lastScoreSide = side;
         }).andThen(
                 Commands.parallel(
-                        arm.moveToSetPositionCommand(() -> armPosition).asProxy(),
-                        sideToSide.moveToSetPositionCommand(() -> sideToSidePosition).asProxy(),
                         Commands
-                                .waitSeconds(0.5)
-                                .andThen(elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy())));
+                                .waitSeconds(0.0)
+                                .andThen(elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy()),
+                        Commands
+                                .waitSeconds(1.0)
+                                .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy()),
+                        Commands
+                                .waitSeconds(2.0)
+                                .andThen(sideToSide.moveToSetPositionCommand(() -> sideToSidePosition).asProxy())));
     }
 
     public static Command autoPrepareCoralScoreCommand(
