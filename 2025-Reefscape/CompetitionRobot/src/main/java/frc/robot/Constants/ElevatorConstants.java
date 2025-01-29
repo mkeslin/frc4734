@@ -14,15 +14,15 @@ public class ElevatorConstants {
         // TOP(1.57);
 
         BOTTOM(0),
-        INTAKE_PREP(0.55),
+        INTAKE_PREP(4.283203 ),
         INTAKE(0.355),
         // ALGAE_L2(0.884),
         // ALGAE_L3(1.234),
-        L1(1.275),
-        L2(2),
-        L3(2.756836),               // 
-        L4(2.756836),
-        TOP(2.756836);
+        L1(4.283203 ),
+        L2(8.024902),
+        L3(15),               // 
+        L4(20),
+        TOP(22.021484);
 
         public final double value;
 

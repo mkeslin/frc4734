@@ -138,21 +138,23 @@ public class RobotContainer {
         // m_mechanismController.rightBumper().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER));
 
         // ARM
-        m_mechanismController.leftTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
-        m_mechanismController.leftBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L1));
-        m_mechanismController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L2));
-        m_mechanismController.rightBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L4));
-        m_mechanismController.x().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP));
+        // m_mechanismController.leftTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
+        // m_mechanismController.leftBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L1));
+        // m_mechanismController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L2));
+        // m_mechanismController.rightBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L4));
+        // m_mechanismController.x().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP));
 
         // ELEVATOR
-        // m_mechanismController.rightTrigger().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM));
+        // m_mechanismController.leftTrigger().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM));
+        // m_mechanismController.leftBumper().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.L1));
+        // m_mechanismController.rightTrigger().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.L2));
         // m_mechanismController.rightBumper().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3));
 
         // PREPARE TO SCORE
-        // m_mechanismController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
-        //         ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
-        // m_mechanismController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
-        //         ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_mechanismController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_mechanismController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
 
         // m_mechanismController.b().onTrue(Commands.run(() -> System.out.printf("mechanism command called")));
         // m_mechanismController.a().onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim));
@@ -181,6 +183,10 @@ public class RobotContainer {
 
         // m_driveController.leftTrigger().onTrue(Commands.runOnce(() -> resetPose(),
         // m_pathPlanner));
+
+        // m_mechanismController.y().onTrue(Commands.runOnce(() -> {
+
+        // }));
 
         m_mechanismController.y().onTrue(Commands.runOnce(() -> {
             m_sideToSide.resetPosition();
