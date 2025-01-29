@@ -10,6 +10,7 @@ public class Constants {
         public static final int ELEVATOR_RIGHT_ID = 21;
         public static final int SIDE_TO_SIDE_ID = 22;
         public static final int ARM_ID = 23;
+        public static final int CLIMBER_ID = 24;
 
         // public static final int CLIMBER_RIGHT_ID = 60;
         // public static final int CLIMBER_LEFT_ID = 61;

@@ -118,7 +118,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         m_armMotor.setNeutralMode(NeutralModeValue.Brake);
 
         // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();
-        talonFxConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_armMotor.getConfigurator().apply(talonFxConfigs);
