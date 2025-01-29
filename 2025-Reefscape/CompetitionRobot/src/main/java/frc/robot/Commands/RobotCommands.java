@@ -76,10 +76,10 @@ public class RobotCommands {
                                 .waitSeconds(0.0)
                                 .andThen(elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy()),
                         Commands
-                                .waitSeconds(1.0)
+                                .waitSeconds(0.5)
                                 .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy()),
                         Commands
-                                .waitSeconds(2.0)
+                                .waitSeconds(1.0)
                                 .andThen(sideToSide.moveToSetPositionCommand(() -> sideToSidePosition).asProxy())));
     }
 
@@ -216,6 +216,22 @@ public class RobotCommands {
                 autoPrepareCoralScoreCommand(level, side, elevator, arm, sideToSide, coralSim)
                         .alongWith(Commands.waitSeconds(0.1).andThen(
                                 coralSim.setLocationCommand(CoralSimLocation.CLAW))));
+    }
+
+    public static Command returnToStartPositions(
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide) {
+        return Commands.parallel(
+            Commands
+                    .waitSeconds(1.0)
+                    .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM).asProxy()),
+            Commands
+                    .waitSeconds(0.5)
+                    .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
+            Commands
+                    .waitSeconds(0.0)
+                    .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()));
     }
 
     // public static Command prepareAlgaeL2RemoveCommand(Elevator elevator, Arm arm) {

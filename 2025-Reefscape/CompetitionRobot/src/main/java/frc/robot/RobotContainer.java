@@ -184,10 +184,10 @@ public class RobotContainer {
         // m_driveController.leftTrigger().onTrue(Commands.runOnce(() -> resetPose(),
         // m_pathPlanner));
 
-        // m_mechanismController.y().onTrue(Commands.runOnce(() -> {
+        // MOVE TO START POSITION
+        m_mechanismController.b().onTrue(RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide));
 
-        // }));
-
+        // SET CURRENT POSITION TO ZERO
         m_mechanismController.y().onTrue(Commands.runOnce(() -> {
             m_sideToSide.resetPosition();
             m_arm.resetPosition();
