@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.RobotCommands;
@@ -132,13 +133,16 @@ public class RobotContainer {
 
     private void configureMechanismBindings() {
         // SIDE-TO-SIDE
-        m_mechanismController.leftTrigger().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.LEFT));
-        m_mechanismController.leftBumper().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.RIGHT));
-        m_mechanismController.rightBumper().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER));
+        // m_mechanismController.leftTrigger().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.LEFT));
+        // m_mechanismController.leftBumper().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.RIGHT));
+        // m_mechanismController.rightBumper().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER));
 
         // ARM
-        // m_mechanismController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
-        // m_mechanismController.rightBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L3));
+        m_mechanismController.leftTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
+        m_mechanismController.leftBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L1));
+        m_mechanismController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L2));
+        m_mechanismController.rightBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L4));
+        m_mechanismController.x().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP));
 
         // ELEVATOR
         // m_mechanismController.rightTrigger().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM));
@@ -177,6 +181,12 @@ public class RobotContainer {
 
         // m_driveController.leftTrigger().onTrue(Commands.runOnce(() -> resetPose(),
         // m_pathPlanner));
+
+        m_mechanismController.y().onTrue(Commands.runOnce(() -> {
+            m_sideToSide.resetPosition();
+            m_arm.resetPosition();
+            m_elevator.resetPosition();
+        }));
     }
 
     public void configureArcadeBindings() {
