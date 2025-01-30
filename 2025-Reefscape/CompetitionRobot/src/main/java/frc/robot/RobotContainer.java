@@ -200,6 +200,25 @@ public class RobotContainer {
     }
 
     public void configureArcadeBindings() {
+
+        m_arcadeController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.b().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.a().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.x().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.y().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
+
+
         // m_arcadeController.a().onTrue(m_intake.commandDeploy());
         // m_arcadeController.x().onTrue(m_intake.commandStow());
 
