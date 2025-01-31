@@ -142,24 +142,24 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     // @Override
     // public void setVoltage(double voltage) {
-    // voltage = MathUtil.clamp(voltage, -12, 12);
-    // voltage = Utils.applySoftStops(voltage, getPosition(), ElevatorConstants.MIN_HEIGHT_METERS,
-    // ElevatorConstants.MAX_HEIGHT_METERS);
+    //     voltage = MathUtil.clamp(voltage, -12, 12);
+    //     // voltage = Utils.applySoftStops(voltage, getPosition(), ElevatorConstants.MIN_HEIGHT_METERS,
+    //     //         ElevatorConstants.MAX_HEIGHT_METERS);
 
-    // if (voltage < 0
-    // && m_positionTracker.getElevatorPosition() < ElevatorConstants.MOTION_LIMIT
-    // && m_positionTracker.getArmAngle() < 0) {
-    // voltage = 0;
-    // }
+    //     // if (voltage < 0
+    //     //         && m_positionTracker.getElevatorPosition() < ElevatorConstants.MOTION_LIMIT
+    //     //         && m_positionTracker.getArmAngle() < 0) {
+    //     //     voltage = 0;
+    //     // }
 
-    // // if (!GlobalStates.INITIALIZED.enabled()) {
-    // // voltage = 0.0;
-    // // }
+    //     // if (!GlobalStates.INITIALIZED.enabled()) {
+    //     // voltage = 0.0;
+    //     // }
 
-    // voltage = .4;
+    //     // voltage = .4;
 
-    // m_elevatorLeftLeaderMotor.setVoltage(voltage);
-    // m_elevatorRightFollowerMotor.setVoltage(voltage);
+    //     m_elevatorLeftLeaderMotor.setVoltage(voltage);
+    //     m_elevatorRightFollowerMotor.setVoltage(-voltage);
     // }
 
     // @Override
