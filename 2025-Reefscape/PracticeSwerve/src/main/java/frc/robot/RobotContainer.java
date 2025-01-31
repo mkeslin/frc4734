@@ -151,10 +151,11 @@ public class RobotContainer {
         // m_mechanismController.rightTrigger().onTrue(shootAmpNoteCommand);
 
         m_driveController.a().onTrue(m_intake.commandStartIn());
-        // m_driveController.a().onTrue(m_intake.commandStartOut());
+        m_driveController.b().onTrue(m_intake.commandStartOut());
+        m_driveController.x().onTrue(m_intake.commandStop());
 
         // m_driveController.y().onTrue(shootAmpNoteCommand);
-        m_driveController.b().onTrue(intakeEjectCommand);
+        // m_driveController.b().onTrue(intakeEjectCommand);
         // m_driveController.x().onTrue(shootAmpNoteCommand);
         // m_mechanismController.y().onTrue(m_shooter.commandSetAngle(MAX_PIVOT_ENCODER_VAL));
         // m_mechanismController.x().onTrue(m_shooter.commandSetAngle(0));
