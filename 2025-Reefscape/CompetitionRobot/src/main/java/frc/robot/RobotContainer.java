@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.RobotCommands;
@@ -131,36 +132,25 @@ public class RobotContainer {
     }
 
     private void configureMechanismBindings() {
-        // // intake
-        // // driveController.y().onTrue(intake.isOn() ? intake.commandStop() :
-        // intake.commandStartIn());
-        // //m_driveController.y().onTrue(m_intake.commandStartIn());
-        // //m_driveController.x().onTrue(m_intake.commandStopRoller());
-
-        // m_driveController.leftBumper().onTrue(m_intake.commandStow());
-        // m_driveController.leftTrigger().onTrue(m_intake.commandDeploy());
-        // m_driveController.b().onTrue(m_intake.commandStopPivot());
-        // // shooter
-        // //m_driveController.y().onTrue(m_shooter.commandShoot());
-        // //m_driveController.x().onTrue(m_shooter.commandStop());
-
-        // elevator
-        // m_mechanismController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1, m_elevator,
-        // m_arm, m_coralSim));
-        // m_mechanismController.leftTrigger().onTrue(m_elevator.moveToPositionCommand(() -> ElevatorPosition.L2));
-        
+        // SIDE-TO-SIDE
         // m_mechanismController.leftTrigger().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.LEFT));
         // m_mechanismController.leftBumper().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.RIGHT));
-        // m_mechanismController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
-        // m_mechanismController.rightBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L3));
-        // m_mechanismController.rightTrigger().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM));
+        // m_mechanismController.rightBumper().onTrue(m_sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER));
+
+        // ARM
+        // m_mechanismController.leftTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
+        // m_mechanismController.leftBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L1));
+        // m_mechanismController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L2));
+        // m_mechanismController.rightBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L4));
+        // m_mechanismController.x().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP));
+
+        // ELEVATOR
+        // m_mechanismController.leftTrigger().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM));
+        // m_mechanismController.leftBumper().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.L1));
+        // m_mechanismController.rightTrigger().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.L2));
         // m_mechanismController.rightBumper().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3));
 
-        // m_mechanismController.rightTrigger().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM));
-        // m_mechanismController.rightBumper().onTrue(m_elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3));
-
-        // m_mechanismController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, m_elevator,
-        // m_arm, m_coralSim));
+        // PREPARE TO SCORE
         m_mechanismController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
                 ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
         m_mechanismController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
@@ -193,9 +183,42 @@ public class RobotContainer {
 
         // m_driveController.leftTrigger().onTrue(Commands.runOnce(() -> resetPose(),
         // m_pathPlanner));
+
+        m_mechanismController.a().onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim));
+
+        m_mechanismController.x().onTrue(RobotCommands.prepareIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_coralSim));
+
+        // MOVE TO START POSITION
+        m_mechanismController.b().onTrue(RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide));
+
+        // SET CURRENT POSITION TO ZERO
+        m_mechanismController.y().onTrue(Commands.runOnce(() -> {
+            m_sideToSide.resetPosition();
+            m_arm.resetPosition();
+            m_elevator.resetPosition();
+        }));
     }
 
     public void configureArcadeBindings() {
+
+        m_arcadeController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.b().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.a().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.x().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.y().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
+        m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
+
+
         // m_arcadeController.a().onTrue(m_intake.commandDeploy());
         // m_arcadeController.x().onTrue(m_intake.commandStow());
 

@@ -1,9 +1,6 @@
 package frc.robot.Constants;
 
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class ArmConstants {
     public static enum ArmPosition {
@@ -16,12 +13,12 @@ public class ArmConstants {
         // TOP(Math.PI / 2.0);
 
         BOTTOM(0),
-        HORIZONTAL(0),
-        L1(5),
-        L2(7), // reef angle
-        L3(9),
-        L4(10),
-        TOP(2);
+        // HORIZONTAL(0),
+        L1(-6.424805),
+        L2(-10.352051), // reef angle
+        L3(-10.352051),
+        L4(-11.641113),
+        TOP(-13.427246);
 
         public final double value;
 

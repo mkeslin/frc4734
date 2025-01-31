@@ -100,7 +100,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
         // set slot 0 gains
         var slot0Configs = talonFxConfigs.Slot0;
-        slot0Configs.kG = 0.0;
+        slot0Configs.kG = -0.2;
         slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
         slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
         slot0Configs.kA = 0.01; // A velocity target of 1 rps results in 0.12 V output
@@ -110,7 +110,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFxConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 40; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicCruiseVelocity = 20; // Target cruise velocity of 80 rps
         motionMagicConfigs.MotionMagicAcceleration = 80; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
