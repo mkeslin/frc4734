@@ -1,8 +1,8 @@
 package frc.robot.Constants;
 
 public class Constants {
-    public static final int INTAKE_ID = 30;
-    public static final int INTAKE_PIVOT_ID = 31;
+    public static final int INTAKE_TOP_ID = 5;
+    public static final int INTAKE_BOTTOM_ID = 14;
     public static final int INTAKE_SENSOR = 0;
 
     public static final int SHOOTER_IN_ID = 40;
