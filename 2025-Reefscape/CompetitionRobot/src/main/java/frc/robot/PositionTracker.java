@@ -6,6 +6,7 @@ public class PositionTracker {
     private Supplier<Double> elevatorPositionSupplier;
     private Supplier<Double> armAngleSupplier;
     private Supplier<Double> sideToSidePositionSupplier;
+    private Supplier<Boolean> coralInArm;
 
     public void setElevatorPositionSupplier(Supplier<Double> elevatorPositionSupplier) {
         this.elevatorPositionSupplier = elevatorPositionSupplier;
@@ -19,6 +20,10 @@ public class PositionTracker {
         this.sideToSidePositionSupplier = sideToSidePositionSupplier;
     }
 
+    public void setCoralInArm(Supplier<Boolean> coralInArm) {
+        this.coralInArm = coralInArm;
+    }
+
     public double getElevatorPosition() {
         return elevatorPositionSupplier.get();
     }
@@ -29,5 +34,9 @@ public class PositionTracker {
 
     public double getSideToSidePosition() {
         return sideToSidePositionSupplier.get();
+    }
+
+    public Boolean getCoralInArm() {
+        return coralInArm.get();
     }
 }

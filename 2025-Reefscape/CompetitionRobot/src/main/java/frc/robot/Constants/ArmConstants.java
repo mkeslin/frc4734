@@ -17,7 +17,10 @@ public class ArmConstants {
         L1(-6.424805),
         L2(-10.352051), // reef angle
         L3(-10.352051),
+
         L4(-11.641113),
+        L4_SCORE(-9.641113),
+
         TOP(-13.427246);
 
         public final double value;
