@@ -76,10 +76,11 @@ public class RobotCommands {
                                 .waitSeconds(0.0)
                                 .andThen(elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy()),
                         Commands
-                                .waitSeconds(0.3)
-                                .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy()),
-                        Commands
                                 .waitSeconds(0.6)
+                                // .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy()),
+                                .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
+                        Commands
+                                .waitSeconds(0.9)
                                 .andThen(sideToSide.moveToSetPositionCommand(() -> sideToSidePosition).asProxy())));
     }
 

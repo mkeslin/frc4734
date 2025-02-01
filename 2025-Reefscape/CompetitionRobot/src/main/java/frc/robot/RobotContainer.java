@@ -1,7 +1,9 @@
 package frc.robot;
 
 import static frc.robot.Constants.Constants.IDs.APRILTAGPIPELINE;
+import static frc.robot.Constants.Constants.IDs.LIGHTS_ID;
 
+import com.ctre.phoenix.led.CANdle;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -54,7 +56,7 @@ public class RobotContainer {
     private Arm m_arm = new Arm(m_positionTracker, m_elevator::getCarriageComponentPose);
     private SideToSide m_sideToSide = new SideToSide(m_positionTracker);
     // private Climber m_climber = new Climber();
-    // private Lights m_lights = new Lights();
+    private CANdle m_lights = new CANdle(LIGHTS_ID);
     private CoralSim m_coralSim = new CoralSim(m_drivetrain::getPose, m_arm::getClawComponentPose);
 
     // COMMANDS
