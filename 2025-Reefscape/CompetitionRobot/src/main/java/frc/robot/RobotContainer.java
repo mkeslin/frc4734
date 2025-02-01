@@ -46,7 +46,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.createDrivetrain();
 
     // SUBSYSTEMS
-    private static Limelight m_limelight = new Limelight("limelight", APRILTAGPIPELINE);
+    private static Limelight m_reef_limelight = new Limelight("limelight-one", APRILTAGPIPELINE);
+    private static Limelight m_station_limelight = new Limelight("limelight-two", APRILTAGPIPELINE);
     // private static LifeCam m_LifeCam = new LifeCam(0);
     // private Intake m_intake = new Intake();
     private Elevator m_elevator = new Elevator(m_positionTracker);
@@ -57,7 +58,7 @@ public class RobotContainer {
     private CoralSim m_coralSim = new CoralSim(m_drivetrain::getPose, m_arm::getClawComponentPose);
 
     // COMMANDS
-    public CenterToTargetCommand centerToAprilTagCommand = new CenterToTargetCommand(m_limelight, m_drivetrain);
+    public CenterToTargetCommand centerToAprilTagCommand = new CenterToTargetCommand(m_reef_limelight, m_drivetrain);
 
     // AUTO CHOOSERS
     // private final SendableChooser<Integer> m_autoStartChooser = new SendableChooser<>();
