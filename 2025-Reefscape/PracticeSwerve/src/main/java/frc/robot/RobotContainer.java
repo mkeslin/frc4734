@@ -136,7 +136,7 @@ public class RobotContainer {
         configureArcadeBindings();
 
         // lights
-        // configureLightsBindings();
+        configureLightsBindings();
 
         // command tests
         // m_driveController.rightBumper().onTrue(acquireNoteCommand);
@@ -275,16 +275,16 @@ public class RobotContainer {
     }
 
     public void configureLightsBindings() {
-        // m_lights.setDefaultCommand(
-        // m_lights.setColors(
-        // (int) (m_driveController.getLeftTriggerAxis() * 255),
-        // (int) (m_driveController.getRightTriggerAxis() * 255),
-        // (int) (m_driveController.getLeftX() * 255)
-        // )
-        // );
+    //     m_lights.setDefaultCommand(
+    //     m_lights.setColors(
+    //     (int) (m_driveController.getLeftTriggerAxis() * 255),
+    //     (int) (m_driveController.getRightTriggerAxis() * 255),
+    //     (int) (m_driveController.getLeftX() * 255)
+    //     )
+    //     );
 
-        // m_driveController.y().onTrue(Commands.runOnce(() ->
-        // m_lights.incrementAnimation(), m_lights));
+    //     m_driveController.y().onTrue(Commands.runOnce(() ->
+    //     m_lights.incrementAnimation(), m_lights));
     }
 
     /*
