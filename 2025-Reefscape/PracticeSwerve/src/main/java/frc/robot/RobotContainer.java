@@ -31,6 +31,7 @@ import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.River;
 import frc.robot.SwerveDrivetrain.*;
+import frc.robot.Subsystems.Lights;
 
 public class RobotContainer {
 
@@ -81,7 +82,7 @@ public class RobotContainer {
     private Shooter m_shooter = new Shooter();
     // private Elevator m_elevator = new Elevator();
     private Climber m_climber = new Climber();
-    // private Lights m_lights = new Lights();
+    private Lights m_lights = new Lights();
     private River m_river = new River();
 
     // Commands
@@ -275,16 +276,13 @@ public class RobotContainer {
     }
 
     public void configureLightsBindings() {
-    //     m_lights.setDefaultCommand(
-    //     m_lights.setColors(
-    //     (int) (m_driveController.getLeftTriggerAxis() * 255),
-    //     (int) (m_driveController.getRightTriggerAxis() * 255),
-    //     (int) (m_driveController.getLeftX() * 255)
-    //     )
-    //     );
+        m_lights.setDefaultCommand(
+                m_lights.setColors(
+                        (int) (m_driveController.getLeftTriggerAxis() * 255),
+                        (int) (m_driveController.getRightTriggerAxis() * 255),
+                        (int) (m_driveController.getLeftX() * 255)));
 
-    //     m_driveController.y().onTrue(Commands.runOnce(() ->
-    //     m_lights.incrementAnimation(), m_lights));
+        m_driveController.y().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation(), m_lights));
     }
 
     /*
