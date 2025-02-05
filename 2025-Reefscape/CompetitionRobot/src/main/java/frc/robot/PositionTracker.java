@@ -6,6 +6,7 @@ public class PositionTracker {
     private Supplier<Double> elevatorPositionSupplier;
     private Supplier<Double> armAngleSupplier;
     private Supplier<Double> sideToSidePositionSupplier;
+    private Supplier<Double> climberPositionSupplier;
     private Supplier<Boolean> coralInArm;
 
     public void setElevatorPositionSupplier(Supplier<Double> elevatorPositionSupplier) {
@@ -18,6 +19,10 @@ public class PositionTracker {
 
     public void setSideToSidePositionSupplier(Supplier<Double> sideToSidePositionSupplier) {
         this.sideToSidePositionSupplier = sideToSidePositionSupplier;
+    }
+
+    public void setClimberPositionSupplier(Supplier<Double> climberPositionSupplier) {
+        this.climberPositionSupplier = climberPositionSupplier;
     }
 
     public void setCoralInArm(Supplier<Boolean> coralInArm) {
@@ -34,6 +39,10 @@ public class PositionTracker {
 
     public double getSideToSidePosition() {
         return sideToSidePositionSupplier.get();
+    }
+
+    public double getClimberPosition() {
+        return climberPositionSupplier.get();
     }
 
     public Boolean getCoralInArm() {

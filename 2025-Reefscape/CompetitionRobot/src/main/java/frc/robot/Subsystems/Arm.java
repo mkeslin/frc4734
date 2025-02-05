@@ -252,7 +252,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
                     // pidController.reset(getPosition());
                 })
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
-                .withName("sideToSide.coastMotorsCommand");
+                .withName("arm.coastMotorsCommand");
     }
 
     // public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {

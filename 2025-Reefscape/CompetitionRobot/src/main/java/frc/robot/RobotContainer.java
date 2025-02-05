@@ -18,12 +18,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ArmConstants.ArmPosition;
+import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
 import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.Subsystems.Arm;
+import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.CoralSim;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.SideToSide;
@@ -57,6 +59,7 @@ public class RobotContainer {
     private Elevator m_elevator = new Elevator(m_positionTracker);
     private Arm m_arm = new Arm(m_positionTracker, m_elevator::getCarriageComponentPose);
     private SideToSide m_sideToSide = new SideToSide(m_positionTracker);
+    private Climber m_climber = new Climber(m_positionTracker);
     // private Climber m_climber = new Climber();
     private CANdle m_lights = new CANdle(LIGHTS_ID);
     private CoralSim m_coralSim = new CoralSim(m_drivetrain::getPose, m_arm::getClawComponentPose);
@@ -136,6 +139,12 @@ public class RobotContainer {
 
         // set position
         // resetPose();
+
+        // reset positions
+        m_sideToSide.resetPosition();
+        m_arm.resetPosition();
+        m_elevator.resetPosition();
+        m_climber.resetPosition();
     }
 
     private void configureMechanismBindings() {
@@ -215,6 +224,7 @@ public class RobotContainer {
         // m_sideToSide.resetPosition();
         // m_arm.resetPosition();
         // m_elevator.resetPosition();
+        // m_climber.resetPosition();
         // }));
     }
 
@@ -240,12 +250,16 @@ public class RobotContainer {
         // m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
         // ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
 
-        m_arcadeController.a().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
-        m_arcadeController.b().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L1));
-        m_arcadeController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L2));
-        m_arcadeController.leftTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L3));
-        m_arcadeController.x().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L4));
-        m_arcadeController.y().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP));
+        m_arcadeController.leftTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
+        m_arcadeController.rightTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
+        m_arcadeController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
+
+        // m_arcadeController.a().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
+        // m_arcadeController.b().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L1));
+        // m_arcadeController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L2));
+        // m_arcadeController.leftTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L3));
+        // m_arcadeController.x().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L4));
+        // m_arcadeController.y().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP));
 
         // m_arcadeController.a().onTrue(m_intake.commandDeploy());
         // m_arcadeController.x().onTrue(m_intake.commandStow());
