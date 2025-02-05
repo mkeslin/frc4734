@@ -14,24 +14,33 @@ public class Limelight extends SubsystemBase {
     //public static NetworkTable table2;
 
     public NetworkTable table;
+    public String tableName;
 
     public Limelight(String t, int p) {
         table = NetworkTableInstance.getDefault().getTable(t);
+        tableName = t;
         setPipeline(p);
+    }
+
+    /**
+     * @return Whether or not limelight has targets within its field of view
+     */
+    public boolean hasTargets() {
+        return LimelightHelpers.getTV(tableName);
     }
 
     /**
      * @return X value of limelight
      */
     public double getX() {
-        return (table.getEntry("tx").getDouble(0.0));
+        return LimelightHelpers.getTX(tableName);
     }
 
     /**
      * @return Y value of limelight
      */
     public double getY() {
-        return (table.getEntry("ty").getDouble(0.0));
+        return LimelightHelpers.getTY(tableName);
     }
 
     /*public static double getTargetYaw() {
@@ -42,14 +51,28 @@ public class Limelight extends SubsystemBase {
      * @return Area value of limelight
      */
     public double getArea() {
-        return (table.getEntry("ta").getDouble(0.0));
+        return LimelightHelpers.getTA(tableName);
+    }
+
+    /**
+     * @return Estimated x distance to target in meters
+     */
+    public double getXDistance() {
+        return LimelightHelpers.getTargetPose3d_CameraSpace(tableName).getX();
+    }
+
+    /**
+     * @return Estimated y distance to target in meters
+     */
+    public double getYDistance() {
+        return LimelightHelpers.getTargetPose3d_CameraSpace(tableName).getY();
     }
 
     /**
      * @return yaw (rotation relative to y-axis) of Limelight camera target in radians
      */
     public double getYaw() {
-        return LimelightHelpers.getTargetPose3d_CameraSpace("limelight").getRotation().getY();
+        return LimelightHelpers.getTargetPose3d_CameraSpace(tableName).getRotation().getY();
     }
 
     /**
@@ -58,22 +81,22 @@ public class Limelight extends SubsystemBase {
      */
     public void status(boolean b) {
         if (b) {
-            table.getEntry("ledMode").setNumber(3);
+            LimelightHelpers.setLEDMode_ForceOn(tableName);
         } else {
-            table.getEntry("ledMode").setNumber(1);
+            LimelightHelpers.setLEDMode_ForceOff(tableName);
         }
     }
 
     public double getPipeline() {
-        return (table.getEntry("pipeline").getDouble(0));
+        return LimelightHelpers.getCurrentPipelineIndex(tableName);
     }
 
     public double getAprilTagID() {
-        return (table.getEntry("tid").getDouble(0));
+        return LimelightHelpers.getFiducialID(tableName);
     }
 
     public void setPipeline(int p) {
-        table.getEntry("pipeline").setNumber(p);
+        LimelightHelpers.setPipelineIndex(tableName, p);
     }
 
     public void putNums() {
