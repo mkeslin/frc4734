@@ -16,6 +16,7 @@ import frc.robot.Subsystems.CoralSim;
 import frc.robot.Subsystems.CoralSim.CoralSimLocation;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.SideToSide;
+import frc.robot.Subystems.Lights;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class RobotCommands {
@@ -205,10 +206,12 @@ public class RobotCommands {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
+            Lights m_lights,
             CoralSim coralSim) {
         return Commands.sequence(
                 prepareIntakeCoralCommand(elevator, arm, sideToSide, coralSim),
                 Commands.parallel(
+                        m_lights.setColors(0,255,0),
                         elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
                         arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                 elevator.movePositionDeltaCommand(() -> 0.31).asProxy()
