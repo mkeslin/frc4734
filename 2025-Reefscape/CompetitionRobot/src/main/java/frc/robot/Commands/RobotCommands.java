@@ -16,7 +16,7 @@ import frc.robot.Subsystems.CoralSim;
 import frc.robot.Subsystems.CoralSim.CoralSimLocation;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.SideToSide;
-import frc.robot.Subystems.Lights;
+import frc.robot.Subsystems.Lights;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class RobotCommands {
@@ -179,9 +179,9 @@ public class RobotCommands {
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L4,
                         Commands.sequence(
-                                drivetrain.commandMoveRelative(-0.5, 0, 0).asProxy(),
+                                Commands.run(() -> drivetrain.moveRelative(-0.5, 0, 0)).withTimeout(0.0),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy(),
-                                drivetrain.commandMoveRelative(-0.5, 0, 0).asProxy())),
+                                Commands.run(() -> drivetrain.moveRelative(-0.5, 0, 0)).withTimeout(0.0))),
 
                 Map.entry(ScoreLevel.None, Commands.none()));
 

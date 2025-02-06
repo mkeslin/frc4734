@@ -340,9 +340,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // this.setControl(m_autoRequest.withSpeeds(chassisSpeeds));
     // }
 
-    public Command commandMoveRelative(double x, double y, double rot) {
-        return Commands.runOnce(() -> moveRelative(x, y, rot));
-    }
+    // public Command commandMoveRelative(double x, double y, double rot) {
+    //     return Commands.runOnce(() -> moveRelative(x, y, rot));
+    // }
 
     public void moveRelative(double x, double y, double rot) {
         // return Commands.runOnce(() -> {
@@ -416,6 +416,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 .withName("drivetrain.followPath");
     }
 
+    // public Command moveToPoseRelative(double x, double y, double rot) {
+    //     var currentPose = getPose();
+    //     var newPose = new Pose2d(currentPose.getX() + x, currentPose.getY() + y, currentPose.getRotation());
+    //     return moveToPose(newPose);
+    // }
+
+    // public Command moveVoltageTimeCommand(double voltage, double time) {
+    //     return run(() -> setVoltage(voltage)).andThen(this::stop).withTimeout(time);
+    // }
+
     public Command moveToPose(Pose2d pose) {
         var constraints = new PathConstraints(
                 DrivetrainConstants.MaxSpeed,
@@ -432,11 +442,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         moveRelative(distance, 0, 0);
     }
 
-    public Command moveVoltageTimeCommand(double voltage, double time) {
-        return run(() -> setVoltage(voltage)).andThen(this::stop).withTimeout(time);
-    }
-
     private void setVoltage(double volts) {
+        // this.setVoltage(volts);
         // leftPrimaryMotor.setVoltage(volts);
         // rightPrimaryMotor.setVoltage(volts);
     }

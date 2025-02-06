@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.CenterToTargetCommand;
 import frc.robot.Commands.RobotCommands;
@@ -121,10 +122,7 @@ public class RobotContainer {
         // resetPose();
 
         // reset positions
-        m_sideToSide.resetPosition();
-        m_arm.resetPosition();
-        m_elevator.resetPosition();
-        m_climber.resetPosition();
+        resetZeros();
     }
 
     private void configureMechanismBindings() {
@@ -207,6 +205,18 @@ public class RobotContainer {
         ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
         m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
         ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim));
+
+        // m_arcadeController.start().onTrue(centerToAprilTagCommand);
+
+        m_arcadeController.start().onTrue(Commands.sequence(
+            RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_coralSim).withTimeout(4),
+            RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_coralSim).withTimeout(4),
+            RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim).withTimeout(4),
+            RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide).withTimeout(4)
+            // Commands.run(() -> m_drivetrain.moveRelative(-0.5, 0, 0)).withTimeout(0.75)
+        ));
+
+        // m_arcadeController.leftTrigger().onTrue(Commands.run(() -> m_drivetrain.moveRelative(-0.5, 0, 0)).withTimeout(0.35));
 
         // m_arcadeController.leftTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
         // m_arcadeController.rightTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
@@ -395,6 +405,13 @@ public class RobotContainer {
         var alliance = DriverStation.getAlliance();
         var isRedAlliance = alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
         return isRedAlliance;
+    }
+
+    public void resetZeros() {
+        m_sideToSide.resetPosition();
+        m_arm.resetPosition();
+        m_elevator.resetPosition();
+        m_climber.resetPosition();
     }
 
     // private void resetPose() {
