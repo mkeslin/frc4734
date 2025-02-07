@@ -64,8 +64,8 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
         slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
         slot0Configs.kA = 0.01; // A velocity target of 1 rps results in 0.12 V output
-        slot0Configs.kP = 16.0; // A position error of 2.5 rotations results in 12 V output
-        slot0Configs.kI = 77.0; // no output for integrated error
+        slot0Configs.kP = 20.0; // A position error of 2.5 rotations results in 12 V output
+        slot0Configs.kI = 80.0; // no output for integrated error
         slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
 
         // set Motion Magic settings

@@ -86,6 +86,8 @@ public class Robot extends TimedRobot {
         // }
 
         AutoManager.getInstance().runSelectedRoutine();
+
+        m_robotContainer.resetZeros();
     }
 
     @Override
@@ -102,6 +104,8 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
+
+        m_robotContainer.resetZeros();
     }
 
     @Override

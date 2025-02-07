@@ -136,8 +136,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * through
      * getters in the classes.
      *
-     * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
-     * @param modules             Constants for each specific module
+     * @param drivetrainConstants
+     *            Drivetrain-wide constants for the swerve drive
+     * @param modules
+     *            Constants for each specific module
      */
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants drivetrainConstants,
@@ -158,11 +160,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * through
      * getters in the classes.
      *
-     * @param drivetrainConstants     Drivetrain-wide constants for the swerve drive
-     * @param odometryUpdateFrequency The frequency to run the odometry loop. If
-     *                                unspecified or set to 0 Hz, this is 250 Hz on
-     *                                CAN FD, and 100 Hz on CAN 2.0.
-     * @param modules                 Constants for each specific module
+     * @param drivetrainConstants
+     *            Drivetrain-wide constants for the swerve drive
+     * @param odometryUpdateFrequency
+     *            The frequency to run the odometry loop. If
+     *            unspecified or set to 0 Hz, this is 250 Hz on
+     *            CAN FD, and 100 Hz on CAN 2.0.
+     * @param modules
+     *            Constants for each specific module
      */
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants drivetrainConstants,
@@ -184,23 +189,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * through
      * getters in the classes.
      *
-     * @param drivetrainConstants       Drivetrain-wide constants for the swerve
-     *                                  drive
-     * @param odometryUpdateFrequency   The frequency to run the odometry loop. If
-     *                                  unspecified or set to 0 Hz, this is 250 Hz
-     *                                  on
-     *                                  CAN FD, and 100 Hz on CAN 2.0.
-     * @param odometryStandardDeviation The standard deviation for odometry
-     *                                  calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in
-     *                                  meters
-     *                                  and radians
-     * @param visionStandardDeviation   The standard deviation for vision
-     *                                  calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in
-     *                                  meters
-     *                                  and radians
-     * @param modules                   Constants for each specific module
+     * @param drivetrainConstants
+     *            Drivetrain-wide constants for the swerve
+     *            drive
+     * @param odometryUpdateFrequency
+     *            The frequency to run the odometry loop. If
+     *            unspecified or set to 0 Hz, this is 250 Hz
+     *            on
+     *            CAN FD, and 100 Hz on CAN 2.0.
+     * @param odometryStandardDeviation
+     *            The standard deviation for odometry
+     *            calculation
+     *            in the form [x, y, theta]ᵀ, with units in
+     *            meters
+     *            and radians
+     * @param visionStandardDeviation
+     *            The standard deviation for vision
+     *            calculation
+     *            in the form [x, y, theta]ᵀ, with units in
+     *            meters
+     *            and radians
+     * @param modules
+     *            Constants for each specific module
      */
     public CommandSwerveDrivetrain(
             SwerveDrivetrainConstants drivetrainConstants,
@@ -253,7 +263,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * Returns a command that applies the specified control request to this swerve
      * drivetrain.
      *
-     * @param request Function returning the request to apply
+     * @param request
+     *            Function returning the request to apply
      * @return Command to run
      */
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -264,7 +275,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * Runs the SysId Quasistatic test in the given direction for the routine
      * specified by {@link #m_sysIdRoutineToApply}.
      *
-     * @param direction Direction of the SysId Quasistatic test
+     * @param direction
+     *            Direction of the SysId Quasistatic test
      * @return Command to run
      */
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
@@ -275,7 +287,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * Runs the SysId Dynamic test in the given direction for the routine
      * specified by {@link #m_sysIdRoutineToApply}.
      *
-     * @param direction Direction of the SysId Dynamic test
+     * @param direction
+     *            Direction of the SysId Dynamic test
      * @return Command to run
      */
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
@@ -340,18 +353,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // this.setControl(m_autoRequest.withSpeeds(chassisSpeeds));
     // }
 
-    public Command commandMoveRelative(double x, double y, double rot) {
-        return Commands.runOnce(() -> moveRelative(x, y, rot));
-    }
+    // public Command commandMoveRelative(double x, double y, double rot) {
+    // return Commands.runOnce(() -> moveRelative(x, y, rot));
+    // }
 
-    public void moveRelative(double x, double y, double rot) {
+    public void setRelativeSpeed(double x, double y, double rot) {
         // return Commands.runOnce(() -> {
         // Pose2d currentPose = getState().Pose;
 
         // The rotation component in these poses represents the direction of travel
         // Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
         // Pose2d endPose = new Pose2d(currentPose.getTranslation().plus(new Translation2d(x, y)),
-        //         new Rotation2d().plus(new Rotation2d(rot)));
+        // new Rotation2d().plus(new Rotation2d(rot)));
 
         // List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startPos,
         // endPos);
@@ -380,14 +393,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         // List<Waypoint> bezierPoints = PathPlannerPath.waypointsFromPoses(currentPose, endPose);
         // PathPlannerPath path = new PathPlannerPath(
-        //         bezierPoints,
-        //         new PathConstraints(
-        //                 DrivetrainConstants.MaxSpeed,
-        //                 DrivetrainConstants.MaxAcceleration,
-        //                 Units.degreesToRadians(360),
-        //                 Units.degreesToRadians(540)),
-        //         new IdealStartingState(0, new Rotation2d()),
-        //         new GoalEndState(0.0, currentPose.getRotation()));
+        // bezierPoints,
+        // new PathConstraints(
+        // DrivetrainConstants.MaxSpeed,
+        // DrivetrainConstants.MaxAcceleration,
+        // Units.degreesToRadians(360),
+        // Units.degreesToRadians(540)),
+        // new IdealStartingState(0, new Rotation2d()),
+        // new GoalEndState(0.0, currentPose.getRotation()));
 
         // SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
         // .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric
@@ -416,6 +429,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 .withName("drivetrain.followPath");
     }
 
+    // public Command moveToPoseRelative(double x, double y, double rot) {
+    // var currentPose = getPose();
+    // var newPose = new Pose2d(currentPose.getX() + x, currentPose.getY() + y, currentPose.getRotation());
+    // return moveToPose(newPose);
+    // }
+
+    // public Command moveVoltageTimeCommand(double voltage, double time) {
+    // return run(() -> setVoltage(voltage)).andThen(this::stop).withTimeout(time);
+    // }
+
     public Command moveToPose(Pose2d pose) {
         var constraints = new PathConstraints(
                 DrivetrainConstants.MaxSpeed,
@@ -429,19 +452,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void moveForwardRobot(double distance) {
-        moveRelative(distance, 0, 0);
-    }
-
-    public Command moveVoltageTimeCommand(double voltage, double time) {
-        return run(() -> setVoltage(voltage)).andThen(this::stop).withTimeout(time);
+        setRelativeSpeed(distance, 0, 0);
     }
 
     private void setVoltage(double volts) {
+        // this.setVoltage(volts);
         // leftPrimaryMotor.setVoltage(volts);
         // rightPrimaryMotor.setVoltage(volts);
     }
 
     public void stop() {
+        var brake = new SwerveRequest.SwerveDriveBrake();
+        applyRequest(() -> brake);
         // leftPrimaryMotor.setVoltage(0);
         // leftSecondaryMotor.setVoltage(0);
         // rightPrimaryMotor.setVoltage(0);
