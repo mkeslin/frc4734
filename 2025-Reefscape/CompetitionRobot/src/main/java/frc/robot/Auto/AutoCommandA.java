@@ -15,6 +15,7 @@ import frc.robot.Subsystems.CoralSim.CoralSimLocation;
 import frc.robot.Subsystems.CoralSim.CoralSimScoreLocation;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.SideToSide;
+import frc.robot.Subsystems.Lights;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /*
@@ -26,6 +27,7 @@ public class AutoCommandA {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
+            Lights m_lights,
             CoralSim coralSim) {
         PathPlannerPath Start_GPath = null; // PathPlannerPath.fromPathFile("Start-G");
         PathPlannerPath G_PickupPath = null; // PathPlannerPath.fromPathFile("G-Pickup");
@@ -34,7 +36,7 @@ public class AutoCommandA {
         PathPlannerPath Pickup_CPath = null; // PathPlannerPath.fromPathFile("Pickup-C");
 
         Command command = Commands.sequence(
-                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, elevator, arm, sideToSide, coralSim)
+                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, elevator, arm, sideToSide, m_lights, coralSim)
                         .alongWith(Commands.waitSeconds(0.5).andThen(drivetrain.followPathCommand(Start_GPath))),
                 Commands.parallel(
                         RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, coralSim),
@@ -45,7 +47,7 @@ public class AutoCommandA {
                 coralSim.setLocationCommand(CoralSimLocation.INTAKE),
                 Commands.parallel(
                         Commands.waitSeconds(0.1)
-                                .andThen(RobotCommands.intakeAndScoreCommand(ScoreLevel.L4, ScoreSide.Right, elevator, arm, sideToSide, coralSim)),
+                                .andThen(RobotCommands.intakeAndScoreCommand(ScoreLevel.L4, ScoreSide.Right, elevator, arm, sideToSide, m_lights, coralSim)),
                         drivetrain.followPathCommand(Pickup_DPath)),
                 Commands.parallel(
                         RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, coralSim),
@@ -56,7 +58,7 @@ public class AutoCommandA {
                 coralSim.setLocationCommand(CoralSimLocation.INTAKE),
                 Commands.parallel(
                         Commands.waitSeconds(0)
-                                .andThen(RobotCommands.intakeAndScoreCommand(ScoreLevel.L4, ScoreSide.Right, elevator, arm, sideToSide, coralSim)),
+                                .andThen(RobotCommands.intakeAndScoreCommand(ScoreLevel.L4, ScoreSide.Right, elevator, arm, sideToSide, m_lights, coralSim)),
                         drivetrain.followPathCommand(Pickup_CPath)),
                 Commands.parallel(
                         RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, coralSim),

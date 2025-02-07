@@ -15,8 +15,8 @@ import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.CoralSim;
 import frc.robot.Subsystems.CoralSim.CoralSimLocation;
 import frc.robot.Subsystems.Elevator;
-import frc.robot.Subsystems.SideToSide;
 import frc.robot.Subsystems.Lights;
+import frc.robot.Subsystems.SideToSide;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class RobotCommands {
@@ -27,6 +27,7 @@ public class RobotCommands {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
+            Lights m_lights,
             CoralSim coralSim) {
         return Commands.parallel(
                 Commands.waitSeconds(0.6)
@@ -43,6 +44,7 @@ public class RobotCommands {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
+            Lights m_lights,
             CoralSim coralSim) {
         ElevatorPosition elevatorPosition;
         ArmPosition armPosition;
@@ -58,10 +60,12 @@ public class RobotCommands {
                 armPosition = ArmPosition.L2;
             }
             case L3 -> {
+                m_lights.setColors(255, 255, 0);
                 elevatorPosition = ElevatorPosition.L3;
                 armPosition = ArmPosition.L3;
             }
             case L4 -> {
+                m_lights.setColors(255, 0, 0);
                 elevatorPosition = ElevatorPosition.L4;
                 armPosition = ArmPosition.L4;
             }
@@ -106,6 +110,7 @@ public class RobotCommands {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
+            Lights m_lights,
             CoralSim coralSim) {
         ElevatorPosition elevatorPosition;
         ArmPosition armPosition;
@@ -121,10 +126,12 @@ public class RobotCommands {
                 armPosition = ArmPosition.L2;
             }
             case L3 -> {
+                m_lights.setColors(255, 255, 0);
                 elevatorPosition = ElevatorPosition.L3;
                 armPosition = ArmPosition.L3;
             }
             case L4 -> {
+                m_lights.setColors(255, 0, 0);
                 elevatorPosition = ElevatorPosition.L4;
                 armPosition = ArmPosition.L4;
             }
@@ -179,9 +186,15 @@ public class RobotCommands {
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L4,
                         Commands.sequence(
-                                Commands.run(() -> drivetrain.moveRelative(-0.5, 0, 0)).withTimeout(0.0),
+                                Commands.run(() -> drivetrain.setRelativeSpeed(0.5, 0, 0)).asProxy()
+                                        .withTimeout(0.35)
+                                        .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                                        .asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy(),
-                                Commands.run(() -> drivetrain.moveRelative(-0.5, 0, 0)).withTimeout(0.0))),
+                                Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy()
+                                        .withTimeout(0.35)
+                                        .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                                        .asProxy())),
 
                 Map.entry(ScoreLevel.None, Commands.none()));
 
@@ -206,12 +219,10 @@ public class RobotCommands {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
-            Lights m_lights,
             CoralSim coralSim) {
         return Commands.sequence(
                 prepareIntakeCoralCommand(elevator, arm, sideToSide, coralSim),
                 Commands.parallel(
-                        m_lights.setColors(0,255,0),
                         elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
                         arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                 elevator.movePositionDeltaCommand(() -> 0.31).asProxy()
@@ -230,12 +241,13 @@ public class RobotCommands {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
+            Lights m_lights,
             CoralSim coralSim) {
         return Commands.sequence(
                 Commands.parallel(
                         elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
                         arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
-                autoPrepareCoralScoreCommand(level, side, elevator, arm, sideToSide, coralSim)
+                autoPrepareCoralScoreCommand(level, side, elevator, arm, sideToSide, m_lights, coralSim)
                         .alongWith(Commands.waitSeconds(0.1).andThen(
                                 coralSim.setLocationCommand(CoralSimLocation.CLAW))));
     }

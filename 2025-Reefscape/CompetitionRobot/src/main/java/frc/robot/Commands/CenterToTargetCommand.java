@@ -40,7 +40,7 @@ public class CenterToTargetCommand extends Command {
     private double MAX_WHEEL_ROTATE = 0.5;
     private double MAX_CAMERA_X = 30;*/
 
-    private double FINAL_AREA = 9;
+    private double FINAL_AREA = 10;
     private double AREA_ERROR = 2;
     private double X_OFFSET_ERROR = 2;
     private double ANGLE_ERROR = 5;
@@ -102,7 +102,7 @@ public class CenterToTargetCommand extends Command {
             if (omegaController.atSetpoint()) {
                 omegaSpeed = 0;
             }
-            m_drivetrain.moveRelative(xSpeed, ySpeed, omegaSpeed);
+            m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
         }
         /*target_area = m_limelight.getArea();
         target_yaw = m_limelight.getYaw();
