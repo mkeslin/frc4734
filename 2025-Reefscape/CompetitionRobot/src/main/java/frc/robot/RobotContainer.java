@@ -216,7 +216,7 @@ public class RobotContainer {
             RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim).withTimeout(4),
             RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide).withTimeout(4),
             Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(4)
-                    .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                    .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0))).asProxy()
         ));
 
         // m_arcadeController.leftTrigger().onTrue(Commands.run(() -> m_drivetrain.moveRelative(-0.5, 0, 0)).withTimeout(0.35));

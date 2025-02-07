@@ -186,13 +186,13 @@ public class RobotCommands {
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L4,
                         Commands.sequence(
-                                Commands.run(() -> drivetrain.setRelativeSpeed(0.5, 0, 0)).asProxy()
-                                        .withTimeout(0.35)
-                                        .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
-                                        .asProxy(),
+                                // Commands.run(() -> drivetrain.setRelativeSpeed(0.5, 0, 0))
+                                //         .withTimeout(0.35)
+                                //         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                                //         .asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy(),
-                                Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy()
-                                        .withTimeout(0.35)
+                                Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                                        .withTimeout(0.35).asProxy()
                                         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                         .asProxy())),
 
