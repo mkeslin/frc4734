@@ -43,6 +43,7 @@ public class RobotCommands {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
+            Lights m_lights,
             CoralSim coralSim) {
         ElevatorPosition elevatorPosition;
         ArmPosition armPosition;
@@ -60,10 +61,12 @@ public class RobotCommands {
             case L3 -> {
                 elevatorPosition = ElevatorPosition.L3;
                 armPosition = ArmPosition.L3;
+                Commands.runOnce(m_lights.setColors(255,255,0));
             }
             case L4 -> {
                 elevatorPosition = ElevatorPosition.L4;
                 armPosition = ArmPosition.L4;
+                Commands.runOnce(m_lights.setColors(255,0,0));
             }
             default -> {
                 throw new IllegalArgumentException("Invalid ScoreLevel");
