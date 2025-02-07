@@ -63,11 +63,13 @@ public class RobotCommands {
                 m_lights.setColors(255, 255, 0);
                 elevatorPosition = ElevatorPosition.L3;
                 armPosition = ArmPosition.L3;
+                Commands.runOnce(m_lights.setColors(255,255,0));
             }
             case L4 -> {
                 m_lights.setColors(255, 0, 0);
                 elevatorPosition = ElevatorPosition.L4;
                 armPosition = ArmPosition.L4;
+                Commands.runOnce(m_lights.setColors(255,0,0));
             }
             default -> {
                 throw new IllegalArgumentException("Invalid ScoreLevel");
