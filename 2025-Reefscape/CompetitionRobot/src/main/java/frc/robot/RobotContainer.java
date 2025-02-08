@@ -214,14 +214,24 @@ public class RobotContainer {
         // m_arcadeController.start().onTrue(centerToAprilTagCommand);
 
         m_arcadeController.start().onTrue(Commands.sequence(
-            RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim).withTimeout(4),
-            centerToAprilTagCommand.withTimeout(4),
-            RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim).withTimeout(4),
-            RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim).withTimeout(4),
-            RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide).withTimeout(4),
-            Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(4)
-                    .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0))).asProxy()
+            RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim).withTimeout(3),
+            centerToAprilTagCommand.withTimeout(3),
+            RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim).withTimeout(3),
+            RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim).withTimeout(3)
+            // RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide).withTimeout(4),
+            // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(4)
+            //         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0))).asProxy()
         ));
+
+        // m_arcadeController.start().onTrue(Commands.sequence(
+        //     RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim).withTimeout(4),
+        //     centerToAprilTagCommand.withTimeout(4),
+        //     RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim).withTimeout(4),
+        //     RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim).withTimeout(4),
+        //     RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide).withTimeout(4),
+        //     Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(4)
+        //             .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0))).asProxy()
+        // ));
 
         // m_arcadeController.leftTrigger().onTrue(Commands.run(() -> m_drivetrain.moveRelative(-0.5, 0, 0)).withTimeout(0.35));
 
