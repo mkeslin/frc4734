@@ -62,7 +62,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         var slot0Configs = talonFxConfigs.Slot0;
         slot0Configs.kG = 0.0;
         slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
-        slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
+        slot0Configs.kV = 0.16; // A velocity target of 1 rps results in 0.12 V output
         slot0Configs.kA = 0.01; // A velocity target of 1 rps results in 0.12 V output
         slot0Configs.kP = 20.0; // A position error of 2.5 rotations results in 12 V output
         slot0Configs.kI = 80.0; // no output for integrated error
@@ -167,14 +167,16 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         return run(() -> {
             m_elevatorLeftLeaderMotor.setControl(m_request.withPosition(goalPosition));
             elevatorPub.set(m_positionTracker.getElevatorPosition());
-        }).withName("elevator.moveToPosition");
+        })
+        .until(() -> Math.abs(getPosition() - goalPosition) < .5) //abs(goal - position) < error 
+        .withName("elevator.moveToPosition");
     }
 
     @Override
     public Command moveToSetPositionCommand(Supplier<ElevatorPosition> goalPositionSupplier) {
         return Commands.sequence(
                 moveToPositionCommand(goalPositionSupplier.get().value))
-                // .withTimeout(3)
+                .withTimeout(3)
                 .withName("elevator.moveToSetPosition");
     }
 

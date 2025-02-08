@@ -157,13 +157,17 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         return run(() -> {
             m_climber.setControl(m_request.withPosition(goalPosition));
             climberPub.set(m_positionTracker.getClimberPosition());
-        }).withName("climber.moveToPosition");
+        })
+        .until(() -> Math.abs(getPosition() - goalPosition) < .5) //abs(goal - position) < error 
+        .withName("climber.moveToPosition");
     }
 
     @Override
     public Command moveToSetPositionCommand(Supplier<ClimberPosition> goalPositionSupplier) {
         return Commands.sequence(
-                moveToPositionCommand(goalPositionSupplier.get().value)).withName("climber.moveToSetPosition");
+                moveToPositionCommand(goalPositionSupplier.get().value))
+                .withTimeout(2.5)
+                .withName("climber.moveToSetPosition");
     }
 
     @Override

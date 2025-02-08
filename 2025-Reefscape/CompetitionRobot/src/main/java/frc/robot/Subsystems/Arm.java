@@ -205,13 +205,17 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         return run(() -> {
             m_armMotor.setControl(m_request.withPosition(goalPosition));
             armPub.set(m_positionTracker.getArmAngle());
-        }).withName("arm.moveToPosition");
+        })
+        .until(() -> Math.abs(getPosition() - goalPosition) < .5) //abs(goal - position) < error 
+        .withName("arm.moveToPosition");
     }
 
     @Override
     public Command moveToSetPositionCommand(Supplier<ArmPosition> goalPositionSupplier) {
         return Commands.sequence(
-                moveToPositionCommand(goalPositionSupplier.get().value)).withName("arm.moveToSetPosition");
+                moveToPositionCommand(goalPositionSupplier.get().value))
+                .withTimeout(3)
+                .withName("arm.moveToSetPosition");
     }
 
     @Override
