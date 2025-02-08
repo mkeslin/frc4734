@@ -17,7 +17,7 @@ public class CenterToTargetCommand extends Command {
 
     private double m_area;
     private double AREA_ERROR = 2;
-    private double X_OFFSET_ERROR = 2;
+    private double CAMERA_X_OFFSET_ERROR = 1;
     private double ANGLE_ERROR = 5;
 
     public Timer t = new Timer();
@@ -28,7 +28,7 @@ public class CenterToTargetCommand extends Command {
         m_area = area;
 
         xController.setTolerance(AREA_ERROR);
-        yController.setTolerance(X_OFFSET_ERROR);
+        yController.setTolerance(CAMERA_X_OFFSET_ERROR);
         omegaController.setTolerance(ANGLE_ERROR);
 
         addRequirements(m_limelight, m_drivetrain);
