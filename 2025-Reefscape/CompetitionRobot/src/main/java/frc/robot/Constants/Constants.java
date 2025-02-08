@@ -17,6 +17,9 @@ public class Constants {
 
         public static final int APRILTAGPIPELINE = 0;
 
+        public static final int REEF_CAMERA_AREA = 17;
+        public static final int STATION_CAMERA_AREA = 17;
+
         public static final int LIGHTS_ID = 0;
 
         // public static final double INTAKE_SENSOR_DELAY = 0.4;

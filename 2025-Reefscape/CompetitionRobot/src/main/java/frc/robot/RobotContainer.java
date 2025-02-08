@@ -2,6 +2,8 @@ package frc.robot;
 
 import static frc.robot.Constants.Constants.IDs.APRILTAGPIPELINE;
 import static frc.robot.Constants.Constants.IDs.INTAKE_SENSOR;
+import static frc.robot.Constants.Constants.IDs.REEF_CAMERA_AREA;
+import static frc.robot.Constants.Constants.IDs.STATION_CAMERA_AREA;
 import static frc.robot.Constants.Constants.IDs.LIGHTS_ID;
 
 import com.ctre.phoenix.led.CANdle;
@@ -63,14 +65,16 @@ public class RobotContainer {
     private DigitalInput m_intakeSensor = new DigitalInput(INTAKE_SENSOR);
 
     // COMMANDS
-    public CenterToTargetCommand centerToAprilTagCommand = new CenterToTargetCommand(m_reef_limelight, m_drivetrain);
+    public CenterToTargetCommand centerToAprilTagCommand = new CenterToTargetCommand(m_reef_limelight, m_drivetrain, REEF_CAMERA_AREA);
+    public CenterToTargetCommand centerToStationCommand = new CenterToTargetCommand(m_station_limelight, m_drivetrain, STATION_CAMERA_AREA);
 
     // AUTO CHOOSERS
     // private final SendableChooser<Integer> m_autoStartChooser = new SendableChooser<>();
 
     public RobotContainer() {
         // register named commands
-        NamedCommands.registerCommand("centerIntakeToTargetCommand", centerToAprilTagCommand);
+        NamedCommands.registerCommand("centerToAprilTagCommand", centerToAprilTagCommand);
+        NamedCommands.registerCommand("centerToStationCommand", centerToStationCommand);
 
         // configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);

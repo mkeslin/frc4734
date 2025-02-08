@@ -15,16 +15,17 @@ public class CenterToTargetCommand extends Command {
     private final PIDController yController = new PIDController(0.05, 0, 0);
     private final PIDController omegaController = new PIDController(0.05, 0, 0);
 
-    private double FINAL_AREA = 17;
+    private double m_area;
     private double AREA_ERROR = 2;
     private double X_OFFSET_ERROR = 2;
     private double ANGLE_ERROR = 5;
 
     public Timer t = new Timer();
 
-    public CenterToTargetCommand(Limelight limelight, CommandSwerveDrivetrain drivetrain) {
+    public CenterToTargetCommand(Limelight limelight, CommandSwerveDrivetrain drivetrain, double area) {
         m_limelight = limelight;
         m_drivetrain = drivetrain;
+        m_area = area;
 
         xController.setTolerance(AREA_ERROR);
         yController.setTolerance(X_OFFSET_ERROR);
@@ -38,7 +39,7 @@ public class CenterToTargetCommand extends Command {
     public void initialize() {
         t.start();
 
-        xController.setSetpoint(FINAL_AREA);
+        xController.setSetpoint(m_area);
         yController.setSetpoint(0);
         omegaController.setSetpoint(0);
     }
