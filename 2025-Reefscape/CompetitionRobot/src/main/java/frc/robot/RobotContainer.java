@@ -2,8 +2,6 @@ package frc.robot;
 
 import static frc.robot.Constants.Constants.IDs.APRILTAGPIPELINE;
 import static frc.robot.Constants.Constants.IDs.INTAKE_SENSOR;
-import static frc.robot.Constants.Constants.IDs.REEF_CAMERA_AREA;
-import static frc.robot.Constants.Constants.IDs.STATION_CAMERA_AREA;
 import static frc.robot.Constants.Constants.IDs.LIGHTS_ID;
 
 import com.ctre.phoenix.led.CANdle;
@@ -17,7 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Commands.CenterToTargetCommand;
+import frc.robot.Commands.CenterToReefCommand;
+import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Constants.ScoreLevel;
@@ -66,17 +65,15 @@ public class RobotContainer {
     private DigitalInput m_intakeSensor = new DigitalInput(INTAKE_SENSOR);
 
     // COMMANDS
-    public CenterToTargetCommand centerToAprilTagCommand = new CenterToTargetCommand(m_reef_limelight, m_drivetrain,
-            REEF_CAMERA_AREA);
-    public CenterToTargetCommand centerToStationCommand = new CenterToTargetCommand(m_station_limelight, m_drivetrain,
-            STATION_CAMERA_AREA);
+    public CenterToReefCommand centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain);
+    public CenterToStationCommand centerToStationCommand = new CenterToStationCommand(m_station_limelight, m_drivetrain);
 
     // AUTO CHOOSERS
     // private final SendableChooser<Integer> m_autoStartChooser = new SendableChooser<>();
 
     public RobotContainer() {
         // register named commands
-        NamedCommands.registerCommand("centerToAprilTagCommand", centerToAprilTagCommand);
+        NamedCommands.registerCommand("centerToReefCommand", centerToReefCommand);
         NamedCommands.registerCommand("centerToStationCommand", centerToStationCommand);
 
         // configure bindings for swerve drivetrain
@@ -106,7 +103,8 @@ public class RobotContainer {
         // m_pathPlanner.configure();
 
         // april tags
-        // m_mechanismController.a().onTrue(centerToAprilTagCommand);
+        // m_mechanismController.a().onTrue(centerToStationCommand);
+        // m_mechanismController.b().onTrue(centerToReefCommand);
 
         // // auto choosers
         // m_autoStartChooser.setDefaultOption("Driver Station 3", 3);
@@ -234,13 +232,11 @@ public class RobotContainer {
 
         Command command = Commands.sequence(
                 RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
-                // centerToAprilTagCommand,
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0)).asProxy().withTimeout(0.50),
-                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, ScoreSide.Left, m_elevator, m_arm, m_sideToSide,
-                        m_lights, m_coralSim),
-                RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim)
-        // RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide)
-        // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
+                centerToReefCommand,
+                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
+                RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim),
+                RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide),
+                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
         );
 
         m_arcadeController.start().onTrue(command);
