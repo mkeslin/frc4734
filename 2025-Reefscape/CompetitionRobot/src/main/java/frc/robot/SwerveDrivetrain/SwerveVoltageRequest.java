@@ -27,6 +27,7 @@ public class SwerveVoltageRequest implements SwerveRequest {
     public StatusCode apply(SwerveControlParameters parameters, SwerveModule... modulesToApply) {
         for (var module : modulesToApply) 
         {
+            // DRIVE TESTS
             if (m_driveType) {
                 // Command steer motor to zero
                 module.getSteerMotor().setControl(m_motionMagicControl);
@@ -34,6 +35,7 @@ public class SwerveVoltageRequest implements SwerveRequest {
                 // Command drive motor to voltage
                 module.getDriveMotor().setControl(m_voltageOutControl.withOutput(m_targetVoltage));
             }
+            // STEER TESTS
             else {
                 // Command steer motor to voltage
                 module.getSteerMotor().setControl(m_voltageOutControl.withOutput(m_targetVoltage));

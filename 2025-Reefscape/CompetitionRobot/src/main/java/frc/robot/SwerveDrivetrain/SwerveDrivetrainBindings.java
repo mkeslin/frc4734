@@ -25,7 +25,7 @@ public class SwerveDrivetrainBindings {
             .withDeadband(CurrentSpeed * 0.1)
             .withRotationalDeadband(CurrentAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // field-centric driving in open loop
-    private static final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
+    // private static final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
     // private static final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
 
     // robot-centric
@@ -98,24 +98,20 @@ public class SwerveDrivetrainBindings {
         // drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         // }
 
+        // TELEMETRY
         // drivetrain.registerTelemetry(m_logger::telemeterize);
 
-        // driveController.pov(0).whileTrue(drivetrain.applyRequest(() ->
-        // forwardStraight.withVelocityX(0.5).withVelocityY(0)));
-        // driveController.pov(180).whileTrue(drivetrain.applyRequest(() ->
-        // forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
-
-        /* Bindings for drivetrain characterization */
-        driveController.x().and(driveController.pov(0)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kForward));
-        driveController.x().and(driveController.pov(180)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kReverse));
+        // SYSID
+        // driveController.x().and(driveController.pov(0)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kForward));
+        // driveController.x().and(driveController.pov(180)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kReverse));
     
-        driveController.y().and(driveController.pov(0)).whileTrue(drivetrain.runDriveDynamTest(Direction.kForward));
-        driveController.y().and(driveController.pov(180)).whileTrue(drivetrain.runDriveDynamTest(Direction.kReverse));
+        // driveController.y().and(driveController.pov(0)).whileTrue(drivetrain.runDriveDynamTest(Direction.kForward));
+        // driveController.y().and(driveController.pov(180)).whileTrue(drivetrain.runDriveDynamTest(Direction.kReverse));
     
-        driveController.a().and(driveController.pov(0)).whileTrue(drivetrain.runSteerQuasiTest(Direction.kForward));
-        driveController.a().and(driveController.pov(180)).whileTrue(drivetrain.runSteerQuasiTest(Direction.kReverse));
+        // driveController.a().and(driveController.pov(0)).whileTrue(drivetrain.runSteerQuasiTest(Direction.kForward));
+        // driveController.a().and(driveController.pov(180)).whileTrue(drivetrain.runSteerQuasiTest(Direction.kReverse));
     
-        driveController.b().and(driveController.pov(0)).whileTrue(drivetrain.runSteerDynamTest(Direction.kForward));
-        driveController.b().and(driveController.pov(180)).whileTrue(drivetrain.runSteerDynamTest(Direction.kReverse));
+        // driveController.b().and(driveController.pov(0)).whileTrue(drivetrain.runSteerDynamTest(Direction.kForward));
+        // driveController.b().and(driveController.pov(180)).whileTrue(drivetrain.runSteerDynamTest(Direction.kReverse));
     }
 }
