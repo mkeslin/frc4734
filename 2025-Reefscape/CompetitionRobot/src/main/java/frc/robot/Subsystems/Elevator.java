@@ -1,12 +1,16 @@
 package frc.robot.Subsystems;
 
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.Constants.IDs.ELEVATOR_LEFT_ID;
 import static frc.robot.Constants.Constants.IDs.ELEVATOR_RIGHT_ID;
 
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -21,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
@@ -32,8 +37,11 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     private TalonFX m_elevatorLeftLeaderMotor;
     private TalonFX m_elevatorRightFollowerMotor;
+    private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
     // private double simVelocity = 0.0;
+
+    private final SysIdRoutine m_sysIdRoutine;
 
     private final PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
@@ -55,6 +63,21 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     public Elevator(PositionTracker positionTracker) {
         m_positionTracker = positionTracker;
         positionTracker.setElevatorPositionSupplier(this::getPosition);
+
+        m_sysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(
+                        Volts.of(15).div(Seconds.of(1)),
+                        Volts.of(7),
+                        null,
+                        (state) -> SignalLogger.writeString("Elevator State", state.toString())),
+                new SysIdRoutine.Mechanism(
+                        (volts) -> {
+                            m_elevatorLeftLeaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
+                            m_elevatorRightFollowerMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
+                        },
+                        null,
+                        this,
+                        "Arm"));
 
         var talonFxConfigs = new TalonFXConfiguration();
 
@@ -142,24 +165,24 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     // @Override
     // public void setVoltage(double voltage) {
-    //     voltage = MathUtil.clamp(voltage, -12, 12);
-    //     // voltage = Utils.applySoftStops(voltage, getPosition(), ElevatorConstants.MIN_HEIGHT_METERS,
-    //     //         ElevatorConstants.MAX_HEIGHT_METERS);
+    // voltage = MathUtil.clamp(voltage, -12, 12);
+    // // voltage = Utils.applySoftStops(voltage, getPosition(), ElevatorConstants.MIN_HEIGHT_METERS,
+    // // ElevatorConstants.MAX_HEIGHT_METERS);
 
-    //     // if (voltage < 0
-    //     //         && m_positionTracker.getElevatorPosition() < ElevatorConstants.MOTION_LIMIT
-    //     //         && m_positionTracker.getArmAngle() < 0) {
-    //     //     voltage = 0;
-    //     // }
+    // // if (voltage < 0
+    // // && m_positionTracker.getElevatorPosition() < ElevatorConstants.MOTION_LIMIT
+    // // && m_positionTracker.getArmAngle() < 0) {
+    // // voltage = 0;
+    // // }
 
-    //     // if (!GlobalStates.INITIALIZED.enabled()) {
-    //     // voltage = 0.0;
-    //     // }
+    // // if (!GlobalStates.INITIALIZED.enabled()) {
+    // // voltage = 0.0;
+    // // }
 
-    //     // voltage = .4;
+    // // voltage = .4;
 
-    //     m_elevatorLeftLeaderMotor.setVoltage(voltage);
-    //     m_elevatorRightFollowerMotor.setVoltage(-voltage);
+    // m_elevatorLeftLeaderMotor.setVoltage(voltage);
+    // m_elevatorRightFollowerMotor.setVoltage(-voltage);
     // }
 
     // @Override
@@ -168,8 +191,8 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
             m_elevatorLeftLeaderMotor.setControl(m_request.withPosition(goalPosition));
             elevatorPub.set(m_positionTracker.getElevatorPosition());
         })
-        .until(() -> Math.abs(getPosition() - goalPosition) < .5) //abs(goal - position) < error 
-        .withName("elevator.moveToPosition");
+                .until(() -> Math.abs(getPosition() - goalPosition) < .5) // abs(goal - position) < error
+                .withName("elevator.moveToPosition");
     }
 
     @Override
@@ -229,13 +252,13 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
                 .withName("elevator.coastMotorsCommand");
     }
 
-    // public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {
-    // return sysIdRoutine.quasistatic(direction).withName("elevator.sysIdQuasistatic");
-    // }
+    public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutine.quasistatic(direction).withName("elevator.sysIdQuasistatic");
+    }
 
-    // public Command sysIdDynamicCommand(SysIdRoutine.Direction direction) {
-    // return sysIdRoutine.dynamic(direction).withName("elevator.sysIdDynamic");
-    // }
+    public Command sysIdDynamicCommand(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutine.dynamic(direction).withName("elevator.sysIdDynamic");
+    }
 
     // public Command resetControllersCommand() {
     // return Commands.runOnce(() -> pidController.reset(getPosition()))
