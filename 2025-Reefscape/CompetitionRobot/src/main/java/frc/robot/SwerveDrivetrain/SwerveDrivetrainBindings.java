@@ -58,7 +58,7 @@ public class SwerveDrivetrainBindings {
                 ).ignoringDisable(false));
 
         // A Button: Brake
-        driveController.a().whileTrue(drivetrain.applyRequest(() -> m_brake));
+        // driveController.a().whileTrue(drivetrain.applyRequest(() -> m_brake));
 
         // B Button
         /*
