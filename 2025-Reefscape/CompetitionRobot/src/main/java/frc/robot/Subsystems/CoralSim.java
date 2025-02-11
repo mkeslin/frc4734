@@ -4,11 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
-// import com.techhounds.houndutil.houndlog.LoggingManager;
-// import com.techhounds.houndutil.houndlog.annotations.Log;
-// import com.techhounds.houndutil.houndlog.annotations.LoggedObject;
-// import com.techhounds.houndutil.houndlog.loggers.StructArrayLogItem;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
