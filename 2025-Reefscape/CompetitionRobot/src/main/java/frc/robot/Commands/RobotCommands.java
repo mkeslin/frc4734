@@ -181,19 +181,19 @@ public class RobotCommands {
                 Map.entry(ScoreLevel.L2,
                         Commands.parallel(
                                 // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
-                                arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy())),
+                                arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L3,
                         Commands.parallel(
                                 // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
-                                arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy())),
+                                arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L4,
                         Commands.sequence(
                                 // Commands.run(() -> drivetrain.setRelativeSpeed(0.5, 0, 0))
                                 //         .withTimeout(0.35)
                                 //         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 //         .asProxy(),
-                                arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy(),
-                                Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
+                                arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy()
+                                // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
                                 //         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                         )),
 

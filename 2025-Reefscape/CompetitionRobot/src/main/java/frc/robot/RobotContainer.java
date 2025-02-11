@@ -186,6 +186,8 @@ public class RobotContainer {
         // SCORE CORAL
         m_mechanismController.a().onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim));
 
+        m_mechanismController.leftBumper().onTrue(Commands.runOnce(() -> resetZeros()));
+
         // SET CURRENT POSITION TO ZERO
         // m_mechanismController.y().onTrue(Commands.runOnce(() -> {
         // m_sideToSide.resetPosition();
@@ -232,21 +234,26 @@ public class RobotContainer {
 
         Command command = Commands.sequence(
                 RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
-                centerToAprilTagCommand,
-                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
-                RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim),
-                RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide),
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
+                // centerToAprilTagCommand,
+                Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0)).asProxy().withTimeout(0.50),
+                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, ScoreSide.Left, m_elevator, m_arm, m_sideToSide,
+                        m_lights, m_coralSim),
+                RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim)
+        // RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide)
+        // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
         );
 
         m_arcadeController.start().onTrue(command);
 
+        m_arcadeController.leftTrigger()
+                .onTrue(Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.55));
+
         // m_arcadeController.leftTrigger().onTrue(Commands.run(() -> m_drivetrain.moveRelative(-0.5, 0,
         // 0)).withTimeout(0.35));
 
-        m_arcadeController.leftTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
-        m_arcadeController.rightTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
-        m_arcadeController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
+        // m_arcadeController.leftTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
+        // m_arcadeController.rightTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
+        // m_arcadeController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
 
         // m_arcadeController.a().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
         // m_arcadeController.b().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L1));

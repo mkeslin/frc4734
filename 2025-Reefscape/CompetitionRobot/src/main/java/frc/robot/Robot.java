@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
 
         AutoManager.getInstance().runSelectedRoutine();
 
-        m_robotContainer.resetZeros();
+        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -97,6 +97,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousExit() {
         AutoManager.getInstance().endRoutine();
+
+        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -105,7 +107,7 @@ public class Robot extends TimedRobot {
             m_autonomousCommand.cancel();
         }
 
-        m_robotContainer.resetZeros();
+        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -114,6 +116,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopExit() {
+        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -121,6 +124,8 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().cancelAll();
 
         // m_robotContainer.initializeTest();
+
+        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -129,6 +134,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testExit() {
+
+        // m_robotContainer.resetZeros();
     }
 
     @Override

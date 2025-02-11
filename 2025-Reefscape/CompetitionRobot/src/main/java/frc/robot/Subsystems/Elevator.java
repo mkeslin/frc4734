@@ -65,13 +65,13 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         slot0Configs.kV = 0.16; // A velocity target of 1 rps results in 0.12 V output
         slot0Configs.kA = 0.01; // A velocity target of 1 rps results in 0.12 V output
         slot0Configs.kP = 20.0; // A position error of 2.5 rotations results in 12 V output
-        slot0Configs.kI = 80.0; // no output for integrated error
-        slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
+        slot0Configs.kI = 82.0; // no output for integrated error
+        slot0Configs.kD = 0.0; // A velocity error of 1 rps results in 0.1 V output
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFxConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 20; // Target cruise velocity of 80 rps
-        motionMagicConfigs.MotionMagicAcceleration = 40; // Target acceleration of 160 rps/s (0.5 seconds)
+        motionMagicConfigs.MotionMagicCruiseVelocity = 30; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicAcceleration = 60; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
         talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

@@ -16,7 +16,7 @@ public class CenterToTargetCommand extends Command {
     private final PIDController omegaController = new PIDController(0.05, 0, 0);
 
     private double m_area;
-    private double AREA_ERROR = 2;
+    private double AREA_ERROR = 1;
     private double CAMERA_X_OFFSET_ERROR = 1;
     private double ANGLE_ERROR = 5;
 

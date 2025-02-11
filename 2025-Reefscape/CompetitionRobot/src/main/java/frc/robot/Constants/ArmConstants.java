@@ -16,7 +16,9 @@ public class ArmConstants {
         // HORIZONTAL(0),
         L1(-6.424805),
         L2(-10.352051), // reef angle
+
         L3(-10.352051),
+        L3_SCORE(-7.5),
 
         L4(-11.641113),
         L4_SCORE(-9.641113),
