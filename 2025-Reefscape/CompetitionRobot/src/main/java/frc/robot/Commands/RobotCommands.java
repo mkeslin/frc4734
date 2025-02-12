@@ -30,6 +30,7 @@ public class RobotCommands {
             Lights m_lights,
             CoralSim coralSim) {
         return Commands.parallel(
+                Commands.runOnce(() -> m_lights.setColors(0,255,0)).asProxy(),
                 Commands.waitSeconds(0.6)
                         .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
                 // Commands.waitSeconds(0)
@@ -171,20 +172,23 @@ public class RobotCommands {
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
             Arm arm,
+            Lights m_lights,
             CoralSim coralSim) {
         Map<ScoreLevel, Command> commandMap = Map.ofEntries(
                 Map.entry(ScoreLevel.L1,
                         Commands.parallel(
                         // drivetrain.moveVoltageTimeCommand(4, 0.5),
                         // elevator.movePositionDeltaCommand(() -> ElevatorConstants.SCORING_MOVEMENT).asProxy())
-                        )),
+                            Commands.runOnce(()->m_lights.setColors(0,0,64)).asProxy())),
                 Map.entry(ScoreLevel.L2,
                         Commands.parallel(
                                 // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
+                                Commands.runOnce(()->m_lights.setColors(0,0,128)).asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy())),
                 Map.entry(ScoreLevel.L3,
                         Commands.parallel(
                                 // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
+                                Commands.runOnce(()->m_lights.setColors(0,0,191)).asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L4,
                         Commands.sequence(
@@ -192,6 +196,7 @@ public class RobotCommands {
                                 //         .withTimeout(0.35)
                                 //         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 //         .asProxy(),
+                                Commands.runOnce(()->m_lights.setColors(0,0,255)).asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy(),
                                 Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
                                 //         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
@@ -220,10 +225,12 @@ public class RobotCommands {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
+            Lights m_lights,
             CoralSim coralSim) {
         return Commands.sequence(
                 prepareIntakeCoralCommand(elevator, arm, sideToSide, coralSim),
                 Commands.parallel(
+                        Commands.runOnce(()->m_lights.setColors(255,0,255)).asProxy(),
                         elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
                         arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                 elevator.movePositionDeltaCommand(() -> 0.31).asProxy()
