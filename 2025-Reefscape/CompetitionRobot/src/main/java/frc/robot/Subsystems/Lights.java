@@ -35,7 +35,7 @@ public class Lights extends SubsystemBase {
         ColorFlow, Fire, Larson, Rainbow, RgbFade, SingleFade, Strobe, Twinkle, TwinkleOff, SetAll
     }
 
-    private AnimationTypes m_currentAnimation;
+    private AnimationTypes m_currentAnimationType = AnimationTypes.Fire;
 
     public Lights() {
         CANdleConfiguration configAll = new CANdleConfiguration();
@@ -45,10 +45,12 @@ public class Lights extends SubsystemBase {
         configAll.brightnessScalar = 0.4;
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         m_candle.configAllSettings(configAll, 100);
+
+        changeAnimation(AnimationTypes.SetAll);
     }
 
     public void incrementAnimation() {
-        switch (m_currentAnimation) {
+        switch (m_currentAnimationType) {
             case ColorFlow:
                 changeAnimation(AnimationTypes.Fire);
                 break;
@@ -83,7 +85,7 @@ public class Lights extends SubsystemBase {
     }
 
     public void decrementAnimation() {
-        switch (m_currentAnimation) {
+        switch (m_currentAnimationType) {
             case ColorFlow:
                 changeAnimation(AnimationTypes.TwinkleOff);
                 break;
@@ -154,10 +156,11 @@ public class Lights extends SubsystemBase {
         m_candle.configStatusLedState(offWhenActive, 0);
     }
 
-    public void changeAnimation(AnimationTypes toChange) {
-        m_currentAnimation = toChange;
+    public void 
+    changeAnimation(AnimationTypes toChangeType) {
+        m_currentAnimationType = toChangeType;
 
-        switch (toChange) {
+        switch (toChangeType) {
             case ColorFlow:
                 m_toAnimate = new ColorFlowAnimation(128, 20, 70, 0, 0.7, LedCount, Direction.Forward);
                 break;
@@ -189,7 +192,8 @@ public class Lights extends SubsystemBase {
                 m_toAnimate = null;
                 break;
         }
-        System.out.println("Changed to " + m_currentAnimation.toString());
+        System.out.println("Changed to " + m_currentAnimationType.toString());
+        m_candle.animate(m_toAnimate);
     }
 
     public Command setColors(int r, int g, int b) {
