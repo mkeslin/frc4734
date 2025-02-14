@@ -248,8 +248,10 @@ public class RobotContainer {
                 .onTrue(Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.55));
 
         // m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        m_arcadeController.leftBumper().onTrue(Commands.runOnce(() -> m_lights.incrementAnimation()));
-
+        // m_arcadeController.leftBumper().onTrue(Commands.parallel(
+        //         Commands.runOnce(()->m_lights.setColors()),
+        //         Commands.runOnce(()->m_lights.setColors(255,128,128))
+        // ));
         // LOGGING & SYSID
         // m_arcadeController.rightTrigger().onTrue(Commands.runOnce(SignalLogger::start));
         // m_arcadeController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));

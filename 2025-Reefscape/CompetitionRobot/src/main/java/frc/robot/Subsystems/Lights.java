@@ -35,7 +35,7 @@ public class Lights extends SubsystemBase {
         ColorFlow, Fire, Larson, Rainbow, RgbFade, SingleFade, Strobe, Twinkle, TwinkleOff, SetAll
     }
 
-    private AnimationTypes m_currentAnimationType = AnimationTypes.Fire;
+    private AnimationTypes m_currentAnimationType;
 
     public Lights() {
         CANdleConfiguration configAll = new CANdleConfiguration();
@@ -45,8 +45,6 @@ public class Lights extends SubsystemBase {
         configAll.brightnessScalar = 0.4;
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         m_candle.configAllSettings(configAll, 100);
-
-        changeAnimation(AnimationTypes.SetAll);
     }
 
     public void incrementAnimation() {
