@@ -184,12 +184,12 @@ public class RobotCommands {
                         Commands.parallel(
                                 // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
                                 Commands.runOnce(()->m_lights.setColors(0,0,128)).asProxy(),
-                                arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy())),
+                                arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L3,
                         Commands.parallel(
                                 // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
                                 Commands.runOnce(()->m_lights.setColors(0,0,191)).asProxy(),
-                                arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy())),
+                                arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L4,
                         Commands.sequence(
                                 // Commands.run(() -> drivetrain.setRelativeSpeed(0.5, 0, 0))
@@ -197,8 +197,8 @@ public class RobotCommands {
                                 //         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 //         .asProxy(),
                                 Commands.runOnce(()->m_lights.setColors(0,0,255)).asProxy(),
-                                arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy(),
-                                Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
+                                arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy()
+                                // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
                                 //         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                         )),
 

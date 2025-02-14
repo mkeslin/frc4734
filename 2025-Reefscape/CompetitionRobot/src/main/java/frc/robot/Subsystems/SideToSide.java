@@ -1,11 +1,15 @@
 package frc.robot.Subsystems;
 
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.Constants.IDs.SIDE_TO_SIDE_ID;
 
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -19,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
 import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
@@ -29,8 +34,11 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
     private final DoublePublisher sideToSidePub = table.getDoubleTopic("Side To Side Position").publish();
 
     private TalonFX m_sideToSideMotor;
+    private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
     // private double simVelocity = 0.0;
+
+    private final SysIdRoutine m_sysIdRoutine;
 
     private final PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
@@ -53,17 +61,37 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
         m_positionTracker = positionTracker;
         positionTracker.setSideToSidePositionSupplier(this::getPosition);
 
+        m_sysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(
+                        Volts.of(1).div(Seconds.of(1)),
+                        Volts.of(3),
+                        null,
+                        (state) -> SignalLogger.writeString("SideToSide State", state.toString())),
+                new SysIdRoutine.Mechanism(
+                        (volts) -> m_sideToSideMotor.setControl(m_voltReq.withOutput(volts.in(Volts))),
+                        null,
+                        this,
+                        "Arm"));
+
         var talonFxConfigs = new TalonFXConfiguration();
 
         // set slot 0 gains
         var slot0Configs = talonFxConfigs.Slot0;
         slot0Configs.kG = 0.0;
-        slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
-        slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-        slot0Configs.kA = 0.01; // A velocity target of 1 rps results in 0.12 V output
-        slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12 V output
-        slot0Configs.kI = 0.0; // no output for integrated error
-        slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
+        slot0Configs.kS = 0.25;
+        slot0Configs.kV = 0.12;
+        slot0Configs.kA = 0.01;
+        slot0Configs.kP = 4.8;
+        slot0Configs.kI = 0.0;
+        slot0Configs.kD = 0.0;
+
+        // slot0Configs.kG = 0.0;
+        // slot0Configs.kS = 0.078998;
+        // slot0Configs.kV = 0.1078;
+        // slot0Configs.kA = 0.00105;
+        // slot0Configs.kP = 58.889;
+        // slot0Configs.kI = 0.0;
+        // slot0Configs.kD = 0.32033;
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFxConfigs.MotionMagic;
@@ -140,8 +168,8 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
             m_sideToSideMotor.setControl(m_request.withPosition(goalPosition));
             sideToSidePub.set(m_positionTracker.getSideToSidePosition());
         })
-        .until(() -> Math.abs(getPosition() - goalPosition) < .5) //abs(goal - position) < error 
-        .withName("sideToSide.moveToPosition");
+                .until(() -> Math.abs(getPosition() - goalPosition) < .5) // abs(goal - position) < error
+                .withName("sideToSide.moveToPosition");
     }
 
     @Override
@@ -181,13 +209,13 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
                 .withName("sideToSide.coastMotorsCommand");
     }
 
-    // public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {
-    // return sysIdRoutine.quasistatic(direction).withName("elevator.sysIdQuasistatic");
-    // }
+    public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutine.quasistatic(direction).withName("sideToSide.sysIdQuasistatic");
+    }
 
-    // public Command sysIdDynamicCommand(SysIdRoutine.Direction direction) {
-    // return sysIdRoutine.dynamic(direction).withName("elevator.sysIdDynamic");
-    // }
+    public Command sysIdDynamicCommand(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutine.dynamic(direction).withName("sideToSide.sysIdDynamic");
+    }
 
     // public Command resetControllersCommand() {
     // return Commands.runOnce(() -> pidController.reset(getPosition()))

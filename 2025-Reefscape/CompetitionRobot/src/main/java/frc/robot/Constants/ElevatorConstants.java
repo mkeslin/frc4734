@@ -19,8 +19,8 @@ public class ElevatorConstants {
         INTAKE_POST(20.0),
         // ALGAE_L2(0.884),
         // ALGAE_L3(1.234),
-        L1(4.283203),
-        L2(6.024902),
+        L1(0.355),
+        L2(0.355),
         L3(7.0),
         L4(20),
         TOP(22.021484);

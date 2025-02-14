@@ -1,18 +1,8 @@
 package frc.robot;
 
-// import org.littletonrobotics.junction.LogFileUtil;
-// import org.littletonrobotics.junction.LoggedRobot;
-// import org.littletonrobotics.junction.Logger;
-// import org.littletonrobotics.junction.networktables.NT4Publisher;
-// import org.littletonrobotics.junction.wpilog.WPILOGReader;
-// import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindingCommand;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -61,7 +51,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        // m_robotContainer.localizeRobotPose();
+        m_robotContainer.localizeRobotPose();
     }
 
     @Override
@@ -87,7 +77,7 @@ public class Robot extends TimedRobot {
 
         AutoManager.getInstance().runSelectedRoutine();
 
-        m_robotContainer.resetZeros();
+        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -97,6 +87,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousExit() {
         AutoManager.getInstance().endRoutine();
+
+        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -105,7 +97,7 @@ public class Robot extends TimedRobot {
             m_autonomousCommand.cancel();
         }
 
-        m_robotContainer.resetZeros();
+        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -114,6 +106,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopExit() {
+        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -121,6 +114,8 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().cancelAll();
 
         // m_robotContainer.initializeTest();
+
+        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -129,6 +124,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testExit() {
+
+        // m_robotContainer.resetZeros();
     }
 
     @Override

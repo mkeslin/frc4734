@@ -1,11 +1,15 @@
 package frc.robot.Subsystems;
 
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.Constants.IDs.ARM_ID;
 
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -20,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
 import frc.robot.Constants.ArmConstants.ArmPosition;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
@@ -31,6 +36,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     private final DoublePublisher armPub = table.getDoubleTopic("Arm Angle").publish();
 
     private TalonFX m_armMotor;
+    private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
     /**
      * The representation of the "elevator" for simulation. (even though this is a
@@ -51,10 +57,10 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     // private final MutableMeasure<Voltage> sysidAppliedVoltageMeasure = MutableMeasure.mutable(Volts.of(0));
     // private final MutableMeasure<Angle> sysidPositionMeasure = MutableMeasure.mutable(Radians.of(0));
-    // private final MutableMeasure<Velocity<Angle>> sysidVelocityMeasure = MutableMeasure
-    // .mutable(RadiansPerSecond.of(0));
+    // private final MutableMeasure<Velocity<Angle>> sysidVelocityMeasure =
+    // MutableMeasure.mutable(RadiansPerSecond.of(0));
 
-    // private final SysIdRoutine sysIdRoutine;
+    private final SysIdRoutine m_sysIdRoutine;
 
     private final PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
@@ -79,20 +85,17 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         // (s) -> s.getEncoder().setPositionConversionFactor(ENCODER_ROTATIONS_TO_METERS),
         // (s) -> s.getEncoder().setVelocityConversionFactor(ENCODER_ROTATIONS_TO_METERS / 60.0));
 
-        // sysIdRoutine = new SysIdRoutine(
-        // new SysIdRoutine.Config(Volts.of(1).per(Seconds.of(1)), Volts.of(3), null, null),
-        // new SysIdRoutine.Mechanism(
-        // volts -> setVoltage(volts.magnitude()),
-        // null,
-        // // log -> {
-        // // log.motor("arm")
-        // // .voltage(sysidAppliedVoltageMeasure.mut_replace(motor.getAppliedOutput(), Volts))
-        // // .angularPosition(sysidPositionMeasure.mut_replace(getPosition(), Radians))
-        // // .angularVelocity(sysidVelocityMeasure.mut_replace(getVelocity(), RadiansPerSecond));
-        // // },
-        // this
-        // )
-        // );
+        m_sysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(
+                        Volts.of(0.5).div(Seconds.of(1)),
+                        Volts.of(0.5),
+                        null,
+                        (state) -> SignalLogger.writeString("Arm State", state.toString())),
+                new SysIdRoutine.Mechanism(
+                        (volts) -> m_armMotor.setControl(m_voltReq.withOutput(volts.in(Volts))),
+                        null,
+                        this,
+                        "Arm"));
 
         // setDefaultCommand(moveToCurrentGoalCommand());
 
@@ -101,12 +104,22 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         // set slot 0 gains
         var slot0Configs = talonFxConfigs.Slot0;
         slot0Configs.kG = -0.2;
-        slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
-        slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-        slot0Configs.kA = 0.01; // A velocity target of 1 rps results in 0.12 V output
-        slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12 V output
-        slot0Configs.kI = 0.0; // no output for integrated error
-        slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
+        slot0Configs.kS = 0.25; 
+        slot0Configs.kV = 0.12; 
+        slot0Configs.kA = 0.01; 
+        slot0Configs.kP = 4.8; 
+        slot0Configs.kI = 0.0; 
+        slot0Configs.kD = 0.1; 
+
+        // slot0Configs.kG = 0.25652;
+        // slot0Configs.kS = 0.0; 
+        // slot0Configs.kV = 0.1039; 
+        // slot0Configs.kA = 0.11164; 
+        // slot0Configs.kP = 46.911; 
+        // slot0Configs.kI = 0.0; 
+        // slot0Configs.kD = 3.1607; 
+        // slot0Configs.GravityType = GravityTypeValue.Arm_Cosine;
+        // // slot0Configs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFxConfigs.MotionMagic;
@@ -118,7 +131,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         m_armMotor.setNeutralMode(NeutralModeValue.Brake);
 
         // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();
-        talonFxConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_armMotor.getConfigurator().apply(talonFxConfigs);
@@ -175,20 +188,20 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     // @Override
     // public void setVoltage(double voltage) {
     // voltage = MathUtil.clamp(voltage, -12, 12);
-    // voltage = Utils.applySoftStops(voltage, getPosition(), ArmConstants.MIN_ANGLE_RADIANS,
-    // ArmConstants.MAX_ANGLE_RADIANS);
+    // // voltage = Utils.applySoftStops(voltage, getPosition(), ArmConstants.MIN_ANGLE_RADIANS,
+    // // ArmConstants.MAX_ANGLE_RADIANS);
 
-    // if (voltage < 0
-    // && getPosition() < 0
-    // && m_positionTracker.getElevatorPosition() < ElevatorConstants.MOTION_LIMIT) {
-    // voltage = 0;
-    // }
+    // // if (voltage < 0
+    // // && getPosition() < 0
+    // // && m_positionTracker.getElevatorPosition() < ElevatorConstants.MOTION_LIMIT) {
+    // // voltage = 0;
+    // // }
 
-    // if (!GlobalStates.INITIALIZED.enabled()) {
-    // voltage = 0.0;
-    // }
+    // // if (!GlobalStates.INITIALIZED.enabled()) {
+    // // voltage = 0.0;
+    // // }
 
-    // m_arm.setVoltage(voltage);
+    // m_armMotor.setVoltage(voltage);
     // }
 
     // @Override
@@ -206,8 +219,8 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
             m_armMotor.setControl(m_request.withPosition(goalPosition));
             armPub.set(m_positionTracker.getArmAngle());
         })
-        .until(() -> Math.abs(getPosition() - goalPosition) < .5) //abs(goal - position) < error 
-        .withName("arm.moveToPosition");
+                .until(() -> Math.abs(getPosition() - goalPosition) < .5)
+                .withName("arm.moveToPosition");
     }
 
     @Override
@@ -232,8 +245,8 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     // @Override
     // public Command holdCurrentPositionCommand() {
-    //     return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
-    //             .withName("arm.holdCurrentPosition");
+    // return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
+    // .withName("arm.holdCurrentPosition");
     // }
 
     @Override
@@ -243,8 +256,8 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     // @Override
     // public Command setOverridenSpeedCommand(Supplier<Double> speed) {
-    //     return runEnd(() -> setVoltage(12.0 * speed.get()), () -> setVoltage(0))
-    //             .withName("arm.setOverriddenSpeed");
+    // return runEnd(() -> setVoltage(12.0 * speed.get()), () -> setVoltage(0))
+    // .withName("arm.setOverriddenSpeed");
     // }
 
     @Override
@@ -259,13 +272,13 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
                 .withName("arm.coastMotorsCommand");
     }
 
-    // public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {
-    // return sysIdRoutine.quasistatic(direction).withName("elevator.sysIdQuasistatic");
-    // }
+    public Command sysIdQuasistaticCommand(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutine.quasistatic(direction).withName("arm.sysIdQuasistatic");
+    }
 
-    // public Command sysIdDynamicCommand(SysIdRoutine.Direction direction) {
-    // return sysIdRoutine.dynamic(direction).withName("elevator.sysIdDynamic");
-    // }
+    public Command sysIdDynamicCommand(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutine.dynamic(direction).withName("arm.sysIdDynamic");
+    }
 
     // public Command resetControllersCommand() {
     // return Commands.runOnce(() -> pidController.reset(getPosition()))
@@ -273,6 +286,6 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     // }
 
     // public boolean atGoal() {
-    //     return pidController.atGoal();
+    // return pidController.atGoal();
     // }
 }

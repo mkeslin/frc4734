@@ -2,12 +2,13 @@ package frc.robot;
 
 import static frc.robot.Constants.Constants.IDs.APRILTAGPIPELINE;
 import static frc.robot.Constants.Constants.IDs.INTAKE_SENSOR;
-import static frc.robot.Constants.Constants.IDs.LIGHTS_ID;
 
-import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -15,10 +16,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
-import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
 import frc.robot.Controllers.ControllerIds;
@@ -66,7 +67,8 @@ public class RobotContainer {
 
     // COMMANDS
     public CenterToReefCommand centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain);
-    public CenterToStationCommand centerToStationCommand = new CenterToStationCommand(m_station_limelight, m_drivetrain);
+    public CenterToStationCommand centerToStationCommand = new CenterToStationCommand(m_station_limelight,
+            m_drivetrain);
 
     // AUTO CHOOSERS
     // private final SendableChooser<Integer> m_autoStartChooser = new SendableChooser<>();
@@ -184,6 +186,8 @@ public class RobotContainer {
         // SCORE CORAL
         m_mechanismController.a().onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
 
+        m_mechanismController.leftBumper().onTrue(Commands.runOnce(() -> resetZeros()));
+
         // SET CURRENT POSITION TO ZERO
         // m_mechanismController.y().onTrue(Commands.runOnce(() -> {
         // m_sideToSide.resetPosition();
@@ -231,20 +235,41 @@ public class RobotContainer {
         Command command = Commands.sequence(
                 RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
                 centerToReefCommand,
-                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
-                RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim),
-                RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide),
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
+                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, m_elevator, m_arm, m_sideToSide,
+                        m_lights, m_coralSim),
+                RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim)
+        // RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide)
+        // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
         );
 
         m_arcadeController.start().onTrue(command);
 
+        m_arcadeController.leftTrigger()
+                .onTrue(Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.55));
+
+        // m_arcadeController.leftBumper().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L2));
+        // m_arcadeController.leftBumper().onTrue(m_arm.coastMotorsCommand());
+
+        // LOGGING & SYSID
+        // m_arcadeController.rightTrigger().onTrue(Commands.runOnce(SignalLogger::start));
+        // m_arcadeController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+        /*
+         * Joystick Y = quasistatic forward
+         * Joystick A = quasistatic reverse
+         * Joystick B = dynamic forward
+         * Joystick X = dyanmic reverse
+         */
+        // m_arcadeController.a().whileTrue(m_elevator.sysIdQuasistaticCommand(SysIdRoutine.Direction.kForward));
+        // m_arcadeController.x().whileTrue(m_elevator.sysIdQuasistaticCommand(SysIdRoutine.Direction.kReverse));
+        // m_arcadeController.b().whileTrue(m_elevator.sysIdDynamicCommand(SysIdRoutine.Direction.kForward));
+        // m_arcadeController.y().whileTrue(m_elevator.sysIdDynamicCommand(SysIdRoutine.Direction.kReverse));
+
         // m_arcadeController.leftTrigger().onTrue(Commands.run(() -> m_drivetrain.moveRelative(-0.5, 0,
         // 0)).withTimeout(0.35));
 
-        m_arcadeController.leftTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
-        m_arcadeController.rightTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
-        m_arcadeController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
+        // m_arcadeController.leftTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
+        // m_arcadeController.rightTrigger().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
+        // m_arcadeController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
 
         // m_arcadeController.a().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
         // m_arcadeController.b().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L1));
@@ -297,26 +322,26 @@ public class RobotContainer {
         // m_lights.incrementAnimation(), m_lights));
     }
 
-    // public void localizeRobotPose() {
-    // boolean doRejectUpdate = false;
-    // LimelightHelpers.SetRobotOrientation("limelight",
-    // // m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
-    // Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
-    // 0, 0, 0, 0, 0);
-    // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+    public void localizeRobotPose() {
+        boolean doRejectUpdate = false;
+        LimelightHelpers.SetRobotOrientation("limelight-one",
+                // m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
+                Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
+                0, 0, 0, 0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-one");
 
-    // // if our angular velocity is greater than 720 degrees per second, ignore vision
-    // // updates
-    // if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
-    // doRejectUpdate = true;
-    // }
-    // if (!doRejectUpdate) {
-    // m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.6, .6, 9999999));
-    // m_drivetrain.addVisionMeasurement(
-    // mt2.pose,
-    // mt2.timestampSeconds);
-    // }
-    // }
+        // if our angular velocity is greater than 720 degrees per second, ignore vision
+        // updates
+        if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
+            doRejectUpdate = true;
+        }
+        if (!doRejectUpdate) {
+            m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+            m_drivetrain.addVisionMeasurement(
+                    mt2.pose,
+                    mt2.timestampSeconds);
+        }
+    }
 
     public void configureAuto() {
         // AutoManager.getInstance().addRoutine(AutoCommandA.testPath(m_drivetrain));
