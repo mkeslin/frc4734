@@ -17,7 +17,7 @@ public class Constants {
 
         public static final int APRILTAGPIPELINE = 0;
 
-        public static final int LIGHTS_ID = 0;
+        public static final int LIGHTS_ID = 40;
 
         // public static final double INTAKE_SENSOR_DELAY = 0.4;
     }

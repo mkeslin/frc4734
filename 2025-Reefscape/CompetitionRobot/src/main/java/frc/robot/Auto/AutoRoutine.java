@@ -20,9 +20,11 @@ public class AutoRoutine {
      * Creates an AutoRoutine. Use for auto routines that do not use trajectories or
      * localization.
      * 
-     * @param name    the name of the routine, this will be pushed to
-     *                NetworkTables
-     * @param command the command to run on auto enable
+     * @param name
+     *            the name of the routine, this will be pushed to
+     *            NetworkTables
+     * @param command
+     *            the command to run on auto enable
      */
     public AutoRoutine(String name, Command command) {
         this.name = name;
@@ -32,12 +34,16 @@ public class AutoRoutine {
     /**
      * Creates an AutoRoutine.
      * 
-     * @param name             the name of the routine, this will be pushed to
-     *                         NetworkTables
-     * @param commandSupplier  the command to run on auto enable
-     * @param pathPlannerPaths a list of paths that the command contains
-     * @param initialPose      the initial blue pose of the path, used to reset
-     *                         odometry
+     * @param name
+     *            the name of the routine, this will be pushed to
+     *            NetworkTables
+     * @param commandSupplier
+     *            the command to run on auto enable
+     * @param pathPlannerPaths
+     *            a list of paths that the command contains
+     * @param initialPose
+     *            the initial blue pose of the path, used to reset
+     *            odometry
      */
     public AutoRoutine(String name, Command command, List<PathPlannerPath> pathPlannerPaths, Pose2d initialPose) {
         this.name = name;
@@ -83,9 +89,9 @@ public class AutoRoutine {
     public Pose2d getInitialPose() {
         if (pathPlannerPaths.size() > 0) {
             // if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
-            //     return Reflector.reflectPose2d(initialPose, 16.54);
+            // return Reflector.reflectPose2d(initialPose, 16.54);
             // else
-                return initialPose;
+            return initialPose;
         } else {
             return new Pose2d();
         }
