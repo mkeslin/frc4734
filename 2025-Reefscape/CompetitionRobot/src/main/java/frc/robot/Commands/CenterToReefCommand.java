@@ -12,11 +12,11 @@ public class CenterToReefCommand extends Command {
     public Limelight m_limelight;
     public CommandSwerveDrivetrain m_drivetrain;
 
-    private final PIDController xController = new PIDController(0.05, 0, 0);
-    private final PIDController yController = new PIDController(0.05, 0, 0);
-    private final PIDController omegaController = new PIDController(0.05, 0, 0);
+    private final PIDController xController = new PIDController(0.03, 0, 0);
+    private final PIDController yController = new PIDController(0.03, 0, 0);
+    private final PIDController omegaController = new PIDController(0.03, 0, 0);
 
-    private double AREA_GOAL = 30;
+    private double AREA_GOAL = 35;
     private double AREA_ERROR = 2;
     private double CAMERA_X_OFFSET_ERROR = 1;
     private double ANGLE_ERROR = 5;
@@ -46,27 +46,16 @@ public class CenterToReefCommand extends Command {
 
     @Override
     public void execute() {
-
-        if(m_limelight.hasTargets()) {
-            //possibly add additional conditions for specific target IDs
-            
-            var xSpeed = xController.calculate(m_limelight.getArea());
-            if (xController.atSetpoint()) {
-                xSpeed = 0;
-            }
-
-            var ySpeed = yController.calculate(m_limelight.getX());
-            if (yController.atSetpoint()) {
-                ySpeed = 0;
-            }
-
-            var omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_limelight.getYaw()));
-            if (omegaController.atSetpoint()) {
-                omegaSpeed = 0;
-            }
-            //getSpeeds(xSpeed, ySpeed, omegaSpeed);
-            m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
+        var xSpeed = xController.calculate(m_limelight.getArea());
+        var ySpeed = yController.calculate(m_limelight.getX());
+        var omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_limelight.getYaw()));
+        if (!m_limelight.hasTargets()) {
+            ySpeed = 0;
+            xSpeed = 0;
+            omegaSpeed = 0;
         }
+
+        m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
     }
 
     // Make this return true when this Command no longer needs to run execute()
