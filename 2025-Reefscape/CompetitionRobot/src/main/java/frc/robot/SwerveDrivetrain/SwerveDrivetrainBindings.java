@@ -70,8 +70,8 @@ public class SwerveDrivetrainBindings {
          * );
          */
 
-        // LEFT BUMPER: Reset the field-centric heading
-        // driveController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // RIGHT BUMPER: Reset the field-centric heading
+        driveController.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         // Turtle Mode while held
         driveController.leftBumper().onTrue(Commands.runOnce(() -> CurrentSpeed = MaxSpeed * TurtleSpeed)
