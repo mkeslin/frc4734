@@ -107,7 +107,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         slot0Configs.kS = 0.25; 
         slot0Configs.kV = 0.12; 
         slot0Configs.kA = 0.01; 
-        slot0Configs.kP = 4.8; 
+        slot0Configs.kP = 3.8; 
         slot0Configs.kI = 0.0; 
         slot0Configs.kD = 0.1; 
 

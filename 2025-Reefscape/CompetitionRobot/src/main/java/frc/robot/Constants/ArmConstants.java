@@ -13,6 +13,9 @@ public class ArmConstants {
         // TOP(Math.PI / 2.0);
 
         BOTTOM(0),
+
+        PREINTAKE(.2),
+
         // HORIZONTAL(0),
         L1(6.424805),
         L2(10.352051), // reef angle

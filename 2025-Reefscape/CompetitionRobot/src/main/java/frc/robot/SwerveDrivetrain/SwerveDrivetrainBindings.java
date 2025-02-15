@@ -57,8 +57,8 @@ public class SwerveDrivetrainBindings {
         // Sticks
         drivetrain.setDefaultCommand(
                 drivetrain.applyRequest(() -> m_drive
-                        .withVelocityX(velocityXLimited) // Drive forward with negative Y (forward)
-                        .withVelocityY(velocityYLimited) // Drive left with negative X (left)
+                        .withVelocityX(coordinateOrientation * driveController.getLeftY() * CurrentSpeed) // Drive forward with negative Y (forward)
+                        .withVelocityY(coordinateOrientation * driveController.getLeftX() * CurrentSpeed) // Drive left with negative X (left)
                         .withRotationalRate(-driveController.getRightX() * CurrentAngularRate) // Drive counterclockwise
                                                                                                // with negative X (left)
                 ).ignoringDisable(false));

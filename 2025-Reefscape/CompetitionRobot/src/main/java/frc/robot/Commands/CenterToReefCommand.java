@@ -16,10 +16,10 @@ public class CenterToReefCommand extends Command {
     private final PIDController yController = new PIDController(0.03, 0, 0);
     private final PIDController omegaController = new PIDController(0.03, 0, 0);
 
-    private double AREA_GOAL = 35;
+    private double AREA_GOAL = 37;
     private double AREA_ERROR = 2;
-    private double CAMERA_X_OFFSET_ERROR = 1;
-    private double ANGLE_ERROR = 5;
+    private double CAMERA_X_OFFSET_ERROR = 0.9;
+    private double ANGLE_ERROR = 3;
 
     public Timer t = new Timer();
 

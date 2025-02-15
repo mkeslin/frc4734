@@ -13,13 +13,13 @@ public class CenterToStationCommand extends Command {
     public CommandSwerveDrivetrain m_drivetrain;
 
     private final PIDController xController = new PIDController(0.15, 0, 0);
-    private final PIDController yController = new PIDController(0.05, 0, 0);
-    private final PIDController omegaController = new PIDController(0.05, 0, 0);
+    private final PIDController yController = new PIDController(0.03, 0, 0);
+    private final PIDController omegaController = new PIDController(0.03, 0, 0);
 
     private double AREA_GOAL = 6;
     private double AREA_ERROR = 2;
     private double CAMERA_X_OFFSET_ERROR = 1;
-    private double ANGLE_ERROR = 5;
+    private double ANGLE_ERROR = 3;
 
     public Timer t = new Timer();
 

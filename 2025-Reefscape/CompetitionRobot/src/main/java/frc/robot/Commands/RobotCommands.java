@@ -214,7 +214,7 @@ public class RobotCommands {
             CoralSim coralSim) {
         return Commands.parallel(
                 Commands.waitSeconds(0)
-                        .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
+                        .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.PREINTAKE).asProxy()),
                 Commands.waitSeconds(0)
                         .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
                 Commands.waitSeconds(1.0)
