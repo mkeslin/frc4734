@@ -172,19 +172,23 @@ public class RobotContainer {
         // m_pathPlanner));
 
         // GO TO PRE-INTAKE
-        m_mechanismController.x()
+        m_mechanismController.a()
                 .onTrue(RobotCommands.prepareIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_coralSim));
 
         // MOVE TO START POSITION // ALSO INTAKE COMMAND
         m_mechanismController.b().onTrue(RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide));
 
         // GO TO POST-INTAKE
-        m_mechanismController.y()
-                .onTrue(RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights,
-                        m_coralSim));
+        m_mechanismController.y().onTrue(Commands.sequence(
+                RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
+                centerToReefCommand));
 
         // SCORE CORAL
-        m_mechanismController.a().onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
+        m_mechanismController.rightTrigger()
+                .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
+
+        m_mechanismController.leftTrigger()
+                .onTrue(centerToStationCommand);
 
         m_mechanismController.leftBumper().onTrue(Commands.runOnce(() -> resetZeros()));
 
@@ -202,22 +206,22 @@ public class RobotContainer {
         // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(.4)));
         // m_arcadeController.leftBumper().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(0)));
 
-        // m_arcadeController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
-        // ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        // m_arcadeController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
-        // ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        // m_arcadeController.b().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
-        // ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        // m_arcadeController.a().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
-        // ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        // m_arcadeController.x().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
-        // ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        // m_arcadeController.y().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
-        // ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        // m_arcadeController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
-        // ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        // m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
-        // ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        m_arcadeController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        m_arcadeController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        m_arcadeController.b().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        m_arcadeController.a().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
+                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        m_arcadeController.x().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        m_arcadeController.y().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        m_arcadeController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
+                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
 
         // m_arcadeController.start().onTrue(centerToAprilTagCommand);
 
@@ -232,25 +236,26 @@ public class RobotContainer {
         // // .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0))).asProxy()
         // );
 
-        Command command = Commands.sequence(
-                RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
-                centerToReefCommand,
-                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, m_elevator, m_arm, m_sideToSide,
-                        m_lights, m_coralSim),
-                RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim)
+        // Command command = Commands.sequence(
+        // RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
+        // centerToReefCommand,
+        // RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, m_elevator, m_arm, m_sideToSide,
+        // m_lights, m_coralSim),
+        // RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim)
         // RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide)
         // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
-        );
+        // );
 
-        m_arcadeController.start().onTrue(command);
+        // m_arcadeController.start().onTrue(command);
 
-        m_arcadeController.leftTrigger()
-                .onTrue(Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.55));
+        // m_arcadeController.leftTrigger()
+        // .onTrue(Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.55));
 
-        // m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        // m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left,
+        // m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
         // m_arcadeController.leftBumper().onTrue(Commands.parallel(
-        //         Commands.runOnce(()->m_lights.setColors()),
-        //         Commands.runOnce(()->m_lights.setColors(255,128,128))
+        // Commands.runOnce(()->m_lights.setColors()),
+        // Commands.runOnce(()->m_lights.setColors(255,128,128))
         // ));
         // LOGGING & SYSID
         // m_arcadeController.rightTrigger().onTrue(Commands.runOnce(SignalLogger::start));
