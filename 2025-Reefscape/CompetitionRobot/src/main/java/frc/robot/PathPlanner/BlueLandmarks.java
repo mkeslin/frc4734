@@ -5,27 +5,19 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class BlueLandmarks {
 
-    public static final Pose2d Start3 = getPose(1.25, 7, 0);
-    public static final Pose2d Start2 = getPose(1.25, 5.5, 0);
-    public static final Pose2d Start1 = getPose(1.25, 4, 0);
-
-    public static final Pose2d Amp = getPose(1.8, 7.5, 90.0);
-    public static final Pose2d Speaker = getPose(1.25, 5.5, 0);
-    public static final Pose2d Source = getPose(15.3, 1.3, -60.0);
-
-    public static final Pose2d Stage1 = getPose(4.3, 5.0, -60.0);
-    public static final Pose2d Stage2 = getPose(5.9, 4.1, 180.0);
-    public static final Pose2d Stage3 = getPose(4.3, 3.2, 60.0);
-
-    public static final Pose2d Note3 = getPose(2.3, 7.0, 0.0);
-    public static final Pose2d Note2 = getPose(2.3, 5.5, 0.0);
-    public static final Pose2d Note1 = getPose(2.3, 4.0, 0.0);
+    public static final Pose2d Start1 = getPose(7.3, 6.17, 180);
+    public static final Pose2d Start2 = getPose(7.3, 4.02, 180);
+    public static final Pose2d Start3 = getPose(7.3, 1.90, 180);
     
-    public static final Pose2d Note4 = getPose(7.6, 7.4, 0.0);
-    public static final Pose2d Note5 = getPose(7.6, 5.7, 0.0);
-    public static final Pose2d Note6 = getPose(7.6, 4.0, 0.0);
-    public static final Pose2d Note7 = getPose(7.6, 2.4, 0.0);
-    public static final Pose2d Note8 = getPose(7.6, 0.8, 0.0);
+    public static final Pose2d CoralStation1 = getPose(1.20, 7.00, 125.0);
+    public static final Pose2d CoralStation2 = getPose(1.20, 1.16, -125);
+
+    public static final Pose2d Reef1 = getPose(5.32, 5.50, -120.0);
+    public static final Pose2d Reef2 = getPose(6.13, 4.00, 180.0);
+    public static final Pose2d Reef3 = getPose(5.32, 2.56, 120.0);
+    public static final Pose2d Reef4 = getPose(3.60, 2.56, 60.0);
+    public static final Pose2d Reef5 = getPose(2.73, 4.00, 0.0);
+    public static final Pose2d Reef6 = getPose(3.60, 5.50, -60.0);
 
     private static Pose2d getPose(double x, double y, double rotationDegrees) {
         return new Pose2d(x, y, Rotation2d.fromDegrees(rotationDegrees));
