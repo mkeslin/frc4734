@@ -184,7 +184,7 @@ public class RobotContainer {
                         m_coralSim));
 
         // SCORE CORAL
-        m_mechanismController.a().onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim));
+        m_mechanismController.a().onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
 
         m_mechanismController.leftBumper().onTrue(Commands.runOnce(() -> resetZeros()));
 
@@ -237,7 +237,7 @@ public class RobotContainer {
                 centerToReefCommand,
                 RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, m_elevator, m_arm, m_sideToSide,
                         m_lights, m_coralSim),
-                RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_coralSim)
+                RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim)
         // RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide)
         // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
         );

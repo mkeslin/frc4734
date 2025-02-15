@@ -39,7 +39,7 @@ public class AutoCommandA {
                 RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, elevator, arm, sideToSide, m_lights, coralSim)
                         .alongWith(Commands.waitSeconds(0.5).andThen(drivetrain.followPathCommand(Start_GPath))),
                 Commands.parallel(
-                        RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, coralSim),
+                        RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, m_lights, coralSim),
                         Commands.waitSeconds(0.1).andThen(simulateCoral(CoralSimScoreLocation.G_L4,
                                 coralSim))),
                 drivetrain.followPathCommand(G_PickupPath)
@@ -50,7 +50,7 @@ public class AutoCommandA {
                                 .andThen(RobotCommands.intakeAndScoreCommand(ScoreLevel.L4, ScoreSide.Right, elevator, arm, sideToSide, m_lights, coralSim)),
                         drivetrain.followPathCommand(Pickup_DPath)),
                 Commands.parallel(
-                        RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, coralSim),
+                        RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, m_lights, coralSim),
                         Commands.waitSeconds(0).andThen(simulateCoral(CoralSimScoreLocation.D_L4,
                                 coralSim))),
                 drivetrain.followPathCommand(D_PickupPath)
@@ -61,7 +61,7 @@ public class AutoCommandA {
                                 .andThen(RobotCommands.intakeAndScoreCommand(ScoreLevel.L4, ScoreSide.Right, elevator, arm, sideToSide, m_lights, coralSim)),
                         drivetrain.followPathCommand(Pickup_CPath)),
                 Commands.parallel(
-                        RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, coralSim),
+                        RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, m_lights, coralSim),
                         Commands.waitSeconds(0.1).andThen(simulateCoral(CoralSimScoreLocation.C_L4,
                                 coralSim))));
 
