@@ -46,27 +46,16 @@ public class CenterToStationCommand extends Command {
 
     @Override
     public void execute() {
-
-        if(m_limelight.hasTargets()) {
-            //possibly add additional conditions for specific target IDs
-            
-            var xSpeed = -xController.calculate(m_limelight.getArea());
-            if (xController.atSetpoint()) {
-                xSpeed = 0;
-            }
-
-            var ySpeed = -yController.calculate(m_limelight.getX());
-            if (yController.atSetpoint()) {
-                ySpeed = 0;
-            }
-
-            var omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_limelight.getYaw()));
-            if (omegaController.atSetpoint()) {
-                omegaSpeed = 0;
-            }
-            //getSpeeds(xSpeed, ySpeed, omegaSpeed);
-            m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
+        var xSpeed = -xController.calculate(m_limelight.getArea());
+        var ySpeed = -yController.calculate(m_limelight.getX());
+        var omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_limelight.getYaw()));
+        if (!m_limelight.hasTargets()) {
+            ySpeed = 0;
+            xSpeed = 0;
+            omegaSpeed = 0;
         }
+        //getSpeeds(xSpeed, ySpeed, omegaSpeed);
+        m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
     }
 
     // Make this return true when this Command no longer needs to run execute()

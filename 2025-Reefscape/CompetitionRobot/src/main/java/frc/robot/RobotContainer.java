@@ -22,6 +22,7 @@ import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
+import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Climber;
