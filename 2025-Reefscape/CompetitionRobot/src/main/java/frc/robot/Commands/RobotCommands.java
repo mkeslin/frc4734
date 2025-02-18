@@ -30,8 +30,8 @@ public class RobotCommands {
             Lights m_lights,
             CoralSim coralSim) {
         return Commands.parallel(
-                Commands.runOnce(() -> m_lights.setColors(0,255,0)).asProxy(),
-                Commands.waitSeconds(0.6)
+                Commands.runOnce(() -> m_lights.setColors(0, 255, 0)).asProxy(),
+                Commands.waitSeconds(0.35)
                         .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
                 // Commands.waitSeconds(0)
                 // .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
@@ -177,30 +177,31 @@ public class RobotCommands {
         Map<ScoreLevel, Command> commandMap = Map.ofEntries(
                 Map.entry(ScoreLevel.L1,
                         Commands.parallel(
-                        // drivetrain.moveVoltageTimeCommand(4, 0.5),
-                        // elevator.movePositionDeltaCommand(() -> ElevatorConstants.SCORING_MOVEMENT).asProxy())
-                            Commands.runOnce(()->m_lights.setColors(0,0,64)).asProxy())),
+                                // drivetrain.moveVoltageTimeCommand(4, 0.5),
+                                // elevator.movePositionDeltaCommand(() ->
+                                // ElevatorConstants.SCORING_MOVEMENT).asProxy())
+                                Commands.runOnce(() -> m_lights.setColors(0, 0, 64)).asProxy())),
                 Map.entry(ScoreLevel.L2,
                         Commands.parallel(
                                 // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
-                                Commands.runOnce(()->m_lights.setColors(0,0,128)).asProxy(),
+                                Commands.runOnce(() -> m_lights.setColors(0, 0, 128)).asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L3,
                         Commands.parallel(
                                 // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
-                                Commands.runOnce(()->m_lights.setColors(0,0,191)).asProxy(),
+                                Commands.runOnce(() -> m_lights.setColors(0, 0, 191)).asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L4,
                         Commands.sequence(
                                 // Commands.run(() -> drivetrain.setRelativeSpeed(0.5, 0, 0))
-                                //         .withTimeout(0.35)
-                                //         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
-                                //         .asProxy(),
-                                Commands.runOnce(()->m_lights.setColors(0,0,255)).asProxy(),
+                                // .withTimeout(0.35)
+                                // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                                // .asProxy(),
+                                Commands.runOnce(() -> m_lights.setColors(0, 0, 255)).asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy()
-                                // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
-                                //         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
-                                        )),
+                        // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
+                        // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                        )),
 
                 Map.entry(ScoreLevel.None, Commands.none()));
 
@@ -212,13 +213,17 @@ public class RobotCommands {
             Arm arm,
             SideToSide sideToSide,
             CoralSim coralSim) {
-        return Commands.parallel(
-                Commands.waitSeconds(0)
-                        .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.PREINTAKE).asProxy()),
-                Commands.waitSeconds(0)
-                        .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
-                Commands.waitSeconds(1.0)
-                        .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy()));
+        return Commands.sequence(
+                // elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy(),
+                Commands.parallel(
+                        Commands.waitSeconds(0.5)
+                                .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.PREINTAKE).asProxy()),
+                        Commands.waitSeconds(0)
+                                .andThen(
+                                        sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
+                        Commands.waitSeconds(0)
+                                .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP)
+                                        .asProxy())));
     }
 
     public static Command intakeCoralCommand(
@@ -230,7 +235,7 @@ public class RobotCommands {
         return Commands.sequence(
                 prepareIntakeCoralCommand(elevator, arm, sideToSide, coralSim),
                 Commands.parallel(
-                        Commands.runOnce(()->m_lights.setColors(255,0,255)).asProxy(),
+                        Commands.runOnce(() -> m_lights.setColors(255, 0, 255)).asProxy(),
                         elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
                         arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                 elevator.movePositionDeltaCommand(() -> 0.31).asProxy()
@@ -266,10 +271,10 @@ public class RobotCommands {
             SideToSide sideToSide) {
         return Commands.parallel(
                 Commands
-                        .waitSeconds(1.0)
+                        .waitSeconds(0.0)
                         .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM).asProxy()),
                 Commands
-                        .waitSeconds(0.5)
+                        .waitSeconds(0.0)
                         .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                 Commands
                         .waitSeconds(0.0)

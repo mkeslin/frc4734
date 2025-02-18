@@ -95,7 +95,7 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFxConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 50; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicCruiseVelocity = 55; // Target cruise velocity of 80 rps
         motionMagicConfigs.MotionMagicAcceleration = 100; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 

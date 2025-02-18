@@ -93,8 +93,8 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFxConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 30; // Target cruise velocity of 80 rps
-        motionMagicConfigs.MotionMagicAcceleration = 60; // Target acceleration of 160 rps/s (0.5 seconds)
+        motionMagicConfigs.MotionMagicCruiseVelocity = 40; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicAcceleration = 70; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
         talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
