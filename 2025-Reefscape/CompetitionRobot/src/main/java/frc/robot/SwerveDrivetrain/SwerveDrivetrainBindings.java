@@ -21,8 +21,9 @@ public class SwerveDrivetrainBindings {
     private static double CurrentAngularRate = MaxAngularRate; // This will be updated when turtle and reset to
                                                                // MaxAngularRate
 
-    private static SlewRateLimiter RateLimiterX = new SlewRateLimiter(0.5);
-    private static SlewRateLimiter RateLimiterY = new SlewRateLimiter(0.5);
+    private static final SlewRateLimiter RateLimiterX = new SlewRateLimiter(0.5);
+    private static final SlewRateLimiter RateLimiterY = new SlewRateLimiter(0.5);
+    private static final SlewRateLimiter RotationLimiter = new SlewRateLimiter(0.5);
 
     // field-centric
     private static final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
@@ -53,6 +54,8 @@ public class SwerveDrivetrainBindings {
 
         var velocityY = coordinateOrientation * driveController.getLeftX() * CurrentSpeed;
         var velocityYLimited = RateLimiterY.calculate(velocityY);
+
+        //https://github.com/Operation-P-E-A-C-C-E-Robotics/frc-2025/blob/main/src/main/java/frc/robot/commands/drivetrain/PeaccyTuner.java
 
         // Sticks
         drivetrain.setDefaultCommand(

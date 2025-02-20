@@ -31,6 +31,7 @@ import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
 import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Lights.AnimationTypes;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
@@ -258,9 +259,9 @@ public class RobotContainer {
 
         // m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left,
         // m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        // m_arcadeController.leftBumper().onTrue(Commands.parallel(
-        // Commands.runOnce(()->m_lights.setColors()),
-        // Commands.runOnce(()->m_lights.setColors(255,128,128))
+        // m_arcadeController.leftBumper().onTrue(Commands.sequence(
+        //     Commands.runOnce(()->m_lights.changeAnimation(AnimationTypes.SetAll)),
+        //     Commands.runOnce(()->m_lights.setColors(255,128,128))
         // ));
         // LOGGING & SYSID
         // m_arcadeController.rightTrigger().onTrue(Commands.runOnce(SignalLogger::start));
