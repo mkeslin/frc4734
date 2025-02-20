@@ -88,10 +88,14 @@ public class AutoRoutine {
      */
     public Pose2d getInitialPose() {
         if (pathPlannerPaths.size() > 0) {
-            // if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
-            // return Reflector.reflectPose2d(initialPose, 16.54);
-            // else
-            return initialPose;
+            if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
+            {
+                return Reflector.reflectPose2d(initialPose, 16.54);
+            }
+            else
+            {
+                return initialPose;
+            }
         } else {
             return new Pose2d();
         }

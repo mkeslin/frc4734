@@ -191,7 +191,8 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
             m_elevatorLeftLeaderMotor.setControl(m_request.withPosition(goalPosition));
             elevatorPub.set(m_positionTracker.getElevatorPosition());
         })
-                .until(() -> Math.abs(getPosition() - goalPosition) < .5) // abs(goal - position) < error
+                .until(() -> Math.abs(getPosition() - goalPosition) < .5) // ||                             // abs(goal - position) < error
+                        // (m_positionTracker.getCoralInArm() && m_positionTracker.getArmAngle() < 0))     // don't move too low if coral is in arm
                 .withName("elevator.moveToPosition");
     }
 

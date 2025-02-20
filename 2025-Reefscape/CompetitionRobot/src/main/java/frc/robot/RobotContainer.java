@@ -356,8 +356,8 @@ public class RobotContainer {
     }
 
     public void configureAuto() {
-        // AutoManager.getInstance().addRoutine(AutoCommandA.testPath(m_drivetrain));
-        // AutoManager.getInstance().addRoutine(AutoCommandA.GDC(m_drivetrain, m_elevator, m_arm, m_coralSim));
+        AutoManager.getInstance().addRoutine(AutoCommandA.GDC(m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        AutoManager.getInstance().addRoutine(AutoCommandTest2.GDC(m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
     }
 
     public void configureDashboard() {

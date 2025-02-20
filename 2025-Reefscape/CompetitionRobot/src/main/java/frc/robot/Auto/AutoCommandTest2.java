@@ -21,7 +21,7 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 /*
  * Command that executes during autonomous mode
  */
-public class AutoCommandA {
+public class AutoCommandTest2 {
     public static AutoRoutine GDC(
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
@@ -35,33 +35,7 @@ public class AutoCommandA {
         PathPlannerPath D_PickupPath = null; // PathPlannerPath.fromPathFile("D-Pickup");
         PathPlannerPath Pickup_CPath = null; // PathPlannerPath.fromPathFile("Pickup-C");
 
-// loop: 
-                
-                // Drive to reef
-
-                // prepare to score
-
-                // score
-
-                // prepare to intake
-
-                // drive to coral station
-
-                // intake
-
-        Command loopCommand = Commands.sequence(
-
-        );
-
-
         Command command = Commands.sequence(
-
-        
-
-                
-
-
-
                 RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, elevator, arm, sideToSide, m_lights, coralSim)
                         .alongWith(Commands.waitSeconds(0.5).andThen(drivetrain.followPathCommand(Start_GPath))),
                 Commands.parallel(
