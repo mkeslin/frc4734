@@ -7,6 +7,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
@@ -31,6 +32,7 @@ public class AutoCommandA {
             SideToSide sideToSide,
             Lights lights,
             Limelight reefLimelight,
+            Limelight stationLimelight,
             CoralSim coralSim) {
         PathPlannerPath Start_B = null;
         PathPlannerPath B_Pickup2 = null;
@@ -48,9 +50,12 @@ public class AutoCommandA {
         }
 
         var command = Commands.sequence(
-                GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Left, drivetrain, elevator, arm, sideToSide, lights, reefLimelight, coralSim),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, drivetrain, elevator, arm, sideToSide, lights, reefLimelight, coralSim),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, drivetrain, elevator, arm, sideToSide, lights, reefLimelight, coralSim)
+                GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Left, drivetrain, elevator, arm, sideToSide, lights,
+                        reefLimelight, stationLimelight, coralSim),
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, drivetrain, elevator, arm, sideToSide, lights,
+                        reefLimelight, stationLimelight, coralSim),
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, drivetrain, elevator, arm, sideToSide, lights,
+                        reefLimelight, stationLimelight, coralSim)
         //
         );
 
@@ -63,7 +68,7 @@ public class AutoCommandA {
     private static Command GetCycleCommand(
             PathPlannerPath pathToReef,
             PathPlannerPath pathToCoralStation,
-            ScoreSide scoreSide, 
+            ScoreSide scoreSide,
 
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
@@ -71,7 +76,10 @@ public class AutoCommandA {
             SideToSide sideToSide,
             Lights lights,
             Limelight reefLimelight,
+            Limelight stationLimelight,
             CoralSim coralSim) {
+        var centerToStationCommand = new CenterToStationCommand(stationLimelight, drivetrain);
+
         Command command = Commands.sequence(
                 // DRIVE TO REEF & POSITION CORAL
                 // Commands.parallel(
@@ -82,19 +90,25 @@ public class AutoCommandA {
                 // .andThen(RobotCommands.movePostIntakeCoralCommand(elevator, arm, sideToSide, lights,
                 // coralSim)))
                 Commands.waitSeconds((0.0))
-                        .andThen(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, scoreSide, true, drivetrain, elevator,
+                        .andThen(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, scoreSide, true, drivetrain,
+                                elevator,
                                 arm, sideToSide, lights, reefLimelight, coralSim)),
                 // //
                 // // ),
                 // SCORE
                 RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, lights, coralSim),
                 // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
-                //         .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0))),
-                // PRE-INTAKE
-                RobotCommands.prepareIntakeCoralCommand(elevator, arm, sideToSide, coralSim),
-                // DRIVE TO CORAL STATION
-                Commands.waitSeconds(0.0)
-                        .andThen(drivetrain.followPathCommand(pathToCoralStation)),
+                // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0))),
+                Commands.parallel(
+                        // PRE-INTAKE
+                        Commands.waitSeconds(0.4)
+                                .andThen(RobotCommands.prepareIntakeCoralCommand(elevator, arm, sideToSide, coralSim)),
+                        // DRIVE TO CORAL STATION
+                        Commands.waitSeconds(0.0)
+                                .andThen(drivetrain.followPathCommand(pathToCoralStation))
+                //
+                ),
+                // centerToStationCommand,
                 // INTAKE
                 Commands.waitSeconds(3.0),
                 RobotCommands.returnToStartPositions(elevator, arm, sideToSide)
