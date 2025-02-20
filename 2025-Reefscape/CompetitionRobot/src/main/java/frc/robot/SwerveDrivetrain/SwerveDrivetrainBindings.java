@@ -13,7 +13,7 @@ public class SwerveDrivetrainBindings {
     private static final double MaxSpeed = DrivetrainConstants.MaxSpeed;
     private static final double MaxAngularRate = DrivetrainConstants.MaxAngularRate;
 
-    private static final double TurtleSpeed = 0.1; // Reduction in speed from Max Speed, 0.1 = 10%
+    private static final double TurtleSpeed = 0.3; // Reduction in speed from Max Speed, 0.1 = 10%
     private static final double TurtleAngularRate = Math.PI * 0.5; // .75 rotation per second max angular velocity.
                                                                    // Adjust for max turning rate speed.
 

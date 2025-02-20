@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start-G"
+            "pathName": "Start-B"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "G-Pickup"
+            "pathName": "B-Pickup2"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pickup-D"
+            "pathName": "Pickup2-D"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "D-Pickup"
+            "pathName": "D-Pickup2"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pickup-C"
+            "pathName": null
           }
         }
       ]
