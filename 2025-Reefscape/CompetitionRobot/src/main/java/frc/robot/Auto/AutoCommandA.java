@@ -108,7 +108,7 @@ public class AutoCommandA {
                                 .andThen(drivetrain.followPathCommand(pathToCoralStation))
                 //
                 ),
-                // centerToStationCommand,
+                centerToStationCommand,
                 // INTAKE
                 Commands.waitSeconds(3.0),
                 RobotCommands.returnToStartPositions(elevator, arm, sideToSide)
