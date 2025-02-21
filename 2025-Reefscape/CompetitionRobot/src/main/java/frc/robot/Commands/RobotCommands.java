@@ -66,13 +66,13 @@ public class RobotCommands {
                 armPosition = ArmPosition.TOP;
             }
             case L3 -> {
-                lights.setColors(255, 255, 0);
+                lights.setSolidColors(255, 255, 0);
                 elevatorPosition = ElevatorPosition.L3;
                 armPosition = ArmPosition.TOP;
                 // Commands.runOnce(lights.setColors(255,255,0));
             }
             case L4 -> {
-                lights.setColors(255, 0, 0);
+                lights.setSolidColors(255, 0, 0);
                 elevatorPosition = ElevatorPosition.L4;
                 armPosition = ArmPosition.TOP;
                 // Commands.runOnce(lights.setColors(255,0,0));
@@ -144,12 +144,12 @@ public class RobotCommands {
                 armPosition = ArmPosition.L2;
             }
             case L3 -> {
-                lights.setColors(255, 255, 0);
+                lights.setSolidColors(255, 255, 0);
                 elevatorPosition = ElevatorPosition.L3;
                 armPosition = ArmPosition.L3;
             }
             case L4 -> {
-                lights.setColors(255, 0, 0);
+                lights.setSolidColors(255, 0, 0);
                 elevatorPosition = ElevatorPosition.L4;
                 armPosition = ArmPosition.L4;
             }
@@ -195,16 +195,16 @@ public class RobotCommands {
                                 // drivetrain.moveVoltageTimeCommand(4, 0.5),
                                 // elevator.movePositionDeltaCommand(() ->
                                 // ElevatorConstants.SCORING_MOVEMENT).asProxy())
-                                Commands.runOnce(() -> lights.setColors(0, 0, 64)).asProxy())),
+                                Commands.runOnce(() -> lights.setSolidColors(0, 0, 64)).asProxy())),
                 Map.entry(ScoreLevel.L2,
                         Commands.parallel(
                                 // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
-                                Commands.runOnce(() -> lights.setColors(0, 0, 128)).asProxy(),
+                                Commands.runOnce(() -> lights.setSolidColors(0, 0, 128)).asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L3,
                         Commands.parallel(
                                 // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
-                                Commands.runOnce(() -> lights.setColors(0, 0, 191)).asProxy(),
+                                Commands.runOnce(() -> lights.setSolidColors(0, 0, 191)).asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy())),
                 Map.entry(ScoreLevel.L4,
                         Commands.sequence(
@@ -212,7 +212,7 @@ public class RobotCommands {
                                 // .withTimeout(0.35)
                                 // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 // .asProxy(),
-                                Commands.runOnce(() -> lights.setColors(0, 0, 255)).asProxy(),
+                                Commands.runOnce(() -> lights.setSolidColors(0, 0, 255)).asProxy(),
                                 arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy()
                         // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
                         // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
@@ -250,7 +250,7 @@ public class RobotCommands {
         return Commands.sequence(
                 prepareIntakeCoralCommand(elevator, arm, sideToSide, coralSim),
                 Commands.parallel(
-                        Commands.runOnce(() -> lights.setColors(255, 0, 255)).asProxy(),
+                        Commands.runOnce(() -> lights.setSolidColors(255, 0, 255)).asProxy(),
                         elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
                         arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                 elevator.movePositionDeltaCommand(() -> 0.31).asProxy()

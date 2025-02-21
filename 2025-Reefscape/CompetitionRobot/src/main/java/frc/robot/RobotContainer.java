@@ -241,8 +241,7 @@ public class RobotContainer {
                 .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
 
         m_arcadeController.leftBumper().onTrue(Commands.sequence(
-            Commands.runOnce(() -> m_lights.changeAnimation(AnimationTypes.SetAll)),
-            Commands.runOnce(() -> m_lights.setColors(255,128,128))
+            Commands.runOnce(() -> m_lights.setSolidColors(255,128,128))
         ));
         
         // m_arcadeController.start().onTrue(centerToAprilTagCommand);

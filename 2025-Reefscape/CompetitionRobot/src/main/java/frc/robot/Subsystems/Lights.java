@@ -45,6 +45,8 @@ public class Lights extends SubsystemBase {
         configAll.brightnessScalar = 0.4;
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         m_candle.configAllSettings(configAll, 100);
+
+        changeAnimation(AnimationTypes.Fire);
     }
 
     public void incrementAnimation() {
@@ -117,8 +119,9 @@ public class Lights extends SubsystemBase {
         }
     }
 
-    public void setColors() {
+    public void setSolidColors(int r, int g, int b) {
         changeAnimation(AnimationTypes.SetAll);
+        m_candle.setLEDs(r, g, b);
     }
 
     /* Wrappers so we can access the CANdle from the subsystem */
@@ -194,9 +197,9 @@ public class Lights extends SubsystemBase {
         m_candle.animate(m_toAnimate);
     }
 
-    public Command setColors(int r, int g, int b) {
-        return Commands.runOnce(() -> m_candle.setLEDs(r, g, b), this);
-    }
+    // public Command setColors(int r, int g, int b) {
+    //     return Commands.runOnce(() -> m_candle.setLEDs(r, g, b), this);
+    // }
 
     @Override
     public void periodic() {
