@@ -2,6 +2,8 @@ package frc.robot.Subsystems;
 
 import static frc.robot.Constants.Constants.IDs.LIGHTS_ID;
 
+import java.util.Random;
+
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
@@ -21,8 +23,6 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Lights extends SubsystemBase {
@@ -117,6 +117,15 @@ public class Lights extends SubsystemBase {
                 changeAnimation(AnimationTypes.ColorFlow);
                 break;
         }
+    }
+
+    public void setSolidColorsRandom() {
+        changeAnimation(AnimationTypes.SetAll);
+        Random random = new Random();
+        int r = random.nextInt(256);
+        int g = random.nextInt(256);
+        int b = random.nextInt(256);
+        m_candle.setLEDs(r, g, b);
     }
 
     public void setSolidColors(int r, int g, int b) {

@@ -233,17 +233,16 @@ public class RobotContainer {
         m_arcadeController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
                 ScoreSide.Right, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
-        // // m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
-        // ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        // m_arcadeController.leftBumper()
-        //         .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
+
+        m_arcadeController.leftBumper()
+                .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
         m_arcadeController.leftTrigger()
                 .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
 
-        m_arcadeController.leftBumper().onTrue(Commands.sequence(
-            Commands.runOnce(() -> m_lights.setSolidColors(255,128,128))
-        ));
-        
+        // m_arcadeController.leftBumper().onTrue(Commands.sequence(
+        // Commands.runOnce(() -> m_lights.setSolidColorsRandom())
+        // ));
+
         // m_arcadeController.start().onTrue(centerToAprilTagCommand);
 
         // Command command = Commands.sequence(
