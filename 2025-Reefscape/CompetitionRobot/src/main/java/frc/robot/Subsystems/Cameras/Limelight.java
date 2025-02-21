@@ -1,5 +1,6 @@
 package frc.robot.Subsystems.Cameras;
 
+import edu.wpi.first.math.geometry.Pose2d;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
 //import edu.wpi.first.networktables.NetworkTableEntry;
@@ -97,6 +98,10 @@ public class Limelight extends SubsystemBase {
 
     public void setPipeline(int p) {
         LimelightHelpers.setPipelineIndex(tableName, p);
+    }
+
+    public Pose2d getRobotMegaTagPose() {
+        return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(tableName).pose;
     }
 
     public void putNums() {
