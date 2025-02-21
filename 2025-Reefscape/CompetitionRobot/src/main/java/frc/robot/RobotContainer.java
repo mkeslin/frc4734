@@ -213,25 +213,27 @@ public class RobotContainer {
         // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(.4)));
         // m_arcadeController.leftBumper().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(0)));
 
+        var centerRobot = false;
+
         // m_arcadeController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
         // ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
         m_arcadeController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
-                ScoreSide.Left, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                ScoreSide.Left, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
         m_arcadeController.b().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
-                ScoreSide.Left, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                ScoreSide.Left, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
         m_arcadeController.a().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
-                ScoreSide.Left, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                ScoreSide.Left, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
         m_arcadeController.x().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
-                ScoreSide.Right, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                ScoreSide.Right, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
         m_arcadeController.y().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
-                ScoreSide.Right, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                ScoreSide.Right, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
         m_arcadeController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
-                ScoreSide.Right, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                ScoreSide.Right, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
 
         m_arcadeController.leftBumper()
