@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Auto.AutoManager;
 import frc.robot.Logging.ModifiedSignalLogger;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA.TunerSwerveDrivetrain;
 
@@ -51,67 +52,70 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
 
     // /* Swerve requests to apply during SysId characterization */
-    // private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
-    // private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
-    // private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+    // private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new
+    // SwerveRequest.SysIdSwerveTranslation();
+    // private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new
+    // SwerveRequest.SysIdSwerveSteerGains();
+    // private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new
+    // SwerveRequest.SysIdSwerveRotation();
 
     // /*
-    //  * SysId routine for characterizing translation. This is used to find PID gains
-    //  * for the drive motors.
-    //  */
+    // * SysId routine for characterizing translation. This is used to find PID gains
+    // * for the drive motors.
+    // */
     // private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
-    //         new SysIdRoutine.Config(
-    //                 null, // Use default ramp rate (1 V/s)
-    //                 Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
-    //                 null, // Use default timeout (10 s)
-    //                 // Log state with SignalLogger class
-    //                 state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
-    //         new SysIdRoutine.Mechanism(
-    //                 output -> setControl(m_translationCharacterization.withVolts(output)),
-    //                 null,
-    //                 this));
+    // new SysIdRoutine.Config(
+    // null, // Use default ramp rate (1 V/s)
+    // Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
+    // null, // Use default timeout (10 s)
+    // // Log state with SignalLogger class
+    // state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
+    // new SysIdRoutine.Mechanism(
+    // output -> setControl(m_translationCharacterization.withVolts(output)),
+    // null,
+    // this));
 
     // /*
-    //  * SysId routine for characterizing steer. This is used to find PID gains for
-    //  * the steer motors.
-    //  */
+    // * SysId routine for characterizing steer. This is used to find PID gains for
+    // * the steer motors.
+    // */
     // private final SysIdRoutine m_sysIdRoutineSteer = new SysIdRoutine(
-    //         new SysIdRoutine.Config(
-    //                 null, // Use default ramp rate (1 V/s)
-    //                 Volts.of(7), // Use dynamic voltage of 7 V
-    //                 null, // Use default timeout (10 s)
-    //                 // Log state with SignalLogger class
-    //                 state -> SignalLogger.writeString("SysIdSteer_State", state.toString())),
-    //         new SysIdRoutine.Mechanism(
-    //                 volts -> setControl(m_steerCharacterization.withVolts(volts)),
-    //                 null,
-    //                 this));
+    // new SysIdRoutine.Config(
+    // null, // Use default ramp rate (1 V/s)
+    // Volts.of(7), // Use dynamic voltage of 7 V
+    // null, // Use default timeout (10 s)
+    // // Log state with SignalLogger class
+    // state -> SignalLogger.writeString("SysIdSteer_State", state.toString())),
+    // new SysIdRoutine.Mechanism(
+    // volts -> setControl(m_steerCharacterization.withVolts(volts)),
+    // null,
+    // this));
 
     // /*
-    //  * SysId routine for characterizing rotation.
-    //  * This is used to find PID gains for the FieldCentricFacingAngle
-    //  * HeadingController.
-    //  * See the documentation of SwerveRequest.SysIdSwerveRotation for info on
-    //  * importing the log to SysId.
-    //  */
+    // * SysId routine for characterizing rotation.
+    // * This is used to find PID gains for the FieldCentricFacingAngle
+    // * HeadingController.
+    // * See the documentation of SwerveRequest.SysIdSwerveRotation for info on
+    // * importing the log to SysId.
+    // */
     // private final SysIdRoutine m_sysIdRoutineRotation = new SysIdRoutine(
-    //         new SysIdRoutine.Config(
-    //                 /* This is in radians per second², but SysId only supports "volts per second" */
-    //                 Volts.of(Math.PI / 6).per(Second),
-    //                 /* This is in radians per second, but SysId only supports "volts" */
-    //                 Volts.of(Math.PI),
-    //                 null, // Use default timeout (10 s)
-    //                 // Log state with SignalLogger class
-    //                 state -> SignalLogger.writeString("SysIdRotation_State", state.toString())),
-    //         new SysIdRoutine.Mechanism(
-    //                 output -> {
-    //                     /* output is actually radians per second, but SysId only supports "volts" */
-    //                     setControl(m_rotationCharacterization.withRotationalRate(output.in(Volts)));
-    //                     /* also log the requested output for SysId */
-    //                     SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
-    //                 },
-    //                 null,
-    //                 this));
+    // new SysIdRoutine.Config(
+    // /* This is in radians per second², but SysId only supports "volts per second" */
+    // Volts.of(Math.PI / 6).per(Second),
+    // /* This is in radians per second, but SysId only supports "volts" */
+    // Volts.of(Math.PI),
+    // null, // Use default timeout (10 s)
+    // // Log state with SignalLogger class
+    // state -> SignalLogger.writeString("SysIdRotation_State", state.toString())),
+    // new SysIdRoutine.Mechanism(
+    // output -> {
+    // /* output is actually radians per second, but SysId only supports "volts" */
+    // setControl(m_rotationCharacterization.withRotationalRate(output.in(Volts)));
+    // /* also log the requested output for SysId */
+    // SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
+    // },
+    // null,
+    // this));
 
     // /* The SysId routine to test */
     // private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
@@ -242,10 +246,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                     this // Subsystem for requirements
             );
+
+            AutoManager.getInstance().setResetOdometryConsumer(this::resetPoseEstimator);
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder",
                     ex.getStackTrace());
         }
+    }
+
+    public void resetPoseEstimator(Pose2d pose) {
+        resetPose(pose);
     }
 
     /**
@@ -262,34 +272,30 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private SwerveVoltageRequest driveVoltageRequest = new SwerveVoltageRequest(true);
 
-    private SysIdRoutine m_driveSysIdRoutine =
-    new SysIdRoutine(
-        new SysIdRoutine.Config(null, null, null, ModifiedSignalLogger.logState()),
-        new SysIdRoutine.Mechanism(
-            (volts) -> setControl(driveVoltageRequest.withVoltage(volts.in(Volts))),
-            null,
-            this));
+    private SysIdRoutine m_driveSysIdRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(null, null, null, ModifiedSignalLogger.logState()),
+            new SysIdRoutine.Mechanism(
+                    (volts) -> setControl(driveVoltageRequest.withVoltage(volts.in(Volts))),
+                    null,
+                    this));
 
     private SwerveVoltageRequest steerVoltageRequest = new SwerveVoltageRequest(false);
 
-    private SysIdRoutine m_steerSysIdRoutine =
-    new SysIdRoutine(
-        new SysIdRoutine.Config(null, null, null, ModifiedSignalLogger.logState()),
-        new SysIdRoutine.Mechanism(
-            (volts) -> setControl(steerVoltageRequest.withVoltage(volts.in(Volts))),
-            null,
-            this));
+    private SysIdRoutine m_steerSysIdRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(null, null, null, ModifiedSignalLogger.logState()),
+            new SysIdRoutine.Mechanism(
+                    (volts) -> setControl(steerVoltageRequest.withVoltage(volts.in(Volts))),
+                    null,
+                    this));
 
-    private SysIdRoutine m_slipSysIdRoutine =
-    new SysIdRoutine(
-        new SysIdRoutine.Config(Volts.of(0.25).div(Seconds.of(1)), null, null, ModifiedSignalLogger.logState()),
-        new SysIdRoutine.Mechanism(
-            (volts) -> setControl(driveVoltageRequest.withVoltage(volts.in(Volts))),
-            null,
-            this));
-    
-    public Command runDriveQuasiTest(Direction direction)
-    {
+    private SysIdRoutine m_slipSysIdRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(Volts.of(0.25).div(Seconds.of(1)), null, null, ModifiedSignalLogger.logState()),
+            new SysIdRoutine.Mechanism(
+                    (volts) -> setControl(driveVoltageRequest.withVoltage(volts.in(Volts))),
+                    null,
+                    this));
+
+    public Command runDriveQuasiTest(Direction direction) {
         return m_driveSysIdRoutine.quasistatic(direction);
     }
 
@@ -297,8 +303,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_driveSysIdRoutine.dynamic(direction);
     }
 
-    public Command runSteerQuasiTest(Direction direction)
-    {
+    public Command runSteerQuasiTest(Direction direction) {
         return m_steerSysIdRoutine.quasistatic(direction);
     }
 
@@ -306,8 +311,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_steerSysIdRoutine.dynamic(direction);
     }
 
-    public Command runDriveSlipTest()
-    {
+    public Command runDriveSlipTest() {
         return m_slipSysIdRoutine.quasistatic(Direction.kForward);
     }
 
@@ -472,9 +476,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // private void setVoltage(double volts) {
-    //     // this.setVoltage(volts);
-    //     // leftPrimaryMotor.setVoltage(volts);
-    //     // rightPrimaryMotor.setVoltage(volts);
+    // // this.setVoltage(volts);
+    // // leftPrimaryMotor.setVoltage(volts);
+    // // rightPrimaryMotor.setVoltage(volts);
     // }
 
     public void stop() {

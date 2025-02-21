@@ -2,7 +2,7 @@ package frc.robot.SwerveDrivetrain;
 
 public class DrivetrainConstants {
 
-    public static final double MaxSpeed = SwerveDrivetrainA.kSpeedAt12Volts.baseUnitMagnitude() * 0.3;
+    public static final double MaxSpeed = SwerveDrivetrainA.kSpeedAt12Volts.baseUnitMagnitude() * 0.2;
     // public static final double MaxSpeed = 1.6; // meters per second desired top speed
     public static final double MaxAngularRate = 1.5 * Math.PI; // 1.5 rotations per second max angular velocity
     // private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed

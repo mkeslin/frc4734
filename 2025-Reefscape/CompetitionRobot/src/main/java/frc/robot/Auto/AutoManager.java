@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -46,7 +48,7 @@ public class AutoManager {
     private static AutoManager instance;
     private HashMap<String, AutoRoutine> routines = new HashMap<String, AutoRoutine>();
     private AutoRoutine lastRoutine;
-    private SendableChooser<AutoRoutine> chooser = new SendableChooser<AutoRoutine>();
+    public SendableChooser<AutoRoutine> chooser = new SendableChooser<AutoRoutine>();
     private Field2d field = new Field2d();
     /**
      * The scheduled command without the additional composition (extra odometry
@@ -63,8 +65,8 @@ public class AutoManager {
      * Base robot config object required by PathPlanner to generate trajectories;
      * only used for visualization.
      */
-    private RobotConfig pathPlannerRobotConfig = new RobotConfig(50, 1,
-            new ModuleConfig(0.05, 4.5, 1.0, DCMotor.getKrakenX60(1), 60, 1));
+    // private RobotConfig pathPlannerRobotConfig = new RobotConfig(50, 1,
+    //         new ModuleConfig(0.05, 4.5, 1.0, DCMotor.getKrakenX60(1), 60, 1));
 
     private AutoManager() {
     }
@@ -85,7 +87,7 @@ public class AutoManager {
      * Initializes logging for the AutoManager.
      */
     public void init() {
-        chooser.setDefaultOption("None", new AutoRoutine("None", Commands.print("No path selected.")));
+        // chooser.setDefaultOption("None", new AutoRoutine("None", Commands.print("No path selected.")));
         // LoggingManager.getInstance().addGroup(
         //         new LogGroup("autonomous",
         //                 new DoubleLogItem("autoTimer", timer::get, LogType.NT),
@@ -100,7 +102,8 @@ public class AutoManager {
      */
     public void addRoutine(AutoRoutine routine) {
         routines.put(routine.getName(), routine);
-        chooser.addOption(routine.getName(), routine);
+        // chooser.addOption(routine.getName(), routine);
+        chooser.setDefaultOption(routine.getName(), routine);
     }
 
     /**
@@ -138,9 +141,9 @@ public class AutoManager {
      * 
      * @param consumer the {@code Pose2d} consumer
      */
-    public void setRobotConfig(RobotConfig robotConfig) {
-        this.pathPlannerRobotConfig = robotConfig;
-    }
+    // public void setRobotConfig(RobotConfig robotConfig) {
+    //     this.pathPlannerRobotConfig = robotConfig;
+    // }
 
     /**
      * Updates the NetworkTables field with the new selected auto path. This
@@ -164,21 +167,24 @@ public class AutoManager {
      * Display the selected routine's trajectories on the field object.
      */
     private void displayPaths(List<PathPlannerPath> paths) {
-        ArrayList<Pose2d> poses = new ArrayList<Pose2d>();
-        for (PathPlannerPath path : paths) {
-            if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-                path = path.flipPath();
-            }
-            PathPlannerTrajectory trajectory = path.generateTrajectory(new ChassisSpeeds(),
-                    path.getStartingDifferentialPose().getRotation(),
-                    pathPlannerRobotConfig);
+        // ArrayList<Pose2d> poses = new ArrayList<Pose2d>();
 
-            poses.addAll(trajectory.getStates().stream()
-                    .map((state) -> state.pose)
-                    .collect(Collectors.toList()));
-        }
+        // var pathPlannerRobotConfig = PathPlannerLogging;
 
-        field.getObject("trajectory").setPoses(poses);
+        // for (PathPlannerPath path : paths) {
+        //     if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+        //         path = path.flipPath();
+        //     }
+        //     PathPlannerTrajectory trajectory = path.generateTrajectory(new ChassisSpeeds(),
+        //             path.getStartingDifferentialPose().getRotation(),
+        //             pathPlannerRobotConfig);
+
+        //     poses.addAll(trajectory.getStates().stream()
+        //             .map((state) -> state.pose)
+        //             .collect(Collectors.toList()));
+        // }
+
+        // field.getObject("trajectory").setPoses(poses);
     }
 
     /**
@@ -187,11 +193,11 @@ public class AutoManager {
      */
     public void runSelectedRoutine() {
         if (this.resetOdometryConsumer == null) {
-            DriverStation.reportError("[houndauto] No odometry reset consumer set.", false);
+            DriverStation.reportError("[AutoManager] No odometry reset consumer set.", false);
         }
 
         if (this.getSelectedRoutine() == null) {
-            DriverStation.reportError("[houndauto] An auto routine must be chosen.", false);
+            DriverStation.reportError("[AutoManager] An auto routine must be chosen.", false);
         } else {
             // the line after this makes the autoroutine command a composition, and
             // commands that are in a composition cannot be recomposed, which is what this

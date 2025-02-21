@@ -168,7 +168,8 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
             m_sideToSideMotor.setControl(m_request.withPosition(goalPosition));
             sideToSidePub.set(m_positionTracker.getSideToSidePosition());
         })
-                .until(() -> Math.abs(getPosition() - goalPosition) < .5) // abs(goal - position) < error
+                .until(() -> Math.abs(getPosition() - goalPosition) < .5) // ||                         // abs(goal - position) < error
+                        // m_positionTracker.getElevatorPosition() < ElevatorPosition.INTAKE_PREP)     // don't move if too low
                 .withName("sideToSide.moveToPosition");
     }
 

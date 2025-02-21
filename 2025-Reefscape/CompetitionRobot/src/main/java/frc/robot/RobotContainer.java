@@ -17,6 +17,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Auto.AutoCommandA;
+import frc.robot.Auto.AutoCommandTest2;
+import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
@@ -45,7 +48,7 @@ public class RobotContainer {
 
     // PATHPLANNER
     // private final PathPlanner m_pathPlanner = new PathPlanner(m_drivetrain);
-    private final SendableChooser<Command> m_autoChooser;
+    // private final SendableChooser<Command> m_autoChooser;
 
     // private Command runAuto = m_drivetrain.getAutoPath("Auto-1");
 
@@ -102,8 +105,9 @@ public class RobotContainer {
         // m_driveController.rightBumper().onTrue(acquireNoteCommand);
 
         // PathPlanner
-        m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
-        SmartDashboard.putData("Auto Mode - 2025", m_autoChooser);
+        // m_autoChooser = AutoBuilder.buildAutoChooser("Auto-1");
+        // SmartDashboard.putData("Auto Mode - 2025", m_autoChooser);
+        // SmartDashboard.putData("Auto Mode", AutoManager.getInstance().chooser);
         // m_pathPlanner.configure();
 
         // april tags
@@ -180,14 +184,15 @@ public class RobotContainer {
         // MOVE TO START POSITION // ALSO INTAKE COMMAND
         m_mechanismController.b().onTrue(RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide));
 
+        // NOTE: MAK - this was removed; you can use prepare score command instead
         // GO TO POST-INTAKE
-        m_mechanismController.y().onTrue(Commands.sequence(
-                RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
-                centerToReefCommand));
+        // m_mechanismController.y().onTrue(Commands.sequence(
+        // RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
+        // centerToReefCommand));
 
         // SCORE CORAL
-        //m_mechanismController.rightTrigger()
-                //.onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
+        // m_mechanismController.rightTrigger()
+        // .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
 
         m_mechanismController.leftTrigger()
                 .onTrue(centerToStationCommand);
@@ -208,27 +213,38 @@ public class RobotContainer {
         // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(.4)));
         // m_arcadeController.leftBumper().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(0)));
 
-        //m_arcadeController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
-                //ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        // m_arcadeController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
+        // ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
         m_arcadeController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
-                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+                ScoreSide.Left, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                m_coralSim));
         m_arcadeController.b().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
-                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+                ScoreSide.Left, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                m_coralSim));
         m_arcadeController.a().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
-                ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+                ScoreSide.Left, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                m_coralSim));
         m_arcadeController.x().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
-                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+                ScoreSide.Right, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                m_coralSim));
         m_arcadeController.y().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
-                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+                ScoreSide.Right, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                m_coralSim));
         m_arcadeController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
-                ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        //m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
-                //ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        m_arcadeController.leftBumper()
-                .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
+                ScoreSide.Right, true, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                m_coralSim));
+        // // m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
+        // ScoreSide.Right, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
+        // m_arcadeController.leftBumper()
+        //         .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
         m_arcadeController.leftTrigger()
                 .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
 
+        m_arcadeController.leftBumper().onTrue(Commands.sequence(
+            Commands.runOnce(() -> m_lights.changeAnimation(AnimationTypes.SetAll)),
+            Commands.runOnce(() -> m_lights.setColors(255,128,128))
+        ));
+        
         // m_arcadeController.start().onTrue(centerToAprilTagCommand);
 
         // Command command = Commands.sequence(
@@ -260,8 +276,8 @@ public class RobotContainer {
         // m_arcadeController.leftBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left,
         // m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
         // m_arcadeController.leftBumper().onTrue(Commands.sequence(
-        //     Commands.runOnce(()->m_lights.changeAnimation(AnimationTypes.SetAll)),
-        //     Commands.runOnce(()->m_lights.setColors(255,128,128))
+        // Commands.runOnce(()->m_lights.changeAnimation(AnimationTypes.SetAll)),
+        // Commands.runOnce(()->m_lights.setColors(255,128,128))
         // ));
         // LOGGING & SYSID
         // m_arcadeController.rightTrigger().onTrue(Commands.runOnce(SignalLogger::start));
@@ -342,6 +358,9 @@ public class RobotContainer {
                 Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
                 0, 0, 0, 0, 0);
         LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-one");
+        if (mt2 == null) {
+            return;
+        }
 
         // if our angular velocity is greater than 720 degrees per second, ignore vision
         // updates
@@ -357,42 +376,47 @@ public class RobotContainer {
     }
 
     public void configureAuto() {
-        // AutoManager.getInstance().addRoutine(AutoCommandA.testPath(m_drivetrain));
-        // AutoManager.getInstance().addRoutine(AutoCommandA.GDC(m_drivetrain, m_elevator, m_arm, m_coralSim));
+        AutoManager.getInstance()
+                .addRoutine(AutoCommandA.GDC(m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+                        m_station_limelight, m_coralSim));
+        // AutoManager.getInstance().addRoutine(AutoCommandTest2.GDC(m_drivetrain, m_elevator, m_arm, m_sideToSide,
+        // m_lights, m_coralSim));
+
+        SmartDashboard.putData("Auto Mode (manager)", AutoManager.getInstance().chooser);
     }
 
     public void configureDashboard() {
-        var cmdL1 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1, ScoreSide.Left, m_elevator, m_arm,
-                m_sideToSide, m_lights, m_coralSim);
-        SmartDashboard.putData("Score L1", cmdL1);
+        // var cmdL1 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1, ScoreSide.Left, m_elevator, m_arm,
+        // m_sideToSide, m_lights, m_coralSim);
+        // SmartDashboard.putData("Score L1", cmdL1);
 
-        var cmdL2 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, ScoreSide.Left, m_elevator, m_arm,
-                m_sideToSide, m_lights, m_coralSim);
-        SmartDashboard.putData("Score L2", cmdL2);
+        // var cmdL2 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, ScoreSide.Left, m_elevator, m_arm,
+        // m_sideToSide, m_lights, m_coralSim);
+        // SmartDashboard.putData("Score L2", cmdL2);
 
-        var cmdL3 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3, ScoreSide.Left, m_elevator, m_arm,
-                m_sideToSide, m_lights, m_coralSim);
-        SmartDashboard.putData("Score L3", cmdL3);
+        // var cmdL3 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3, ScoreSide.Left, m_elevator, m_arm,
+        // m_sideToSide, m_lights, m_coralSim);
+        // SmartDashboard.putData("Score L3", cmdL3);
 
-        var cmdL4 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, m_elevator, m_arm,
-                m_sideToSide, m_lights, m_coralSim);
-        SmartDashboard.putData("Score L4", cmdL4);
+        // var cmdL4 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Left, m_elevator, m_arm,
+        // m_sideToSide, m_lights, m_coralSim);
+        // SmartDashboard.putData("Score L4", cmdL4);
 
-        var cmdR1 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1, ScoreSide.Right, m_elevator, m_arm,
-                m_sideToSide, m_lights, m_coralSim);
-        SmartDashboard.putData("Score R1", cmdR1);
+        // var cmdR1 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1, ScoreSide.Right, m_elevator, m_arm,
+        // m_sideToSide, m_lights, m_coralSim);
+        // SmartDashboard.putData("Score R1", cmdR1);
 
-        var cmdR2 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, ScoreSide.Right, m_elevator, m_arm,
-                m_sideToSide, m_lights, m_coralSim);
-        SmartDashboard.putData("Score R2", cmdR2);
+        // var cmdR2 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2, ScoreSide.Right, m_elevator, m_arm,
+        // m_sideToSide, m_lights, m_coralSim);
+        // SmartDashboard.putData("Score R2", cmdR2);
 
-        var cmdR3 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3, ScoreSide.Right, m_elevator, m_arm,
-                m_sideToSide, m_lights, m_coralSim);
-        SmartDashboard.putData("Score R3", cmdR3);
+        // var cmdR3 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3, ScoreSide.Right, m_elevator, m_arm,
+        // m_sideToSide, m_lights, m_coralSim);
+        // SmartDashboard.putData("Score R3", cmdR3);
 
-        var cmdR4 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Right, m_elevator, m_arm,
-                m_sideToSide, m_lights, m_coralSim);
-        SmartDashboard.putData("Score R4", cmdR4);
+        // var cmdR4 = RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4, ScoreSide.Right, m_elevator, m_arm,
+        // m_sideToSide, m_lights, m_coralSim);
+        // SmartDashboard.putData("Score R4", cmdR4);
     }
 
     // public void initializeAuto() {

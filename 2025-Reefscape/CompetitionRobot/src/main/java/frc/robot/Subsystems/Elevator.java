@@ -93,8 +93,8 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFxConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 40; // Target cruise velocity of 80 rps
-        motionMagicConfigs.MotionMagicAcceleration = 70; // Target acceleration of 160 rps/s (0.5 seconds)
+        motionMagicConfigs.MotionMagicCruiseVelocity = 30; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicAcceleration = 50; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
         talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -191,7 +191,8 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
             m_elevatorLeftLeaderMotor.setControl(m_request.withPosition(goalPosition));
             elevatorPub.set(m_positionTracker.getElevatorPosition());
         })
-                .until(() -> Math.abs(getPosition() - goalPosition) < .5) // abs(goal - position) < error
+                .until(() -> Math.abs(getPosition() - goalPosition) < .5) // ||                             // abs(goal - position) < error
+                        // (m_positionTracker.getCoralInArm() && m_positionTracker.getArmAngle() < 0))     // don't move too low if coral is in arm
                 .withName("elevator.moveToPosition");
     }
 
