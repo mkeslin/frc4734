@@ -14,7 +14,7 @@ public class ArmConstants {
 
         BOTTOM(0),
 
-        PREINTAKE(.2),
+        // PREINTAKE(.2),
 
         // HORIZONTAL(0),
         L1(6.424805),

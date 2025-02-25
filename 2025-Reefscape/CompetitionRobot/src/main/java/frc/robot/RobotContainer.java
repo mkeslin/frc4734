@@ -38,6 +38,7 @@ import frc.robot.Subsystems.Lights.AnimationTypes;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
+import com.ctre.phoenix6.Utils;
 
 public class RobotContainer {
 
@@ -194,10 +195,12 @@ public class RobotContainer {
         // m_mechanismController.rightTrigger()
         // .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
 
-        m_mechanismController.leftTrigger()
-                .onTrue(centerToStationCommand);
+        // m_mechanismController.leftTrigger().onTrue(centerToStationCommand);
 
         m_mechanismController.leftBumper().onTrue(Commands.runOnce(() -> resetZeros()));
+
+        m_driveController.rightTrigger().onTrue(centerToStationCommand);
+        m_driveController.leftTrigger().onTrue(centerToReefCommand);
 
         // SET CURRENT POSITION TO ZERO
         // m_mechanismController.y().onTrue(Commands.runOnce(() -> {
@@ -213,13 +216,22 @@ public class RobotContainer {
         // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(.4)));
         // m_arcadeController.leftBumper().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(0)));
 
-        var centerRobot = false;
+        var centerRobot = true;
 
         // m_arcadeController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
         // ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
-        m_arcadeController.rightTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
-                ScoreSide.Left, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
-                m_coralSim));
+        m_arcadeController.rightTrigger().onTrue(Commands.sequence(
+                RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
+                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
+                        ScoreSide.Left, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights,
+                        m_reef_limelight,
+                        m_coralSim),
+                Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
+                        .withTimeout(0.15)
+                        .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                        .asProxy()
+        //
+        ));
         m_arcadeController.b().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
                 ScoreSide.Left, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
@@ -232,9 +244,18 @@ public class RobotContainer {
         m_arcadeController.y().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
                 ScoreSide.Right, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
-        m_arcadeController.rightBumper().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
-                ScoreSide.Right, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
-                m_coralSim));
+        m_arcadeController.rightBumper().onTrue(Commands.sequence(
+                RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
+                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
+                        ScoreSide.Right, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights,
+                        m_reef_limelight,
+                        m_coralSim),
+                Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
+                        .withTimeout(0.15)
+                        .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                        .asProxy()
+        //
+        ));
 
         m_arcadeController.leftBumper()
                 .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
@@ -358,10 +379,9 @@ public class RobotContainer {
                 Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
                 0, 0, 0, 0, 0);
         LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-one");
-        if (mt2 == null) {
+        if (mt2 == null || mt2.tagCount == 0) {
             return;
         }
-
         // if our angular velocity is greater than 720 degrees per second, ignore vision
         // updates
         if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
@@ -371,7 +391,7 @@ public class RobotContainer {
             m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
             m_drivetrain.addVisionMeasurement(
                     mt2.pose,
-                    mt2.timestampSeconds);
+                    Utils.fpgaToCurrentTime(mt2.timestampSeconds));
         }
     }
 

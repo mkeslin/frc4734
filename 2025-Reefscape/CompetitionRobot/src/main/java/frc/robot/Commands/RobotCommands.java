@@ -24,21 +24,21 @@ public class RobotCommands {
     public static ScoreLevel lastScoreLevel = ScoreLevel.None;
     public static ScoreSide lastScoreSide = ScoreSide.None;
     
-    // public static Command movePostIntakeCoralCommand(
-    //         Elevator elevator,
-    //         Arm arm,
-    //         SideToSide sideToSide,
-    //         Lights lights,
-    //         CoralSim coralSim) {
-    //     return Commands.parallel(
-    //             Commands.runOnce(() -> lights.setColors(0, 255, 0)).asProxy(),
-    //             Commands.waitSeconds(0.35)
-    //                     .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
-    //             // Commands.waitSeconds(0)
-    //             // .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
-    //             Commands.waitSeconds(0.0)
-    //                     .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_POST).asProxy()));
-    // }
+    public static Command movePostIntakeCoralCommand(
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide,
+            Lights lights,
+            CoralSim coralSim) {
+        return Commands.parallel(
+                // Commands.runOnce(() -> lights.setColors(0, 255, 0)).asProxy(),
+                Commands.waitSeconds(0.35)
+                        .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
+                // Commands.waitSeconds(0)
+                // .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
+                Commands.waitSeconds(0.0)
+                        .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3).asProxy()));
+    }
 
     public static Command prepareCoralScoreCommand(
             ScoreLevel level,
@@ -232,7 +232,7 @@ public class RobotCommands {
                 // elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy(),
                 Commands.parallel(
                         Commands.waitSeconds(0.5)
-                                .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.PREINTAKE).asProxy()),
+                                .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                         Commands.waitSeconds(0)
                                 .andThen(
                                         sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),

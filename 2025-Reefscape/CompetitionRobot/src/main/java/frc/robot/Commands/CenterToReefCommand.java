@@ -29,11 +29,11 @@ public class CenterToReefCommand extends Command {
     private final PIDController yController = new PIDController(0.03, 0, 0);
     private final PIDController omegaController = new PIDController(0.03, 0, 0);
 
-    private double POSE_X_ERROR = 0.5;
-    private double POSE_Y_ERROR = 0.5;
+    private double POSE_X_ERROR = 0.1;
+    private double POSE_Y_ERROR = 0.1;
     private double POSE_ANGLE_ERROR = 3;
 
-    private double CAMERA_AREA_GOAL = 37;
+    private double CAMERA_AREA_GOAL = 40;
     private double CAMERA_AREA_ERROR = 2;
     private double CAMERA_X_OFFSET_ERROR = 0.9;
     private double CAMERA_ANGLE_ERROR = 3;
@@ -52,6 +52,7 @@ public class CenterToReefCommand extends Command {
             tagPoses.put(Integer.valueOf(i), layout.getTagPose(i).get().toPose2d());
         }
         
+        setPIDValues(centerMethod);
         setTolerances(centerMethod);
 
         addRequirements(m_limelight, m_drivetrain);
@@ -67,6 +68,10 @@ public class CenterToReefCommand extends Command {
     @Override
     public void execute() {
         setSpeeds(centerMethod);
+        SmartDashboard.putNumber("xSpeed", xSpeed);
+        SmartDashboard.putNumber("ySpeed", ySpeed);
+        SmartDashboard.putNumber("omegaSpeed", omegaSpeed);
+
         m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
     }
 
@@ -81,21 +86,33 @@ public class CenterToReefCommand extends Command {
     public void end(boolean interrupted) {
         t.stop();
         t.reset();
+        m_drivetrain.setRelativeSpeed(0, 0, 0);
     }
 
     public Pose2d getClosestAprilTagTarget() {
         Integer closestTag = Integer.valueOf(0);
         double currentDistance;
         double closestDistance = Double.MAX_VALUE;
-        Pose2d botPose = m_limelight.getRobotMegaTagPose();
+        Pose2d botPose = m_drivetrain.getPose();
         for (Integer i : tagPoses.keySet()) {
             currentDistance = Math.sqrt(Math.pow(tagPoses.get(i).getX() - botPose.getX(), 2) + Math.pow(tagPoses.get(i).getY() - botPose.getY(), 2));
-            if(closestDistance < currentDistance) {
+            if(currentDistance < closestDistance) {
                 closestTag = i;
                 closestDistance = currentDistance;
             }
         }
+        SmartDashboard.putNumber("target", closestTag);
         return tagPoses.get(closestTag);
+    }
+
+    public void setPIDValues(int method) {
+        if(method == POSE) {
+            xController.setP(0.3);
+            yController.setP(0.3);
+        } else if(method == CAMERA) {
+            xController.setP(0.03);
+            yController.setP(0.03);
+        }
     }
 
     public void setTolerances(int method) {
@@ -115,6 +132,8 @@ public class CenterToReefCommand extends Command {
             Pose2d target = getClosestAprilTagTarget();
             double tagRot = target.getRotation().getDegrees();
             double targetRot = (tagRot < 180) ? tagRot + 180 : tagRot - 180;
+            SmartDashboard.putNumber("xTarget", target.getX());
+            SmartDashboard.putNumber("yTarget", target.getY());
             xController.setSetpoint(target.getX());
             yController.setSetpoint(target.getY());
             omegaController.setSetpoint(targetRot);
@@ -127,10 +146,13 @@ public class CenterToReefCommand extends Command {
 
     public void setSpeeds(int method) {
         if(method == POSE) {
-            Pose2d position = m_limelight.getRobotMegaTagPose();
-            xController.setSetpoint(position.getX());
-            yController.setSetpoint(position.getY());
-            omegaController.setSetpoint(position.getRotation().getDegrees());
+            Pose2d position = m_drivetrain.getPose();
+            SmartDashboard.putNumber("xPos", position.getX());
+            SmartDashboard.putNumber("yPos", position.getY());
+            SmartDashboard.putNumber("omegaPos", position.getRotation().getDegrees());
+            xSpeed = xController.calculate(position.getX());
+            ySpeed = yController.calculate(position.getY());
+            omegaSpeed = omegaController.calculate(position.getRotation().getDegrees());
         } else if(method == CAMERA) {
             xSpeed = xController.calculate(m_limelight.getArea());
             ySpeed = yController.calculate(m_limelight.getX());
