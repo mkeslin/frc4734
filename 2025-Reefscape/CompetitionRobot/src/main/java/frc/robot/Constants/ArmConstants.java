@@ -26,7 +26,7 @@ public class ArmConstants {
         L4(11.641113),
         L4_SCORE(9.641113),
 
-        TOP(13.427246);
+        TOP(13.1);
 
         public final double value;
 

@@ -183,10 +183,14 @@ public class RobotContainer {
 
         // GO TO PRE-INTAKE
         m_mechanismController.a()
-                .onTrue(RobotCommands.prepareIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_coralSim));
+                .onTrue(RobotCommands.prepareIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_coralSim));
 
         // MOVE TO START POSITION // ALSO INTAKE COMMAND
-        m_mechanismController.b().onTrue(RobotCommands.returnToStartPositions(m_elevator, m_arm, m_sideToSide));
+        m_mechanismController.b().onTrue(Commands.sequence(
+            RobotCommands.prepareIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_coralSim),
+            RobotCommands.returnToStartPositions(m_positionTracker, m_elevator, m_arm, m_sideToSide)
+         //   
+        ));
 
         // NOTE: MAK - this was removed; you can use prepare score command instead
         // GO TO POST-INTAKE
@@ -219,7 +223,7 @@ public class RobotContainer {
         // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(.4)));
         // m_arcadeController.leftBumper().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(0)));
 
-        var centerRobot = true;
+        var centerRobot = false;
 
         // m_arcadeController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
         // ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
