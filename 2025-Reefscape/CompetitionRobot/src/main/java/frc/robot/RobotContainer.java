@@ -39,6 +39,8 @@ import frc.robot.Subsystems.Lights.AnimationTypes;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
+import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindingsAuto;
+
 import com.ctre.phoenix6.Utils;
 
 public class RobotContainer {
@@ -88,6 +90,7 @@ public class RobotContainer {
 
         // configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
+        // SwerveDrivetrainBindingsAuto.configureBindings(m_driveController, m_drivetrain);
 
         m_positionTracker.setCoralInTraySupplier(m_coralTraySensor::get);
         m_positionTracker.setCoralInArmSupplier(m_coralArmSensor::get);
@@ -125,8 +128,8 @@ public class RobotContainer {
         // SmartDashboard.putData("Auto Start Position", m_autoStartChooser);
 
         // set alliance
-        var isRedAlliance = isRedAlliance();
-        SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
+        // var isRedAlliance = isRedAlliance();
+        // SwerveDrivetrainBindings.setAllianceOrientation(isRedAlliance);
 
         m_drivetrain.seedFieldCentric();
 
@@ -183,14 +186,16 @@ public class RobotContainer {
 
         // GO TO PRE-INTAKE
         m_mechanismController.a()
-                .onTrue(RobotCommands.prepareIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_coralSim));
+                .onTrue(RobotCommands.prepareIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
+                        m_coralSim));
 
         // MOVE TO START POSITION // ALSO INTAKE COMMAND
-        m_mechanismController.b().onTrue(Commands.sequence(
-            RobotCommands.prepareIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_coralSim),
-            RobotCommands.returnToStartPositions(m_positionTracker, m_elevator, m_arm, m_sideToSide)
-         //   
-        ));
+        m_mechanismController.b().onTrue(// Commands.sequence(
+                // RobotCommands.prepareIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
+                // m_coralSim),
+                RobotCommands.returnToStartPositions(m_positionTracker, m_elevator, m_arm, m_sideToSide)
+        //
+        );
 
         // NOTE: MAK - this was removed; you can use prepare score command instead
         // GO TO POST-INTAKE
@@ -223,7 +228,7 @@ public class RobotContainer {
         // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(.4)));
         // m_arcadeController.leftBumper().onTrue(Commands.runOnce(() -> m_elevator.setVoltage(0)));
 
-        var centerRobot = false;
+        var centerRobot = true;
 
         // m_arcadeController.leftTrigger().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L1,
         // ScoreSide.Left, m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim));
