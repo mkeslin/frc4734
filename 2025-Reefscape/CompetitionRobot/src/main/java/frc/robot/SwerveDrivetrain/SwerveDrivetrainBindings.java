@@ -55,13 +55,20 @@ public class SwerveDrivetrainBindings {
         var velocityY = coordinateOrientation * driveController.getLeftX() * CurrentSpeed;
         var velocityYLimited = RateLimiterY.calculate(velocityY);
 
-        //https://github.com/Operation-P-E-A-C-C-E-Robotics/frc-2025/blob/main/src/main/java/frc/robot/commands/drivetrain/PeaccyTuner.java
+        // https://github.com/Operation-P-E-A-C-C-E-Robotics/frc-2025/blob/main/src/main/java/frc/robot/commands/drivetrain/PeaccyTuner.java
 
         // Sticks
         drivetrain.setDefaultCommand(
                 drivetrain.applyRequest(() -> m_drive
-                        .withVelocityX(coordinateOrientation * driveController.getLeftY() * CurrentSpeed) // Drive forward with negative Y (forward)
-                        .withVelocityY(coordinateOrientation * driveController.getLeftX() * CurrentSpeed) // Drive left with negative X (left)
+                        .withVelocityX(coordinateOrientation * driveController.getLeftY() * CurrentSpeed) // Drive
+                                                                                                          // forward
+                                                                                                          // with
+                                                                                                          // negative Y
+                                                                                                          // (forward)
+                        .withVelocityY(coordinateOrientation * driveController.getLeftX() * CurrentSpeed) // Drive left
+                                                                                                          // with
+                                                                                                          // negative X
+                                                                                                          // (left)
                         .withRotationalRate(-driveController.getRightX() * CurrentAngularRate) // Drive counterclockwise
                                                                                                // with negative X (left)
                 ).ignoringDisable(false));
@@ -111,6 +118,13 @@ public class SwerveDrivetrainBindings {
         // drivetrain.registerTelemetry(m_logger::telemeterize);
 
         // SYSID
+        // Run SysId routines when holding back/start and X/Y.
+        // Note that each routine should be run exactly once in a single log.
+        // driveController.back().and(driveController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // driveController.back().and(driveController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // driveController.start().and(driveController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // driveController.start().and(driveController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
         // driveController.x().and(driveController.pov(0)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kForward));
         // driveController.x().and(driveController.pov(180)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kReverse));
 
@@ -122,5 +136,7 @@ public class SwerveDrivetrainBindings {
 
         // driveController.b().and(driveController.pov(0)).whileTrue(drivetrain.runSteerDynamTest(Direction.kForward));
         // driveController.b().and(driveController.pov(180)).whileTrue(drivetrain.runSteerDynamTest(Direction.kReverse));
+
+        // driveController.start().whileTrue(drivetrain.runDriveSlipTest());
     }
 }

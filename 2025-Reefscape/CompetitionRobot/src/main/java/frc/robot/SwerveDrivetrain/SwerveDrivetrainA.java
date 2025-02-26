@@ -40,24 +40,23 @@ public class SwerveDrivetrainA {
     // The steer motor uses any SwerveModule.SteerRequestType control request with
     // the output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerGains = new Slot0Configs()
-            .withKP(100) // Proportional Gain.
+            .withKP(30.025) // Proportional Gain.
             .withKI(0) // Integral Gain.
-            .withKD(0.05) // Derivative Gain.
-            .withKS(0) // Static Feedforward Gain.
-            .withKV(1.5) // Velocity Feedforward Gain.
-            .withKA(0); // Acceleration Feedforward Gain.
+            .withKD(1.3748) // Derivative Gain.
+            .withKS(0.31874) // Static Feedforward Gain.
+            .withKV(1.2075) // Velocity Feedforward Gain.
+            .withKA(0.058931); // Acceleration Feedforward Gain.
     // .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
     private static final Slot0Configs driveGains = new Slot0Configs()
-            .withKP(3)
-            // .withKP(0.05) // Proportional Gain.
+            .withKP(63.576) // Proportional Gain.
             .withKI(0) // Integral Gain.
-            .withKD(0) // Derivative Gain.
-            .withKS(0) // Static Feedforward Gain.
-            .withKV(0) // Velocity Feedforward Gain.
-            .withKA(0); // Acceleration Feedforward Gain.
+            .withKD(0.58327) // Derivative Gain.
+            .withKS(0.2236) // Static Feedforward Gain.
+            .withKV(0.12089) // Velocity Feedforward Gain.
+            .withKA(0.0032103); // Acceleration Feedforward Gain.
 
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors
@@ -78,8 +77,9 @@ public class SwerveDrivetrainA {
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
-    private static final Current kSlipCurrent = Amps.of(120.0);
+    // private static final Current kSlipCurrent = Amps.of(120.0);
     // private static final Current kSlipCurrent = Amps.of(200.0);
+    private static final Current kSlipCurrent = Amps.of(63.0);
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these
     // cannot be null.
@@ -88,7 +88,7 @@ public class SwerveDrivetrainA {
     private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration()
             .withCurrentLimits(
                     new CurrentLimitsConfigs()
-                            .withStatorCurrentLimit(Amps.of(120))
+                            .withStatorCurrentLimit(Amps.of(80))
                             .withStatorCurrentLimitEnable(true));
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
             .withCurrentLimits(

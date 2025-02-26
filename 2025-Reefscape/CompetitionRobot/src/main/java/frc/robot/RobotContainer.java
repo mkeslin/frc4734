@@ -308,8 +308,8 @@ public class RobotContainer {
         // Commands.runOnce(()->m_lights.setColors(255,128,128))
         // ));
         // LOGGING & SYSID
-        // m_arcadeController.rightTrigger().onTrue(Commands.runOnce(SignalLogger::start));
-        // m_arcadeController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+        // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
+        // m_arcadeController.leftBumper().onTrue(Commands.runOnce(SignalLogger::stop));
         /*
          * Joystick Y = quasistatic forward
          * Joystick A = quasistatic reverse
