@@ -113,12 +113,8 @@ public class SwerveDrivetrainA {
     public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(4.88);
 
     // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
-    // This may need to be tuned to your individual robot
-    // private static final double kCoupleRatio = 2;
-    private static final double kCoupleRatio = 3.5;
+    private static final double kCoupleRatio = 1.76;
 
-    // private static final double kDriveGearRatio = 6.545454545454545;
-    // private static final double kSteerGearRatio = 10.285714285714286;
     private static final double kDriveGearRatio = 5.5;
     private static final double kSteerGearRatio = 10.285714285714286;
     private static final Distance kWheelRadius = Inches.of(2);
