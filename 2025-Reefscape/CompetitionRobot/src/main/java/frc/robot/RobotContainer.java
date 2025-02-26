@@ -1,7 +1,8 @@
 package frc.robot;
 
 import static frc.robot.Constants.Constants.IDs.APRILTAGPIPELINE;
-import static frc.robot.Constants.Constants.IDs.INTAKE_SENSOR;
+import static frc.robot.Constants.Constants.IDs.CORAL_TRAY_SENSOR;
+import static frc.robot.Constants.Constants.IDs.CORAL_ARM_SENSOR;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -69,7 +70,8 @@ public class RobotContainer {
     private Lights m_lights = new Lights();
     private CoralSim m_coralSim = new CoralSim(m_drivetrain::getPose, m_arm::getClawComponentPose);
 
-    private DigitalInput m_intakeSensor = new DigitalInput(INTAKE_SENSOR);
+    private DigitalInput m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
+    private DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
 
     // COMMANDS
     public CenterToReefCommand centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain);
@@ -87,7 +89,8 @@ public class RobotContainer {
         // configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
 
-        m_positionTracker.setCoralInArm(m_intakeSensor::get);
+        m_positionTracker.setCoralInTraySupplier(m_coralTraySensor::get);
+        m_positionTracker.setCoralInArmSupplier(m_coralArmSensor::get);
 
         // configure bindings for mechanisms
         configureMechanismBindings();
@@ -355,8 +358,13 @@ public class RobotContainer {
         // 0.5).onTrue(m_shooter.commandSetAngle(0));
         // m_arcadeController.start().onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
 
-        // m_arcadeController.start().onTrue(Commands.runOnce(() ->
-        // m_lights.incrementAnimation(), m_lights));
+        // m_arcadeController.start().onTrue(Commands.runOnce(() -> {
+        //     if (m_positionTracker.getCoralInArm()) {
+        //         m_lights.setSolidColors(0, 255, 0);
+        //     } else {
+        //         m_lights.setSolidColors(255, 0, 0);
+        //     }
+        // }, m_lights));
     }
 
     public void configureLightsBindings() {

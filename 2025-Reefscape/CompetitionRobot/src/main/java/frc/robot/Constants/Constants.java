@@ -4,7 +4,9 @@ public class Constants {
     public class IDs {
         // public static final int INTAKE_ID = 30;
         // public static final int INTAKE_PIVOT_ID = 31;
-        public static final int INTAKE_SENSOR = 0;
+
+        public static final int CORAL_TRAY_SENSOR = 0;
+        public static final int CORAL_ARM_SENSOR = 1;
 
         public static final int ELEVATOR_LEFT_ID = 20;
         public static final int ELEVATOR_RIGHT_ID = 21;
