@@ -7,6 +7,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.PositionTracker;
 import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ScoreLevel;
@@ -26,6 +27,7 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  */
 public class AutoCommandA {
     public static AutoRoutine GDC(
+            PositionTracker positionTracker, 
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
             Arm arm,
@@ -50,18 +52,17 @@ public class AutoCommandA {
         }
 
         var command = Commands.sequence(
-                GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Left, drivetrain, elevator, arm, sideToSide, lights,
+                GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Left, positionTracker, drivetrain, elevator, arm, sideToSide, lights,
                         reefLimelight, stationLimelight, coralSim),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, drivetrain, elevator, arm, sideToSide, lights,
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain, elevator, arm, sideToSide, lights,
                         reefLimelight, stationLimelight, coralSim),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, drivetrain, elevator, arm, sideToSide, lights,
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain, elevator, arm, sideToSide, lights,
                         reefLimelight, stationLimelight, coralSim)
         //
         );
 
         return new AutoRoutine("GDC", command,
-                // List.of(Start_GPath, G_PickupPath, Pickup_DPath, D_PickupPath, Pickup_CPath),
-                List.of(Start_B, B_Pickup2),
+                List.of(Start_B, B_Pickup2, Pickup2_D, D_Pickup2),
                 Start_B.getStartingDifferentialPose());
     }
 
@@ -69,6 +70,7 @@ public class AutoCommandA {
             PathPlannerPath pathToReef,
             PathPlannerPath pathToCoralStation,
             ScoreSide scoreSide,
+            PositionTracker positionTracker,
 
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
@@ -110,7 +112,7 @@ public class AutoCommandA {
                 ),
                 centerToStationCommand,
                 // INTAKE
-                Commands.waitSeconds(3.0),
+                Commands.waitSeconds(3.0).until(() -> positionTracker.getCoralInTray()),
                 RobotCommands.returnToStartPositions(elevator, arm, sideToSide)
         //
         );

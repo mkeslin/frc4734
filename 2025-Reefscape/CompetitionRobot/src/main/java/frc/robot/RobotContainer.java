@@ -359,11 +359,11 @@ public class RobotContainer {
         // m_arcadeController.start().onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
 
         // m_arcadeController.start().onTrue(Commands.runOnce(() -> {
-        //     if (m_positionTracker.getCoralInArm()) {
-        //         m_lights.setSolidColors(0, 255, 0);
-        //     } else {
-        //         m_lights.setSolidColors(255, 0, 0);
-        //     }
+        // if (m_positionTracker.getCoralInArm()) {
+        // m_lights.setSolidColors(0, 255, 0);
+        // } else {
+        // m_lights.setSolidColors(255, 0, 0);
+        // }
         // }, m_lights));
     }
 
@@ -405,8 +405,8 @@ public class RobotContainer {
 
     public void configureAuto() {
         AutoManager.getInstance()
-                .addRoutine(AutoCommandA.GDC(m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
-                        m_station_limelight, m_coralSim));
+                .addRoutine(AutoCommandA.GDC(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights,
+                        m_reef_limelight, m_station_limelight, m_coralSim));
         // AutoManager.getInstance().addRoutine(AutoCommandTest2.GDC(m_drivetrain, m_elevator, m_arm, m_sideToSide,
         // m_lights, m_coralSim));
 
