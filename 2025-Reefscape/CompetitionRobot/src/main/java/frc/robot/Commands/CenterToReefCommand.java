@@ -6,6 +6,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,6 +19,7 @@ public class CenterToReefCommand extends Command {
     public CommandSwerveDrivetrain m_drivetrain;
 
     private double xSpeed, ySpeed, omegaSpeed;
+    private Pose2d tagPose, targetPose;
     private int centerMethod;
     private int POSE = 0;
     private int CAMERA = 1;
@@ -29,8 +31,10 @@ public class CenterToReefCommand extends Command {
     private final PIDController yController = new PIDController(0.03, 0, 0);
     private final PIDController omegaController = new PIDController(0.03, 0, 0);
 
-    private double POSE_X_ERROR = 0.1;
-    private double POSE_Y_ERROR = 0.1;
+    private double DISTANCE_FROM_APRILTAG = 0.5;
+    
+    private double POSE_X_ERROR = 0.05;
+    private double POSE_Y_ERROR = 0.05;
     private double POSE_ANGLE_ERROR = 3;
 
     private double CAMERA_AREA_GOAL = 40;
@@ -46,10 +50,14 @@ public class CenterToReefCommand extends Command {
         centerMethod = CAMERA;
 
         for(int i = 6; i <= 11; i++) {
-            tagPoses.put(Integer.valueOf(i), layout.getTagPose(i).get().toPose2d());
+            tagPose = layout.getTagPose(i).get().toPose2d();
+            targetPose = new Pose2d(tagPose.getTranslation().plus(new Translation2d(tagPose.getRotation().getCos() * DISTANCE_FROM_APRILTAG, tagPose.getRotation().getSin() * DISTANCE_FROM_APRILTAG)), tagPose.getRotation());
+            tagPoses.put(Integer.valueOf(i), targetPose);
         }
         for(int i = 17; i <= 22; i++) {
-            tagPoses.put(Integer.valueOf(i), layout.getTagPose(i).get().toPose2d());
+            tagPose = layout.getTagPose(i).get().toPose2d();
+            targetPose = new Pose2d(tagPose.getTranslation().plus(new Translation2d(tagPose.getRotation().getCos() * DISTANCE_FROM_APRILTAG, tagPose.getRotation().getSin() * DISTANCE_FROM_APRILTAG)), tagPose.getRotation());
+            tagPoses.put(Integer.valueOf(i), targetPose);
         }
         
         setPIDValues(centerMethod);
@@ -107,8 +115,8 @@ public class CenterToReefCommand extends Command {
 
     public void setPIDValues(int method) {
         if(method == POSE) {
-            xController.setP(0.3);
-            yController.setP(0.3);
+            xController.setP(1);
+            yController.setP(1);
         } else if(method == CAMERA) {
             xController.setP(0.03);
             yController.setP(0.03);
