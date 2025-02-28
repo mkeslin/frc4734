@@ -102,8 +102,8 @@ public class AutoManager {
      */
     public void addRoutine(AutoRoutine routine) {
         routines.put(routine.getName(), routine);
-        // chooser.addOption(routine.getName(), routine);
-        chooser.setDefaultOption(routine.getName(), routine);
+        chooser.addOption(routine.getName(), routine);
+        // chooser.setDefaultOption(routine.getName(), routine);
     }
 
     /**

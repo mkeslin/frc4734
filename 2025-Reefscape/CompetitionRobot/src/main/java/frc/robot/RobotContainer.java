@@ -414,10 +414,14 @@ public class RobotContainer {
 
     public void configureAuto() {
         AutoManager.getInstance()
-                .addRoutine(AutoCommandA.GDC(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights,
-                        m_reef_limelight, m_station_limelight, m_coralSim));
-        // AutoManager.getInstance().addRoutine(AutoCommandTest2.GDC(m_drivetrain, m_elevator, m_arm, m_sideToSide,
-        // m_lights, m_coralSim));
+                .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, m_drivetrain, m_elevator, m_arm,
+                        m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
+        AutoManager.getInstance()
+                .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_drivetrain, m_elevator, m_arm,
+                        m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
+        AutoManager.getInstance()
+                .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_drivetrain, m_elevator, m_arm,
+                        m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
 
         SmartDashboard.putData("Auto Mode (manager)", AutoManager.getInstance().chooser);
     }

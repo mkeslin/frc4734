@@ -26,7 +26,43 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * Command that executes during autonomous mode
  */
 public class AutoCommandA {
-    public static AutoRoutine GDC(
+    public static AutoRoutine StartingPosition1(
+            PositionTracker positionTracker, 
+            CommandSwerveDrivetrain drivetrain,
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide,
+            Lights lights,
+            Limelight reefLimelight,
+            Limelight stationLimelight,
+            CoralSim coralSim) {
+        PathPlannerPath Start_A = null;
+        PathPlannerPath A_Pickup1 = null;
+        PathPlannerPath Pickup1_F = null;
+        PathPlannerPath F_Pickup1 = null;
+        try {
+            Start_A = PathPlannerPath.fromPathFile("1-Start-A");
+            A_Pickup1 = PathPlannerPath.fromPathFile("1-A-Pickup1");
+            Pickup1_F = PathPlannerPath.fromPathFile("1-Pickup1-F");
+            F_Pickup1 = PathPlannerPath.fromPathFile("1-F-Pickup1");
+        } catch (Exception exception) {
+            DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
+        }
+        var command = Commands.sequence(
+                GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Left, positionTracker, drivetrain, elevator, arm, sideToSide, lights,
+                        reefLimelight, stationLimelight, coralSim),
+                GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain, elevator, arm, sideToSide, lights,
+                        reefLimelight, stationLimelight, coralSim),
+                GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, positionTracker, drivetrain, elevator, arm, sideToSide, lights,
+                        reefLimelight, stationLimelight, coralSim)
+        //
+        );
+        return new AutoRoutine("Routine 1", command,
+                List.of(Start_A, A_Pickup1, Pickup1_F, F_Pickup1),
+                Start_A.getStartingDifferentialPose());
+    }
+
+    public static AutoRoutine StartingPosition2(
             PositionTracker positionTracker, 
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
@@ -38,19 +74,16 @@ public class AutoCommandA {
             CoralSim coralSim) {
         PathPlannerPath Start_B = null;
         PathPlannerPath B_Pickup2 = null;
-
         PathPlannerPath Pickup2_D = null;
         PathPlannerPath D_Pickup2 = null;
         try {
-            Start_B = PathPlannerPath.fromPathFile("Start-B");
-            B_Pickup2 = PathPlannerPath.fromPathFile("B-Pickup2");
-
-            Pickup2_D = PathPlannerPath.fromPathFile("Pickup2-D");
-            D_Pickup2 = PathPlannerPath.fromPathFile("D-Pickup2");
+            Start_B = PathPlannerPath.fromPathFile("2-Start-B");
+            B_Pickup2 = PathPlannerPath.fromPathFile("2-B-Pickup2");
+            Pickup2_D = PathPlannerPath.fromPathFile("2-Pickup2-D");
+            D_Pickup2 = PathPlannerPath.fromPathFile("2-D-Pickup2");
         } catch (Exception exception) {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
-
         var command = Commands.sequence(
                 GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Left, positionTracker, drivetrain, elevator, arm, sideToSide, lights,
                         reefLimelight, stationLimelight, coralSim),
@@ -60,10 +93,45 @@ public class AutoCommandA {
                         reefLimelight, stationLimelight, coralSim)
         //
         );
-
-        return new AutoRoutine("GDC", command,
+        return new AutoRoutine("Routine 2", command,
                 List.of(Start_B, B_Pickup2, Pickup2_D, D_Pickup2),
                 Start_B.getStartingDifferentialPose());
+    }
+
+    public static AutoRoutine StartingPosition3(
+            PositionTracker positionTracker, 
+            CommandSwerveDrivetrain drivetrain,
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide,
+            Lights lights,
+            Limelight reefLimelight,
+            Limelight stationLimelight,
+            CoralSim coralSim) {
+        PathPlannerPath Start_C = null;
+        PathPlannerPath C_Pickup2 = null;
+        PathPlannerPath Pickup2_D = null;
+        PathPlannerPath D_Pickup2 = null;
+        try {
+            Start_C = PathPlannerPath.fromPathFile("3-Start-C");
+            C_Pickup2 = PathPlannerPath.fromPathFile("3-C-Pickup2");
+            Pickup2_D = PathPlannerPath.fromPathFile("3-Pickup2-D");
+            D_Pickup2 = PathPlannerPath.fromPathFile("3-D-Pickup2");
+        } catch (Exception exception) {
+            DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
+        }
+        var command = Commands.sequence(
+                GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Left, positionTracker, drivetrain, elevator, arm, sideToSide, lights,
+                        reefLimelight, stationLimelight, coralSim),
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain, elevator, arm, sideToSide, lights,
+                        reefLimelight, stationLimelight, coralSim),
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain, elevator, arm, sideToSide, lights,
+                        reefLimelight, stationLimelight, coralSim)
+        //
+        );
+        return new AutoRoutine("Routine 3", command,
+                List.of(Start_C, C_Pickup2, Pickup2_D, D_Pickup2),
+                Start_C.getStartingDifferentialPose());
     }
 
     private static Command GetCycleCommand(
