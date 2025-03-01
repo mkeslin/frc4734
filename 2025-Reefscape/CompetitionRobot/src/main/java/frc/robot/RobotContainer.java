@@ -60,7 +60,8 @@ public class RobotContainer {
     private DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
 
     // COMMANDS
-    public CenterToReefCommand centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain, m_driveController);
+    public CenterToReefCommand centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain,
+            m_driveController);
     public CenterToStationCommand centerToStationCommand = new CenterToStationCommand(m_station_limelight,
             m_drivetrain);
 
@@ -142,36 +143,34 @@ public class RobotContainer {
     }
 
     public void configureArcadeBindings() {
-        var centerRobot = true;
+        var centerToReef = true;
 
         m_arcadeController.rightTrigger().onTrue(Commands.sequence(
-                RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
-                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
-                        ScoreSide.Left, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights,
-                        m_reef_limelight,
-                        m_coralSim),
+                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
+                RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef, centerToReefCommand,
+                        m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight, m_coralSim),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
                         .withTimeout(0.15)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
         //
         ));
-        m_arcadeController.b().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
-                ScoreSide.Left, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+        m_arcadeController.b().onTrue(RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3,
+                ScoreSide.Left, centerToReef, centerToReefCommand, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
-        m_arcadeController.a().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
-                ScoreSide.Left, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+        m_arcadeController.a().onTrue(RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4,
+                ScoreSide.Left, centerToReef, centerToReefCommand, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
-        m_arcadeController.x().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L4,
-                ScoreSide.Right, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+        m_arcadeController.x().onTrue(RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4,
+                ScoreSide.Right, centerToReef, centerToReefCommand, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
-        m_arcadeController.y().onTrue(RobotCommands.prepareCoralScoreCommand(ScoreLevel.L3,
-                ScoreSide.Right, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
+        m_arcadeController.y().onTrue(RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3,
+                ScoreSide.Right, centerToReef, centerToReefCommand, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
                 m_coralSim));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
-                RobotCommands.movePostIntakeCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
-                RobotCommands.prepareCoralScoreCommand(ScoreLevel.L2,
-                        ScoreSide.Right, centerRobot, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights,
+                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
+                RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2,
+                        ScoreSide.Right, centerToReef, centerToReefCommand, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights,
                         m_reef_limelight,
                         m_coralSim),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
@@ -287,22 +286,22 @@ public class RobotContainer {
 
     public void configureAuto() {
         AutoManager.getInstance()
-                .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, m_drivetrain, m_elevator, m_arm,
+                .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, centerToReefCommand, m_drivetrain, m_elevator, m_arm,
                         m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
         // AutoManager.getInstance()
-        //         .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_drivetrain, m_elevator, m_arm,
-        //                 m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
+        // .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_drivetrain, m_elevator, m_arm,
+        // m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
         // AutoManager.getInstance()
-        //         .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_drivetrain, m_elevator, m_arm,
-        //                 m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
+        // .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_drivetrain, m_elevator, m_arm,
+        // m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
 
         SmartDashboard.putData("Auto Mode (manager)", AutoManager.getInstance().chooser);
     }
 
     // private boolean isRedAlliance() {
-    //     var alliance = DriverStation.getAlliance();
-    //     var isRedAlliance = alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
-    //     return isRedAlliance;
+    // var alliance = DriverStation.getAlliance();
+    // var isRedAlliance = alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+    // return isRedAlliance;
     // }
 
     public void resetZeros() {

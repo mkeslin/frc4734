@@ -22,7 +22,7 @@ public class RobotCommands {
     public static ScoreLevel lastScoreLevel = ScoreLevel.None;
     public static ScoreSide lastScoreSide = ScoreSide.None;
 
-    public static Command movePostIntakeCoralCommand(
+    public static Command moveIntermediatePrepareScoreCoralCommand(
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
@@ -38,11 +38,9 @@ public class RobotCommands {
                         .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3).asProxy()));
     }
 
-    public static Command prepareCoralScoreCommand(
+    public static Command prepareScoreCoralCommand(
             ScoreLevel level,
             ScoreSide side,
-            Boolean centerToAprilTag,
-
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
             Arm arm,
@@ -96,87 +94,42 @@ public class RobotCommands {
             lastScoreLevel = level;
             lastScoreSide = side;
         }).andThen(
-                Commands.sequence(
-                        Commands.parallel(
-                                Commands
-                                        .waitSeconds(0.35)
-                                        .andThen(sideToSide.moveToSetPositionCommand(() -> sideToSidePosition)
-                                                .asProxy()),
-                                Commands
-                                        .waitSeconds(0.35)
-                                        .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy()),
-                                Commands
-                                        .waitSeconds(0.0)
-                                        .andThen(elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy())
-                        // Commands
-                        // .waitSeconds(0.0)
-                        // .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy())
-                        // .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
-                        )
-                        //centerToReefCommand.unless(() -> !centerToAprilTag)
-                //
+                Commands.parallel(
+                        Commands
+                                .waitSeconds(0.35)
+                                .andThen(sideToSide.moveToSetPositionCommand(() -> sideToSidePosition)
+                                        .asProxy()),
+                        Commands
+                                .waitSeconds(0.35)
+                                .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy()),
+                        Commands
+                                .waitSeconds(0.0)
+                                .andThen(elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy())
+                // Commands
+                // .waitSeconds(0.0)
+                // .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy())
+                // .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
                 ));
     }
 
-    public static Command autoPrepareCoralScoreCommand(
-            ScoreLevel level,
-            ScoreSide side,
+    public static Command prepareScoreCoralAndCenterToReefCommand(
+            ScoreLevel scoreLevel,
+            ScoreSide scoreSide,
+            boolean centerToReef,
+            CenterToReefCommand centerToReefCommand,
+            CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
+            Limelight reefLimelight,
             CoralSim coralSim) {
-        ElevatorPosition elevatorPosition;
-        ArmPosition armPosition;
-        SideToSidePosition sideToSidePosition;
-
-        switch (level) {
-            case L1 -> {
-                elevatorPosition = ElevatorPosition.L1;
-                armPosition = ArmPosition.L1;
-            }
-            case L2 -> {
-                elevatorPosition = ElevatorPosition.L2;
-                armPosition = ArmPosition.L2;
-            }
-            case L3 -> {
-                lights.setSolidColors(255, 255, 0);
-                elevatorPosition = ElevatorPosition.L3;
-                armPosition = ArmPosition.L3;
-            }
-            case L4 -> {
-                lights.setSolidColors(255, 0, 0);
-                elevatorPosition = ElevatorPosition.L4;
-                armPosition = ArmPosition.L4;
-            }
-            default -> {
-                throw new IllegalArgumentException("Invalid ScoreLevel");
-            }
-        }
-
-        switch (side) {
-            case Left -> {
-                sideToSidePosition = SideToSidePosition.LEFT;
-            }
-            case Right -> {
-                sideToSidePosition = SideToSidePosition.RIGHT;
-            }
-            default -> {
-                throw new IllegalArgumentException("Invalid ScoreSide");
-            }
-        }
-
-        return Commands.runOnce(() -> {
-            lastScoreLevel = level;
-            lastScoreSide = side;
-        }).andThen(
-                Commands.parallel(
-                        Commands.waitSeconds(0.5)
-                                .andThen(arm.moveToSetPositionCommand(() -> armPosition)).asProxy(),
-                        Commands.waitSeconds(0)
-                                .andThen(sideToSide.moveToSetPositionCommand(() -> sideToSidePosition)).asProxy(),
-                        Commands.waitSeconds(0)
-                                .andThen(elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy())));
+        return Commands.sequence(
+                RobotCommands.prepareScoreCoralCommand(scoreLevel, scoreSide, drivetrain, elevator, arm,
+                        sideToSide, lights, reefLimelight, coralSim),
+                centerToReefCommand.unless(() -> !centerToReef)
+        //
+        );
     }
 
     public static Command scoreCoralCommand(
