@@ -92,8 +92,6 @@ public class RobotCommands {
             }
         }
 
-        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain);
-
         return Commands.runOnce(() -> {
             lastScoreLevel = level;
             lastScoreSide = side;
@@ -114,8 +112,8 @@ public class RobotCommands {
                         // .waitSeconds(0.0)
                         // .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy())
                         // .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
-                        ),
-                        centerToReefCommand.unless(() -> !centerToAprilTag)
+                        )
+                        //centerToReefCommand.unless(() -> !centerToAprilTag)
                 //
                 ));
     }
