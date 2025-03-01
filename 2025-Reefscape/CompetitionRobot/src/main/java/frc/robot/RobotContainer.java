@@ -11,6 +11,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommandA;
@@ -142,37 +143,36 @@ public class RobotContainer {
         m_driveController.leftTrigger().onTrue(centerToReefCommand);
     }
 
+    private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide, boolean centerToReef) {
+        return Commands.sequence(
+            RobotCommands.prepareScoreCoralCommand(ScoreLevel.L2, ScoreSide.Left,
+                        m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight, m_coralSim),
+            centerToReefCommand.unless(() -> !centerToReef)
+        //
+        );
+    }
+
     public void configureArcadeBindings() {
         var centerToReef = true;
 
         m_arcadeController.rightTrigger().onTrue(Commands.sequence(
-                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
-                RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef, centerToReefCommand,
-                        m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight, m_coralSim),
+                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights,
+                        m_coralSim),
+                prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
                         .withTimeout(0.15)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
         //
         ));
-        m_arcadeController.b().onTrue(RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3,
-                ScoreSide.Left, centerToReef, centerToReefCommand, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
-                m_coralSim));
-        m_arcadeController.a().onTrue(RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4,
-                ScoreSide.Left, centerToReef, centerToReefCommand, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
-                m_coralSim));
-        m_arcadeController.x().onTrue(RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4,
-                ScoreSide.Right, centerToReef, centerToReefCommand, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
-                m_coralSim));
-        m_arcadeController.y().onTrue(RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3,
-                ScoreSide.Right, centerToReef, centerToReefCommand, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight,
-                m_coralSim));
+        m_arcadeController.b().onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef));
+        m_arcadeController.a().onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef));
+        m_arcadeController.x().onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef));
+        m_arcadeController.y().onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
-                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights, m_coralSim),
-                RobotCommands.prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2,
-                        ScoreSide.Right, centerToReef, centerToReefCommand, m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights,
-                        m_reef_limelight,
+                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights,
                         m_coralSim),
+                prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
                         .withTimeout(0.15)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
@@ -286,7 +286,8 @@ public class RobotContainer {
 
     public void configureAuto() {
         AutoManager.getInstance()
-                .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, centerToReefCommand, m_drivetrain, m_elevator, m_arm,
+                .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, centerToReefCommand, m_drivetrain,
+                        m_elevator, m_arm,
                         m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
         // AutoManager.getInstance()
         // .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_drivetrain, m_elevator, m_arm,

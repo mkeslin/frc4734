@@ -112,26 +112,6 @@ public class RobotCommands {
                 ));
     }
 
-    public static Command prepareScoreCoralAndCenterToReefCommand(
-            ScoreLevel scoreLevel,
-            ScoreSide scoreSide,
-            boolean centerToReef,
-            CenterToReefCommand centerToReefCommand,
-            CommandSwerveDrivetrain drivetrain,
-            Elevator elevator,
-            Arm arm,
-            SideToSide sideToSide,
-            Lights lights,
-            Limelight reefLimelight,
-            CoralSim coralSim) {
-        return Commands.sequence(
-                RobotCommands.prepareScoreCoralCommand(scoreLevel, scoreSide, drivetrain, elevator, arm,
-                        sideToSide, lights, reefLimelight, coralSim),
-                centerToReefCommand.unless(() -> !centerToReef)
-        //
-        );
-    }
-
     public static Command scoreCoralCommand(
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
