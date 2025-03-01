@@ -6,7 +6,7 @@ public class ClimberConstants {
     public static enum ClimberPosition {
         DOWN(0),
         ACQUIRE(80),
-        CLIMB(315);
+        CLIMB(335);
 
         public final double value;
 

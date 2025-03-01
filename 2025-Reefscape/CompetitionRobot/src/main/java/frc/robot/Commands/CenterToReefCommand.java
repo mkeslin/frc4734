@@ -9,14 +9,17 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class CenterToReefCommand extends Command {
     public Limelight m_limelight;
     public CommandSwerveDrivetrain m_drivetrain;
+    public CommandXboxController m_driveController;
 
     private double xSpeed, ySpeed, omegaSpeed;
     private Pose2d tagPose, targetPose;
@@ -44,7 +47,7 @@ public class CenterToReefCommand extends Command {
 
     public Timer t = new Timer();
 
-    public CenterToReefCommand(Limelight limelight, CommandSwerveDrivetrain drivetrain) {
+    public CenterToReefCommand(Limelight limelight, CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
         m_limelight = limelight;
         m_drivetrain = drivetrain;
         centerMethod = CAMERA;
@@ -71,6 +74,7 @@ public class CenterToReefCommand extends Command {
     public void initialize() {
         t.start();
         setTargets(centerMethod);
+        m_drivetrain.setRelativeSpeed(0, 0, 0);
     }
 
     @Override
