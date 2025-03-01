@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Start-B"
+            "pathName": "2-Start-B"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "B-Pickup2"
+            "pathName": "2-B-Pickup2"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pickup2-D"
+            "pathName": "2-Pickup2-D"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "D-Pickup2"
+            "pathName": "2-D-Pickup2"
           }
         },
         {
