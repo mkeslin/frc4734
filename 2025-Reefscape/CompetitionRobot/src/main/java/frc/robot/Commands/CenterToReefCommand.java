@@ -50,6 +50,7 @@ public class CenterToReefCommand extends Command {
     public CenterToReefCommand(Limelight limelight, CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
         m_limelight = limelight;
         m_drivetrain = drivetrain;
+        m_driveController = driveController;
         centerMethod = CAMERA;
 
         for(int i = 6; i <= 11; i++) {

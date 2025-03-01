@@ -76,7 +76,7 @@ public class RobotContainer {
     private DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
 
     // COMMANDS
-    public CenterToReefCommand centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain);
+    public CenterToReefCommand centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain, m_driveController);
     public CenterToStationCommand centerToStationCommand = new CenterToStationCommand(m_station_limelight,
             m_drivetrain);
 
