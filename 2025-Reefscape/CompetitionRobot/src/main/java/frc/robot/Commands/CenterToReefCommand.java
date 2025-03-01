@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
@@ -23,6 +25,7 @@ public class CenterToReefCommand extends Command {
 
     private double xSpeed, ySpeed, omegaSpeed;
     private Pose2d tagPose, targetPose;
+    private boolean driverInterrupted;
     private int centerMethod;
     private int POSE = 0;
     private int CAMERA = 1;
@@ -76,6 +79,7 @@ public class CenterToReefCommand extends Command {
         t.start();
         setTargets(centerMethod);
         m_drivetrain.setRelativeSpeed(0, 0, 0);
+        driverInterrupted = false;
     }
 
     @Override
@@ -86,12 +90,15 @@ public class CenterToReefCommand extends Command {
         SmartDashboard.putNumber("omegaSpeed", omegaSpeed);
 
         m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
+        if(m_driveController != null ) {
+            m_driveController.povUp().onTrue(Commands.runOnce(() -> {driverInterrupted = true;}));
+        }
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return t.hasElapsed(5) || (centerMethod == CAMERA && !m_limelight.hasTargets()) || (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()); //|| (area > FINAL_AREA && x_offset < FINAL_X_OFFSET && yaw_degrees < FINAL_ANGLE_DEGREES);
+        return t.hasElapsed(5) || driverInterrupted || (centerMethod == CAMERA && !m_limelight.hasTargets()) || (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint());
     }
 
     // Called once after isFinished returns true

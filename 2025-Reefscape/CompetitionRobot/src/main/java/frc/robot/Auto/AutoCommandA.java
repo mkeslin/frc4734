@@ -161,7 +161,7 @@ public class AutoCommandA {
             Limelight stationLimelight,
             CoralSim coralSim) {
         var centerToReefCommand = new CenterToReefCommand(stationLimelight, drivetrain, null);
-        var centerToStationCommand = new CenterToStationCommand(stationLimelight, drivetrain);
+        var centerToStationCommand = new CenterToStationCommand(stationLimelight, drivetrain, null);
 
         Command command = Commands.sequence(
                 // DRIVE TO REEF & POSITION CORAL

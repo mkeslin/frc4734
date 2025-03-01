@@ -61,15 +61,15 @@ public class RobotContainer {
     private DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
 
     // COMMANDS
-    public CenterToReefCommand centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain,
+    public CenterToReefCommand m_centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain,
             m_driveController);
-    public CenterToStationCommand centerToStationCommand = new CenterToStationCommand(m_station_limelight,
-            m_drivetrain);
+    public CenterToStationCommand m_centerToStationCommand = new CenterToStationCommand(m_station_limelight,
+            m_drivetrain, m_driveController);
 
     public RobotContainer() {
         // register named commands
-        NamedCommands.registerCommand("centerToReefCommand", centerToReefCommand);
-        NamedCommands.registerCommand("centerToStationCommand", centerToStationCommand);
+        NamedCommands.registerCommand("centerToReefCommand", m_centerToReefCommand);
+        NamedCommands.registerCommand("centerToStationCommand", m_centerToStationCommand);
 
         // configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
@@ -139,13 +139,19 @@ public class RobotContainer {
     }
 
     private void configureDriveBindings() {
-        m_driveController.rightTrigger().onTrue(centerToStationCommand);
-        m_driveController.leftTrigger().onTrue(centerToReefCommand);
+        m_driveController.rightTrigger().onTrue(m_centerToStationCommand);
+        m_driveController.leftTrigger().onTrue(m_centerToReefCommand);
+
+        m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
+        m_driveController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
+        m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
     }
 
     private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide, boolean centerToReef) {
+        // var centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain, m_driveController);
+        var centerToReefCommand = NamedCommands.getCommand("centerToReefCommand");
         return Commands.sequence(
-            RobotCommands.prepareScoreCoralCommand(ScoreLevel.L2, ScoreSide.Left,
+            RobotCommands.prepareScoreCoralCommand(scoreLevel, scoreSide,
                         m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight, m_coralSim),
             centerToReefCommand.unless(() -> !centerToReef)
         //
@@ -188,65 +194,11 @@ public class RobotContainer {
         // LOGGING & SYSID
         // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
         // m_arcadeController.leftBumper().onTrue(Commands.runOnce(SignalLogger::stop));
-        /*
-         * Joystick Y = quasistatic forward
-         * Joystick A = quasistatic reverse
-         * Joystick B = dynamic forward
-         * Joystick X = dyanmic reverse
-         */
+
         // m_arcadeController.a().whileTrue(m_elevator.sysIdQuasistaticCommand(SysIdRoutine.Direction.kForward));
         // m_arcadeController.x().whileTrue(m_elevator.sysIdQuasistaticCommand(SysIdRoutine.Direction.kReverse));
         // m_arcadeController.b().whileTrue(m_elevator.sysIdDynamicCommand(SysIdRoutine.Direction.kForward));
         // m_arcadeController.y().whileTrue(m_elevator.sysIdDynamicCommand(SysIdRoutine.Direction.kReverse));
-
-        // m_arcadeController.leftTrigger().onTrue(Commands.run(() -> m_drivetrain.moveRelative(-0.5, 0,
-        // 0)).withTimeout(0.35));
-
-        m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
-        m_driveController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
-        m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
-
-        // m_arcadeController.a().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM));
-        // m_arcadeController.b().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L1));
-        // m_arcadeController.rightTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L2));
-        // m_arcadeController.leftTrigger().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L3));
-        // m_arcadeController.x().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.L4));
-        // m_arcadeController.y().onTrue(m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP));
-
-        // m_arcadeController.a().onTrue(m_intake.commandDeploy());
-        // m_arcadeController.x().onTrue(m_intake.commandStow());
-
-        // m_arcadeController.b().onTrue(m_climber.CommandFullRetract());
-        // m_arcadeController.y().onTrue(m_climber.CommandFullExtend());
-
-        // m_arcadeController.rightTrigger().onTrue(m_elevator.CommandFullRetract());
-        // m_arcadeController.rightBumper().onTrue(m_elevator.CommandFullExtend());
-
-        // m_arcadeController.leftTrigger().onTrue(m_elevator.CommandPivotStow());
-        // m_arcadeController.leftBumper().onTrue(m_elevator.CommandPivotDeploy());
-
-        // m_arcadeController.axisLessThan(ControllerButtons.CLY,
-        // -0.5).onTrue(shootAmpNoteCommand);
-        // m_arcadeController.axisLessThan(ControllerButtons.CLY,
-        // -0.5).onTrue(Commands.sequence(shootNoteCommand,
-        // m_shooter.commandSetAngle(1)));
-        // m_arcadeController
-        // .axisGreaterThan(ControllerButtons.CLY, 0.5)
-        // .onTrue(intakeNoteCommand);
-
-        // m_arcadeController.axisLessThan(ControllerButtons.CRY,
-        // -0.5).onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
-        // m_arcadeController.axisGreaterThan(ControllerButtons.CRY,
-        // 0.5).onTrue(m_shooter.commandSetAngle(0));
-        // m_arcadeController.start().onTrue(m_shooter.commandSetAngle(Shooter.TELEOP_SPEAKER_PIVOT_ENCODER_VAL));
-
-        // m_arcadeController.start().onTrue(Commands.runOnce(() -> {
-        // if (m_positionTracker.getCoralInArm()) {
-        // m_lights.setSolidColors(0, 255, 0);
-        // } else {
-        // m_lights.setSolidColors(255, 0, 0);
-        // }
-        // }, m_lights));
     }
 
     public void configureLightsBindings() {
@@ -286,7 +238,7 @@ public class RobotContainer {
 
     public void configureAuto() {
         AutoManager.getInstance()
-                .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, centerToReefCommand, m_drivetrain,
+                .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, m_centerToReefCommand, m_drivetrain,
                         m_elevator, m_arm,
                         m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
         // AutoManager.getInstance()
