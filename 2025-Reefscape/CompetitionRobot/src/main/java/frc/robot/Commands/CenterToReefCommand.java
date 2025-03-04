@@ -9,12 +9,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
@@ -170,9 +168,10 @@ public class CenterToReefCommand extends Command {
             SmartDashboard.putNumber("xPos", position.getX());
             SmartDashboard.putNumber("yPos", position.getY());
             SmartDashboard.putNumber("omegaPos", position.getRotation().getDegrees());
-            xSpeed = xController.calculate(position.getX());
-            ySpeed = yController.calculate(position.getY());
+            xSpeed = Math.signum(position.getRotation().getCos()) * xController.calculate(position.getX());
+            ySpeed = Math.signum(position.getRotation().getCos()) * yController.calculate(position.getY());
             omegaSpeed = omegaController.calculate(position.getRotation().getDegrees());
+            //getSpeeds();
         } else if(method == CAMERA) {
             xSpeed = xController.calculate(m_limelight.getArea());
             ySpeed = yController.calculate(m_limelight.getX());
@@ -185,9 +184,9 @@ public class CenterToReefCommand extends Command {
         }
     }
 
-    public void getSpeeds(double x, double y, double omega) {
-        SmartDashboard.putNumber("xSpeed", x);
-        SmartDashboard.putNumber("ySpeed", y);
-        SmartDashboard.putNumber("omegaSpeed", omega);
+    public void getSpeeds() {
+        SmartDashboard.putNumber("xSpeed", xSpeed);
+        SmartDashboard.putNumber("ySpeed", ySpeed);
+        SmartDashboard.putNumber("omegaSpeed", omegaSpeed);
     }
 }
