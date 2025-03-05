@@ -23,6 +23,7 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Lights extends SubsystemBase {
@@ -46,7 +47,7 @@ public class Lights extends SubsystemBase {
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         m_candle.configAllSettings(configAll, 100);
 
-        changeAnimation(AnimationTypes.Fire);
+        changeAnimation(AnimationTypes.Larson);
     }
 
     public void incrementAnimation() {
@@ -119,7 +120,7 @@ public class Lights extends SubsystemBase {
         }
     }
 
-    public void setSolidColorsRandom() {
+    public void setSolidColorRandom() {
         changeAnimation(AnimationTypes.SetAll);
         Random random = new Random();
         int r = random.nextInt(256);
@@ -128,9 +129,14 @@ public class Lights extends SubsystemBase {
         m_candle.setLEDs(r, g, b);
     }
 
-    public void setSolidColors(int r, int g, int b) {
+    public void setSolidColor(int r, int g, int b) {
         changeAnimation(AnimationTypes.SetAll);
         m_candle.setLEDs(r, g, b);
+    }
+
+    public void setSolidColor(Color color) {
+        changeAnimation(AnimationTypes.SetAll);
+        m_candle.setLEDs((int)(color.red * 255), (int)(color.green * 255), (int)(color.blue * 255));
     }
 
     /* Wrappers so we can access the CANdle from the subsystem */
@@ -202,7 +208,7 @@ public class Lights extends SubsystemBase {
                 m_toAnimate = null;
                 break;
         }
-        System.out.println("Changed to " + m_currentAnimationType.toString());
+        // System.out.println("Changed to " + m_currentAnimationType.toString());
         m_candle.animate(m_toAnimate);
     }
 

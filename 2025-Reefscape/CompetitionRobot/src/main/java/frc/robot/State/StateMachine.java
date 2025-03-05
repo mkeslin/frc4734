@@ -11,6 +11,8 @@ public class StateMachine {
     private static Map<StateMachineStateName, ArrayList<StateMachineState>> m_stateMap = new HashMap<StateMachineStateName, ArrayList<StateMachineState>>();
     private static StateMachineStateName m_currentStateName = StateMachineStateName.Intake;
 
+    private static Map<StateMachineStateName, StateMachineState> m_allStates = new HashMap<StateMachineStateName, StateMachineState>();
+
     public static void Load() {
         // states
         var intakeState = new StateMachineState(
@@ -49,6 +51,12 @@ public class StateMachine {
                 false,
                 true);
 
+        m_allStates.put(intakeState.Name, intakeState);
+        m_allStates.put(postIntakeState.Name, postIntakeState);
+        m_allStates.put(prepareScoreState.Name, prepareScoreState);
+        m_allStates.put(scoreState.Name, scoreState);
+        m_allStates.put(preIntakeState.Name, preIntakeState);
+
         // transitions
         var intakeList = new ArrayList<StateMachineState>();
         intakeList.add(postIntakeState);
@@ -75,6 +83,10 @@ public class StateMachine {
         preIntakeList.add(intakeState);
         preIntakeList.add(postIntakeState);
         m_stateMap.put(preIntakeState.Name, preIntakeList);
+    }
+
+    public static StateMachineState GetCurrentState() {
+        return m_allStates.get(m_currentStateName);
     }
 
     public static Boolean CanTransition(
@@ -105,23 +117,19 @@ public class StateMachine {
         }
 
         // check booleans
-        if (toState.RequiresIntakeCoral && !positionTracker.getCoralInTray())
-        {
+        if (toState.RequiresIntakeCoral && !positionTracker.getCoralInTray()) {
             System.out.println("Failed: coral not in tray");
             return false;
         }
-        if (toState.RequiresArmCoral && !positionTracker.getCoralInArm())
-        {
+        if (toState.RequiresArmCoral && !positionTracker.getCoralInArm()) {
             System.out.println("Failed: coral not in arm");
             return false;
         }
-        if (toState.NotIfIntakeCoral && positionTracker.getCoralInTray())
-        {
+        if (toState.NotIfIntakeCoral && positionTracker.getCoralInTray()) {
             System.out.println("Failed: coral in tray");
             return false;
         }
-        if (toState.NotIfArmCoral && positionTracker.getCoralInArm())
-        {
+        if (toState.NotIfArmCoral && positionTracker.getCoralInArm()) {
             System.out.println("Failed: coral in arm");
             return false;
         }

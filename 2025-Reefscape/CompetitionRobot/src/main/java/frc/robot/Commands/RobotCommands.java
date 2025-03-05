@@ -39,10 +39,7 @@ public class RobotCommands {
                 Commands.waitSeconds(0.0)
                         .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3).asProxy())
         //
-        )
-                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore));
-        // NOTE: do not update state, since this is an intermediate step
-        // .andThen(() -> lastStateName = StateMachineStateName.PrepareScore);
+        ).onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore));
     }
 
     public static Command prepareScoreCoralCommand(
@@ -70,13 +67,13 @@ public class RobotCommands {
                 armPosition = ArmPosition.TOP;
             }
             case L3 -> {
-                lights.setSolidColors(255, 255, 0);
+                // lights.setSolidColor(255, 255, 0);
                 elevatorPosition = ElevatorPosition.L3;
                 armPosition = ArmPosition.TOP;
                 // Commands.runOnce(lights.setColors(255,255,0));
             }
             case L4 -> {
-                lights.setSolidColors(255, 0, 0);
+                // lights.setSolidColors(255, 0, 0);
                 elevatorPosition = ElevatorPosition.L4;
                 armPosition = ArmPosition.TOP;
                 // Commands.runOnce(lights.setColors(255,0,0));
@@ -118,6 +115,7 @@ public class RobotCommands {
                 // .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
                 )
                         .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore))
+                        .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color))
         //
         );
     }
@@ -130,38 +128,15 @@ public class RobotCommands {
             Lights lights,
             CoralSim coralSim) {
         Map<ScoreLevel, Command> commandMap = Map.ofEntries(
-                Map.entry(ScoreLevel.L1,
-                        Commands.parallel(
-                                // drivetrain.moveVoltageTimeCommand(4, 0.5),
-                                // elevator.movePositionDeltaCommand(() ->
-                                // ElevatorConstants.SCORING_MOVEMENT).asProxy())
-                                Commands.runOnce(() -> lights.setSolidColors(0, 0, 64)).asProxy())),
-                Map.entry(ScoreLevel.L2,
-                        Commands.parallel(
-                                // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
-                                Commands.runOnce(() -> lights.setSolidColors(0, 0, 128)).asProxy(),
-                                arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy())),
-                Map.entry(ScoreLevel.L3,
-                        Commands.parallel(
-                                // arm.movePositionDeltaCommand(() -> ArmConstants.SCORING_MOVEMENT).asProxy())),
-                                Commands.runOnce(() -> lights.setSolidColors(0, 0, 191)).asProxy(),
-                                arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy())),
-                Map.entry(ScoreLevel.L4,
-                        Commands.sequence(
-                                // Commands.run(() -> drivetrain.setRelativeSpeed(0.5, 0, 0))
-                                // .withTimeout(0.35)
-                                // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
-                                // .asProxy(),
-                                Commands.runOnce(() -> lights.setSolidColors(0, 0, 255)).asProxy(),
-                                arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy()
-                        // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
-                        // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
-                        )),
-
+                Map.entry(ScoreLevel.L1, Commands.none()),
+                Map.entry(ScoreLevel.L2, arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy()),
+                Map.entry(ScoreLevel.L3, arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy()),
+                Map.entry(ScoreLevel.L4, arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy()),
                 Map.entry(ScoreLevel.None, Commands.none()));
 
         return Commands.select(commandMap, () -> lastScoreLevel)
-                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.Score));
+                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.Score))
+                .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));
     }
 
     public static Command preIntakeCoralCommand(
@@ -169,6 +144,7 @@ public class RobotCommands {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
+            Lights lights,
             CoralSim coralSim) {
         return Commands.sequence(
                 // elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy(),
@@ -184,15 +160,16 @@ public class RobotCommands {
                 //
                 )
         //
-        )
-                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PreIntake));
+        ).onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PreIntake))
+                .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));
     }
 
     public static Command intakeCoralCommand(
             PositionTracker positionTracker,
             Elevator elevator,
             Arm arm,
-            SideToSide sideToSide) {
+            SideToSide sideToSide,
+            Lights lights) {
         return Commands.parallel(
                 Commands
                         .waitSeconds(0.0)
@@ -205,14 +182,16 @@ public class RobotCommands {
                         .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         //
         )
-                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.Intake));
+                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.Intake))
+                .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));
     }
 
     public static Command postIntakeCoralCommand(
             PositionTracker positionTracker,
             Elevator elevator,
             Arm arm,
-            SideToSide sideToSide) {
+            SideToSide sideToSide,
+            Lights lights) {
         return Commands.parallel(
                 Commands
                         .waitSeconds(0.0)
@@ -225,6 +204,7 @@ public class RobotCommands {
                         .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         //
         )
-                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PostIntake));
+                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PostIntake))
+                .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));
     }
 }

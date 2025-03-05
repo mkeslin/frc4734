@@ -186,7 +186,7 @@ public class AutoCommandA {
                         // PRE-INTAKE
                         Commands.waitSeconds(0.4)
                                 .andThen(RobotCommands.preIntakeCoralCommand(positionTracker, elevator, arm,
-                                        sideToSide, coralSim)),
+                                        sideToSide, lights, coralSim)),
                         // DRIVE TO CORAL STATION
                         Commands.waitSeconds(0.0)
                                 .andThen(drivetrain.followPathCommand(pathToCoralStation))
@@ -195,7 +195,7 @@ public class AutoCommandA {
                 centerToStationCommand,
                 // INTAKE
                 Commands.waitSeconds(3.0).until(() -> positionTracker.getCoralInTray()),
-                RobotCommands.intakeCoralCommand(positionTracker, elevator, arm, sideToSide)
+                RobotCommands.intakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights)
         //
         );
 

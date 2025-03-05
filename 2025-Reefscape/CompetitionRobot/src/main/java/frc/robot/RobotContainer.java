@@ -121,19 +121,20 @@ public class RobotContainer {
         // GO TO PRE-INTAKE
         m_mechanismController.a()
                 .onTrue(RobotCommands.preIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
-                        m_coralSim));
+                        m_lights, m_coralSim));
 
         // INTAKE & POST-INTAKE
         m_mechanismController.b().onTrue(
                 Commands.sequence(
-                        RobotCommands.intakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide),
-                        RobotCommands.postIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide)
+                        RobotCommands.intakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights),
+                        RobotCommands.postIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
+                                m_lights)
                 //
                 ));
 
         // RESET POSE
         m_mechanismController.start()
-                .onTrue(RobotCommands.intakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide));
+                .onTrue(RobotCommands.intakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights));
 
         // m_mechanismController.leftBumper().onTrue(Commands.runOnce(() -> resetZeros()));
 
@@ -220,18 +221,18 @@ public class RobotContainer {
         // m_arcadeController.y().whileTrue(m_elevator.sysIdDynamicCommand(SysIdRoutine.Direction.kReverse));
     }
 
-    public void configureLightsBindings() {
-        // m_lights.setDefaultCommand(
-        // m_lights.setColors(
-        // (int) (m_driveController.getLeftTriggerAxis() * 255),
-        // (int) (m_driveController.getRightTriggerAxis() * 255),
-        // (int) (m_driveController.getLeftX() * 255)
-        // )
-        // );
+    // public void configureLightsBindings() {
+    //     // m_lights.setDefaultCommand(
+    //     // m_lights.setColors(
+    //     // (int) (m_driveController.getLeftTriggerAxis() * 255),
+    //     // (int) (m_driveController.getRightTriggerAxis() * 255),
+    //     // (int) (m_driveController.getLeftX() * 255)
+    //     // )
+    //     // );
 
-        // m_driveController.y().onTrue(Commands.runOnce(() ->
-        // m_lights.incrementAnimation(), m_lights));
-    }
+    //     // m_driveController.y().onTrue(Commands.runOnce(() ->
+    //     // m_lights.incrementAnimation(), m_lights));
+    // }
 
     public void localizeRobotPose() {
         boolean doRejectUpdate = false;
