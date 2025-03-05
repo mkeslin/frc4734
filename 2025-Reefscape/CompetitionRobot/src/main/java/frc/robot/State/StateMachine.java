@@ -28,7 +28,7 @@ public class StateMachine {
                 true,
                 false,
                 false,
-                true);
+                false);
         var prepareScoreState = new StateMachineState(
                 StateMachineStateName.PrepareScore,
                 Color.kOrange,

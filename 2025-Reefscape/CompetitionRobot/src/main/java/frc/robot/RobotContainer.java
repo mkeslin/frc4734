@@ -175,9 +175,9 @@ public class RobotContainer {
         var centerToReef = true;
 
         m_arcadeController.rightTrigger().onTrue(Commands.sequence(
-                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_positionTracker, m_elevator, m_arm,
-                        m_sideToSide, m_lights,
-                        m_coralSim),
+                // RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_positionTracker, m_elevator, m_arm,
+                //         m_sideToSide, m_lights,
+                //         m_coralSim),
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
                         .withTimeout(0.15)
@@ -194,8 +194,8 @@ public class RobotContainer {
         m_arcadeController.y()
                 .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
-                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_positionTracker, m_elevator, m_arm,
-                        m_sideToSide, m_lights, m_coralSim),
+                // RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_positionTracker, m_elevator, m_arm,
+                //         m_sideToSide, m_lights, m_coralSim),
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
                         .withTimeout(0.15)

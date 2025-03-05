@@ -23,24 +23,24 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 public class RobotCommands {
     private static ScoreLevel lastScoreLevel = ScoreLevel.None;
 
-    public static Command moveIntermediatePrepareScoreCoralCommand(
-            PositionTracker positionTracker,
-            Elevator elevator,
-            Arm arm,
-            SideToSide sideToSide,
-            Lights lights,
-            CoralSim coralSim) {
-        return Commands.parallel(
-                // Commands.runOnce(() -> lights.setColors(0, 255, 0)).asProxy(),
-                Commands.waitSeconds(0.35)
-                        .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
-                // Commands.waitSeconds(0)
-                // .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
-                Commands.waitSeconds(0.0)
-                        .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3).asProxy())
-        //
-        ).onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore));
-    }
+    // public static Command moveIntermediatePrepareScoreCoralCommand(
+    //         PositionTracker positionTracker,
+    //         Elevator elevator,
+    //         Arm arm,
+    //         SideToSide sideToSide,
+    //         Lights lights,
+    //         CoralSim coralSim) {
+    //     return Commands.parallel(
+    //             // Commands.runOnce(() -> lights.setColors(0, 255, 0)).asProxy(),
+    //             Commands.waitSeconds(0.35)
+    //                     .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
+    //             // Commands.waitSeconds(0)
+    //             // .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
+    //             Commands.waitSeconds(0.0)
+    //                     .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3).asProxy())
+    //     //
+    //     ).onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore));
+    // }
 
     public static Command prepareScoreCoralCommand(
             PositionTracker positionTracker,
@@ -100,11 +100,11 @@ public class RobotCommands {
         }).andThen(
                 Commands.parallel(
                         Commands
-                                .waitSeconds(0.35)
+                                .waitSeconds(0.0)
                                 .andThen(sideToSide.moveToSetPositionCommand(() -> sideToSidePosition)
                                         .asProxy()),
                         Commands
-                                .waitSeconds(0.35)
+                                .waitSeconds(0.0)
                                 .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy()),
                         Commands
                                 .waitSeconds(0.0)
@@ -149,12 +149,12 @@ public class RobotCommands {
         return Commands.sequence(
                 // elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy(),
                 Commands.parallel(
-                        Commands.waitSeconds(0.35)
+                        Commands.waitSeconds(0.0)
                                 .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
-                        Commands.waitSeconds(0)
+                        Commands.waitSeconds(0.0)
                                 .andThen(
                                         sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
-                        Commands.waitSeconds(0)
+                        Commands.waitSeconds(0.0)
                                 .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP)
                                         .asProxy())
                 //
@@ -197,7 +197,7 @@ public class RobotCommands {
                         .waitSeconds(0.0)
                         .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy()),
                 Commands
-                        .waitSeconds(0.35)
+                        .waitSeconds(0.30)
                         .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
                 Commands
                         .waitSeconds(0.0)
