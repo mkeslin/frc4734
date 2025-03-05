@@ -10,6 +10,8 @@ import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
 import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
+import frc.robot.State.StateMachine;
+import frc.robot.State.StateMachineStateName;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.CoralSim;
 import frc.robot.Subsystems.Elevator;
@@ -19,10 +21,10 @@ import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class RobotCommands {
-    public static ScoreLevel lastScoreLevel = ScoreLevel.None;
-    public static ScoreSide lastScoreSide = ScoreSide.None;
+    private static ScoreLevel lastScoreLevel = ScoreLevel.None;
 
     public static Command moveIntermediatePrepareScoreCoralCommand(
+            PositionTracker positionTracker,
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
@@ -35,10 +37,16 @@ public class RobotCommands {
                 // Commands.waitSeconds(0)
                 // .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
                 Commands.waitSeconds(0.0)
-                        .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3).asProxy()));
+                        .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3).asProxy())
+        //
+        )
+                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore));
+        // NOTE: do not update state, since this is an intermediate step
+        // .andThen(() -> lastStateName = StateMachineStateName.PrepareScore);
     }
 
     public static Command prepareScoreCoralCommand(
+            PositionTracker positionTracker,
             ScoreLevel level,
             ScoreSide side,
             CommandSwerveDrivetrain drivetrain,
@@ -92,7 +100,6 @@ public class RobotCommands {
 
         return Commands.runOnce(() -> {
             lastScoreLevel = level;
-            lastScoreSide = side;
         }).andThen(
                 Commands.parallel(
                         Commands
@@ -109,10 +116,14 @@ public class RobotCommands {
                 // .waitSeconds(0.0)
                 // .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy())
                 // .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
-                ));
+                )
+                        .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore))
+        //
+        );
     }
 
     public static Command scoreCoralCommand(
+            PositionTracker positionTracker,
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
             Arm arm,
@@ -149,10 +160,11 @@ public class RobotCommands {
 
                 Map.entry(ScoreLevel.None, Commands.none()));
 
-        return Commands.select(commandMap, () -> lastScoreLevel);
+        return Commands.select(commandMap, () -> lastScoreLevel)
+                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.Score));
     }
 
-    public static Command prepareIntakeCoralCommand(
+    public static Command preIntakeCoralCommand(
             PositionTracker positionTracker,
             Elevator elevator,
             Arm arm,
@@ -170,49 +182,11 @@ public class RobotCommands {
                                 .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP)
                                         .asProxy())
                 //
-                ).unless(() -> positionTracker.getCoralInArm())
+                )
         //
-        ).unless(() -> positionTracker.getCoralInArm());
+        )
+                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PreIntake));
     }
-
-    // public static Command intakeCoralCommand(
-    // Elevator elevator,
-    // Arm arm,
-    // SideToSide sideToSide,
-    // Lights lights,
-    // CoralSim coralSim) {
-    // return Commands.sequence(
-    // prepareIntakeCoralCommand(elevator, arm, sideToSide, coralSim),
-    // Commands.parallel(
-    // Commands.runOnce(() -> lights.setSolidColors(255, 0, 255)).asProxy(),
-    // elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
-    // arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
-    // elevator.movePositionDeltaCommand(() -> 0.31).asProxy()
-    // .alongWith(Commands.waitSeconds(0.1).andThen(
-    // coralSim.setLocationCommand(CoralSimLocation.CLAW))),
-    // Commands.parallel(
-    // Commands.waitSeconds(0.5)
-    // .andThen(elevator.moveToSetPositionCommand(
-    // () -> ElevatorPosition.BOTTOM).asProxy()),
-    // arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()));
-    // }
-
-    // public static Command intakeAndScoreCommand(
-    // ScoreLevel level,
-    // ScoreSide side,
-    // Elevator elevator,
-    // Arm arm,
-    // SideToSide sideToSide,
-    // Lights lights,
-    // CoralSim coralSim) {
-    // return Commands.sequence(
-    // Commands.parallel(
-    // elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE).asProxy(),
-    // arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
-    // autoPrepareCoralScoreCommand(level, side, elevator, arm, sideToSide, lights, coralSim)
-    // .alongWith(Commands.waitSeconds(0.1).andThen(
-    // coralSim.setLocationCommand(CoralSimLocation.CLAW))));
-    // }
 
     public static Command intakeCoralCommand(
             PositionTracker positionTracker,
@@ -230,7 +204,8 @@ public class RobotCommands {
                         .waitSeconds(0.0)
                         .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         //
-        ).unless(() -> positionTracker.getCoralInArm());
+        )
+                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.Intake));
     }
 
     public static Command postIntakeCoralCommand(
@@ -249,26 +224,7 @@ public class RobotCommands {
                         .waitSeconds(0.0)
                         .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         //
-        );
+        )
+                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PostIntake));
     }
-
-    // public static Command prepareAlgaeL2RemoveCommand(Elevator elevator, Arm arm) {
-    // return Commands.sequence(Commands.parallel(
-    // elevator.moveToSetPositionCommand(() -> ElevatorPosition.ALGAE_L2).asProxy(),
-    // arm.moveToPositionCommand(() -> ArmPosition.HORIZONTAL).asProxy()));
-    // }
-
-    // public static Command prepareAlgaeL3RemoveCommand(Elevator elevator, Arm arm) {
-    // return Commands.sequence(Commands.parallel(
-    // elevator.moveToSetPositionCommand(() -> ElevatorPosition.ALGAE_L3).asProxy(),
-    // arm.moveToPositionCommand(() -> ArmPosition.HORIZONTAL).asProxy()));
-    // }
-
-    // public static Command algaeRemoveCommand(Drivetrain drivetrain, Elevator
-    // elevator, Arm arm) {
-    // return Commands.sequence(
-    // Commands.parallel(
-    // drivetrain.moveVoltageTimeCommand(-2, 0.5),
-    // elevator.movePositionDeltaCommand(() -> -0.06).asProxy()));
-    // }
 }

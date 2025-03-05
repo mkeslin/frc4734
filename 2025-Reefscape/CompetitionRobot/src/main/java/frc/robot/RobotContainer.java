@@ -23,6 +23,7 @@ import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
 import frc.robot.Controllers.ControllerIds;
+import frc.robot.State.StateMachine;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.CoralSim;
@@ -77,6 +78,9 @@ public class RobotContainer {
         m_positionTracker.setCoralInTraySupplier(m_coralTraySensor::get);
         m_positionTracker.setCoralInArmSupplier(m_coralArmSensor::get);
 
+        // load state machine
+        StateMachine.Load();
+
         // configure bindings for mechanisms
         configureMechanismBindings();
 
@@ -116,7 +120,7 @@ public class RobotContainer {
     private void configureMechanismBindings() {
         // GO TO PRE-INTAKE
         m_mechanismController.a()
-                .onTrue(RobotCommands.prepareIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
+                .onTrue(RobotCommands.preIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
                         m_coralSim));
 
         // INTAKE & POST-INTAKE
@@ -157,7 +161,7 @@ public class RobotContainer {
         return Commands.parallel(
                 Commands
                         .waitSeconds(0.0)
-                        .andThen(RobotCommands.prepareScoreCoralCommand(scoreLevel, scoreSide,
+                        .andThen(RobotCommands.prepareScoreCoralCommand(m_positionTracker, scoreLevel, scoreSide,
                                 m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight, m_coralSim)),
                 Commands
                         .waitSeconds(0.0)
@@ -170,7 +174,8 @@ public class RobotContainer {
         var centerToReef = true;
 
         m_arcadeController.rightTrigger().onTrue(Commands.sequence(
-                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights,
+                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_positionTracker, m_elevator, m_arm,
+                        m_sideToSide, m_lights,
                         m_coralSim),
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
@@ -188,8 +193,8 @@ public class RobotContainer {
         m_arcadeController.y()
                 .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
-                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights,
-                        m_coralSim),
+                RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_positionTracker, m_elevator, m_arm,
+                        m_sideToSide, m_lights, m_coralSim),
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
                         .withTimeout(0.15)
@@ -199,9 +204,11 @@ public class RobotContainer {
         ));
 
         m_arcadeController.leftBumper()
-                .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
+                .onTrue(RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights,
+                        m_coralSim));
         m_arcadeController.leftTrigger()
-                .onTrue(RobotCommands.scoreCoralCommand(m_drivetrain, m_elevator, m_arm, m_lights, m_coralSim));
+                .onTrue(RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights,
+                        m_coralSim));
 
         // LOGGING & SYSID
         // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
