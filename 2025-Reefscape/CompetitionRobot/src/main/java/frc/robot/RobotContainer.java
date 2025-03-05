@@ -119,13 +119,17 @@ public class RobotContainer {
                 .onTrue(RobotCommands.prepareIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
                         m_coralSim));
 
-        // MOVE TO START POSITION // ALSO INTAKE COMMAND
-        m_mechanismController.b().onTrue(// Commands.sequence(
-                // RobotCommands.prepareIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
-                // m_coralSim),
-                RobotCommands.returnToStartPositions(m_positionTracker, m_elevator, m_arm, m_sideToSide)
-        //
-        );
+        // INTAKE & POST-INTAKE
+        m_mechanismController.b().onTrue(
+                Commands.sequence(
+                        RobotCommands.intakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide),
+                        RobotCommands.postIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide)
+                //
+                ));
+
+        // RESET POSE
+        m_mechanismController.start()
+                .onTrue(RobotCommands.intakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide));
 
         // m_mechanismController.leftBumper().onTrue(Commands.runOnce(() -> resetZeros()));
 
@@ -147,13 +151,17 @@ public class RobotContainer {
         m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
     }
 
-    private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide, boolean centerToReef) {
-        // var centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain, m_driveController);
+    private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide,
+            boolean centerToReef) {
         var centerToReefCommand = NamedCommands.getCommand("centerToReefCommand");
-        return Commands.sequence(
-            RobotCommands.prepareScoreCoralCommand(scoreLevel, scoreSide,
-                        m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight, m_coralSim),
-            centerToReefCommand.unless(() -> !centerToReef)
+        return Commands.parallel(
+                Commands
+                        .waitSeconds(0.0)
+                        .andThen(RobotCommands.prepareScoreCoralCommand(scoreLevel, scoreSide,
+                                m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight, m_coralSim)),
+                Commands
+                        .waitSeconds(0.0)
+                        .andThen(centerToReefCommand.unless(() -> !centerToReef))
         //
         );
     }
@@ -171,10 +179,14 @@ public class RobotContainer {
                         .asProxy()
         //
         ));
-        m_arcadeController.b().onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef));
-        m_arcadeController.a().onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef));
-        m_arcadeController.x().onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef));
-        m_arcadeController.y().onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef));
+        m_arcadeController.b()
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef));
+        m_arcadeController.a()
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef));
+        m_arcadeController.x()
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef));
+        m_arcadeController.y()
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
                 RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_elevator, m_arm, m_sideToSide, m_lights,
                         m_coralSim),

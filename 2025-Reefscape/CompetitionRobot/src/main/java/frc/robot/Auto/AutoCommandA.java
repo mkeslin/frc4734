@@ -195,7 +195,7 @@ public class AutoCommandA {
                 centerToStationCommand,
                 // INTAKE
                 Commands.waitSeconds(3.0).until(() -> positionTracker.getCoralInTray()),
-                RobotCommands.returnToStartPositions(positionTracker, elevator, arm, sideToSide)
+                RobotCommands.intakeCoralCommand(positionTracker, elevator, arm, sideToSide)
         //
         );
 

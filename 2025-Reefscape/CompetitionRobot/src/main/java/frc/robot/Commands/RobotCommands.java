@@ -161,7 +161,7 @@ public class RobotCommands {
         return Commands.sequence(
                 // elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy(),
                 Commands.parallel(
-                        Commands.waitSeconds(0.5)
+                        Commands.waitSeconds(0.35)
                                 .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                         Commands.waitSeconds(0)
                                 .andThen(
@@ -170,7 +170,7 @@ public class RobotCommands {
                                 .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP)
                                         .asProxy())
                 //
-                )
+                ).unless(() -> positionTracker.getCoralInArm())
         //
         ).unless(() -> positionTracker.getCoralInArm());
     }
@@ -214,7 +214,7 @@ public class RobotCommands {
     // coralSim.setLocationCommand(CoralSimLocation.CLAW))));
     // }
 
-    public static Command returnToStartPositions(
+    public static Command intakeCoralCommand(
             PositionTracker positionTracker,
             Elevator elevator,
             Arm arm,
@@ -231,6 +231,25 @@ public class RobotCommands {
                         .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         //
         ).unless(() -> positionTracker.getCoralInArm());
+    }
+
+    public static Command postIntakeCoralCommand(
+            PositionTracker positionTracker,
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide) {
+        return Commands.parallel(
+                Commands
+                        .waitSeconds(0.0)
+                        .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy()),
+                Commands
+                        .waitSeconds(0.35)
+                        .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
+                Commands
+                        .waitSeconds(0.0)
+                        .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
+        //
+        );
     }
 
     // public static Command prepareAlgaeL2RemoveCommand(Elevator elevator, Arm arm) {
