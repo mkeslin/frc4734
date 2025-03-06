@@ -115,6 +115,9 @@ public class RobotContainer {
         resetZeros();
     }
 
+    private ScoreLevel m_previousScoreLevel = ScoreLevel.L4;
+    private ScoreSide m_previousScoreSide = ScoreSide.Left;
+
     private void configureMechanismBindings() {
         // GO TO PRE-INTAKE
         m_mechanismController.a()
@@ -173,38 +176,72 @@ public class RobotContainer {
         var centerToReef = true;
 
         m_arcadeController.rightTrigger().onTrue(Commands.sequence(
-                // RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_positionTracker, m_elevator, m_arm,
-                //         m_sideToSide, m_lights),
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
                         .withTimeout(0.15)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
         //
-        ));
+        ).finallyDo(() -> {
+            m_previousScoreLevel = ScoreLevel.L2;
+            m_previousScoreSide = ScoreSide.Left;
+        }));
         m_arcadeController.b()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef));
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef)
+                        .finallyDo(() -> {
+                            System.out.println("L3-Left");
+                            m_previousScoreLevel = ScoreLevel.L3;
+                            m_previousScoreSide = ScoreSide.Left;
+                        }));
         m_arcadeController.a()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef));
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef)
+                        .finallyDo(() -> {
+                            m_previousScoreLevel = ScoreLevel.L4;
+                            m_previousScoreSide = ScoreSide.Left;
+                        }));
         m_arcadeController.x()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef));
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef)
+                        .finallyDo(() -> {
+                            m_previousScoreLevel = ScoreLevel.L4;
+                            m_previousScoreSide = ScoreSide.Right;
+                        }));
         m_arcadeController.y()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef));
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef)
+                        .finallyDo(() -> {
+                            System.out.println("L3-Right");
+                            m_previousScoreLevel = ScoreLevel.L3;
+                            m_previousScoreSide = ScoreSide.Right;
+                        }));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
-                // RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_positionTracker, m_elevator, m_arm,
-                //         m_sideToSide, m_lights),
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
                         .withTimeout(0.15)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
         //
-        ));
+        ).finallyDo(() -> {
+            m_previousScoreLevel = ScoreLevel.L2;
+            m_previousScoreSide = ScoreSide.Right;
+        }));
 
-        m_arcadeController.leftBumper()
-                .onTrue(RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights));
-        m_arcadeController.leftTrigger()
-                .onTrue(RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights));
+        var scoreCommand = Commands.sequence(
+                // move arm down
+                RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights),
+                // move forward to set coral if not completely placed
+                Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0)).withTimeout(0.15)
+                        .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                        .asProxy(),
+                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(0.65)
+                        .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                        .asProxy(),
+                RobotCommands.preIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights)
+                        .onlyIf(() -> !m_positionTracker.getCoralInArm()),
+                prepareScoreCoralAndCenterToReefCommand(m_previousScoreLevel, m_previousScoreSide, false)
+                        .onlyIf(() -> m_positionTracker.getCoralInArm())
+        //
+        );
+        m_arcadeController.leftBumper().onTrue(scoreCommand);
+        m_arcadeController.leftTrigger().onTrue(scoreCommand);
 
         // LOGGING & SYSID
         // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
@@ -217,16 +254,16 @@ public class RobotContainer {
     }
 
     // public void configureLightsBindings() {
-    //     // m_lights.setDefaultCommand(
-    //     // m_lights.setColors(
-    //     // (int) (m_driveController.getLeftTriggerAxis() * 255),
-    //     // (int) (m_driveController.getRightTriggerAxis() * 255),
-    //     // (int) (m_driveController.getLeftX() * 255)
-    //     // )
-    //     // );
+    // // m_lights.setDefaultCommand(
+    // // m_lights.setColors(
+    // // (int) (m_driveController.getLeftTriggerAxis() * 255),
+    // // (int) (m_driveController.getRightTriggerAxis() * 255),
+    // // (int) (m_driveController.getLeftX() * 255)
+    // // )
+    // // );
 
-    //     // m_driveController.y().onTrue(Commands.runOnce(() ->
-    //     // m_lights.incrementAnimation(), m_lights));
+    // // m_driveController.y().onTrue(Commands.runOnce(() ->
+    // // m_lights.incrementAnimation(), m_lights));
     // }
 
     public void localizeRobotPose() {
