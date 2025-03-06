@@ -7,17 +7,11 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.PositionTracker;
-import frc.robot.Commands.RobotCommands;
-import frc.robot.Constants.ScoreLevel;
-import frc.robot.Constants.ScoreSide;
 import frc.robot.Subsystems.Arm;
-import frc.robot.Subsystems.CoralSim;
-import frc.robot.Subsystems.CoralSim.CoralSimLocation;
-import frc.robot.Subsystems.CoralSim.CoralSimScoreLocation;
 import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
 import frc.robot.Subsystems.Cameras.Limelight;
-import frc.robot.Subsystems.Lights;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /*

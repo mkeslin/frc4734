@@ -156,11 +156,11 @@ public class AutoCommandA {
                                 .andThen(drivetrain.followPathCommand(pathToReef)),
                         // PRE-POSITION CORAL
                         Commands.waitSeconds(0.2)
-                                .andThen(RobotCommands.movePostIntakeCoralCommand(elevator, arm, sideToSide, lights))
+                                .andThen(RobotCommands.postIntakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights))
                 //
                 ),
                 // POSITION CORAL, CENTER, & SCORE
-                CommandProcessor.sequence(
+                Commands.sequence(
                         // POSITION CORAL
                         RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide, drivetrain,
                                 elevator, arm, sideToSide, lights, reefLimelight),
