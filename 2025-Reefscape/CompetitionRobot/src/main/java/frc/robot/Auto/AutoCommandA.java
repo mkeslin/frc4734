@@ -149,34 +149,43 @@ public class AutoCommandA {
         var centerToStationCommand = new CenterToStationCommand(stationLimelight, drivetrain, null);
 
         Command command = Commands.sequence(
-                // DRIVE TO REEF & POSITION CORAL
+                // DRIVE TO REEF & PRE-POSITION CORAL
                 Commands.parallel(
+                        // DRIVE TO REEF
                         Commands.waitSeconds(0.0)
                                 .andThen(drivetrain.followPathCommand(pathToReef)),
+                        // PRE-POSITION CORAL
                         Commands.waitSeconds(0.2)
-                                .andThen(RobotCommands.movePostIntakeCoralCommand(elevator, arm, sideToSide, lights))),
-                Commands.waitSeconds((0.0))
-                        .andThen(RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide, drivetrain,
-                                elevator, arm, sideToSide, lights, reefLimelight))
-                        .andThen(centerToReefCommand),
-                // //
-                // // ),
-                // SCORE
-                RobotCommands.scoreCoralCommand(positionTracker, drivetrain, elevator, arm, lights),
-                // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
-                // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0))),
+                                .andThen(RobotCommands.movePostIntakeCoralCommand(elevator, arm, sideToSide, lights))
+                //
+                ),
+                // POSITION CORAL, CENTER, & SCORE
+                CommandProcessor.sequence(
+                        // POSITION CORAL
+                        RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide, drivetrain,
+                                elevator, arm, sideToSide, lights, reefLimelight),
+                        // CENTER
+                        centerToReefCommand,
+                        // SCORE
+                        RobotCommands.scoreCoralCommand(positionTracker, drivetrain, elevator, arm, lights),
+                        // REVERSE
+                        Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
+                                .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                //
+                ).until(() -> !positionTracker.getCoralInArm()),
+                // PRE-INTAKE & DRIVE TO CORAL STATION
                 Commands.parallel(
                         // PRE-INTAKE
-                        Commands.waitSeconds(0.4)
+                        Commands.waitSeconds(0.0)
                                 .andThen(RobotCommands.preIntakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights)),
                         // DRIVE TO CORAL STATION
-                        Commands.waitSeconds(0.0)
+                        Commands.waitSeconds(0.35)
                                 .andThen(drivetrain.followPathCommand(pathToCoralStation))
                 //
                 ),
                 centerToStationCommand,
                 // INTAKE
-                Commands.waitSeconds(3.0).until(() -> positionTracker.getCoralInTray()),
+                Commands.waitSeconds(15.0).until(() -> positionTracker.getCoralInTray()),
                 RobotCommands.intakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights)
         //
         );
