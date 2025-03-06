@@ -14,9 +14,6 @@ import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
 import frc.robot.Subsystems.Arm;
-import frc.robot.Subsystems.CoralSim;
-import frc.robot.Subsystems.CoralSim.CoralSimLocation;
-import frc.robot.Subsystems.CoralSim.CoralSimScoreLocation;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
@@ -27,6 +24,7 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * Command that executes during autonomous mode
  */
 public class AutoCommandA {
+
     public static AutoRoutine StartingPosition1(
             PositionTracker positionTracker,
             CenterToReefCommand centerToReefCommand,
@@ -36,8 +34,7 @@ public class AutoCommandA {
             SideToSide sideToSide,
             Lights lights,
             Limelight reefLimelight,
-            Limelight stationLimelight,
-            CoralSim coralSim) {
+            Limelight stationLimelight) {
         PathPlannerPath Start_A = null;
         PathPlannerPath A_Pickup1 = null;
         PathPlannerPath Pickup1_F = null;
@@ -52,14 +49,11 @@ public class AutoCommandA {
         }
         var command = Commands.sequence(
                 GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights,
-                        reefLimelight, stationLimelight, coralSim),
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights,
-                        reefLimelight, stationLimelight, coralSim),
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights,
-                        reefLimelight, stationLimelight, coralSim)
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
         //
         );
         return new AutoRoutine("Routine 1", command,
@@ -76,8 +70,7 @@ public class AutoCommandA {
             SideToSide sideToSide,
             Lights lights,
             Limelight reefLimelight,
-            Limelight stationLimelight,
-            CoralSim coralSim) {
+            Limelight stationLimelight) {
         PathPlannerPath Start_B = null;
         PathPlannerPath B_Pickup2 = null;
         PathPlannerPath Pickup2_D = null;
@@ -92,14 +85,11 @@ public class AutoCommandA {
         }
         var command = Commands.sequence(
                 GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights,
-                        reefLimelight, stationLimelight, coralSim),
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights,
-                        reefLimelight, stationLimelight, coralSim),
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights,
-                        reefLimelight, stationLimelight, coralSim)
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
         //
         );
         return new AutoRoutine("Routine 2", command,
@@ -116,8 +106,7 @@ public class AutoCommandA {
             SideToSide sideToSide,
             Lights lights,
             Limelight reefLimelight,
-            Limelight stationLimelight,
-            CoralSim coralSim) {
+            Limelight stationLimelight) {
         PathPlannerPath Start_C = null;
         PathPlannerPath C_Pickup2 = null;
         PathPlannerPath Pickup2_D = null;
@@ -132,14 +121,11 @@ public class AutoCommandA {
         }
         var command = Commands.sequence(
                 GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights,
-                        reefLimelight, stationLimelight, coralSim),
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights,
-                        reefLimelight, stationLimelight, coralSim),
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights,
-                        reefLimelight, stationLimelight, coralSim)
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
         //
         );
         return new AutoRoutine("Routine 3", command,
@@ -158,35 +144,31 @@ public class AutoCommandA {
             SideToSide sideToSide,
             Lights lights,
             Limelight reefLimelight,
-            Limelight stationLimelight,
-            CoralSim coralSim) {
+            Limelight stationLimelight) {
         var centerToReefCommand = new CenterToReefCommand(stationLimelight, drivetrain, null);
         var centerToStationCommand = new CenterToStationCommand(stationLimelight, drivetrain, null);
 
         Command command = Commands.sequence(
                 // DRIVE TO REEF & POSITION CORAL
-                // Commands.parallel(
-                // drivetrain.moveToPose(new Pose2d()));
-                Commands.waitSeconds(0.0)
-                        .andThen(drivetrain.followPathCommand(pathToReef)),
-                // Commands.waitSeconds(0.2)
-                // .andThen(RobotCommands.movePostIntakeCoralCommand(elevator, arm, sideToSide, lights,
-                // coralSim)))
+                Commands.parallel(
+                        Commands.waitSeconds(0.0)
+                                .andThen(drivetrain.followPathCommand(pathToReef)),
+                        Commands.waitSeconds(0.2)
+                                .andThen(RobotCommands.movePostIntakeCoralCommand(elevator, arm, sideToSide, lights))),
                 Commands.waitSeconds((0.0))
                         .andThen(RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide, drivetrain,
-                                elevator, arm, sideToSide, lights, reefLimelight, coralSim))
+                                elevator, arm, sideToSide, lights, reefLimelight))
                         .andThen(centerToReefCommand),
                 // //
                 // // ),
                 // SCORE
-                RobotCommands.scoreCoralCommand(positionTracker, drivetrain, elevator, arm, lights, coralSim),
+                RobotCommands.scoreCoralCommand(positionTracker, drivetrain, elevator, arm, lights),
                 // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
                 // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0))),
                 Commands.parallel(
                         // PRE-INTAKE
                         Commands.waitSeconds(0.4)
-                                .andThen(RobotCommands.preIntakeCoralCommand(positionTracker, elevator, arm,
-                                        sideToSide, lights, coralSim)),
+                                .andThen(RobotCommands.preIntakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights)),
                         // DRIVE TO CORAL STATION
                         Commands.waitSeconds(0.0)
                                 .andThen(drivetrain.followPathCommand(pathToCoralStation))
@@ -200,11 +182,5 @@ public class AutoCommandA {
         );
 
         return command;
-    }
-
-    public static Command simulateCoral(CoralSimScoreLocation scoreLocation, CoralSim coralSim) {
-        return Commands.sequence(
-                coralSim.setLocationCommand(CoralSimLocation.HIDDEN),
-                coralSim.addScoringLocationCommand(scoreLocation));
     }
 }

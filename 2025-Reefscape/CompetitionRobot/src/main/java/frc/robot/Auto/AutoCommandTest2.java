@@ -31,8 +31,7 @@ public class AutoCommandTest2 {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight,
-            CoralSim coralSim) {
+            Limelight reefLimelight) {
         PathPlannerPath Start_GPath = null; // PathPlannerPath.fromPathFile("Start-G");
         PathPlannerPath G_PickupPath = null; // PathPlannerPath.fromPathFile("G-Pickup");
         PathPlannerPath Pickup_DPath = null; // PathPlannerPath.fromPathFile("Pickup-D");
@@ -79,11 +78,5 @@ public class AutoCommandTest2 {
         return new AutoRoutine("GDC", command,
                 List.of(Start_GPath, G_PickupPath, Pickup_DPath, D_PickupPath, Pickup_CPath),
                 Start_GPath.getStartingDifferentialPose());
-    }
-
-    public static Command simulateCoral(CoralSimScoreLocation scoreLocation, CoralSim coralSim) {
-        return Commands.sequence(
-                coralSim.setLocationCommand(CoralSimLocation.HIDDEN),
-                coralSim.addScoringLocationCommand(scoreLocation));
     }
 }

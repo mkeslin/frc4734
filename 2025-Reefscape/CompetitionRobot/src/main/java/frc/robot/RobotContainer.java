@@ -26,7 +26,6 @@ import frc.robot.Controllers.ControllerIds;
 import frc.robot.State.StateMachine;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Climber;
-import frc.robot.Subsystems.CoralSim;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
@@ -56,7 +55,6 @@ public class RobotContainer {
     private SideToSide m_sideToSide = new SideToSide(m_positionTracker);
     private Climber m_climber = new Climber(m_positionTracker);
     private Lights m_lights = new Lights();
-    private CoralSim m_coralSim = new CoralSim(m_drivetrain::getPose, m_arm::getClawComponentPose);
 
     private DigitalInput m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
     private DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
@@ -121,7 +119,7 @@ public class RobotContainer {
         // GO TO PRE-INTAKE
         m_mechanismController.a()
                 .onTrue(RobotCommands.preIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
-                        m_lights, m_coralSim));
+                        m_lights));
 
         // INTAKE & POST-INTAKE
         m_mechanismController.b().onTrue(
@@ -163,7 +161,7 @@ public class RobotContainer {
                 Commands
                         .waitSeconds(0.0)
                         .andThen(RobotCommands.prepareScoreCoralCommand(m_positionTracker, scoreLevel, scoreSide,
-                                m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight, m_coralSim)),
+                                m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight)),
                 Commands
                         .waitSeconds(0.0)
                         .andThen(centerToReefCommand.unless(() -> !centerToReef))
@@ -176,8 +174,7 @@ public class RobotContainer {
 
         m_arcadeController.rightTrigger().onTrue(Commands.sequence(
                 // RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_positionTracker, m_elevator, m_arm,
-                //         m_sideToSide, m_lights,
-                //         m_coralSim),
+                //         m_sideToSide, m_lights),
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
                         .withTimeout(0.15)
@@ -195,7 +192,7 @@ public class RobotContainer {
                 .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
                 // RobotCommands.moveIntermediatePrepareScoreCoralCommand(m_positionTracker, m_elevator, m_arm,
-                //         m_sideToSide, m_lights, m_coralSim),
+                //         m_sideToSide, m_lights),
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
                         .withTimeout(0.15)
@@ -205,11 +202,9 @@ public class RobotContainer {
         ));
 
         m_arcadeController.leftBumper()
-                .onTrue(RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights,
-                        m_coralSim));
+                .onTrue(RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights));
         m_arcadeController.leftTrigger()
-                .onTrue(RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights,
-                        m_coralSim));
+                .onTrue(RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights));
 
         // LOGGING & SYSID
         // m_arcadeController.leftTrigger().onTrue(Commands.runOnce(SignalLogger::start));
@@ -260,13 +255,13 @@ public class RobotContainer {
         AutoManager.getInstance()
                 .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, m_centerToReefCommand, m_drivetrain,
                         m_elevator, m_arm,
-                        m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
+                        m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
         // AutoManager.getInstance()
         // .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_drivetrain, m_elevator, m_arm,
-        // m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
+        // m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
         // AutoManager.getInstance()
         // .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_drivetrain, m_elevator, m_arm,
-        // m_sideToSide, m_lights, m_reef_limelight, m_station_limelight, m_coralSim));
+        // m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
 
         SmartDashboard.putData("Auto Mode (manager)", AutoManager.getInstance().chooser);
     }

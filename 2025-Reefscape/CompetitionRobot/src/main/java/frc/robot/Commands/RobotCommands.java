@@ -13,7 +13,6 @@ import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
 import frc.robot.State.StateMachine;
 import frc.robot.State.StateMachineStateName;
 import frc.robot.Subsystems.Arm;
-import frc.robot.Subsystems.CoralSim;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
@@ -28,8 +27,7 @@ public class RobotCommands {
     //         Elevator elevator,
     //         Arm arm,
     //         SideToSide sideToSide,
-    //         Lights lights,
-    //         CoralSim coralSim) {
+    //         Lights lights) {
     //     return Commands.parallel(
     //             // Commands.runOnce(() -> lights.setColors(0, 255, 0)).asProxy(),
     //             Commands.waitSeconds(0.35)
@@ -51,8 +49,7 @@ public class RobotCommands {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight,
-            CoralSim coralSim) {
+            Limelight reefLimelight) {
         ElevatorPosition elevatorPosition;
         ArmPosition armPosition;
         SideToSidePosition sideToSidePosition;
@@ -125,8 +122,7 @@ public class RobotCommands {
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
             Arm arm,
-            Lights lights,
-            CoralSim coralSim) {
+            Lights lights) {
         Map<ScoreLevel, Command> commandMap = Map.ofEntries(
                 Map.entry(ScoreLevel.L1, Commands.none()),
                 Map.entry(ScoreLevel.L2, arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy()),
@@ -144,8 +140,7 @@ public class RobotCommands {
             Elevator elevator,
             Arm arm,
             SideToSide sideToSide,
-            Lights lights,
-            CoralSim coralSim) {
+            Lights lights) {
         return Commands.sequence(
                 // elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy(),
                 Commands.parallel(
