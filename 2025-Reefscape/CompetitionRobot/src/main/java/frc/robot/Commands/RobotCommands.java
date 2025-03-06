@@ -192,7 +192,7 @@ public class RobotCommands {
                         .waitSeconds(0.0)
                         .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy()),
                 Commands
-                        .waitSeconds(0.30)
+                        .waitSeconds(0.40)
                         .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
                 Commands
                         .waitSeconds(0.0)

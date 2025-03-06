@@ -52,7 +52,7 @@ public class CenterToReefCommand extends Command {
         m_limelight = limelight;
         m_drivetrain = drivetrain;
         m_driveController = driveController;
-        centerMethod = POSE;
+        centerMethod = CAMERA;
 
         for(int i = 6; i <= 11; i++) {
             tagPose = layout.getTagPose(i).get().toPose2d();
