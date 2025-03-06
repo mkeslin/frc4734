@@ -52,7 +52,7 @@ public class CenterToReefCommand extends Command {
         m_limelight = limelight;
         m_drivetrain = drivetrain;
         m_driveController = driveController;
-        centerMethod = CAMERA;
+        centerMethod = POSE;
 
         for(int i = 6; i <= 11; i++) {
             tagPose = layout.getTagPose(i).get().toPose2d();
@@ -149,9 +149,10 @@ public class CenterToReefCommand extends Command {
         if(method == POSE) {
             Pose2d target = getClosestAprilTagTarget();
             double tagRot = target.getRotation().getDegrees();
-            double targetRot = (tagRot < 180) ? tagRot + 180 : tagRot - 180;
+            double targetRot = (tagRot < 0) ? tagRot + 180 : tagRot - 180;
             SmartDashboard.putNumber("xTarget", target.getX());
             SmartDashboard.putNumber("yTarget", target.getY());
+            SmartDashboard.putNumber("omegaTarget", targetRot);
             xController.setSetpoint(target.getX());
             yController.setSetpoint(target.getY());
             omegaController.setSetpoint(targetRot);
@@ -168,9 +169,12 @@ public class CenterToReefCommand extends Command {
             SmartDashboard.putNumber("xPos", position.getX());
             SmartDashboard.putNumber("yPos", position.getY());
             SmartDashboard.putNumber("omegaPos", position.getRotation().getDegrees());
-            xSpeed = Math.signum(position.getRotation().getCos()) * xController.calculate(position.getX());
-            ySpeed = Math.signum(position.getRotation().getCos()) * yController.calculate(position.getY());
-            omegaSpeed = omegaController.calculate(position.getRotation().getDegrees());
+            if(Math.abs(omegaController.getSetpoint()) == 180 && Math.signum(omegaController.getSetpoint()) != Math.signum(position.getRotation().getDegrees())) {
+                omegaController.setSetpoint(-omegaController.getSetpoint());
+            }
+            xSpeed = 0;//2 * Math.signum(position.getRotation().getCos()) * xController.calculate(position.getX());
+            ySpeed = 0;//2 * Math.signum(position.getRotation().getCos()) * yController.calculate(position.getY());
+            omegaSpeed = 0;//omegaController.calculate(position.getRotation().getDegrees());
             //getSpeeds();
         } else if(method == CAMERA) {
             xSpeed = xController.calculate(m_limelight.getArea());

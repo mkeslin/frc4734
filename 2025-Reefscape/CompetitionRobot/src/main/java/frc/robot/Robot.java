@@ -25,6 +25,9 @@ public class Robot extends TimedRobot {
         FollowPathCommand.warmupCommand().schedule();
         PathfindingCommand.warmupCommand().schedule();
 
+        int[] validIDs = {1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 20, 21, 22};
+        LimelightHelpers.SetFiducialIDFiltersOverride("limelight-one", validIDs);
+
         // LiveWindow is essentially deprecated, and HoundLog is a much better
         // replacement. LiveWindow is still active during test mode by default, but it
         // consumes an inordinate amount of bandwidth, so we disable it.
