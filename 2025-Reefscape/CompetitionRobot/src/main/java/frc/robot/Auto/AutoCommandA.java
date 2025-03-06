@@ -173,20 +173,20 @@ public class AutoCommandA {
                 // .andThen(RobotCommands.movePostIntakeCoralCommand(elevator, arm, sideToSide, lights,
                 // coralSim)))
                 Commands.waitSeconds((0.0))
-                        .andThen(RobotCommands.prepareScoreCoralCommand(ScoreLevel.L4, scoreSide, drivetrain,
+                        .andThen(RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide, drivetrain,
                                 elevator, arm, sideToSide, lights, reefLimelight, coralSim))
                         .andThen(centerToReefCommand),
                 // //
                 // // ),
                 // SCORE
-                RobotCommands.scoreCoralCommand(drivetrain, elevator, arm, lights, coralSim),
+                RobotCommands.scoreCoralCommand(positionTracker, drivetrain, elevator, arm, lights, coralSim),
                 // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
                 // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0))),
                 Commands.parallel(
                         // PRE-INTAKE
                         Commands.waitSeconds(0.4)
-                                .andThen(RobotCommands.prepareIntakeCoralCommand(positionTracker, elevator, arm,
-                                        sideToSide, coralSim)),
+                                .andThen(RobotCommands.preIntakeCoralCommand(positionTracker, elevator, arm,
+                                        sideToSide, lights, coralSim)),
                         // DRIVE TO CORAL STATION
                         Commands.waitSeconds(0.0)
                                 .andThen(drivetrain.followPathCommand(pathToCoralStation))
@@ -195,7 +195,7 @@ public class AutoCommandA {
                 centerToStationCommand,
                 // INTAKE
                 Commands.waitSeconds(3.0).until(() -> positionTracker.getCoralInTray()),
-                RobotCommands.returnToStartPositions(positionTracker, elevator, arm, sideToSide)
+                RobotCommands.intakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights)
         //
         );
 
