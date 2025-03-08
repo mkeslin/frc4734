@@ -88,9 +88,9 @@ public class SwerveDrivetrainA {
     private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration()
             .withCurrentLimits(
                     new CurrentLimitsConfigs()
-                            .withSupplyCurrentLimit(120)
+                            .withSupplyCurrentLimit(90)
                             .withSupplyCurrentLimitEnable(true)
-                            .withStatorCurrentLimit(Amps.of(75))
+                            .withStatorCurrentLimit(Amps.of(70))
                             .withStatorCurrentLimitEnable(true));
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
             .withCurrentLimits(
