@@ -177,7 +177,7 @@ public class RobotContainer {
 
         m_arcadeController.rightTrigger().onTrue(Commands.sequence(
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef),
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
+                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
                         .withTimeout(0.15)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
@@ -214,7 +214,7 @@ public class RobotContainer {
                         }));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0))
+                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
                         .withTimeout(0.15)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
