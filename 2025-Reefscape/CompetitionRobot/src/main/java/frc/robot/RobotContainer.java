@@ -22,6 +22,7 @@ import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
+import frc.robot.Constants.ArmConstants.ArmPosition;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.State.StateMachine;
 import frc.robot.Subsystems.Arm;
@@ -115,9 +116,6 @@ public class RobotContainer {
         resetZeros();
     }
 
-    private ScoreLevel m_previousScoreLevel = ScoreLevel.L4;
-    private ScoreSide m_previousScoreSide = ScoreSide.Left;
-
     private void configureMechanismBindings() {
         // GO TO PRE-INTAKE
         m_mechanismController.a()
@@ -182,36 +180,15 @@ public class RobotContainer {
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
         //
-        ).andThen(() -> {
-            m_previousScoreLevel = ScoreLevel.L2;
-            m_previousScoreSide = ScoreSide.Left;
-        }));
+        ));
         m_arcadeController.b()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef)
-                        .andThen(() -> {
-                            System.out.println("L3-Left");
-                            m_previousScoreLevel = ScoreLevel.L3;
-                            m_previousScoreSide = ScoreSide.Left;
-                        }));
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef));
         m_arcadeController.a()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef)
-                        .andThen(() -> {
-                            m_previousScoreLevel = ScoreLevel.L4;
-                            m_previousScoreSide = ScoreSide.Left;
-                        }));
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef));
         m_arcadeController.x()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef)
-                        .andThen(() -> {
-                            m_previousScoreLevel = ScoreLevel.L4;
-                            m_previousScoreSide = ScoreSide.Right;
-                        }));
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef));
         m_arcadeController.y()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef)
-                        .andThen(() -> {
-                            System.out.println("L3-Right");
-                            m_previousScoreLevel = ScoreLevel.L3;
-                            m_previousScoreSide = ScoreSide.Right;
-                        }));
+                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
@@ -219,10 +196,7 @@ public class RobotContainer {
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
         //
-        ).andThen(() -> {
-            m_previousScoreLevel = ScoreLevel.L2;
-            m_previousScoreSide = ScoreSide.Right;
-        }));
+        ));
 
         var scoreCommand = Commands.sequence(
                 // move arm down
@@ -236,7 +210,7 @@ public class RobotContainer {
                         .asProxy(),
                 RobotCommands.preIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights)
                         .onlyIf(() -> !m_positionTracker.getCoralInArm()),
-                prepareScoreCoralAndCenterToReefCommand(m_previousScoreLevel, m_previousScoreSide, false)
+                m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
                         .onlyIf(() -> m_positionTracker.getCoralInArm())
         //
         );
