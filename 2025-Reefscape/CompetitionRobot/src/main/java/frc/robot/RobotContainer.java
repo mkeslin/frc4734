@@ -182,32 +182,32 @@ public class RobotContainer {
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
         //
-        ).finallyDo(() -> {
+        ).andThen(() -> {
             m_previousScoreLevel = ScoreLevel.L2;
             m_previousScoreSide = ScoreSide.Left;
         }));
         m_arcadeController.b()
                 .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef)
-                        .finallyDo(() -> {
+                        .andThen(() -> {
                             System.out.println("L3-Left");
                             m_previousScoreLevel = ScoreLevel.L3;
                             m_previousScoreSide = ScoreSide.Left;
                         }));
         m_arcadeController.a()
                 .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef)
-                        .finallyDo(() -> {
+                        .andThen(() -> {
                             m_previousScoreLevel = ScoreLevel.L4;
                             m_previousScoreSide = ScoreSide.Left;
                         }));
         m_arcadeController.x()
                 .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef)
-                        .finallyDo(() -> {
+                        .andThen(() -> {
                             m_previousScoreLevel = ScoreLevel.L4;
                             m_previousScoreSide = ScoreSide.Right;
                         }));
         m_arcadeController.y()
                 .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef)
-                        .finallyDo(() -> {
+                        .andThen(() -> {
                             System.out.println("L3-Right");
                             m_previousScoreLevel = ScoreLevel.L3;
                             m_previousScoreSide = ScoreSide.Right;
@@ -219,7 +219,7 @@ public class RobotContainer {
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
         //
-        ).finallyDo(() -> {
+        ).andThen(() -> {
             m_previousScoreLevel = ScoreLevel.L2;
             m_previousScoreSide = ScoreSide.Right;
         }));
