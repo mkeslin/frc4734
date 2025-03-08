@@ -35,7 +35,7 @@ public class CenterToReefCommand extends Command {
     private final PIDController yController = new PIDController(0.03, 0, 0);
     private final PIDController omegaController = new PIDController(0.03, 0, 0);
 
-    private double DISTANCE_FROM_APRILTAG = 0.5;
+    private double DISTANCE_FROM_APRILTAG = 0.75;
     
     private double POSE_X_ERROR = 0.05;
     private double POSE_Y_ERROR = 0.05;
@@ -52,7 +52,7 @@ public class CenterToReefCommand extends Command {
         m_limelight = limelight;
         m_drivetrain = drivetrain;
         m_driveController = driveController;
-        centerMethod = POSE;
+        centerMethod = CAMERA;
 
         for(int i = 6; i <= 11; i++) {
             tagPose = layout.getTagPose(i).get().toPose2d();
@@ -172,9 +172,9 @@ public class CenterToReefCommand extends Command {
             if(Math.abs(omegaController.getSetpoint()) == 180 && Math.signum(omegaController.getSetpoint()) != Math.signum(position.getRotation().getDegrees())) {
                 omegaController.setSetpoint(-omegaController.getSetpoint());
             }
-            xSpeed = 0;//2 * Math.signum(position.getRotation().getCos()) * xController.calculate(position.getX());
-            ySpeed = 0;//2 * Math.signum(position.getRotation().getCos()) * yController.calculate(position.getY());
-            omegaSpeed = 0;//omegaController.calculate(position.getRotation().getDegrees());
+            xSpeed = 2 * Math.signum(position.getRotation().getCos()) * xController.calculate(position.getX());
+            ySpeed = 2 * Math.signum(position.getRotation().getCos()) * yController.calculate(position.getY());
+            omegaSpeed = omegaController.calculate(position.getRotation().getDegrees());
             //getSpeeds();
         } else if(method == CAMERA) {
             xSpeed = xController.calculate(m_limelight.getArea());
