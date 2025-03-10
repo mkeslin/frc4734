@@ -201,16 +201,29 @@ public class AutoCommandA {
                 ),
                 // POSITION CORAL, CENTER, & SCORE
                 Commands.sequence(
-                        // POSITION CORAL
-                        RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide, drivetrain,
-                                elevator, arm, sideToSide, lights, reefLimelight),
-                        // CENTER
-                        centerToReefCommand,
+                        Commands.parallel(
+                                // POSITION CORAL
+                                RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide,
+                                        drivetrain, elevator, arm, sideToSide, lights, reefLimelight),
+                                // CENTER
+                                centerToReefCommand
+                        //
+                        ),
+                        // // POSITION CORAL
+                        // RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide, drivetrain,
+                        // elevator, arm, sideToSide, lights, reefLimelight),
+                        // // CENTER
+                        // centerToReefCommand,
                         // SCORE
                         RobotCommands.scoreCoralCommand(positionTracker, drivetrain, elevator, arm, lights),
-                        // REVERSE
-                        Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
+                        // MOVE FORWARD - set coral if not completely placed
+                        Commands.run(() -> drivetrain.setRelativeSpeed(0.5, 0, 0)).withTimeout(0.15)
                                 .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                                .asProxy(),
+                        // MOVE REVERSE
+                        Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(0.65)
+                                .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                                .asProxy()
                 //
                 ).until(() -> !positionTracker.getCoralInArm()),
                 // PRE-INTAKE & DRIVE TO CORAL STATION
