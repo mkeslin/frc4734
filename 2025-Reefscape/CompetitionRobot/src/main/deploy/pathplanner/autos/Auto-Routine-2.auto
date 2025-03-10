@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "2-Start-B"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "2-B-Pickup2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2-Pickup2-D"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2-D-Pickup2"
           }
         }
       ]

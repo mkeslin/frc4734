@@ -61,8 +61,8 @@ public class RobotContainer {
     // COMMANDS
     public CenterToReefCommand m_centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain,
             m_driveController);
-    public CenterToStationCommand m_centerToStationCommand = new CenterToStationCommand(m_station_limelight,
-            m_drivetrain, m_driveController);
+    public CenterToStationCommand m_centerToStationCommand = new CenterToStationCommand(m_positionTracker,
+            m_station_limelight, m_drivetrain, m_driveController);
 
     public RobotContainer() {
         // register named commands
@@ -242,25 +242,25 @@ public class RobotContainer {
     // }
 
     public void localizeRobotPose() {
-        boolean doRejectUpdate = false;
-        LimelightHelpers.SetRobotOrientation("limelight-one",
-                Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
-                0, 0, 0, 0, 0);
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-one");
-        if (mt2 == null || mt2.tagCount == 0) {
-            return;
-        }
-        // if our angular velocity is greater than 720 degrees per second, ignore vision
-        // updates
-        if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
-            doRejectUpdate = true;
-        }
-        if (!doRejectUpdate) {
-            m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-            m_drivetrain.addVisionMeasurement(
-                    mt2.pose,
-                    Utils.fpgaToCurrentTime(mt2.timestampSeconds));
-        }
+        // boolean doRejectUpdate = false;
+        // LimelightHelpers.SetRobotOrientation("limelight-one",
+        // Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
+        // 0, 0, 0, 0, 0);
+        // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-one");
+        // if (mt2 == null || mt2.tagCount == 0) {
+        // return;
+        // }
+        // // if our angular velocity is greater than 720 degrees per second, ignore vision
+        // // updates
+        // if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
+        // doRejectUpdate = true;
+        // }
+        // if (!doRejectUpdate) {
+        // m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        // m_drivetrain.addVisionMeasurement(
+        // mt2.pose,
+        // Utils.fpgaToCurrentTime(mt2.timestampSeconds));
+        // }
     }
 
     public void configureAuto() {
