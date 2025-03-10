@@ -48,19 +48,19 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
         var command = Commands.sequence(
-                GetDrivingPracticeCommand(Start_A, A_Pickup1, positionTracker, drivetrain, reefLimelight,
-                        stationLimelight),
-                GetDrivingPracticeCommand(Pickup1_F, F_Pickup1, positionTracker, drivetrain, reefLimelight,
-                        stationLimelight),
-                GetDrivingPracticeCommand(Pickup1_F, F_Pickup1, positionTracker, drivetrain, reefLimelight,
-                        stationLimelight)
+                // GetDrivingPracticeCommand(Start_A, A_Pickup1, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup1_F, F_Pickup1, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup1_F, F_Pickup1, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight)
 
-        // GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
-        // elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
-        // GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
-        // elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
-        // GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
-        // elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
+                GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
         //
         );
         return new AutoRoutine("Routine 1", command,
@@ -91,19 +91,19 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
         var command = Commands.sequence(
-                GetDrivingPracticeCommand(Start_B, B_Pickup2, positionTracker, drivetrain, reefLimelight,
-                        stationLimelight),
-                GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
-                        stationLimelight),
-                GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
-                        stationLimelight)
+                // GetDrivingPracticeCommand(Start_B, B_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight)
 
-        // GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-        // elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
-        // GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-        // elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
-        // GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-        // elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
+                GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
         //
         );
         return new AutoRoutine("Routine 2", command,
@@ -134,19 +134,19 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
         var command = Commands.sequence(
-                GetDrivingPracticeCommand(Start_C, C_Pickup2, positionTracker, drivetrain, reefLimelight,
-                        stationLimelight),
-                GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
-                        stationLimelight),
-                GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
-                        stationLimelight)
+                // GetDrivingPracticeCommand(Start_C, C_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight)
 
-        // GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-        // elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
-        // GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-        // elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
-        // GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-        // elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
+                GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
         //
         );
         return new AutoRoutine("Routine 3", command,
@@ -194,7 +194,7 @@ public class AutoCommandA {
                         Commands.waitSeconds(0.0)
                                 .andThen(drivetrain.followPathCommand(pathToReef)),
                         // PRE-POSITION CORAL
-                        Commands.waitSeconds(0.2)
+                        Commands.waitSeconds(0.1)
                                 .andThen(RobotCommands.postIntakeCoralCommand(positionTracker, elevator, arm,
                                         sideToSide, lights))
                 //
