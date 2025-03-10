@@ -19,10 +19,8 @@ import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
-import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
-import frc.robot.Constants.ArmConstants.ArmPosition;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.State.StateMachine;
 import frc.robot.Subsystems.Arm;
@@ -150,9 +148,9 @@ public class RobotContainer {
         m_driveController.rightTrigger().onTrue(m_centerToStationCommand);
         m_driveController.leftTrigger().onTrue(m_centerToReefCommand);
 
-        //m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
-        //m_driveController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
-        //m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
+        // m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
+        // m_driveController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
+        // m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
     }
 
     private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide,
@@ -210,7 +208,10 @@ public class RobotContainer {
                         .asProxy(),
                 RobotCommands.preIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights)
                         .onlyIf(() -> !m_positionTracker.getCoralInArm()),
-                m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
+                // m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
+                RobotCommands
+                        .prepareScoreCoralRetryCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_sideToSide,
+                                m_lights, m_reef_limelight)
                         .onlyIf(() -> m_positionTracker.getCoralInArm())
         //
         );
@@ -267,12 +268,14 @@ public class RobotContainer {
                 .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, m_centerToReefCommand, m_drivetrain,
                         m_elevator, m_arm,
                         m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
-        // AutoManager.getInstance()
-        // .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_drivetrain, m_elevator, m_arm,
-        // m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
-        // AutoManager.getInstance()
-        // .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_drivetrain, m_elevator, m_arm,
-        // m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
+        AutoManager.getInstance()
+                .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_centerToReefCommand, m_drivetrain,
+                        m_elevator, m_arm,
+                        m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
+        AutoManager.getInstance()
+                .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_centerToReefCommand, m_drivetrain,
+                        m_elevator, m_arm,
+                        m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
 
         SmartDashboard.putData("Auto Mode (manager)", AutoManager.getInstance().chooser);
     }

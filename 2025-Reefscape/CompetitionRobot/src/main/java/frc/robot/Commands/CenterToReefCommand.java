@@ -35,13 +35,16 @@ public class CenterToReefCommand extends Command {
     private final PIDController yController = new PIDController(0.03, 0, 0);
     private final PIDController omegaController = new PIDController(0.03, 0, 0);
 
+    // NOTE: Nick, please review
+    private double Y_OFFSET = -2.75;
+
     private double DISTANCE_FROM_APRILTAG = 0.75;
     
     private double POSE_X_ERROR = 0.05;
     private double POSE_Y_ERROR = 0.05;
     private double POSE_ANGLE_ERROR = 3;
 
-    private double CAMERA_AREA_GOAL = 40;
+    private double CAMERA_AREA_GOAL = 39;
     private double CAMERA_AREA_ERROR = 2;
     private double CAMERA_X_OFFSET_ERROR = 0.9;
     private double CAMERA_ANGLE_ERROR = 3;
@@ -158,7 +161,7 @@ public class CenterToReefCommand extends Command {
             omegaController.setSetpoint(targetRot);
         } else if(method == CAMERA) {
             xController.setSetpoint(CAMERA_AREA_GOAL);
-            yController.setSetpoint(0);
+            yController.setSetpoint(Y_OFFSET);
             omegaController.setSetpoint(0);
         }
     }

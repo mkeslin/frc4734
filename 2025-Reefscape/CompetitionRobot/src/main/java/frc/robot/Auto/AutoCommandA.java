@@ -114,8 +114,8 @@ public class AutoCommandA {
         try {
             Start_C = PathPlannerPath.fromPathFile("3-Start-C");
             C_Pickup2 = PathPlannerPath.fromPathFile("3-C-Pickup2");
-            Pickup2_D = PathPlannerPath.fromPathFile("3-Pickup2-D");
-            D_Pickup2 = PathPlannerPath.fromPathFile("3-D-Pickup2");
+            Pickup2_D = PathPlannerPath.fromPathFile("2-Pickup2-D");
+            D_Pickup2 = PathPlannerPath.fromPathFile("2-D-Pickup2");
         } catch (Exception exception) {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
