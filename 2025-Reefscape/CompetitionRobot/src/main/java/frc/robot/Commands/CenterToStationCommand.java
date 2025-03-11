@@ -19,18 +19,19 @@ public class CenterToStationCommand extends Command {
 
     private boolean driverInterrupted;
 
-    private final PIDController xController = new PIDController(0.15, 0, 0);
-    private final PIDController yController = new PIDController(0.03, 0, 0);
+    private final PIDController xController = new PIDController(.3, 0, 0);
+    private final PIDController yController = new PIDController(.1, 0, 0);
     private final PIDController omegaController = new PIDController(0.03, 0, 0);
 
-    private double AREA_GOAL = 4.8;
+    private double AREA_GOAL = 5.0;
     private double AREA_ERROR = 2;
     private double CAMERA_X_OFFSET_ERROR = 1;
     private double ANGLE_ERROR = 3;
 
     public Timer t = new Timer();
 
-    public CenterToStationCommand(PositionTracker positionTracker, Limelight limelight, CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
+    public CenterToStationCommand(PositionTracker positionTracker, Limelight limelight,
+            CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
         m_positionTracker = positionTracker;
         m_limelight = limelight;
         m_drivetrain = drivetrain;
@@ -64,21 +65,45 @@ public class CenterToStationCommand extends Command {
             xSpeed = 0;
             omegaSpeed = 0;
         }
-        //getSpeeds(xSpeed, ySpeed, omegaSpeed);
+        // getSpeeds(xSpeed, ySpeed, omegaSpeed);
         m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
-        if(m_driveController != null ) {
-            m_driveController.povUp().onTrue(Commands.runOnce(() -> {driverInterrupted = true;}));
+        if (m_driveController != null) {
+            m_driveController.povUp().onTrue(Commands.runOnce(() -> {
+                driverInterrupted = true;
+            }));
         }
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return t.hasElapsed(5) || 
-            m_positionTracker.getCoralInTray() ||
-            driverInterrupted || 
-            !m_limelight.hasTargets() || 
-            (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()); //|| (area > FINAL_AREA && x_offset < FINAL_X_OFFSET && yaw_degrees < FINAL_ANGLE_DEGREES);
+        if (t.hasElapsed(5)) {
+            System.out.println("Center to Station: time elapsed");
+            return true;
+        }
+        if (driverInterrupted) {
+            System.out.println("Center to Station: driver interrupted");
+            return true;
+        }
+        if (m_positionTracker.getCoralInTray()) {
+            System.out.println("Center to Station: coral acquired");
+            return true;
+        }
+        if (!m_limelight.hasTargets()) {
+            System.out.println("Center to Station: lost tag");
+            return true;
+        }
+        if (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()) {
+            System.out.println("Center to Station: centered");
+            return true;
+        }
+
+        return false;
+
+        // return t.hasElapsed(5) || m_positionTracker.getCoralInTray() || driverInterrupted ||
+        // !m_limelight.hasTargets() || (xController.atSetpoint() && yController.atSetpoint() &&
+        // omegaController.atSetpoint()); //|| (area > FINAL_AREA && x_offset < FINAL_X_OFFSET && yaw_degrees <
+        // FINAL_ANGLE_DEGREES);
     }
 
     // Called once after isFinished returns true

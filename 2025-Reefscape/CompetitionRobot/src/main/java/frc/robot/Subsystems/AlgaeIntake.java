@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -72,8 +73,8 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
 
     public AlgaeIntake(
             PositionTracker positionTracker) {
-            /* MechanismLigament2d ligament */
-            // Supplier<Pose3d> carriagePoseSupplier) {
+        /* MechanismLigament2d ligament */
+        // Supplier<Pose3d> carriagePoseSupplier) {
         m_positionTracker = positionTracker;
         positionTracker.setAlgaeIntakeSpeedSupplier(this::getSpeed);
 
@@ -93,41 +94,40 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
 
         // setDefaultCommand(moveToCurrentGoalCommand());
 
-        var talonFxConfigs = new TalonFXConfiguration();
+        // var talonFxConfigs = new TalonFXConfiguration();
 
         // set slot 0 gains
-        var slot0Configs = talonFxConfigs.Slot0;
-        slot0Configs.kG = -0.2;
-        slot0Configs.kS = 0.25; 
-        slot0Configs.kV = 0.12; 
-        slot0Configs.kA = 0.01; 
-        slot0Configs.kP = 3.8; 
-        slot0Configs.kI = 0.0; 
-        slot0Configs.kD = 0.1; 
+        // var slot0Configs = talonFxConfigs.Slot0;
+        // slot0Configs.kS = 0.25;
+        // slot0Configs.kV = 0.12;
+        // slot0Configs.kA = 0.01;
+        // slot0Configs.kP = 3.8;
+        // slot0Configs.kI = 0.0;
+        // slot0Configs.kD = 0.1;
 
         // slot0Configs.kG = 0.25652;
-        // slot0Configs.kS = 0.0; 
-        // slot0Configs.kV = 0.1039; 
-        // slot0Configs.kA = 0.11164; 
-        // slot0Configs.kP = 46.911; 
-        // slot0Configs.kI = 0.0; 
-        // slot0Configs.kD = 3.1607; 
+        // slot0Configs.kS = 0.0;
+        // slot0Configs.kV = 0.1039;
+        // slot0Configs.kA = 0.11164;
+        // slot0Configs.kP = 46.911;
+        // slot0Configs.kI = 0.0;
+        // slot0Configs.kD = 3.1607;
         // slot0Configs.GravityType = GravityTypeValue.Arm_Cosine;
         // // slot0Configs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
         // set Motion Magic settings
-        var motionMagicConfigs = talonFxConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicAcceleration  = 400; // Target acceleration of 160 rps/s (0.5 seconds)
-        motionMagicConfigs.MotionMagicJerk  = 4000; // Target jerk of 1600 rps/s/s (0.1 seconds)
+        // var motionMagicConfigs = talonFxConfigs.MotionMagic;
+        // motionMagicConfigs.MotionMagicAcceleration = 400; // Target acceleration of 160 rps/s (0.5 seconds)
+        // motionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
         m_algaeIntakeMotor = new TalonFX(ALGAE_INTAKE_ID);
-        m_algaeIntakeMotor.setNeutralMode(NeutralModeValue.Brake);
+        // m_algaeIntakeMotor.setNeutralMode(NeutralModeValue.Brake);
 
         // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();
-        talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        // talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         // configs.CurrentLimits.SupplyCurrentLimit = 20;
         // configs.CurrentLimits.SupplyCurrentLimit = 40;
-        m_algaeIntakeMotor.getConfigurator().apply(talonFxConfigs);
+        // m_algaeIntakeMotor.getConfigurator().apply(talonFxConfigs);
 
         resetSpeed();
     }
@@ -147,14 +147,14 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
 
     // // @Log(groups = "components")
     // public Pose3d getArmComponentPose() {
-    //     return carriagePoseSupplier.get()
-    //             .plus(new Transform3d(0.083, 0, 0, new Rotation3d()))
-    //             .plus(new Transform3d(0, 0, 0, new Rotation3d(0, -getSpeed(), 0)));
+    // return carriagePoseSupplier.get()
+    // .plus(new Transform3d(0.083, 0, 0, new Rotation3d()))
+    // .plus(new Transform3d(0, 0, 0, new Rotation3d(0, -getSpeed(), 0)));
     // }
 
     // // @Log(groups = "components")
     // public Pose3d getClawComponentPose() {
-    //     return getArmComponentPose().plus(new Transform3d(0.2585, 0, 0, new Rotation3d()));
+    // return getArmComponentPose().plus(new Transform3d(0.2585, 0, 0, new Rotation3d()));
     // }
 
     // @Log
@@ -165,10 +165,10 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
 
     // @Log
     // public double getVelocity() {
-    //     // if (RobotBase.isReal())
-    //     return m_algaeIntakeMotor.getVelocity().getValueAsDouble();
-    //     // else
-    //     // return simVelocity;
+    // // if (RobotBase.isReal())
+    // return m_algaeIntakeMotor.getVelocity().getValueAsDouble();
+    // // else
+    // // return simVelocity;
     // }
 
     @Override
@@ -198,6 +198,13 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
     // m_armMotor.setVoltage(voltage);
     // }
 
+    public void moveToSpeed(double goalVelocity) {
+            // VelocityVoltage velocityOut = new VelocityVoltage(0);
+            // velocityOut.Slot = 0;
+            // m_algaeIntakeMotor.setControl(velocityOut.withVelocity(goalVelocity));
+            m_algaeIntakeMotor.set(goalVelocity);
+    }
+
     // @Override
     // public Command moveToCurrentGoalCommand() {
     // return run(() -> {
@@ -210,11 +217,19 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
     // }
     private Command moveToSpeedCommand(double goalVelocity) {
         return run(() -> {
-            m_algaeIntakeMotor.setControl(m_request.withVelocity(goalVelocity));
-            algaeIntakePub.set(m_positionTracker.getAlgaeIntakeSpeed());
+            VelocityVoltage velocityOut = new VelocityVoltage(0);
+            velocityOut.Slot = 0;
+            m_algaeIntakeMotor.setControl(velocityOut.withVelocity(goalVelocity));
         })
-                .until(() -> Math.abs(getSpeed() - goalVelocity) < .5)
+                // .until(() -> Math.abs(getSpeed() - goalVelocity) < .5)
                 .withName("algaeIntake.moveToSpeed");
+
+        // return run(() -> {
+        // m_algaeIntakeMotor.setControl(m_request.withVelocity(goalVelocity));
+        // algaeIntakePub.set(m_positionTracker.getAlgaeIntakeSpeed());
+        // })
+        // .until(() -> Math.abs(getSpeed() - goalVelocity) < .5)
+        // .withName("algaeIntake.moveToSpeed");
     }
 
     @Override

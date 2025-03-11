@@ -22,7 +22,7 @@ public class ElevatorConstants {
         L1(0.355),
         L2(0.355),
         L3(7.0),
-        L4(20),
+        L4(20.5),
         TOP(22.021484);
 
         public final double value;

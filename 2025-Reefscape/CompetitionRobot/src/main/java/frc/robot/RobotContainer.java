@@ -154,9 +154,9 @@ public class RobotContainer {
         //m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
 
         // INTAKE
-        m_driveController.a().onTrue(m_algaeIntake.moveToSetSpeedCommand(() -> AlgaeIntakeSpeed.FORWARD));
-        m_driveController.b().onTrue(m_algaeIntake.moveToSetSpeedCommand(() -> AlgaeIntakeSpeed.REVERSE));
-        m_driveController.y().onTrue(m_algaeIntake.moveToSetSpeedCommand(() -> AlgaeIntakeSpeed.STOPPED));
+        m_driveController.a().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.IN.value)));
+        m_driveController.b().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.OUT.value)));
+        m_driveController.y().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.STOPPED.value)));
     }
 
     private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide,
@@ -186,13 +186,27 @@ public class RobotContainer {
         //
         ));
         m_arcadeController.b()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef));
+                .onTrue(Commands.sequence(
+                    prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef),
+                    Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                            .withTimeout(0.15)
+                            .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                            .asProxy()
+            //
+            ));
         m_arcadeController.a()
                 .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef));
         m_arcadeController.x()
                 .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef));
         m_arcadeController.y()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef));
+                .onTrue(Commands.sequence(
+                    prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef),
+                    Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                            .withTimeout(0.15)
+                            .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                            .asProxy()
+            //
+            ));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))

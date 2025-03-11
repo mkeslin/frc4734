@@ -2,9 +2,13 @@ package frc.robot.Constants;
 
 public class SideToSideConstants {
     public static enum SideToSidePosition {
-        LEFT(27.7),
+        // LEFT(27.7),
+        // CENTER(0),
+        // RIGHT(-27.7);
+
+        LEFT(28),
         CENTER(0),
-        RIGHT(-27.7);
+        RIGHT(-28);
 
         public final double value;
 

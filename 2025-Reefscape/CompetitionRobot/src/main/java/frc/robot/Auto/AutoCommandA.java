@@ -225,7 +225,7 @@ public class AutoCommandA {
                                 .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 .asProxy()
                 //
-                ).until(() -> !positionTracker.getCoralInArm()),
+                ).repeatedly().unless(() -> !positionTracker.getCoralInArm()),
                 // PRE-INTAKE & DRIVE TO CORAL STATION
                 Commands.parallel(
                         // PRE-INTAKE

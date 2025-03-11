@@ -3,8 +3,8 @@ package frc.robot.Constants;
 public class AlgaeIntakeConstants {
     public static enum AlgaeIntakeSpeed {
         STOPPED(0),
-        FORWARD(2),
-        REVERSE(-2);
+        IN(0.3),
+        OUT(-0.3);
 
         public final double value;
 
