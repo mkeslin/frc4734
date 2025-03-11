@@ -23,12 +23,13 @@ public class CenterToStationCommand extends Command {
     private final PIDController yController = new PIDController(.1, 0, 0);
     private final PIDController omegaController = new PIDController(0.03, 0, 0);
 
-    private double AREA_GOAL = 5.0;
+    private double AREA_GOAL = 4.2;
     private double AREA_ERROR = 2;
     private double CAMERA_X_OFFSET_ERROR = 1;
     private double ANGLE_ERROR = 3;
 
     public Timer t = new Timer();
+    public Timer t_tray = new Timer();
 
     public CenterToStationCommand(PositionTracker positionTracker, Limelight limelight,
             CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
@@ -72,6 +73,10 @@ public class CenterToStationCommand extends Command {
                 driverInterrupted = true;
             }));
         }
+
+        if (m_positionTracker.getCoralInTray() && !t_tray.isRunning()) {
+            t_tray.start();
+        }
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -85,7 +90,7 @@ public class CenterToStationCommand extends Command {
             System.out.println("Center to Station: driver interrupted");
             return true;
         }
-        if (m_positionTracker.getCoralInTray()) {
+        if (t_tray.hasElapsed(.75)) {
             System.out.println("Center to Station: coral acquired");
             return true;
         }
@@ -111,6 +116,9 @@ public class CenterToStationCommand extends Command {
     public void end(boolean interrupted) {
         t.stop();
         t.reset();
+
+        t_tray.stop();
+        t_tray.reset();
     }
 
     public void getSpeeds(double x, double y, double omega) {

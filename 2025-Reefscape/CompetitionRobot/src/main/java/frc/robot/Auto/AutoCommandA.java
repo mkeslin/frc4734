@@ -24,6 +24,7 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * Command that executes during autonomous mode
  */
 public class AutoCommandA {
+    private static ScoreLevel m_autoScoreLevel = ScoreLevel.L3;
 
     public static AutoRoutine StartingPosition1(
             PositionTracker positionTracker,
@@ -185,6 +186,7 @@ public class AutoCommandA {
             Limelight reefLimelight,
             Limelight stationLimelight) {
         var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null);
+        // var centerToReefCommand2 = new CenterToReefCommand(reefLimelight, drivetrain, null);
         var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
 
         Command command = Commands.sequence(
@@ -203,17 +205,18 @@ public class AutoCommandA {
                 Commands.sequence(
                         Commands.parallel(
                                 // POSITION CORAL
-                                RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide,
+                                RobotCommands.prepareScoreCoralCommand(positionTracker, m_autoScoreLevel, scoreSide,
                                         drivetrain, elevator, arm, sideToSide, lights, reefLimelight),
                                 // CENTER
                                 centerToReefCommand
                         //
                         ),
-                        // // POSITION CORAL
-                        // RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide, drivetrain,
-                        // elevator, arm, sideToSide, lights, reefLimelight),
-                        // // CENTER
-                        // centerToReefCommand,
+                        // centerToReefCommand2,
+                        // BACK UP A BIT
+                        Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                            .withTimeout(0.15)
+                            .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                            .asProxy(),
                         // SCORE
                         RobotCommands.scoreCoralCommand(positionTracker, drivetrain, elevator, arm, lights),
                         // MOVE FORWARD - set coral if not completely placed
@@ -225,7 +228,13 @@ public class AutoCommandA {
                                 .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 .asProxy()
                 //
-                ).repeatedly().unless(() -> !positionTracker.getCoralInArm()),
+                ),
+                        // .until(() -> !positionTracker.getCoralInArm())
+                        // .andThen(
+                        //         // MOVE REVERSE
+                        //         Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(0.65)
+                        //                 .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                        //                 .asProxy()),
                 // PRE-INTAKE & DRIVE TO CORAL STATION
                 Commands.parallel(
                         // PRE-INTAKE
@@ -237,7 +246,7 @@ public class AutoCommandA {
                                 .andThen(drivetrain.followPathCommand(pathToCoralStation))
                 //
                 ),
-                centerToStationCommand,
+                // centerToStationCommand,
                 // INTAKE
                 Commands.waitSeconds(15.0).until(() -> positionTracker.getCoralInTray()),
                 RobotCommands.intakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights)

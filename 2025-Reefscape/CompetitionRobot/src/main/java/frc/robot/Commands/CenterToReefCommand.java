@@ -40,7 +40,7 @@ public class CenterToReefCommand extends Command {
 
     private double DISTANCE_FROM_APRILTAG = 0.75;
 
-    private double POSE_X_ERROR = 0.05;
+    private double POSE_X_ERROR = 0.06;
     private double POSE_Y_ERROR = 0.05;
     private double POSE_ANGLE_ERROR = 3;
 
@@ -105,10 +105,27 @@ public class CenterToReefCommand extends Command {
         }
     }
 
+    private boolean hasPrintedX = false;
+    private boolean hasPrintedY = false;
+    private boolean hasPrintedZ = false;
+
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        if (t.hasElapsed(5)) {
+        if (!hasPrintedX && xController.atSetpoint()) {
+            System.out.println("Center to Reef: xxxxxxxxxxxxxxx");
+            hasPrintedX = true;
+        }
+        if (!hasPrintedY && yController.atSetpoint()) {
+            System.out.println("Center to Reef: yyyyyyyyyyyyyyy");
+            hasPrintedY = true;
+        }
+        if (!hasPrintedZ && omegaController.atSetpoint()) {
+            System.out.println("Center to Reef: zzzzzzzzzzzzzzz");
+            hasPrintedZ = true;
+        }
+        
+        if (t.hasElapsed(4)) {
             System.out.println("Center to Reef: time elapsed");
             return true;
         }
