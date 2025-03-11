@@ -9,6 +9,7 @@ public class PositionTracker {
     private Supplier<Double> climberPositionSupplier;
     private Supplier<Boolean> coralInTraySupplier;
     private Supplier<Boolean> coralInArmSupplier;
+    private Supplier<Double> algaeIntakeSpeedSupplier;
 
     public void setElevatorPositionSupplier(Supplier<Double> elevatorPositionSupplier) {
         this.elevatorPositionSupplier = elevatorPositionSupplier;
@@ -32,6 +33,10 @@ public class PositionTracker {
 
     public void setCoralInArmSupplier(Supplier<Boolean> coralInArm) {
         this.coralInArmSupplier = coralInArm;
+    }
+
+    public void setAlgaeIntakeSpeedSupplier(Supplier<Double> algaeIntakeSpeed) {
+        this.algaeIntakeSpeedSupplier = algaeIntakeSpeed;
     }
 
     public double getElevatorPosition() {
@@ -58,5 +63,9 @@ public class PositionTracker {
     // logic is backwards
     public Boolean getCoralInArm() {
         return !coralInArmSupplier.get();
+    }
+
+    public double getAlgaeIntakeSpeed() {
+        return algaeIntakeSpeedSupplier.get();
     }
 }

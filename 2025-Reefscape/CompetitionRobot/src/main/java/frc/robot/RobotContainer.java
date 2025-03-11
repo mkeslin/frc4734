@@ -19,12 +19,13 @@ import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
-import frc.robot.Constants.ClimberConstants.ClimberPosition;
+import frc.robot.Constants.ArmConstants.ArmPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
-import frc.robot.Constants.ArmConstants.ArmPosition;
+import frc.robot.Constants.AlgaeIntakeConstants.AlgaeIntakeSpeed;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.State.StateMachine;
+import frc.robot.Subsystems.AlgaeIntake;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Elevator;
@@ -56,6 +57,7 @@ public class RobotContainer {
     private SideToSide m_sideToSide = new SideToSide(m_positionTracker);
     private Climber m_climber = new Climber(m_positionTracker);
     private Lights m_lights = new Lights();
+    private AlgaeIntake m_algaeIntake = new AlgaeIntake(m_positionTracker);
 
     private DigitalInput m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
     private DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
@@ -150,9 +152,15 @@ public class RobotContainer {
         m_driveController.rightTrigger().onTrue(m_centerToStationCommand);
         m_driveController.leftTrigger().onTrue(m_centerToReefCommand);
 
+        // CLIMBER
         //m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
         //m_driveController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
         //m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
+
+        // INTAKE
+        m_driveController.a().onTrue(m_algaeIntake.moveToSetSpeedCommand(() -> AlgaeIntakeSpeed.FORWARD));
+        m_driveController.b().onTrue(m_algaeIntake.moveToSetSpeedCommand(() -> AlgaeIntakeSpeed.REVERSE));
+        m_driveController.y().onTrue(m_algaeIntake.moveToSetSpeedCommand(() -> AlgaeIntakeSpeed.STOPPED));
     }
 
     private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide,
@@ -288,6 +296,7 @@ public class RobotContainer {
         m_arm.resetPosition();
         m_elevator.resetPosition();
         m_climber.resetPosition();
+        m_algaeIntake.resetSpeed();
     }
 
     // private void resetPose() {
