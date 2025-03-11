@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.PositionTracker;
 import frc.robot.Commands.CenterToReefCommand;
-import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
@@ -155,23 +154,23 @@ public class AutoCommandA {
                 Start_C.getStartingDifferentialPose());
     }
 
-    private static Command GetDrivingPracticeCommand(
-            PathPlannerPath pathToReef,
-            PathPlannerPath pathToCoralStation,
-            PositionTracker positionTracker,
-            CommandSwerveDrivetrain drivetrain,
-            Limelight reefLimelight,
-            Limelight stationLimelight) {
-        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1);
-        var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
-        return Commands.sequence(
-                drivetrain.followPathCommand(pathToReef),
-                centerToReefCommand,
-                drivetrain.followPathCommand(pathToCoralStation),
-                centerToStationCommand
-        //
-        );
-    }
+    // private static Command GetDrivingPracticeCommand(
+    //         PathPlannerPath pathToReef,
+    //         PathPlannerPath pathToCoralStation,
+    //         PositionTracker positionTracker,
+    //         CommandSwerveDrivetrain drivetrain,
+    //         Limelight reefLimelight,
+    //         Limelight stationLimelight) {
+    //     var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1.25);
+    //     var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
+    //     return Commands.sequence(
+    //             drivetrain.followPathCommand(pathToReef),
+    //             centerToReefCommand,
+    //             drivetrain.followPathCommand(pathToCoralStation),
+    //             centerToStationCommand
+    //     //
+    //     );
+    // }
 
     private static Command GetCycleCommand(
             PathPlannerPath pathToReef,
@@ -185,7 +184,7 @@ public class AutoCommandA {
             Lights lights,
             Limelight reefLimelight,
             Limelight stationLimelight) {
-        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1);
+        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1.25);
         // var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
 
         Command command = Commands.sequence(
@@ -210,10 +209,9 @@ public class AutoCommandA {
                                 centerToReefCommand
                         //
                         ),
-                        // centerToReefCommand2,
                         // BACK UP A BIT
-                        Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                                .withTimeout(0.15)
+                        Commands.run(() -> drivetrain.setRelativeSpeed(-0.6, 0, 0))
+                                .withTimeout(0.12)
                                 .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 .asProxy(),
                         // SCORE
