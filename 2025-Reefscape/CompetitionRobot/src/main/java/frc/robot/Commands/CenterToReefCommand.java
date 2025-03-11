@@ -49,13 +49,17 @@ public class CenterToReefCommand extends Command {
     private double CAMERA_X_OFFSET_ERROR = 0.9;
     private double CAMERA_ANGLE_ERROR = 3;
 
+    private double m_timeoutDuration;
+
     public Timer t = new Timer();
 
     public CenterToReefCommand(Limelight limelight, CommandSwerveDrivetrain drivetrain,
-            CommandXboxController driveController) {
+            CommandXboxController driveController, double timeoutDuration) {
         m_limelight = limelight;
         m_drivetrain = drivetrain;
         m_driveController = driveController;
+        m_timeoutDuration = timeoutDuration;
+
         centerMethod = CAMERA;
 
         for (int i = 6; i <= 11; i++) {
@@ -125,7 +129,7 @@ public class CenterToReefCommand extends Command {
             hasPrintedZ = true;
         }
         
-        if (t.hasElapsed(4)) {
+        if (t.hasElapsed(m_timeoutDuration)) {
             System.out.println("Center to Reef: time elapsed");
             return true;
         }

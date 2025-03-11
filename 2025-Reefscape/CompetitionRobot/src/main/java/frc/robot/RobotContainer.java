@@ -60,7 +60,7 @@ public class RobotContainer {
 
     // COMMANDS
     public CenterToReefCommand m_centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain,
-            m_driveController);
+            m_driveController, 3);
     public CenterToStationCommand m_centerToStationCommand = new CenterToStationCommand(m_positionTracker,
             m_station_limelight, m_drivetrain, m_driveController);
 

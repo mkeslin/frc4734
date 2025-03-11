@@ -162,7 +162,7 @@ public class AutoCommandA {
             CommandSwerveDrivetrain drivetrain,
             Limelight reefLimelight,
             Limelight stationLimelight) {
-        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null);
+        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1);
         var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
         return Commands.sequence(
                 drivetrain.followPathCommand(pathToReef),
@@ -185,9 +185,8 @@ public class AutoCommandA {
             Lights lights,
             Limelight reefLimelight,
             Limelight stationLimelight) {
-        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null);
-        // var centerToReefCommand2 = new CenterToReefCommand(reefLimelight, drivetrain, null);
-        var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
+        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1);
+        // var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
 
         Command command = Commands.sequence(
                 // DRIVE TO REEF & PRE-POSITION CORAL
@@ -214,27 +213,27 @@ public class AutoCommandA {
                         // centerToReefCommand2,
                         // BACK UP A BIT
                         Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                            .withTimeout(0.15)
-                            .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
-                            .asProxy(),
+                                .withTimeout(0.15)
+                                .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                                .asProxy(),
                         // SCORE
                         RobotCommands.scoreCoralCommand(positionTracker, drivetrain, elevator, arm, lights),
                         // MOVE FORWARD - set coral if not completely placed
-                        Commands.run(() -> drivetrain.setRelativeSpeed(0.5, 0, 0)).withTimeout(0.15)
-                                .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                        Commands.run(() -> drivetrain.setRelativeSpeed(0.75, 0, 0)).withTimeout(0.12)
+                                // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 .asProxy(),
                         // MOVE REVERSE
-                        Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(0.65)
-                                .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                        Commands.run(() -> drivetrain.setRelativeSpeed(-1, 0, 0)).withTimeout(0.45)
+                                // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 .asProxy()
                 //
                 ),
-                        // .until(() -> !positionTracker.getCoralInArm())
-                        // .andThen(
-                        //         // MOVE REVERSE
-                        //         Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(0.65)
-                        //                 .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
-                        //                 .asProxy()),
+                // .until(() -> !positionTracker.getCoralInArm())
+                // .andThen(
+                // // MOVE REVERSE
+                // Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(0.65)
+                // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                // .asProxy()),
                 // PRE-INTAKE & DRIVE TO CORAL STATION
                 Commands.parallel(
                         // PRE-INTAKE
@@ -248,7 +247,8 @@ public class AutoCommandA {
                 ),
                 // centerToStationCommand,
                 // INTAKE
-                Commands.waitSeconds(15.0).until(() -> positionTracker.getCoralInTray()),
+                Commands.waitSeconds(15.0).until(() -> positionTracker.getCoralInTray())
+                        .andThen(Commands.waitSeconds(0.15)),
                 RobotCommands.intakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights)
         //
         );
