@@ -189,20 +189,34 @@ public class RobotContainer {
                 .onTrue(Commands.sequence(
                     prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef),
                     Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                            .withTimeout(0.15)
+                            .withTimeout(0.12)
                             .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                             .asProxy()
             //
             ));
         m_arcadeController.a()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef));
+                .onTrue(Commands.sequence(
+                    prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef),
+                    Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                            .withTimeout(0.15)
+                            .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                            .asProxy()
+            //
+            ));
         m_arcadeController.x()
-                .onTrue(prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef));
+                .onTrue(Commands.sequence(
+                    prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef),
+                    Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                            .withTimeout(0.15)
+                            .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                            .asProxy()
+            //
+            ));
         m_arcadeController.y()
                 .onTrue(Commands.sequence(
                     prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef),
                     Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                            .withTimeout(0.15)
+                            .withTimeout(0.12)
                             .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                             .asProxy()
             //

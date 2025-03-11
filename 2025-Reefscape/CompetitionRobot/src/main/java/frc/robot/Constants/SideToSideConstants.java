@@ -6,9 +6,9 @@ public class SideToSideConstants {
         // CENTER(0),
         // RIGHT(-27.7);
 
-        LEFT(28),
+        LEFT(28.2),
         CENTER(0),
-        RIGHT(-28);
+        RIGHT(-28.2);
 
         public final double value;
 
