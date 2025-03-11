@@ -23,7 +23,7 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * Command that executes during autonomous mode
  */
 public class AutoCommandA {
-    private static ScoreLevel m_autoScoreLevel = ScoreLevel.L3;
+    private static ScoreLevel m_autoScoreLevel = ScoreLevel.L4;
 
     public static AutoRoutine StartingPosition1(
             PositionTracker positionTracker,
@@ -55,7 +55,7 @@ public class AutoCommandA {
                 // GetDrivingPracticeCommand(Pickup1_F, F_Pickup1, positionTracker, drivetrain, reefLimelight,
                 // stationLimelight)
 
-                GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
+                GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
@@ -98,7 +98,7 @@ public class AutoCommandA {
                 // GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
                 // stationLimelight)
 
-                GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
+                GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
@@ -141,7 +141,7 @@ public class AutoCommandA {
                 // GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
                 // stationLimelight)
 
-                GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
+                GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
@@ -191,10 +191,10 @@ public class AutoCommandA {
                 // DRIVE TO REEF & PRE-POSITION CORAL
                 Commands.parallel(
                         // DRIVE TO REEF
-                        Commands.waitSeconds(0.0)
+                        Commands.waitSeconds(0.1)
                                 .andThen(drivetrain.followPathCommand(pathToReef)),
                         // PRE-POSITION CORAL
-                        Commands.waitSeconds(0.1)
+                        Commands.waitSeconds(0.0)
                                 .andThen(RobotCommands.postIntakeCoralCommand(positionTracker, elevator, arm,
                                         sideToSide, lights))
                 //
@@ -221,7 +221,7 @@ public class AutoCommandA {
                                 // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 .asProxy(),
                         // MOVE REVERSE
-                        Commands.run(() -> drivetrain.setRelativeSpeed(-1, 0, 0)).withTimeout(0.45)
+                        Commands.run(() -> drivetrain.setRelativeSpeed(-1, 0, 0)).withTimeout(0.35)
                                 // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 .asProxy()
                 //
