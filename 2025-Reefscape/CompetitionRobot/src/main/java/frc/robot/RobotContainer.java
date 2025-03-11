@@ -4,11 +4,8 @@ import static frc.robot.Constants.Constants.IDs.APRILTAGPIPELINE;
 import static frc.robot.Constants.Constants.IDs.CORAL_ARM_SENSOR;
 import static frc.robot.Constants.Constants.IDs.CORAL_TRAY_SENSOR;
 
-import com.ctre.phoenix6.Utils;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,10 +16,9 @@ import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
-import frc.robot.Constants.ArmConstants.ArmPosition;
+import frc.robot.Constants.AlgaeIntakeConstants.AlgaeIntakeSpeed;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
-import frc.robot.Constants.AlgaeIntakeConstants.AlgaeIntakeSpeed;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.State.StateMachine;
 import frc.robot.Subsystems.AlgaeIntake;
@@ -65,8 +61,8 @@ public class RobotContainer {
     // COMMANDS
     public CenterToReefCommand m_centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain,
             m_driveController);
-    public CenterToStationCommand m_centerToStationCommand = new CenterToStationCommand(m_station_limelight,
-            m_drivetrain, m_driveController);
+    public CenterToStationCommand m_centerToStationCommand = new CenterToStationCommand(m_positionTracker,
+            m_station_limelight, m_drivetrain, m_driveController);
 
     public RobotContainer() {
         // register named commands
@@ -218,7 +214,10 @@ public class RobotContainer {
                         .asProxy(),
                 RobotCommands.preIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights)
                         .onlyIf(() -> !m_positionTracker.getCoralInArm()),
-                m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
+                // m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
+                RobotCommands
+                        .prepareScoreCoralRetryCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_sideToSide,
+                                m_lights, m_reef_limelight)
                         .onlyIf(() -> m_positionTracker.getCoralInArm())
         //
         );
@@ -249,25 +248,25 @@ public class RobotContainer {
     // }
 
     public void localizeRobotPose() {
-        boolean doRejectUpdate = false;
-        LimelightHelpers.SetRobotOrientation("limelight-one",
-                Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
-                0, 0, 0, 0, 0);
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-one");
-        if (mt2 == null || mt2.tagCount == 0) {
-            return;
-        }
-        // if our angular velocity is greater than 720 degrees per second, ignore vision
-        // updates
-        if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
-            doRejectUpdate = true;
-        }
-        if (!doRejectUpdate) {
-            m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-            m_drivetrain.addVisionMeasurement(
-                    mt2.pose,
-                    Utils.fpgaToCurrentTime(mt2.timestampSeconds));
-        }
+        // boolean doRejectUpdate = false;
+        // LimelightHelpers.SetRobotOrientation("limelight-one",
+        //         Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
+        //         0, 0, 0, 0, 0);
+        // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-one");
+        // if (mt2 == null || mt2.tagCount == 0) {
+        //     return;
+        // }
+        // // if our angular velocity is greater than 720 degrees per second, ignore vision
+        // // updates
+        // if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
+        //     doRejectUpdate = true;
+        // }
+        // if (!doRejectUpdate) {
+        //     m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        //     m_drivetrain.addVisionMeasurement(
+        //             mt2.pose,
+        //             Utils.fpgaToCurrentTime(mt2.timestampSeconds));
+        // }
     }
 
     public void configureAuto() {
@@ -275,12 +274,14 @@ public class RobotContainer {
                 .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, m_centerToReefCommand, m_drivetrain,
                         m_elevator, m_arm,
                         m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
-        // AutoManager.getInstance()
-        // .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_drivetrain, m_elevator, m_arm,
-        // m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
-        // AutoManager.getInstance()
-        // .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_drivetrain, m_elevator, m_arm,
-        // m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
+        AutoManager.getInstance()
+                .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_centerToReefCommand, m_drivetrain,
+                        m_elevator, m_arm,
+                        m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
+        AutoManager.getInstance()
+                .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_centerToReefCommand, m_drivetrain,
+                        m_elevator, m_arm,
+                        m_sideToSide, m_lights, m_reef_limelight, m_station_limelight));
 
         SmartDashboard.putData("Auto Mode (manager)", AutoManager.getInstance().chooser);
     }

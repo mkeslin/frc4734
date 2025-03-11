@@ -22,24 +22,6 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 public class RobotCommands {
     private static ScoreLevel lastScoreLevel = ScoreLevel.None;
 
-    // public static Command moveIntermediatePrepareScoreCoralCommand(
-    //         PositionTracker positionTracker,
-    //         Elevator elevator,
-    //         Arm arm,
-    //         SideToSide sideToSide,
-    //         Lights lights) {
-    //     return Commands.parallel(
-    //             // Commands.runOnce(() -> lights.setColors(0, 255, 0)).asProxy(),
-    //             Commands.waitSeconds(0.35)
-    //                     .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
-    //             // Commands.waitSeconds(0)
-    //             // .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
-    //             Commands.waitSeconds(0.0)
-    //                     .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.L3).asProxy())
-    //     //
-    //     ).onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore));
-    // }
-
     public static Command prepareScoreCoralCommand(
             PositionTracker positionTracker,
             ScoreLevel level,
@@ -115,6 +97,19 @@ public class RobotCommands {
                         .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color))
         //
         );
+    }
+
+    public static Command prepareScoreCoralRetryCommand(
+            PositionTracker positionTracker,
+            CommandSwerveDrivetrain drivetrain,
+            Elevator elevator,
+            Arm arm,
+            SideToSide sideToSide,
+            Lights lights,
+            Limelight reefLimelight) {
+                return arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
+                        .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore))
+                        .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));
     }
 
     public static Command scoreCoralCommand(

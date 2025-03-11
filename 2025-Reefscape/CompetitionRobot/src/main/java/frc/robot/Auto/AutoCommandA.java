@@ -48,6 +48,13 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
         var command = Commands.sequence(
+                // GetDrivingPracticeCommand(Start_A, A_Pickup1, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup1_F, F_Pickup1, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup1_F, F_Pickup1, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight)
+
                 GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
@@ -84,6 +91,13 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
         var command = Commands.sequence(
+                // GetDrivingPracticeCommand(Start_B, B_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight)
+
                 GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
@@ -114,12 +128,19 @@ public class AutoCommandA {
         try {
             Start_C = PathPlannerPath.fromPathFile("3-Start-C");
             C_Pickup2 = PathPlannerPath.fromPathFile("3-C-Pickup2");
-            Pickup2_D = PathPlannerPath.fromPathFile("3-Pickup2-D");
-            D_Pickup2 = PathPlannerPath.fromPathFile("3-D-Pickup2");
+            Pickup2_D = PathPlannerPath.fromPathFile("2-Pickup2-D");
+            D_Pickup2 = PathPlannerPath.fromPathFile("2-D-Pickup2");
         } catch (Exception exception) {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
         var command = Commands.sequence(
+                // GetDrivingPracticeCommand(Start_C, C_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight),
+                // GetDrivingPracticeCommand(Pickup2_D, D_Pickup2, positionTracker, drivetrain, reefLimelight,
+                // stationLimelight)
+
                 GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
@@ -131,6 +152,24 @@ public class AutoCommandA {
         return new AutoRoutine("Routine 3", command,
                 List.of(Start_C, C_Pickup2, Pickup2_D, D_Pickup2),
                 Start_C.getStartingDifferentialPose());
+    }
+
+    private static Command GetDrivingPracticeCommand(
+            PathPlannerPath pathToReef,
+            PathPlannerPath pathToCoralStation,
+            PositionTracker positionTracker,
+            CommandSwerveDrivetrain drivetrain,
+            Limelight reefLimelight,
+            Limelight stationLimelight) {
+        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null);
+        var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
+        return Commands.sequence(
+                drivetrain.followPathCommand(pathToReef),
+                centerToReefCommand,
+                drivetrain.followPathCommand(pathToCoralStation),
+                centerToStationCommand
+        //
+        );
     }
 
     private static Command GetCycleCommand(
@@ -145,8 +184,8 @@ public class AutoCommandA {
             Lights lights,
             Limelight reefLimelight,
             Limelight stationLimelight) {
-        var centerToReefCommand = new CenterToReefCommand(stationLimelight, drivetrain, null);
-        var centerToStationCommand = new CenterToStationCommand(stationLimelight, drivetrain, null);
+        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null);
+        var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
 
         Command command = Commands.sequence(
                 // DRIVE TO REEF & PRE-POSITION CORAL
@@ -155,29 +194,44 @@ public class AutoCommandA {
                         Commands.waitSeconds(0.0)
                                 .andThen(drivetrain.followPathCommand(pathToReef)),
                         // PRE-POSITION CORAL
-                        Commands.waitSeconds(0.2)
-                                .andThen(RobotCommands.postIntakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights))
+                        Commands.waitSeconds(0.1)
+                                .andThen(RobotCommands.postIntakeCoralCommand(positionTracker, elevator, arm,
+                                        sideToSide, lights))
                 //
                 ),
                 // POSITION CORAL, CENTER, & SCORE
                 Commands.sequence(
-                        // POSITION CORAL
-                        RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide, drivetrain,
-                                elevator, arm, sideToSide, lights, reefLimelight),
-                        // CENTER
-                        centerToReefCommand,
+                        Commands.parallel(
+                                // POSITION CORAL
+                                RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide,
+                                        drivetrain, elevator, arm, sideToSide, lights, reefLimelight),
+                                // CENTER
+                                centerToReefCommand
+                        //
+                        ),
+                        // // POSITION CORAL
+                        // RobotCommands.prepareScoreCoralCommand(positionTracker, ScoreLevel.L4, scoreSide, drivetrain,
+                        // elevator, arm, sideToSide, lights, reefLimelight),
+                        // // CENTER
+                        // centerToReefCommand,
                         // SCORE
                         RobotCommands.scoreCoralCommand(positionTracker, drivetrain, elevator, arm, lights),
-                        // REVERSE
-                        Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).asProxy().withTimeout(0.45)
+                        // MOVE FORWARD - set coral if not completely placed
+                        Commands.run(() -> drivetrain.setRelativeSpeed(0.5, 0, 0)).withTimeout(0.15)
                                 .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                                .asProxy(),
+                        // MOVE REVERSE
+                        Commands.run(() -> drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(0.65)
+                                .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
+                                .asProxy()
                 //
                 ).until(() -> !positionTracker.getCoralInArm()),
                 // PRE-INTAKE & DRIVE TO CORAL STATION
                 Commands.parallel(
                         // PRE-INTAKE
                         Commands.waitSeconds(0.0)
-                                .andThen(RobotCommands.preIntakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights)),
+                                .andThen(RobotCommands.preIntakeCoralCommand(positionTracker, elevator, arm, sideToSide,
+                                        lights)),
                         // DRIVE TO CORAL STATION
                         Commands.waitSeconds(0.35)
                                 .andThen(drivetrain.followPathCommand(pathToCoralStation))

@@ -7,12 +7,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.PositionTracker;
 import frc.robot.Subsystems.Cameras.Limelight;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
-public class CenterToStationCommand extends Command {
-    public PositionTracker m_positionTracker;
+public class CenterToProcesserCommand extends Command {
     public Limelight m_limelight;
     public CommandSwerveDrivetrain m_drivetrain;
     public CommandXboxController m_driveController;
@@ -23,15 +21,14 @@ public class CenterToStationCommand extends Command {
     private final PIDController yController = new PIDController(0.03, 0, 0);
     private final PIDController omegaController = new PIDController(0.03, 0, 0);
 
-    private double AREA_GOAL = 4.8;
+    private double AREA_GOAL = 5;
     private double AREA_ERROR = 2;
     private double CAMERA_X_OFFSET_ERROR = 1;
     private double ANGLE_ERROR = 3;
 
     public Timer t = new Timer();
 
-    public CenterToStationCommand(PositionTracker positionTracker, Limelight limelight, CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
-        m_positionTracker = positionTracker;
+    public CenterToProcesserCommand(Limelight limelight, CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
         m_limelight = limelight;
         m_drivetrain = drivetrain;
         m_driveController = driveController;
@@ -74,11 +71,7 @@ public class CenterToStationCommand extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return t.hasElapsed(5) || 
-            m_positionTracker.getCoralInTray() ||
-            driverInterrupted || 
-            !m_limelight.hasTargets() || 
-            (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()); //|| (area > FINAL_AREA && x_offset < FINAL_X_OFFSET && yaw_degrees < FINAL_ANGLE_DEGREES);
+        return t.hasElapsed(5) || driverInterrupted || !m_limelight.hasTargets() || (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()); //|| (area > FINAL_AREA && x_offset < FINAL_X_OFFSET && yaw_degrees < FINAL_ANGLE_DEGREES);
     }
 
     // Called once after isFinished returns true
