@@ -103,6 +103,7 @@ public class AutoManager {
      */
     public AutoRoutine getSelectedRoutine() {
         return chooser.getSelected();
+        // return routines.entrySet().iterator().next().getValue();
     }
 
     /**
