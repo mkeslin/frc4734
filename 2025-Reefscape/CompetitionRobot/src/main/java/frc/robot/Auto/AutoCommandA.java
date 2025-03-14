@@ -57,9 +57,9 @@ public class AutoCommandA {
 
                 GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
-                GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
         //
         );
@@ -100,9 +100,9 @@ public class AutoCommandA {
 
                 GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
         //
         );
@@ -143,9 +143,9 @@ public class AutoCommandA {
 
                 GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
+                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
         //
         );

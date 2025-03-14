@@ -53,7 +53,7 @@ public class RobotContainer {
     private SideToSide m_sideToSide = new SideToSide(m_positionTracker);
     private Climber m_climber = new Climber(m_positionTracker);
     private Lights m_lights = new Lights();
-    private AlgaeIntake m_algaeIntake = new AlgaeIntake(m_positionTracker);
+    //private AlgaeIntake m_algaeIntake = new AlgaeIntake(m_positionTracker);
 
     private DigitalInput m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
     private DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
@@ -154,9 +154,9 @@ public class RobotContainer {
         //m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
 
         // INTAKE
-        m_driveController.a().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.IN.value)));
-        m_driveController.b().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.OUT.value)));
-        m_driveController.y().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.STOPPED.value)));
+        //m_driveController.a().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.IN.value)));
+        //m_driveController.b().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.OUT.value)));
+        //m_driveController.y().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.STOPPED.value)));
     }
 
     private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide,
@@ -198,7 +198,7 @@ public class RobotContainer {
                 .onTrue(Commands.sequence(
                     prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef),
                     Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                            .withTimeout(0.15)
+                            .withTimeout(0.17)
                             .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                             .asProxy()
             //
@@ -224,7 +224,7 @@ public class RobotContainer {
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                        .withTimeout(0.15)
+                        .withTimeout(0.17)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy()
         //
@@ -234,15 +234,14 @@ public class RobotContainer {
                 // move arm down
                 RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights),
                 // move forward to set coral if not completely placed
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(0.5, 0, 0)).withTimeout(0.15)
+                Commands.run(() -> m_drivetrain.setRelativeSpeed(0.75, 0, 0)).withTimeout(0.12)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy(),
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0)).withTimeout(0.65)
+                Commands.run(() -> m_drivetrain.setRelativeSpeed(-1.0, 0, 0)).withTimeout(0.35)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy(),
                 RobotCommands.preIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights)
                         .onlyIf(() -> !m_positionTracker.getCoralInArm()),
-                // m_arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
                 RobotCommands
                         .prepareScoreCoralRetryCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_sideToSide,
                                 m_lights, m_reef_limelight)
@@ -325,7 +324,7 @@ public class RobotContainer {
         m_arm.resetPosition();
         m_elevator.resetPosition();
         m_climber.resetPosition();
-        m_algaeIntake.resetSpeed();
+        //m_algaeIntake.resetSpeed();
     }
 
     // private void resetPose() {
