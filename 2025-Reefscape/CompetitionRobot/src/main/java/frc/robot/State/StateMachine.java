@@ -33,14 +33,14 @@ public class StateMachine {
                 StateMachineStateName.PrepareScore,
                 Color.kOrange,
                 false,
-                true,
+                false,
                 false,
                 false);
         var scoreState = new StateMachineState(
                 StateMachineStateName.Score,
                 Color.kPurple,
                 false,
-                true,
+                false,
                 false,
                 false);
         var preIntakeState = new StateMachineState(
@@ -82,6 +82,7 @@ public class StateMachine {
         var preIntakeList = new ArrayList<StateMachineState>();
         preIntakeList.add(intakeState);
         preIntakeList.add(postIntakeState);
+        preIntakeList.add(prepareScoreState);
         m_stateMap.put(preIntakeState.Name, preIntakeList);
     }
 

@@ -53,7 +53,7 @@ public class RobotContainer {
     private SideToSide m_sideToSide = new SideToSide(m_positionTracker);
     private Climber m_climber = new Climber(m_positionTracker);
     private Lights m_lights = new Lights();
-    //private AlgaeIntake m_algaeIntake = new AlgaeIntake(m_positionTracker);
+    // private AlgaeIntake m_algaeIntake = new AlgaeIntake(m_positionTracker);
 
     private DigitalInput m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
     private DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
@@ -149,14 +149,15 @@ public class RobotContainer {
         m_driveController.leftTrigger().onTrue(m_centerToReefCommand);
 
         // CLIMBER
-        //m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
-        //m_driveController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
-        //m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
+        // m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
+        // m_driveController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
+        // m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
 
         // INTAKE
-        //m_driveController.a().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.IN.value)));
-        //m_driveController.b().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.OUT.value)));
-        //m_driveController.y().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.STOPPED.value)));
+        // m_driveController.a().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.IN.value)));
+        // m_driveController.b().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.OUT.value)));
+        // m_driveController.y().onTrue(Commands.runOnce(() ->
+        // m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.STOPPED.value)));
     }
 
     private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide,
@@ -187,40 +188,40 @@ public class RobotContainer {
         ));
         m_arcadeController.b()
                 .onTrue(Commands.sequence(
-                    prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef),
-                    Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                            .withTimeout(0.12)
-                            .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                            .asProxy()
-            //
-            ));
+                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef),
+                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                                .withTimeout(0.12)
+                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                                .asProxy()
+                //
+                ));
         m_arcadeController.a()
                 .onTrue(Commands.sequence(
-                    prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef),
-                    Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                            .withTimeout(0.17)
-                            .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                            .asProxy()
-            //
-            ));
+                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef),
+                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                                .withTimeout(0.17)
+                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                                .asProxy()
+                //
+                ));
         m_arcadeController.x()
                 .onTrue(Commands.sequence(
-                    prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef),
-                    Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                            .withTimeout(0.15)
-                            .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                            .asProxy()
-            //
-            ));
+                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef),
+                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                                .withTimeout(0.15)
+                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                                .asProxy()
+                //
+                ));
         m_arcadeController.y()
                 .onTrue(Commands.sequence(
-                    prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef),
-                    Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                            .withTimeout(0.12)
-                            .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                            .asProxy()
-            //
-            ));
+                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef),
+                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                                .withTimeout(0.12)
+                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                                .asProxy()
+                //
+                ));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
@@ -229,6 +230,9 @@ public class RobotContainer {
                         .asProxy()
         //
         ));
+
+        m_arcadeController.start().onTrue(
+                prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Center, centerToReef));
 
         var scoreCommand = Commands.sequence(
                 // move arm down
@@ -277,22 +281,22 @@ public class RobotContainer {
     public void localizeRobotPose() {
         // boolean doRejectUpdate = false;
         // LimelightHelpers.SetRobotOrientation("limelight-one",
-        //         Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
-        //         0, 0, 0, 0, 0);
+        // Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
+        // 0, 0, 0, 0, 0);
         // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-one");
         // if (mt2 == null || mt2.tagCount == 0) {
-        //     return;
+        // return;
         // }
         // // if our angular velocity is greater than 720 degrees per second, ignore vision
         // // updates
         // if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
-        //     doRejectUpdate = true;
+        // doRejectUpdate = true;
         // }
         // if (!doRejectUpdate) {
-        //     m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-        //     m_drivetrain.addVisionMeasurement(
-        //             mt2.pose,
-        //             Utils.fpgaToCurrentTime(mt2.timestampSeconds));
+        // m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        // m_drivetrain.addVisionMeasurement(
+        // mt2.pose,
+        // Utils.fpgaToCurrentTime(mt2.timestampSeconds));
         // }
     }
 
@@ -324,7 +328,7 @@ public class RobotContainer {
         m_arm.resetPosition();
         m_elevator.resetPosition();
         m_climber.resetPosition();
-        //m_algaeIntake.resetSpeed();
+        // m_algaeIntake.resetSpeed();
     }
 
     // private void resetPose() {

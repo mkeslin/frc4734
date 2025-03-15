@@ -69,6 +69,9 @@ public class RobotCommands {
             case Right -> {
                 sideToSidePosition = SideToSidePosition.RIGHT;
             }
+            case Center -> {
+                sideToSidePosition = SideToSidePosition.CENTER;
+            }
             default -> {
                 throw new IllegalArgumentException("Invalid ScoreSide");
             }
