@@ -1,6 +1,7 @@
 package frc.robot.Auto;
 
 import java.util.List;
+
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -83,19 +84,23 @@ public class AutoRoutine {
 
     /**
      * Gets the initial pose for the routine. When the DriverStation is set to the
-     * red alliance, this is reflected over a field length of 16.54m.
+     * red alliance, this is reflected over the field length
      * 
      * @return the initial pose for the routine, or the pose at (0,0) if no
      *         trajectories are used.
      */
     public Pose2d getInitialPose() {
         if (pathPlannerPaths.size() > 0) {
-            // if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-            //     return Reflector.reflectPose2d(initialPose, 16.54);
-            // } else {
-            //     return initialPose;
-            // }
-            return initialPose;
+            if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+                var newPose1 = Reflector.reflectPose2d(initialPose, 17.521);
+
+                var newY2 = ((newPose1.getY() - 4.009) * -1) + 4.009;
+                var newPose2 = new Pose2d(newPose1.getX(), newY2, newPose1.getRotation());
+
+                return newPose2;
+            } else {
+                return initialPose;
+            }
         } else {
             return new Pose2d();
         }
