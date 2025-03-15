@@ -184,7 +184,7 @@ public class AutoCommandA {
             Lights lights,
             Limelight reefLimelight,
             Limelight stationLimelight) {
-        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 2.5);
+        var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1.5);
         // var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
 
         Command command = Commands.sequence(
