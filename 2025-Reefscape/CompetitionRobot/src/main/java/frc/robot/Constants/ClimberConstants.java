@@ -5,8 +5,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 public class ClimberConstants {
     public static enum ClimberPosition {
         DOWN(0),
-        ACQUIRE(80),
-        CLIMB(335);
+        ACQUIRE(70),
+        CLIMB(375);
 
         public final double value;
 

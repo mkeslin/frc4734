@@ -33,8 +33,8 @@ public class AutoCommandA {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight,
-            Limelight stationLimelight) {
+            Limelight reefLimelight/*,
+            Limelight stationLimelight*/) {
         PathPlannerPath Start_A = null;
         PathPlannerPath A_Pickup1 = null;
         PathPlannerPath Pickup1_F = null;
@@ -56,11 +56,11 @@ public class AutoCommandA {
                 // stationLimelight)
 
                 GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight */),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight */),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
+                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight */)
         //
         );
         return new AutoRoutine("Routine 1", command,
@@ -76,8 +76,8 @@ public class AutoCommandA {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight,
-            Limelight stationLimelight) {
+            Limelight reefLimelight/*,
+            Limelight stationLimelight*/) {
         PathPlannerPath Start_B = null;
         PathPlannerPath B_Pickup2 = null;
         PathPlannerPath Pickup2_D = null;
@@ -99,11 +99,11 @@ public class AutoCommandA {
                 // stationLimelight)
 
                 GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
+                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/)
         //
         );
         return new AutoRoutine("Routine 2", command,
@@ -119,8 +119,8 @@ public class AutoCommandA {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight,
-            Limelight stationLimelight) {
+            Limelight reefLimelight/*,
+            Limelight stationLimelight*/) {
         PathPlannerPath Start_C = null;
         PathPlannerPath C_Pickup2 = null;
         PathPlannerPath Pickup2_D = null;
@@ -142,11 +142,11 @@ public class AutoCommandA {
                 // stationLimelight)
 
                 GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight),
+                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight, stationLimelight)
+                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/)
         //
         );
         return new AutoRoutine("Routine 3", command,
@@ -182,8 +182,8 @@ public class AutoCommandA {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight,
-            Limelight stationLimelight) {
+            Limelight reefLimelight/*,
+            Limelight stationLimelight */) {
         var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1.5);
         // var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
 
