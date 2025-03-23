@@ -156,7 +156,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
             m_climber.setControl(m_request.withPosition(goalPosition));
             climberPub.set(m_positionTracker.getClimberPosition());
         })
-        .until(() -> Math.abs(getPosition() - goalPosition) < .5) //abs(goal - position) < error 
+        .until(() -> Math.abs(getPosition() - goalPosition) < .5 || Math.abs(getPosition()) > Math.abs(goalPosition)) //abs(goal - position) < error or abs(position) > abs(goal) (so it can't move backwards) 
         .withName("climber.moveToPosition");
     }
 
