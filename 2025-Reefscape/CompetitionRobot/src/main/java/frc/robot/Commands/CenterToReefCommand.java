@@ -47,7 +47,7 @@ public class CenterToReefCommand extends Command {
     private double CAMERA_AREA_GOAL = 37;
     private double CAMERA_AREA_ERROR = 2;
     private double CAMERA_X_OFFSET_ERROR = 0.9;
-    private double CAMERA_ANGLE_ERROR = 3;
+    private double CAMERA_ANGLE_ERROR = 2.5;
 
     private double m_timeoutDuration;
 
