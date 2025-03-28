@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -38,8 +39,8 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     private boolean initialized;
 
     public Climber(PositionTracker positionTracker) {
-            /* MechanismLigament2d ligament */
-            // Supplier<Pose3d> carriagePoseSupplier) {
+        /* MechanismLigament2d ligament */
+        // Supplier<Pose3d> carriagePoseSupplier) {
         m_positionTracker = positionTracker;
         positionTracker.setClimberPositionSupplier(this::getPosition);
 
@@ -59,7 +60,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFxConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 50; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicCruiseVelocity = 70; // Target cruise velocity of 80 rps
         motionMagicConfigs.MotionMagicAcceleration = 80; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
@@ -92,13 +93,13 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     public Pose3d getClimberComponentPose() {
         return null;
         // return carriagePoseSupplier.get()
-        //         .plus(new Transform3d(0.083, 0, 0, new Rotation3d()))
-        //         .plus(new Transform3d(0, 0, 0, new Rotation3d(0, -getPosition(), 0)));
+        // .plus(new Transform3d(0.083, 0, 0, new Rotation3d()))
+        // .plus(new Transform3d(0, 0, 0, new Rotation3d(0, -getPosition(), 0)));
     }
 
     // @Log(groups = "components")
     // public Pose3d getClawComponentPose() {
-    //     return getClimberComponentPose().plus(new Transform3d(0.2585, 0, 0, new Rotation3d()));
+    // return getClimberComponentPose().plus(new Transform3d(0.2585, 0, 0, new Rotation3d()));
     // }
 
     // @Log
@@ -123,23 +124,23 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     }
 
     // @Override
-    // public void setVoltage(double voltage) {
-    // voltage = MathUtil.clamp(voltage, -12, 12);
-    // voltage = Utils.applySoftStops(voltage, getPosition(), ClimberConstants.MIN_ANGLE_RADIANS,
-    // ClimberConstants.MAX_ANGLE_RADIANS);
+    public void setVoltage(double voltage) {
+        voltage = MathUtil.clamp(voltage, -12, 12);
+        // voltage = Utils.applySoftStops(voltage, getPosition(), ClimberConstants.MIN_ANGLE_RADIANS,
+        // ClimberConstants.MAX_ANGLE_RADIANS);
 
-    // if (voltage < 0
-    // && getPosition() < 0
-    // && m_positionTracker.getElevatorPosition() < ElevatorConstants.MOTION_LIMIT) {
-    // voltage = 0;
-    // }
+        // if (voltage < 0
+        // && getPosition() < 0
+        // && m_positionTracker.getElevatorPosition() < ElevatorConstants.MOTION_LIMIT) {
+        // voltage = 0;
+        // }
 
-    // if (!GlobalStates.INITIALIZED.enabled()) {
-    // voltage = 0.0;
-    // }
+        // if (!GlobalStates.INITIALIZED.enabled()) {
+        // voltage = 0.0;
+        // }
 
-    // m_climber.setVoltage(voltage);
-    // }
+        m_climber.setVoltage(voltage);
+    }
 
     // @Override
     // public Command moveToCurrentGoalCommand() {
@@ -152,19 +153,25 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     // }).withName("climber.moveToCurrentGoal");
     // }
     private Command moveToPositionCommand(double goalPosition) {
+        // var currentPosition = getPosition();
+        // if(Math.abs(getPosition()) > Math.abs(goalPosition)) {
+        //     return Commands.none();
+        // }
         return run(() -> {
             m_climber.setControl(m_request.withPosition(goalPosition));
             climberPub.set(m_positionTracker.getClimberPosition());
         })
-        .until(() -> Math.abs(getPosition() - goalPosition) < .5 || Math.abs(getPosition()) > Math.abs(goalPosition)) //abs(goal - position) < error or abs(position) > abs(goal) (so it can't move backwards) 
-        .withName("climber.moveToPosition");
+                .until(() -> Math.abs(getPosition() - goalPosition) < .5) // abs(goal - position) < error or
+                                                                             // abs(position) > abs(goal) (so it can't
+                                                                             // move backwards)
+                .withName("climber.moveToPosition");
     }
 
     @Override
     public Command moveToSetPositionCommand(Supplier<ClimberPosition> goalPositionSupplier) {
         return Commands.sequence(
                 moveToPositionCommand(goalPositionSupplier.get().value))
-                .withTimeout(2.5)
+                .withTimeout(15)
                 .withName("climber.moveToSetPosition");
     }
 

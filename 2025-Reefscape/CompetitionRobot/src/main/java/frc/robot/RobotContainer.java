@@ -151,8 +151,14 @@ public class RobotContainer {
 
         // CLIMBER
         //m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
-        m_driveController.b().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
-        m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
+        m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
+        m_driveController.x().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
+        
+        m_driveController.povRight().whileTrue(Commands.run(() -> m_climber.setVoltage(-1.75)));
+        m_driveController.povRight().onFalse(Commands.run(() -> m_climber.setVoltage(0.0)));
+
+        m_driveController.povLeft().whileTrue(Commands.run(() -> m_climber.setVoltage(-3.5)));
+        m_driveController.povLeft().onFalse(Commands.run(() -> m_climber.setVoltage(0.0)));
 
         // INTAKE
         // m_driveController.a().onTrue(Commands.runOnce(() -> m_algaeIntake.moveToSpeed(AlgaeIntakeSpeed.IN.value)));
