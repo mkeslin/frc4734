@@ -16,7 +16,7 @@ import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
-import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Cameras.VisionCamera;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class RobotCommands {
@@ -31,7 +31,7 @@ public class RobotCommands {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight) {
+            VisionCamera reefCamera) {
         ElevatorPosition elevatorPosition;
         ArmPosition armPosition;
         SideToSidePosition sideToSidePosition;
@@ -109,7 +109,7 @@ public class RobotCommands {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight) {
+            VisionCamera reefCamera) {
                 return arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
                         .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore))
                         .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));

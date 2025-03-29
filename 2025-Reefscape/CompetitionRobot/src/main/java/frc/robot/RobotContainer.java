@@ -14,21 +14,18 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoCommandA;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToReefCommand;
-import frc.robot.Commands.CenterToStationCommand;
 import frc.robot.Commands.RobotCommands;
-import frc.robot.Constants.AlgaeIntakeConstants.AlgaeIntakeSpeed;
+import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.State.StateMachine;
-import frc.robot.Subsystems.AlgaeIntake;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Climber;
-import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
-import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Cameras.VisionCamera;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
@@ -47,8 +44,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.createDrivetrain();
 
     // SUBSYSTEMS
-    private static Limelight m_reef_limelight = new Limelight("limelight-one", APRILTAGPIPELINE);
-    //private static Limelight m_station_limelight = new Limelight("limelight-two", APRILTAGPIPELINE);
+    private static VisionCamera m_reef_camera = new VisionCamera("photon-one", APRILTAGPIPELINE);
+    // private static VisionCamera m_station_camera = new VisionCamera("photon-two", APRILTAGPIPELINE);
     private Elevator m_elevator = new Elevator(m_positionTracker);
     private Arm m_arm = new Arm(m_positionTracker, m_elevator::getCarriageComponentPose);
     private SideToSide m_sideToSide = new SideToSide(m_positionTracker);
@@ -60,15 +57,15 @@ public class RobotContainer {
     private DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
 
     // COMMANDS
-    public CenterToReefCommand m_centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain,
+    public CenterToReefCommand m_centerToReefCommand = new CenterToReefCommand(m_reef_camera, m_drivetrain,
             m_driveController, 3);
-    //public CenterToStationCommand m_centerToStationCommand = new CenterToStationCommand(m_positionTracker,
-    //        m_station_limelight, m_drivetrain, m_driveController);
+    // public CenterToStationCommand m_centerToStationCommand = new CenterToStationCommand(m_positionTracker,
+    // m_station_camera, m_drivetrain, m_driveController);
 
     public RobotContainer() {
         // register named commands
         NamedCommands.registerCommand("centerToReefCommand", m_centerToReefCommand);
-        //NamedCommands.registerCommand("centerToStationCommand", m_centerToStationCommand);
+        // NamedCommands.registerCommand("centerToStationCommand", m_centerToStationCommand);
 
         // configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
@@ -146,14 +143,14 @@ public class RobotContainer {
     }
 
     private void configureDriveBindings() {
-        //m_driveController.rightTrigger().onTrue(m_centerToStationCommand);
+        // m_driveController.rightTrigger().onTrue(m_centerToStationCommand);
         m_driveController.leftTrigger().onTrue(m_centerToReefCommand);
 
         // CLIMBER
-        //m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
+        // m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
         m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
         m_driveController.x().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
-        
+
         m_driveController.povRight().whileTrue(Commands.run(() -> m_climber.setVoltage(-1.75)));
         m_driveController.povRight().onFalse(Commands.run(() -> m_climber.setVoltage(0.0)));
 
@@ -174,7 +171,7 @@ public class RobotContainer {
                 Commands
                         .waitSeconds(0.0)
                         .andThen(RobotCommands.prepareScoreCoralCommand(m_positionTracker, scoreLevel, scoreSide,
-                                m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight)),
+                                m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_camera)),
                 Commands
                         .waitSeconds(0.0)
                         .andThen(centerToReefCommand.unless(() -> !centerToReef))
@@ -255,7 +252,7 @@ public class RobotContainer {
                         .onlyIf(() -> !m_positionTracker.getCoralInArm()),
                 RobotCommands
                         .prepareScoreCoralRetryCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_sideToSide,
-                                m_lights, m_reef_limelight)
+                                m_lights, m_reef_camera)
                         .onlyIf(() -> m_positionTracker.getCoralInArm())
         //
         );
@@ -286,40 +283,38 @@ public class RobotContainer {
     // }
 
     public void localizeRobotPose() {
-        // boolean doRejectUpdate = false;
-        // LimelightHelpers.SetRobotOrientation("limelight-one",
-        // Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
-        // 0, 0, 0, 0, 0);
-        // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-one");
-        // if (mt2 == null || mt2.tagCount == 0) {
-        // return;
-        // }
-        // // if our angular velocity is greater than 720 degrees per second, ignore vision
-        // // updates
-        // if (Math.abs(m_drivetrain.getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720) {
-        // doRejectUpdate = true;
-        // }
-        // if (!doRejectUpdate) {
-        // m_drivetrain.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-        // m_drivetrain.addVisionMeasurement(
-        // mt2.pose,
-        // Utils.fpgaToCurrentTime(mt2.timestampSeconds));
+        // load camera results for this loop
+        m_reef_camera.cameraPeriodic();
+
+        // Correct pose estimate with vision measurements
+        var poseEstimate = m_reef_camera.getEstimatedGlobalPose();
+        poseEstimate.ifPresent(
+                est -> {
+                    // Change our trust in the measurement based on the tags we can see
+                    var estStdDevs = m_reef_camera.getEstimationStdDevs();
+
+                    m_drivetrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+                });
+
+        // // Test/Example only!
+        // // Apply an offset to pose estimator to test vision correction
+        // // You probably don't want this on a real robot, just delete it.
+        // if (controller.getBButtonPressed()) {
+        // var disturbance = new Transform2d(new Translation2d(1.0, 1.0), new Rotation2d(0.17 * 2 * Math.PI));
+        // drivetrain.resetPose(drivetrain.getPose().plus(disturbance), false);
         // }
     }
 
     public void configureAuto() {
         AutoManager.getInstance()
                 .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, m_centerToReefCommand, m_drivetrain,
-                        m_elevator, m_arm,
-                        m_sideToSide, m_lights, m_reef_limelight/* , m_station_limelight*/));
+                        m_elevator, m_arm, m_sideToSide, m_lights, m_reef_camera));
         AutoManager.getInstance()
                 .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_centerToReefCommand, m_drivetrain,
-                        m_elevator, m_arm,
-                        m_sideToSide, m_lights, m_reef_limelight/*, m_station_limelight */));
+                        m_elevator, m_arm, m_sideToSide, m_lights, m_reef_camera));
         AutoManager.getInstance()
                 .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_centerToReefCommand, m_drivetrain,
-                        m_elevator, m_arm,
-                        m_sideToSide, m_lights, m_reef_limelight/*, m_station_limelight */));
+                        m_elevator, m_arm, m_sideToSide, m_lights, m_reef_camera));
 
         SmartDashboard.putData("Auto Mode (manager)", AutoManager.getInstance().chooser);
     }

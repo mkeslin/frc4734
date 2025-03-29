@@ -7,11 +7,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Cameras.VisionCamera;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class CenterToProcesserCommand extends Command {
-    public Limelight m_limelight;
+    public VisionCamera m_camera;
     public CommandSwerveDrivetrain m_drivetrain;
     public CommandXboxController m_driveController;
 
@@ -28,8 +28,8 @@ public class CenterToProcesserCommand extends Command {
 
     public Timer t = new Timer();
 
-    public CenterToProcesserCommand(Limelight limelight, CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
-        m_limelight = limelight;
+    public CenterToProcesserCommand(VisionCamera camera, CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
+        m_camera = camera;
         m_drivetrain = drivetrain;
         m_driveController = driveController;
 
@@ -37,7 +37,7 @@ public class CenterToProcesserCommand extends Command {
         yController.setTolerance(CAMERA_X_OFFSET_ERROR);
         omegaController.setTolerance(ANGLE_ERROR);
 
-        addRequirements(m_limelight, m_drivetrain);
+        addRequirements(m_camera, m_drivetrain);
     }
 
     // Called just before this Command runs the first time
@@ -53,10 +53,10 @@ public class CenterToProcesserCommand extends Command {
 
     @Override
     public void execute() {
-        var xSpeed = -xController.calculate(m_limelight.getArea());
-        var ySpeed = -yController.calculate(m_limelight.getX());
-        var omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_limelight.getYaw()));
-        if (!m_limelight.hasTargets()) {
+        var xSpeed = -xController.calculate(m_camera.getArea());
+        var ySpeed = -yController.calculate(m_camera.getX());
+        var omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_camera.getYaw()));
+        if (!m_camera.hasTargets()) {
             ySpeed = 0;
             xSpeed = 0;
             omegaSpeed = 0;
@@ -71,7 +71,7 @@ public class CenterToProcesserCommand extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     public boolean isFinished() {
-        return t.hasElapsed(5) || driverInterrupted || !m_limelight.hasTargets() || (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()); //|| (area > FINAL_AREA && x_offset < FINAL_X_OFFSET && yaw_degrees < FINAL_ANGLE_DEGREES);
+        return t.hasElapsed(5) || driverInterrupted || !m_camera.hasTargets() || (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()); //|| (area > FINAL_AREA && x_offset < FINAL_X_OFFSET && yaw_degrees < FINAL_ANGLE_DEGREES);
     }
 
     // Called once after isFinished returns true

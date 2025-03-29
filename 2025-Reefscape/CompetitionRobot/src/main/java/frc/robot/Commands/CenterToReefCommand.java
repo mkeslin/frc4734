@@ -13,11 +13,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Cameras.VisionCamera;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class CenterToReefCommand extends Command {
-    public Limelight m_limelight;
+    public VisionCamera m_camera;
     public CommandSwerveDrivetrain m_drivetrain;
     public CommandXboxController m_driveController;
 
@@ -53,9 +53,9 @@ public class CenterToReefCommand extends Command {
 
     public Timer t = new Timer();
 
-    public CenterToReefCommand(Limelight limelight, CommandSwerveDrivetrain drivetrain,
+    public CenterToReefCommand(VisionCamera camera, CommandSwerveDrivetrain drivetrain,
             CommandXboxController driveController, double timeoutDuration) {
-        m_limelight = limelight;
+        m_camera = camera;
         m_drivetrain = drivetrain;
         m_driveController = driveController;
         m_timeoutDuration = timeoutDuration;
@@ -82,7 +82,7 @@ public class CenterToReefCommand extends Command {
         setPIDValues(centerMethod);
         setTolerances(centerMethod);
 
-        addRequirements(m_limelight, m_drivetrain);
+        addRequirements(m_drivetrain);
     }
 
     // Called just before this Command runs the first time
@@ -128,7 +128,7 @@ public class CenterToReefCommand extends Command {
             System.out.println("Center to Reef: zzzzzzzzzzzzzzz");
             hasPrintedZ = true;
         }
-        
+
         if (t.hasElapsed(m_timeoutDuration)) {
             System.out.println("Center to Reef: time elapsed");
             return true;
@@ -137,7 +137,7 @@ public class CenterToReefCommand extends Command {
             System.out.println("Center to Reef: driver interrupted");
             return true;
         }
-        if (centerMethod == CAMERA && !m_limelight.hasTargets()) {
+        if (centerMethod == CAMERA && !m_camera.hasTargets()) {
             System.out.println("Center to Reef: lost tag");
             return true;
         }
@@ -148,7 +148,7 @@ public class CenterToReefCommand extends Command {
 
         return false;
 
-        // return t.hasElapsed(5) || driverInterrupted || (centerMethod == CAMERA && !m_limelight.hasTargets()) ||
+        // return t.hasElapsed(5) || driverInterrupted || (centerMethod == CAMERA && !m_camera.hasTargets()) ||
         // (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint());
     }
 
@@ -232,10 +232,10 @@ public class CenterToReefCommand extends Command {
             omegaSpeed = omegaController.calculate(position.getRotation().getDegrees());
             // getSpeeds();
         } else if (method == CAMERA) {
-            xSpeed = xController.calculate(m_limelight.getArea());
-            ySpeed = yController.calculate(m_limelight.getX());
-            omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_limelight.getYaw()));
-            if (!m_limelight.hasTargets()) {
+            xSpeed = xController.calculate(m_camera.getArea());
+            ySpeed = yController.calculate(m_camera.getX());
+            omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_camera.getYaw()));
+            if (!m_camera.hasTargets()) {
                 ySpeed = 0;
                 xSpeed = 0;
                 omegaSpeed = 0;
