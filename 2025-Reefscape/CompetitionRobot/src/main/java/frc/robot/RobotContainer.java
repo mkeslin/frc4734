@@ -47,8 +47,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.createDrivetrain();
 
     // SUBSYSTEMS
-    private static Limelight m_reef_limelight = new Limelight("limelight-one", APRILTAGPIPELINE);
-    //private static Limelight m_station_limelight = new Limelight("limelight-two", APRILTAGPIPELINE);
+    private static Limelight m_reef_limelight = new Limelight("limelight", APRILTAGPIPELINE);
+    // private static Limelight m_station_limelight = new Limelight("limelight-two", APRILTAGPIPELINE);
     private Elevator m_elevator = new Elevator(m_positionTracker);
     private Arm m_arm = new Arm(m_positionTracker, m_elevator::getCarriageComponentPose);
     private SideToSide m_sideToSide = new SideToSide(m_positionTracker);
@@ -62,13 +62,13 @@ public class RobotContainer {
     // COMMANDS
     public CenterToReefCommand m_centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain,
             m_driveController, 3);
-    //public CenterToStationCommand m_centerToStationCommand = new CenterToStationCommand(m_positionTracker,
-    //        m_station_limelight, m_drivetrain, m_driveController);
+    // public CenterToStationCommand m_centerToStationCommand = new CenterToStationCommand(m_positionTracker,
+    // m_station_limelight, m_drivetrain, m_driveController);
 
     public RobotContainer() {
         // register named commands
         NamedCommands.registerCommand("centerToReefCommand", m_centerToReefCommand);
-        //NamedCommands.registerCommand("centerToStationCommand", m_centerToStationCommand);
+        // NamedCommands.registerCommand("centerToStationCommand", m_centerToStationCommand);
 
         // configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
@@ -146,14 +146,14 @@ public class RobotContainer {
     }
 
     private void configureDriveBindings() {
-        //m_driveController.rightTrigger().onTrue(m_centerToStationCommand);
+        // m_driveController.rightTrigger().onTrue(m_centerToStationCommand);
         m_driveController.leftTrigger().onTrue(m_centerToReefCommand);
 
         // CLIMBER
-        //m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
+        // m_driveController.a().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.DOWN));
         m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
         m_driveController.x().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
-        
+
         m_driveController.povRight().whileTrue(Commands.run(() -> m_climber.setVoltage(-1.75)));
         m_driveController.povRight().onFalse(Commands.run(() -> m_climber.setVoltage(0.0)));
 
@@ -287,10 +287,10 @@ public class RobotContainer {
 
     public void localizeRobotPose() {
         // boolean doRejectUpdate = false;
-        // LimelightHelpers.SetRobotOrientation("limelight-one",
+        // LimelightHelpers.SetRobotOrientation("limelight",
         // Units.radiansToDegrees(m_drivetrain.getRotation3d().getZ()),
         // 0, 0, 0, 0, 0);
-        // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-one");
+        // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
         // if (mt2 == null || mt2.tagCount == 0) {
         // return;
         // }
@@ -311,15 +311,24 @@ public class RobotContainer {
         AutoManager.getInstance()
                 .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, m_centerToReefCommand, m_drivetrain,
                         m_elevator, m_arm,
-                        m_sideToSide, m_lights, m_reef_limelight/* , m_station_limelight*/));
+                        m_sideToSide, m_lights, m_reef_limelight/* , m_station_limelight */));
         AutoManager.getInstance()
                 .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_centerToReefCommand, m_drivetrain,
                         m_elevator, m_arm,
-                        m_sideToSide, m_lights, m_reef_limelight/*, m_station_limelight */));
+                        m_sideToSide, m_lights, m_reef_limelight/* , m_station_limelight */));
         AutoManager.getInstance()
                 .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_centerToReefCommand, m_drivetrain,
                         m_elevator, m_arm,
-                        m_sideToSide, m_lights, m_reef_limelight/*, m_station_limelight */));
+                        m_sideToSide, m_lights, m_reef_limelight/* , m_station_limelight */));
+
+        // AutoManager.getInstance()
+        //         .addRoutine(AutoCommandA.StartingPositionTuning1(m_drivetrain));
+        // AutoManager.getInstance()
+        //         .addRoutine(AutoCommandA.StartingPositionTuning2(m_drivetrain));
+        // AutoManager.getInstance()
+        //         .addRoutine(AutoCommandA.StartingPositionTuning3(m_drivetrain));
+        // AutoManager.getInstance()
+        //         .addRoutine(AutoCommandA.StartingPositionTuning4(m_drivetrain));
 
         SmartDashboard.putData("Auto Mode (manager)", AutoManager.getInstance().chooser);
     }

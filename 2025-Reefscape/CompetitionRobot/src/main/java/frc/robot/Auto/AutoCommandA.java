@@ -33,8 +33,7 @@ public class AutoCommandA {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight/*,
-            Limelight stationLimelight*/) {
+            Limelight reefLimelight) {
         PathPlannerPath Start_A = null;
         PathPlannerPath A_Pickup1 = null;
         PathPlannerPath Pickup1_F = null;
@@ -56,11 +55,11 @@ public class AutoCommandA {
                 // stationLimelight)
 
                 GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight */),
+                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight */),
+                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight */)
+                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */)
         //
         );
         return new AutoRoutine("Routine 1", command,
@@ -76,8 +75,7 @@ public class AutoCommandA {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight/*,
-            Limelight stationLimelight*/) {
+            Limelight reefLimelight) {
         PathPlannerPath Start_B = null;
         PathPlannerPath B_Pickup2 = null;
         PathPlannerPath Pickup2_D = null;
@@ -99,11 +97,11 @@ public class AutoCommandA {
                 // stationLimelight)
 
                 GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/),
+                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/),
+                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/)
+                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */)
         //
         );
         return new AutoRoutine("Routine 2", command,
@@ -119,8 +117,7 @@ public class AutoCommandA {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight/*,
-            Limelight stationLimelight*/) {
+            Limelight reefLimelight) {
         PathPlannerPath Start_C = null;
         PathPlannerPath C_Pickup2 = null;
         PathPlannerPath Pickup2_D = null;
@@ -142,11 +139,11 @@ public class AutoCommandA {
                 // stationLimelight)
 
                 GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/),
+                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/),
+                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/*, stationLimelight*/)
+                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */)
         //
         );
         return new AutoRoutine("Routine 3", command,
@@ -154,22 +151,71 @@ public class AutoCommandA {
                 Start_C.getStartingDifferentialPose());
     }
 
+    public static AutoRoutine StartingPositionTuning1(CommandSwerveDrivetrain drivetrain) {
+        PathPlannerPath path = null;
+        try {
+            path = PathPlannerPath.fromPathFile("zzTuning-1");
+
+        } catch (Exception exception) {
+            DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
+        }
+
+        Command command = drivetrain.followPathCommand(path);
+        return new AutoRoutine("Tuning1", command, List.of(path), path.getStartingDifferentialPose());
+    }
+
+    public static AutoRoutine StartingPositionTuning2(CommandSwerveDrivetrain drivetrain) {
+        PathPlannerPath path = null;
+        try {
+            path = PathPlannerPath.fromPathFile("zzTuning-2");
+        } catch (Exception exception) {
+            DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
+        }
+
+        Command command = drivetrain.followPathCommand(path);
+        return new AutoRoutine("Tuning2", command, List.of(path), path.getStartingDifferentialPose());
+    }
+
+    public static AutoRoutine StartingPositionTuning3(CommandSwerveDrivetrain drivetrain) {
+        PathPlannerPath path = null;
+        try {
+            path = PathPlannerPath.fromPathFile("zzTuning-3");
+        } catch (Exception exception) {
+            DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
+        }
+
+        Command command = drivetrain.followPathCommand(path);
+        return new AutoRoutine("Tuning3", command, List.of(path), path.getStartingDifferentialPose());
+    }
+
+    public static AutoRoutine StartingPositionTuning4(CommandSwerveDrivetrain drivetrain) {
+        PathPlannerPath path = null;
+        try {
+            path = PathPlannerPath.fromPathFile("zzTuning-4");
+        } catch (Exception exception) {
+            DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
+        }
+
+        Command command = drivetrain.followPathCommand(path);
+        return new AutoRoutine("Tuning4", command, List.of(path), path.getStartingDifferentialPose());
+    }
+
     // private static Command GetDrivingPracticeCommand(
-    //         PathPlannerPath pathToReef,
-    //         PathPlannerPath pathToCoralStation,
-    //         PositionTracker positionTracker,
-    //         CommandSwerveDrivetrain drivetrain,
-    //         Limelight reefLimelight,
-    //         Limelight stationLimelight) {
-    //     var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1.25);
-    //     var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
-    //     return Commands.sequence(
-    //             drivetrain.followPathCommand(pathToReef),
-    //             centerToReefCommand,
-    //             drivetrain.followPathCommand(pathToCoralStation),
-    //             centerToStationCommand
-    //     //
-    //     );
+    // PathPlannerPath pathToReef,
+    // PathPlannerPath pathToCoralStation,
+    // PositionTracker positionTracker,
+    // CommandSwerveDrivetrain drivetrain,
+    // Limelight reefLimelight,
+    // Limelight stationLimelight) {
+    // var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1.25);
+    // var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
+    // return Commands.sequence(
+    // drivetrain.followPathCommand(pathToReef),
+    // centerToReefCommand,
+    // drivetrain.followPathCommand(pathToCoralStation),
+    // centerToStationCommand
+    // //
+    // );
     // }
 
     private static Command GetCycleCommand(
@@ -182,8 +228,7 @@ public class AutoCommandA {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight/*,
-            Limelight stationLimelight */) {
+            Limelight reefLimelight) {
         var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1.5);
         // var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
 
