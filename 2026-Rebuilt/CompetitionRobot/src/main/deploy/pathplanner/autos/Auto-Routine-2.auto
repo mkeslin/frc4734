@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2-Start-B"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2-B-Pickup2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2-Pickup2-D"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2-D-Pickup2"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
