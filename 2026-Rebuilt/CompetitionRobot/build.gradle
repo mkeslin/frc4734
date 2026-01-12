@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2026.1.1"
+    id "jacoco"
 }
 
 java {
@@ -82,6 +83,42 @@ dependencies {
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+    
+    // Enable JaCoCo for test coverage
+    finalizedBy jacocoTestReport
+}
+
+// JaCoCo test coverage configuration
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+    dependsOn test // Tests must be run before generating the report
+    
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+    
+    // Exclude generated classes and test classes from coverage
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                '**/Main.class',
+                '**/*Test*.class',
+                '**/TestUtils.class'
+            ])
+        }))
+    }
+}
+
+// Task to generate coverage report
+task coverageReport(type: JacocoReport) {
+    dependsOn test
+    executionData test
+    sourceSets sourceSets.main
 }
 
 // Remove test dependency from check task so tests don't run during build
