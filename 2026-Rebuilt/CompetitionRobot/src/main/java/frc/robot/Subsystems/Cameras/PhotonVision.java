@@ -5,12 +5,14 @@ package frc.robot.Subsystems.Cameras;
 import static frc.robot.Constants.VisionConstants.CAMERA_POSITION;
 import static frc.robot.Constants.VisionConstants.CAMERA_ROTATION;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -53,10 +55,25 @@ public class PhotonVision extends SubsystemBase {
     }
 
     /**
+     * Gets the latest camera result using the non-deprecated API.
+     * Uses getAllUnreadResults() and returns the most recent result, or null if none available.
+     * 
+     * @return The latest PhotonPipelineResult, or null if no results are available
+     */
+    private PhotonPipelineResult getLatestResultInternal() {
+        List<PhotonPipelineResult> results = camera.getAllUnreadResults();
+        if (results != null && !results.isEmpty()) {
+            // Return the last (most recent) result
+            return results.get(results.size() - 1);
+        }
+        return null;
+    }
+
+    /**
      * @return Whether or not PhotonVision has targets within its field of view
      */
     public boolean hasTargets() {
-        var result = camera.getLatestResult();
+        var result = getLatestResultInternal();
         return result != null && result.hasTargets();
     }
 
@@ -65,7 +82,7 @@ public class PhotonVision extends SubsystemBase {
      *         Note: This maps to Limelight's getX() method
      */
     public double getX() {
-        var result = camera.getLatestResult();
+        var result = getLatestResultInternal();
         if (result != null && result.hasTargets()) {
             return result.getBestTarget().getYaw();
         }
@@ -77,7 +94,7 @@ public class PhotonVision extends SubsystemBase {
      *         Note: This maps to Limelight's getY() method
      */
     public double getY() {
-        var result = camera.getLatestResult();
+        var result = getLatestResultInternal();
         if (result != null && result.hasTargets()) {
             return result.getBestTarget().getPitch();
         }
@@ -89,7 +106,7 @@ public class PhotonVision extends SubsystemBase {
      *         Note: PhotonVision uses different metrics than Limelight
      */
     public double getArea() {
-        var result = camera.getLatestResult();
+        var result = getLatestResultInternal();
         if (result != null && result.hasTargets()) {
             PhotonTrackedTarget target = result.getBestTarget();
             // PhotonVision provides area directly as a percentage
@@ -102,7 +119,7 @@ public class PhotonVision extends SubsystemBase {
      * @return Estimated x distance to target in meters
      */
     public double getXDistance() {
-        var result = camera.getLatestResult();
+        var result = getLatestResultInternal();
         if (result != null && result.hasTargets()) {
             return result.getBestTarget().getBestCameraToTarget().getX();
         }
@@ -113,7 +130,7 @@ public class PhotonVision extends SubsystemBase {
      * @return Estimated y distance to target in meters
      */
     public double getYDistance() {
-        var result = camera.getLatestResult();
+        var result = getLatestResultInternal();
         if (result != null && result.hasTargets()) {
             return result.getBestTarget().getBestCameraToTarget().getY();
         }
@@ -124,7 +141,7 @@ public class PhotonVision extends SubsystemBase {
      * @return Yaw (rotation relative to y-axis) of camera target in radians
      */
     public double getYaw() {
-        var result = camera.getLatestResult();
+        var result = getLatestResultInternal();
         if (result != null && result.hasTargets()) {
             return Math.toRadians(result.getBestTarget().getYaw());
         }
@@ -153,7 +170,7 @@ public class PhotonVision extends SubsystemBase {
      * @return AprilTag ID of the best target, or -1 if no target
      */
     public double getAprilTagID() {
-        var result = camera.getLatestResult();
+        var result = getLatestResultInternal();
         if (result != null && result.hasTargets()) {
             return result.getBestTarget().getFiducialId();
         }
@@ -171,11 +188,12 @@ public class PhotonVision extends SubsystemBase {
 
     /**
      * Gets the latest camera result for direct access.
+     * Uses the non-deprecated API internally.
      * 
-     * @return The latest PhotonPipelineResult
+     * @return The latest PhotonPipelineResult, or null if no results are available
      */
-    public org.photonvision.targeting.PhotonPipelineResult getLatestResult() {
-        return camera.getLatestResult();
+    public PhotonPipelineResult getLatestResult() {
+        return getLatestResultInternal();
     }
 
     /**
@@ -184,7 +202,7 @@ public class PhotonVision extends SubsystemBase {
      * @return Optional containing the estimated robot pose, or empty if no valid estimate
      */
     public Optional<EstimatedRobotPose> getEstimatedRobotPose() {
-        var result = camera.getLatestResult();
+        var result = getLatestResultInternal();
         if (result != null && result.hasTargets()) {
             return poseEstimator.update(result);
         }
