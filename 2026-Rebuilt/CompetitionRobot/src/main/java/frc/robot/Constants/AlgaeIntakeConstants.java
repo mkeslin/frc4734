@@ -1,6 +1,14 @@
 package frc.robot.Constants;
 
+/**
+ * Constants for the AlgaeIntake subsystem.
+ * Contains predefined intake speeds for different operational modes.
+ */
 public class AlgaeIntakeConstants {
+    /**
+     * Enumeration of predefined algae intake speeds.
+     * STOPPED, IN (intake), and OUT (outtake) speeds.
+     */
     public static enum AlgaeIntakeSpeed {
         STOPPED(0),
         IN(0.3),

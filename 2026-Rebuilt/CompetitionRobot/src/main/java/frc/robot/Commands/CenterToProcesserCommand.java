@@ -12,6 +12,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
+/**
+ * Command to center the robot to the processor station using PhotonVision.
+ * Uses PID controllers to align the robot based on camera feedback (area, X offset, and yaw).
+ * The command completes when the robot reaches the target position, loses vision targets,
+ * times out after 5 seconds, or is interrupted by the driver.
+ * 
+ * @see PhotonVision
+ * @see CommandSwerveDrivetrain
+ */
 public class CenterToProcesserCommand extends Command {
     public PhotonVision m_photonVision;
     public CommandSwerveDrivetrain m_drivetrain;
@@ -30,6 +39,14 @@ public class CenterToProcesserCommand extends Command {
 
     public Timer t = new Timer();
 
+    /**
+     * Creates a new CenterToProcesserCommand.
+     * 
+     * @param photonVision The PhotonVision camera subsystem for vision feedback
+     * @param drivetrain The swerve drivetrain to control
+     * @param driveController The Xbox controller for driver interruption (can be null)
+     * @throws NullPointerException if photonVision or drivetrain is null
+     */
     public CenterToProcesserCommand(PhotonVision photonVision, CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
         m_photonVision = Objects.requireNonNull(photonVision, "PhotonVision cannot be null");
         m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
@@ -42,7 +59,10 @@ public class CenterToProcesserCommand extends Command {
         addRequirements(m_photonVision, m_drivetrain);
     }
 
-    // Called just before this Command runs the first time
+    /**
+     * Initializes the command by starting the timer and setting PID controller setpoints.
+     * Resets the driver interruption flag.
+     */
     @Override
     public void initialize() {
         t.start();
@@ -53,6 +73,10 @@ public class CenterToProcesserCommand extends Command {
         driverInterrupted = false;
     }
 
+    /**
+     * Executes the command by calculating PID outputs based on vision feedback
+     * and applying them to the drivetrain. Stops movement if no vision targets are detected.
+     */
     @Override
     public void execute() {
         var xSpeed = -xController.calculate(m_photonVision.getArea());
@@ -70,19 +94,36 @@ public class CenterToProcesserCommand extends Command {
         }
     }
 
-    // Make this return true when this Command no longer needs to run execute()
+    /**
+     * Determines if the command should finish.
+     * 
+     * @return true if the timeout has elapsed, driver interrupted, no targets detected,
+     *         or all PID controllers are at their setpoints
+     */
     @Override
     public boolean isFinished() {
         return t.hasElapsed(5) || driverInterrupted || !m_photonVision.hasTargets() || (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()); //|| (area > FINAL_AREA && x_offset < FINAL_X_OFFSET && yaw_degrees < FINAL_ANGLE_DEGREES);
     }
 
-    // Called once after isFinished returns true
+    /**
+     * Called when the command ends. Stops and resets the timer.
+     * 
+     * @param interrupted true if the command was interrupted, false if it completed normally
+     */
     @Override
     public void end(boolean interrupted) {
         t.stop();
         t.reset();
     }
 
+    /**
+     * Debug method to publish calculated speeds to SmartDashboard.
+     * Currently unused but kept for debugging purposes.
+     * 
+     * @param x The X speed component
+     * @param y The Y speed component
+     * @param omega The rotational speed component
+     */
     public void getSpeeds(double x, double y, double omega) {
         SmartDashboard.putNumber("xSpeed", x);
         SmartDashboard.putNumber("ySpeed", y);

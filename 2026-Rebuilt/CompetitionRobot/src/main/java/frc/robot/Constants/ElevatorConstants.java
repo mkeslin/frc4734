@@ -1,6 +1,14 @@
 package frc.robot.Constants;
 
+/**
+ * Constants for the Elevator subsystem.
+ * Contains predefined elevator positions, motion limits, and velocity/acceleration constraints.
+ */
 public class ElevatorConstants {
+    /**
+     * Enumeration of predefined elevator positions in rotations.
+     * These positions correspond to different scoring levels and operational states.
+     */
     public static enum ElevatorPosition {
         BOTTOM(0),
         INTAKE_PREP(4.283203 ),

@@ -18,6 +18,19 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
+/**
+ * Command to center the robot to the reef scoring station using PhotonVision.
+ * Supports two centering methods: camera-based (using area, X offset, and yaw) and
+ * pose-based (using estimated robot pose from AprilTags). Uses PID controllers to
+ * align the robot and completes when the target position is reached, vision is lost,
+ * timeout occurs, or driver interrupts.
+ * 
+ * <p>This command pre-calculates target poses for AprilTags 6-11 and 17-22 during
+ * construction, positioning the robot at a fixed distance from each tag.
+ * 
+ * @see PhotonVision
+ * @see CommandSwerveDrivetrain
+ */
 public class CenterToReefCommand extends Command {
     public PhotonVision m_photonVision;
     public CommandSwerveDrivetrain m_drivetrain;
@@ -55,6 +68,16 @@ public class CenterToReefCommand extends Command {
 
     public Timer t = new Timer();
 
+    /**
+     * Creates a new CenterToReefCommand.
+     * 
+     * @param photonVision The PhotonVision camera subsystem for vision feedback
+     * @param drivetrain The swerve drivetrain to control
+     * @param driveController The Xbox controller for driver interruption (can be null)
+     * @param timeoutDuration The maximum time in seconds before the command times out (must be > 0)
+     * @throws NullPointerException if photonVision or drivetrain is null
+     * @throws IllegalArgumentException if timeoutDuration is less than or equal to 0
+     */
     public CenterToReefCommand(PhotonVision photonVision, CommandSwerveDrivetrain drivetrain,
             CommandXboxController driveController, double timeoutDuration) {
         m_photonVision = Objects.requireNonNull(photonVision, "PhotonVision cannot be null");
@@ -101,7 +124,10 @@ public class CenterToReefCommand extends Command {
         addRequirements(m_photonVision, m_drivetrain);
     }
 
-    // Called just before this Command runs the first time
+    /**
+     * Initializes the command by starting the timer, setting targets based on the centering method,
+     * and resetting the driver interruption flag.
+     */
     @Override
     public void initialize() {
         t.start();
@@ -110,6 +136,10 @@ public class CenterToReefCommand extends Command {
         driverInterrupted = false;
     }
 
+    /**
+     * Executes the command by calculating speeds based on the selected centering method
+     * and applying them to the drivetrain. Publishes speeds to SmartDashboard for debugging.
+     */
     @Override
     public void execute() {
         setSpeeds(centerMethod);
@@ -129,7 +159,12 @@ public class CenterToReefCommand extends Command {
     private boolean hasPrintedY = false;
     private boolean hasPrintedZ = false;
 
-    // Make this return true when this Command no longer needs to run execute()
+    /**
+     * Determines if the command should finish. Logs when each axis reaches its setpoint.
+     * 
+     * @return true if the timeout has elapsed, driver interrupted, no targets detected,
+     *         or all PID controllers are at their setpoints
+     */
     @Override
     public boolean isFinished() {
         if (!hasPrintedX && xController.atSetpoint()) {
@@ -165,7 +200,11 @@ public class CenterToReefCommand extends Command {
         return false;
     }
 
-    // Called once after isFinished returns true
+    /**
+     * Called when the command ends. Stops and resets the timer, and stops drivetrain movement.
+     * 
+     * @param interrupted true if the command was interrupted, false if it completed normally
+     */
     @Override
     public void end(boolean interrupted) {
         t.stop();

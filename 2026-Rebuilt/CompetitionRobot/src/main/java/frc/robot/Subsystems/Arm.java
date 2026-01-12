@@ -31,6 +31,22 @@ import frc.robot.Telemetry;
 import frc.robot.Constants.ArmConstants.ArmPosition;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
 
+/**
+ * Arm subsystem that controls the robot's arm mechanism.
+ * Uses a TalonFX motor with MotionMagic control for smooth position-based movement.
+ * The arm can move to predefined positions (via ArmPosition enum) or arbitrary positions.
+ * 
+ * <p>Safety features:
+ * <ul>
+ *   <li>Prevents movement until robot is initialized via RobotState</li>
+ *   <li>Uses MotionMagic for smooth, controlled motion</li>
+ *   <li>Publishes arm angle to NetworkTables for telemetry</li>
+ * </ul>
+ * 
+ * @see BaseSingleJointedArm
+ * @see ArmPosition
+ * @see RobotState
+ */
 // @LoggedObject
 public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPosition> {
     private final DoublePublisher armPub = Telemetry.createMechanismsPublisher("Arm Angle");
@@ -144,6 +160,11 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         // ligament.setAngle(Units.radiansToDegrees(getPosition()) + 270);
     }
 
+    /**
+     * Gets whether the arm has been initialized (position reset).
+     * 
+     * @return true if initialized, false otherwise
+     */
     public boolean getInitialized() {
         return initialized;
     }
@@ -151,6 +172,8 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     /**
      * Updates the PositionTracker reference. Used during initialization to ensure
      * all subsystems share the same PositionTracker instance with real suppliers.
+     * 
+     * @param positionTracker The PositionTracker instance to use (can be null)
      */
     public void setPositionTracker(PositionTracker positionTracker) {
         m_positionTracker = positionTracker;
@@ -173,12 +196,22 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         return getArmComponentPose().plus(new Transform3d(0.2585, 0, 0, new Rotation3d()));
     }
 
+    /**
+     * Gets the current arm position in rotations.
+     * 
+     * @return The current arm position
+     */
     // @Log
     @Override
     public double getPosition() {
         return m_armMotor.getPosition().getValueAsDouble();
     }
 
+    /**
+     * Gets the current arm velocity in rotations per second.
+     * 
+     * @return The current arm velocity
+     */
     // @Log
     public double getVelocity() {
         // if (RobotBase.isReal())
@@ -187,6 +220,10 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         // return simVelocity;
     }
 
+    /**
+     * Resets the arm position to the bottom position and marks the arm as initialized.
+     * This should be called when the arm is at a known hard stop position.
+     */
     @Override
     public void resetPosition() {
         m_armMotor.setPosition(ArmPosition.BOTTOM.value);

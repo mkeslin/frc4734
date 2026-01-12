@@ -31,6 +31,22 @@ import frc.robot.Telemetry;
 import frc.robot.Constants.AlgaeIntakeConstants.AlgaeIntakeSpeed;
 import frc.robot.Subsystems.Bases.BaseIntake;
 
+/**
+ * AlgaeIntake subsystem that controls the robot's algae intake mechanism.
+ * Uses a TalonFX motor with velocity control for speed-based operation.
+ * The intake can run at predefined speeds (via AlgaeIntakeSpeed enum) or arbitrary speeds.
+ * 
+ * <p>Safety features:
+ * <ul>
+ *   <li>Prevents movement until robot is initialized via RobotState</li>
+ *   <li>Uses velocity control for smooth speed regulation</li>
+ *   <li>Publishes intake speed to NetworkTables for telemetry</li>
+ * </ul>
+ * 
+ * @see BaseIntake
+ * @see AlgaeIntakeSpeed
+ * @see RobotState
+ */
 // @LoggedObject
 public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntakeSpeed> {
     private final DoublePublisher algaeIntakePub = Telemetry.createMechanismsPublisher("Intake Speed");

@@ -2,7 +2,15 @@ package frc.robot.Constants;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
+/**
+ * Constants for the Arm subsystem.
+ * Contains predefined arm positions, motion limits, and PID tuning parameters.
+ */
 public class ArmConstants {
+    /**
+     * Enumeration of predefined arm positions in rotations.
+     * These positions correspond to different scoring levels and operational states.
+     */
     public static enum ArmPosition {
         BOTTOM(0),
         L1(6.424805),

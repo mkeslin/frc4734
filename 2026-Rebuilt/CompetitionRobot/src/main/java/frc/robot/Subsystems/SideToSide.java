@@ -29,6 +29,22 @@ import frc.robot.Telemetry;
 import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
 
+/**
+ * SideToSide subsystem that controls the robot's horizontal side-to-side mechanism.
+ * Uses a TalonFX motor with MotionMagic control for smooth position-based movement.
+ * The mechanism can move to predefined positions (via SideToSidePosition enum) or arbitrary positions.
+ * 
+ * <p>Safety features:
+ * <ul>
+ *   <li>Prevents movement until robot is initialized via RobotState</li>
+ *   <li>Uses MotionMagic for smooth, controlled motion</li>
+ *   <li>Publishes side-to-side position to NetworkTables for telemetry</li>
+ * </ul>
+ * 
+ * @see BaseLinearMechanism
+ * @see SideToSidePosition
+ * @see RobotState
+ */
 public class SideToSide extends SubsystemBase implements BaseLinearMechanism<SideToSidePosition> {
     private final DoublePublisher sideToSidePub = Telemetry.createMechanismsPublisher("Side To Side Position");
 

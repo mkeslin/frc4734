@@ -1,6 +1,14 @@
 package frc.robot.Constants;
 
+/**
+ * Constants for the SideToSide subsystem.
+ * Contains predefined side-to-side positions, conversion factors, and motion constraints.
+ */
 public class SideToSideConstants {
+    /**
+     * Enumeration of predefined side-to-side positions in rotations.
+     * LEFT, CENTER, and RIGHT positions for scoring alignment.
+     */
     public static enum SideToSidePosition {
         LEFT(28.3),
         CENTER(0),

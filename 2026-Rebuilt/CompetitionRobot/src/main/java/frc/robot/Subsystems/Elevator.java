@@ -32,6 +32,22 @@ import frc.robot.Telemetry;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
 
+/**
+ * Elevator subsystem that controls the robot's vertical elevator mechanism.
+ * Uses two TalonFX motors (leader and follower) with MotionMagic control for smooth position-based movement.
+ * The elevator can move to predefined positions (via ElevatorPosition enum) or arbitrary positions.
+ * 
+ * <p>Safety features:
+ * <ul>
+ *   <li>Prevents movement until robot is initialized via RobotState</li>
+ *   <li>Uses MotionMagic for smooth, controlled motion</li>
+ *   <li>Publishes elevator position to NetworkTables for telemetry</li>
+ * </ul>
+ * 
+ * @see BaseLinearMechanism
+ * @see ElevatorPosition
+ * @see RobotState
+ */
 public class Elevator extends SubsystemBase implements BaseLinearMechanism<ElevatorPosition> {
     private final DoublePublisher elevatorPub = Telemetry.createMechanismsPublisher("Elevator Position");
 

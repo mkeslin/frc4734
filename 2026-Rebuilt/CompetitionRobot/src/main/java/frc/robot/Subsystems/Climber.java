@@ -24,6 +24,22 @@ import frc.robot.Telemetry;
 import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
 
+/**
+ * Climber subsystem that controls the robot's climbing mechanism.
+ * Uses a TalonFX motor with MotionMagic control for smooth position-based movement.
+ * The climber can move to predefined positions (via ClimberPosition enum) or arbitrary positions.
+ * 
+ * <p>Safety features:
+ * <ul>
+ *   <li>Prevents movement until robot is initialized via RobotState</li>
+ *   <li>Uses MotionMagic for smooth, controlled motion</li>
+ *   <li>Publishes climber position to NetworkTables for telemetry</li>
+ * </ul>
+ * 
+ * @see BaseSingleJointedArm
+ * @see ClimberPosition
+ * @see RobotState
+ */
 public class Climber extends SubsystemBase implements BaseSingleJointedArm<ClimberPosition> {
     private final DoublePublisher climberPub = Telemetry.createMechanismsPublisher("Climber Position");
 

@@ -2,7 +2,15 @@ package frc.robot.Constants;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
+/**
+ * Constants for the Climber subsystem.
+ * Contains predefined climber positions, motion limits, PID tuning parameters, and motion constraints.
+ */
 public class ClimberConstants {
+    /**
+     * Enumeration of predefined climber positions in rotations.
+     * DOWN, ACQUIRE, and CLIMB positions for different climbing states.
+     */
     public static enum ClimberPosition {
         DOWN(0),
         ACQUIRE(-50),
