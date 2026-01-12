@@ -153,9 +153,6 @@ public class CenterToReefCommand extends Command {
         }
 
         return false;
-
-        // return t.hasElapsed(5) || driverInterrupted || (centerMethod == CAMERA && !m_limelight.hasTargets()) ||
-        // (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint());
     }
 
     // Called once after isFinished returns true
@@ -236,7 +233,6 @@ public class CenterToReefCommand extends Command {
             xSpeed = 2 * Math.signum(position.getRotation().getCos()) * xController.calculate(position.getX());
             ySpeed = 2 * Math.signum(position.getRotation().getCos()) * yController.calculate(position.getY());
             omegaSpeed = omegaController.calculate(position.getRotation().getDegrees());
-            // getSpeeds();
         } else if (method == CAMERA) {
             xSpeed = xController.calculate(m_photonVision.getArea());
             ySpeed = yController.calculate(m_photonVision.getX());

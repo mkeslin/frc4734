@@ -69,7 +69,6 @@ public class CenterToStationCommand extends Command {
             xSpeed = 0;
             omegaSpeed = 0;
         }
-        // getSpeeds(xSpeed, ySpeed, omegaSpeed);
         m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
         if (m_driveController != null) {
             m_driveController.povUp().onTrue(Commands.runOnce(() -> {
@@ -107,11 +106,6 @@ public class CenterToStationCommand extends Command {
         }
 
         return false;
-
-        // return t.hasElapsed(5) || m_positionTracker.getCoralInTray() || driverInterrupted ||
-        // !m_limelight.hasTargets() || (xController.atSetpoint() && yController.atSetpoint() &&
-        // omegaController.atSetpoint()); //|| (area > FINAL_AREA && x_offset < FINAL_X_OFFSET && yaw_degrees <
-        // FINAL_ANGLE_DEGREES);
     }
 
     // Called once after isFinished returns true

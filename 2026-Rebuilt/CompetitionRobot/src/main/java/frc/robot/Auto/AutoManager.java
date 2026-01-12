@@ -48,12 +48,6 @@ public class AutoManager {
     private Consumer<Pose2d> resetOdometryConsumer;
     private Timer timer = new Timer();
 
-    /**
-     * Base robot config object required by PathPlanner to generate trajectories;
-     * only used for visualization.
-     */
-    // private RobotConfig pathPlannerRobotConfig = new RobotConfig(50, 1,
-    //         new ModuleConfig(0.05, 4.5, 1.0, DCMotor.getKrakenX60(1), 60, 1));
 
     /**
      * Creates a new AutoManager instance.
@@ -65,12 +59,6 @@ public class AutoManager {
      * Initializes logging for the AutoManager.
      */
     public void init() {
-        // chooser.setDefaultOption("None", new AutoRoutine("None", Commands.print("No path selected.")));
-        // LoggingManager.getInstance().addGroup(
-        //         new LogGroup("autonomous",
-        //                 new DoubleLogItem("autoTimer", timer::get, LogType.NT),
-        //                 new SendableLogItem("field", field),
-        //                 new SendableLogItem("chooser", chooser)));
     }
 
     /**
@@ -99,7 +87,6 @@ public class AutoManager {
      */
     public AutoRoutine getSelectedRoutine() {
         return chooser.getSelected();
-        // return routines.entrySet().iterator().next().getValue();
     }
 
     /**
@@ -126,14 +113,6 @@ public class AutoManager {
         DataLogManager.log("[AutoManager] Reset odometry consumer set");
     }
 
-    /**
-     * Sets the RobotConfig object to use when generating
-     * 
-     * @param consumer the {@code Pose2d} consumer
-     */
-    // public void setRobotConfig(RobotConfig robotConfig) {
-    //     this.pathPlannerRobotConfig = robotConfig;
-    // }
 
     /**
      * Updates the NetworkTables field with the new selected auto path. This
