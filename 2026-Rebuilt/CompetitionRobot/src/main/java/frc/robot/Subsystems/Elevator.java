@@ -40,26 +40,13 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     private TalonFX m_elevatorRightFollowerMotor;
     private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
-    // private double simVelocity = 0.0;
-
     private final SysIdRoutine m_sysIdRoutine;
 
     private final PositionTracker m_positionTracker;
-    // private final MechanismLigament2d ligament;
 
     private MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
     private boolean initialized;
-
-    // private final ElevatorSim elevatorSim = new ElevatorSim(
-    // MOTOR_GEARBOX_REPR,
-    // GEARING,
-    // MASS_KG,
-    // DRUM_RADIUS_METERS,
-    // MIN_HEIGHT_METERS,
-    // MAX_HEIGHT_METERS,
-    // true,
-    // ElevatorPosition.BOTTOM.value);
 
     public Elevator(PositionTracker positionTracker) {
         m_positionTracker = positionTracker;
@@ -113,33 +100,12 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     @Override
     public void simulationPeriodic() {
-        // elevatorSim.setInput(motor.getAppliedOutput());
-        // elevatorSim.update(0.020);
-        // motor.getEncoder().setPosition(elevatorSim.getPositionMeters());
-        // simVelocity = elevatorSim.getVelocityMetersPerSecond();
-
-        // ligament.setLength(getPosition());
     }
 
     public boolean getInitialized() {
         return initialized;
     }
 
-    // @Log(groups = "components")
-    // public Pose3d getFrameComponentPose() {
-    // return new Pose3d(0.14, 0, 0.13, new Rotation3d());
-    // }
-
-    // @Log(groups = "components")
-    // public Pose3d getStageComponentPose() {
-    // Transform3d transform = new Transform3d();
-    // if (getPosition() > 0.706) {
-    // transform = new Transform3d(0, 0, getPosition() - 0.706, new Rotation3d());
-    // }
-    // return new Pose3d(0.14, 0, 0.169, new Rotation3d()).plus(transform);
-    // }
-
-    // @Log(groups = "components")
     public Pose3d getCarriageComponentPose() {
         return new Pose3d(0.14, 0, 0.247 + getPosition(), new Rotation3d());
     }
@@ -150,10 +116,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     }
 
     public double getVelocity() {
-        // if (RobotBase.isReal())
         return m_elevatorLeftLeaderMotor.getVelocity().getValueAsDouble();
-        // else
-        // return simVelocity;
     }
 
     @Override
@@ -164,36 +127,12 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         initialized = true;
     }
 
-    // @Override
-    // public void setVoltage(double voltage) {
-    // voltage = MathUtil.clamp(voltage, -12, 12);
-    // // voltage = Utils.applySoftStops(voltage, getPosition(), ElevatorConstants.MIN_HEIGHT_METERS,
-    // // ElevatorConstants.MAX_HEIGHT_METERS);
-
-    // // if (voltage < 0
-    // // && m_positionTracker.getElevatorPosition() < ElevatorConstants.MOTION_LIMIT
-    // // && m_positionTracker.getArmAngle() < 0) {
-    // // voltage = 0;
-    // // }
-
-    // // if (!GlobalStates.INITIALIZED.enabled()) {
-    // // voltage = 0.0;
-    // // }
-
-    // // voltage = .4;
-
-    // m_elevatorLeftLeaderMotor.setVoltage(voltage);
-    // m_elevatorRightFollowerMotor.setVoltage(-voltage);
-    // }
-
-    // @Override
     private Command moveToPositionCommand(double goalPosition) {
         return run(() -> {
             m_elevatorLeftLeaderMotor.setControl(m_request.withPosition(goalPosition));
             elevatorPub.set(m_positionTracker.getElevatorPosition());
         })
-                .until(() -> Math.abs(getPosition() - goalPosition) < .5) // ||                             // abs(goal - position) < error
-                        // (m_positionTracker.getCoralInArm() && m_positionTracker.getArmAngle() < 0))     // don't move too low if coral is in arm
+                .until(() -> Math.abs(getPosition() - goalPosition) < .5)
                 .withName("elevator.moveToPosition");
     }
 
@@ -219,22 +158,10 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
                 .withName("elevator.movePositionDelta");
     }
 
-    // @Override
-    // public Command holdCurrentPositionCommand() {
-    // return runOnce(() -> pidController.setGoal(getPosition())).andThen(moveToCurrentGoalCommand())
-    // .withName("elevator.holdCurrentPosition");
-    // }
-
     @Override
     public Command resetPositionCommand() {
         return runOnce(this::resetPosition).withName("elevator.resetPosition");
     }
-
-    // @Override
-    // public Command setOverridenSpeedCommand(Supplier<Double> speed) {
-    // return runEnd(() -> setVoltage(12.0 * speed.get()), () -> setVoltage(0))
-    // .withName("elevator.setOverriddenSpeed");
-    // }
 
     @Override
     public Command coastMotorsCommand() {
@@ -245,10 +172,6 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
                 .andThen(() -> {
                     m_elevatorLeftLeaderMotor.setNeutralMode(NeutralModeValue.Coast);
                     m_elevatorRightFollowerMotor.setNeutralMode(NeutralModeValue.Coast);
-                })
-                .finallyDo((d) -> {
-                    // motor.setIdleMode(IdleMode.kBrake);
-                    // pidController.reset(getPosition());
                 })
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                 .withName("elevator.coastMotorsCommand");
@@ -261,13 +184,4 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     public Command sysIdDynamicCommand(SysIdRoutine.Direction direction) {
         return m_sysIdRoutine.dynamic(direction).withName("elevator.sysIdDynamic");
     }
-
-    // public Command resetControllersCommand() {
-    // return Commands.runOnce(() -> pidController.reset(getPosition()))
-    // .andThen(Commands.runOnce(() -> pidController.setGoal(getPosition())));
-    // }
-
-    // public boolean atGoal() {
-    // return pidController.atGoal();
-    // }
 }

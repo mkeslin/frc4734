@@ -16,8 +16,6 @@ public class Robot extends TimedRobot {
     private RobotContainer m_robotContainer;
 
     public Robot() {
-        // initLogging();
-
         AutoManager.getInstance().init();
 
         m_robotContainer = new RobotContainer();
@@ -33,30 +31,6 @@ public class Robot extends TimedRobot {
         // consumes an inordinate amount of bandwidth, so we disable it.
         LiveWindow.disableAllTelemetry();
     }
-
-    // private void initLogging() {
-    // Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
-
-    // if (isReal()) {
-    // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-    // Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-    // new PowerDistribution(1, ModuleType.kRev); // Enables power distribution
-    // logging
-    // } else {
-    // setUseTiming(false); // Run as fast as possible
-    // String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from
-    // AdvantageScope (or prompt the
-    // // user)
-    // Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-    // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath,
-    // "_sim"))); // Save outputs to a
-    // // new log
-    // }
-
-    // Logger.start(); // Start logging! No more data receivers, replay sources, or
-    // metadata values may
-    // // be added.
-    // }
 
     @Override
     public void robotPeriodic() {
@@ -79,16 +53,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        // // m_robotContainer.initializeAuto();
-        // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-        // if (m_autonomousCommand != null) {
-        // m_autonomousCommand.schedule();
-        // }
-
         AutoManager.getInstance().runSelectedRoutine();
-
-        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -98,8 +63,6 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousExit() {
         AutoManager.getInstance().endRoutine();
-
-        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -107,8 +70,6 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
-
-        // m_robotContainer.resetZeros();
     }
 
     @Override
@@ -117,17 +78,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopExit() {
-        // m_robotContainer.resetZeros();
     }
 
     @Override
     public void testInit() {
-        CommandScheduler.getInstance().cancelAll();
-
-        // m_robotContainer.initializeTest();
-
-        // m_robotContainer.resetZeros();
-
         CommandScheduler.getInstance().cancelAll();
         LiveWindow.setEnabled(false);
     }
@@ -138,8 +92,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testExit() {
-
-        // m_robotContainer.resetZeros();
     }
 
     @Override
