@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
+import frc.robot.RobotState;
 import frc.robot.Telemetry;
 import frc.robot.Constants.ArmConstants.ArmPosition;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
@@ -217,7 +218,12 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     // }
     private Command moveToPositionCommand(double goalPosition) {
         return run(() -> {
-            m_armMotor.setControl(m_request.withPosition(goalPosition));
+            // Safety check: prevent movement until robot is initialized
+            if (RobotState.getInstance().isInitialized()) {
+                m_armMotor.setControl(m_request.withPosition(goalPosition));
+            } else {
+                m_armMotor.stopMotor();
+            }
             if (m_positionTracker != null) {
                 armPub.set(m_positionTracker.getArmAngle());
             }

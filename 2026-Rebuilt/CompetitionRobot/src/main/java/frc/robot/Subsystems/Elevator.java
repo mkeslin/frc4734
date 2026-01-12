@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
+import frc.robot.RobotState;
 import frc.robot.Telemetry;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
@@ -132,7 +133,13 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     private Command moveToPositionCommand(double goalPosition) {
         return run(() -> {
-            m_elevatorLeftLeaderMotor.setControl(m_request.withPosition(goalPosition));
+            // Safety check: prevent movement until robot is initialized
+            if (RobotState.getInstance().isInitialized()) {
+                m_elevatorLeftLeaderMotor.setControl(m_request.withPosition(goalPosition));
+            } else {
+                m_elevatorLeftLeaderMotor.stopMotor();
+                m_elevatorRightFollowerMotor.stopMotor();
+            }
             if (m_positionTracker != null) {
                 elevatorPub.set(m_positionTracker.getElevatorPosition());
             }

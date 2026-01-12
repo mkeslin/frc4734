@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
+import frc.robot.RobotState;
 import frc.robot.Telemetry;
 import frc.robot.Constants.AlgaeIntakeConstants.AlgaeIntakeSpeed;
 import frc.robot.Subsystems.Bases.BaseIntake;
@@ -199,10 +200,14 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
     // }
 
     public void moveToSpeed(double goalVelocity) {
-            // VelocityVoltage velocityOut = new VelocityVoltage(0);
-            // velocityOut.Slot = 0;
-            // m_algaeIntakeMotor.setControl(velocityOut.withVelocity(goalVelocity));
-            m_algaeIntakeMotor.set(goalVelocity);
+        // Safety check: prevent movement until robot is initialized
+        if (!RobotState.getInstance().isInitialized()) {
+            goalVelocity = 0.0;
+        }
+        // VelocityVoltage velocityOut = new VelocityVoltage(0);
+        // velocityOut.Slot = 0;
+        // m_algaeIntakeMotor.setControl(velocityOut.withVelocity(goalVelocity));
+        m_algaeIntakeMotor.set(goalVelocity);
     }
 
     // @Override
@@ -217,9 +222,14 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
     // }
     private Command moveToSpeedCommand(double goalVelocity) {
         return run(() -> {
-            VelocityVoltage velocityOut = new VelocityVoltage(0);
-            velocityOut.Slot = 0;
-            m_algaeIntakeMotor.setControl(velocityOut.withVelocity(goalVelocity));
+            // Safety check: prevent movement until robot is initialized
+            if (RobotState.getInstance().isInitialized()) {
+                VelocityVoltage velocityOut = new VelocityVoltage(0);
+                velocityOut.Slot = 0;
+                m_algaeIntakeMotor.setControl(velocityOut.withVelocity(goalVelocity));
+            } else {
+                m_algaeIntakeMotor.stopMotor();
+            }
         })
                 // .until(() -> Math.abs(getSpeed() - goalVelocity) < .5)
                 .withName("algaeIntake.moveToSpeed");

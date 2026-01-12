@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
+import frc.robot.RobotState;
 import frc.robot.Telemetry;
 import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
@@ -168,7 +169,12 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
 
     private Command moveToPositionCommand(double goalPosition) {
         return run(() -> {
-            m_sideToSideMotor.setControl(m_request.withPosition(goalPosition));
+            // Safety check: prevent movement until robot is initialized
+            if (RobotState.getInstance().isInitialized()) {
+                m_sideToSideMotor.setControl(m_request.withPosition(goalPosition));
+            } else {
+                m_sideToSideMotor.stopMotor();
+            }
             if (m_positionTracker != null) {
                 sideToSidePub.set(m_positionTracker.getSideToSidePosition());
             }

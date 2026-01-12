@@ -5,6 +5,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToReefCommand;
@@ -90,7 +91,7 @@ public class RobotContainer {
         m_drivetrain.seedFieldCentric();
 
         // Initialize subsystems
-        GlobalStates.INITIALIZED.enableCommand();
+        CommandScheduler.getInstance().schedule(RobotState.getInstance().enableInitializationCommand());
 
         // Reset positions
         m_subsystemFactory.resetZeros();

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.PositionTracker;
+import frc.robot.RobotState;
 import frc.robot.Telemetry;
 import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
@@ -136,9 +137,10 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         // voltage = 0;
         // }
 
-        // if (!GlobalStates.INITIALIZED.enabled()) {
-        // voltage = 0.0;
-        // }
+        // Safety check: prevent movement until robot is initialized
+        if (!RobotState.getInstance().isInitialized()) {
+            voltage = 0.0;
+        }
 
         m_climber.setVoltage(voltage);
     }
@@ -159,7 +161,12 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         //     return Commands.none();
         // }
         return run(() -> {
-            m_climber.setControl(m_request.withPosition(goalPosition));
+            // Safety check: prevent movement until robot is initialized
+            if (RobotState.getInstance().isInitialized()) {
+                m_climber.setControl(m_request.withPosition(goalPosition));
+            } else {
+                m_climber.stopMotor();
+            }
             if (m_positionTracker != null) {
                 climberPub.set(m_positionTracker.getClimberPosition());
             }
