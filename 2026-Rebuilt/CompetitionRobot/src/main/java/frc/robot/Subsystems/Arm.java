@@ -2,7 +2,7 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.Constants.IDs.ARM_ID;
+import static frc.robot.Constants.CANIds.ARM;
 
 import java.util.function.Supplier;
 
@@ -127,7 +127,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         motionMagicConfigs.MotionMagicAcceleration = 60; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-        m_armMotor = new TalonFX(ARM_ID);
+        m_armMotor = new TalonFX(ARM);
         m_armMotor.setNeutralMode(NeutralModeValue.Brake);
 
         // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();

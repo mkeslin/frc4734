@@ -2,7 +2,7 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.Constants.IDs.ALGAE_INTAKE_ID;
+import static frc.robot.Constants.CANIds.ALGAE_INTAKE;
 
 import java.util.function.Supplier;
 
@@ -120,7 +120,7 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
         // motionMagicConfigs.MotionMagicAcceleration = 400; // Target acceleration of 160 rps/s (0.5 seconds)
         // motionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-        m_algaeIntakeMotor = new TalonFX(ALGAE_INTAKE_ID);
+        m_algaeIntakeMotor = new TalonFX(ALGAE_INTAKE);
         // m_algaeIntakeMotor.setNeutralMode(NeutralModeValue.Brake);
 
         // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();

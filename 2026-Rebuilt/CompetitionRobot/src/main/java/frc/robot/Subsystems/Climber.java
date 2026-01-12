@@ -1,6 +1,6 @@
 package frc.robot.Subsystems;
 
-import static frc.robot.Constants.Constants.IDs.CLIMBER_ID;
+import static frc.robot.Constants.CANIds.CLIMBER;
 
 import java.util.function.Supplier;
 
@@ -64,7 +64,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         motionMagicConfigs.MotionMagicAcceleration = 80; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-        m_climber = new TalonFX(CLIMBER_ID);
+        m_climber = new TalonFX(CLIMBER);
         m_climber.setNeutralMode(NeutralModeValue.Brake);
 
         // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();

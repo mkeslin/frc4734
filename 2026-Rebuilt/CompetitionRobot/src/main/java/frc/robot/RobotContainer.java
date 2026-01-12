@@ -1,8 +1,8 @@
 package frc.robot;
 
-import static frc.robot.Constants.Constants.IDs.APRILTAGPIPELINE;
-import static frc.robot.Constants.Constants.IDs.CORAL_ARM_SENSOR;
-import static frc.robot.Constants.Constants.IDs.CORAL_TRAY_SENSOR;
+import static frc.robot.Constants.DigitalInputIds.CORAL_ARM_SENSOR;
+import static frc.robot.Constants.DigitalInputIds.CORAL_TRAY_SENSOR;
+import static frc.robot.Constants.VisionConstants.APRILTAG_PIPELINE;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -44,7 +44,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.createDrivetrain();
 
     // SUBSYSTEMS
-    private static Limelight m_reef_limelight = new Limelight("limelight", APRILTAGPIPELINE);
+    private static Limelight m_reef_limelight = new Limelight("limelight", APRILTAG_PIPELINE);
     private Elevator m_elevator = new Elevator(m_positionTracker);
     private Arm m_arm = new Arm(m_positionTracker, m_elevator::getCarriageComponentPose);
     private SideToSide m_sideToSide = new SideToSide(m_positionTracker);

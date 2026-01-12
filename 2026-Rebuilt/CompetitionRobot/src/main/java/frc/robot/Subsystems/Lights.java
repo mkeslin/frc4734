@@ -1,6 +1,6 @@
 package frc.robot.Subsystems;
 
-import static frc.robot.Constants.Constants.IDs.LIGHTS_ID;
+import static frc.robot.Constants.CANIds.LIGHTS;
 
 import java.util.Random;
 
@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Lights extends SubsystemBase {
-    private final CANdle m_candle = new CANdle(LIGHTS_ID);
+    private final CANdle m_candle = new CANdle(LIGHTS);
     private final int LedCount = 300;
 
     private Animation m_toAnimate = null;

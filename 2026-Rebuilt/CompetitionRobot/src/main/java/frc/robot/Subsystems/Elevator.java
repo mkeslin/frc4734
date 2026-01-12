@@ -2,8 +2,8 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.Constants.IDs.ELEVATOR_LEFT_ID;
-import static frc.robot.Constants.Constants.IDs.ELEVATOR_RIGHT_ID;
+import static frc.robot.Constants.CANIds.ELEVATOR_LEFT;
+import static frc.robot.Constants.CANIds.ELEVATOR_RIGHT;
 
 import java.util.function.Supplier;
 
@@ -87,11 +87,11 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
         talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        m_elevatorLeftLeaderMotor = new TalonFX(ELEVATOR_LEFT_ID);
+        m_elevatorLeftLeaderMotor = new TalonFX(ELEVATOR_LEFT);
         m_elevatorLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
         m_elevatorLeftLeaderMotor.getConfigurator().apply(talonFxConfigs);
 
-        m_elevatorRightFollowerMotor = new TalonFX(ELEVATOR_RIGHT_ID);
+        m_elevatorRightFollowerMotor = new TalonFX(ELEVATOR_RIGHT);
         m_elevatorRightFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
         m_elevatorRightFollowerMotor.setControl(new Follower(m_elevatorLeftLeaderMotor.getDeviceID(), MotorAlignmentValue.Aligned));
 

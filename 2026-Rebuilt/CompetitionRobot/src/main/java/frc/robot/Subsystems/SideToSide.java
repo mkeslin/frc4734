@@ -2,7 +2,7 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.Constants.IDs.SIDE_TO_SIDE_ID;
+import static frc.robot.Constants.CANIds.SIDE_TO_SIDE;
 
 import java.util.function.Supplier;
 
@@ -99,7 +99,7 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
         motionMagicConfigs.MotionMagicAcceleration = 100; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-        m_sideToSideMotor = new TalonFX(SIDE_TO_SIDE_ID);
+        m_sideToSideMotor = new TalonFX(SIDE_TO_SIDE);
         m_sideToSideMotor.setNeutralMode(NeutralModeValue.Brake);
 
         // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();
