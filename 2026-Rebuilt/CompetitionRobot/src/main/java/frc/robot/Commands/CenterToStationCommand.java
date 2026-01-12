@@ -2,13 +2,7 @@ package frc.robot.Commands;
 
 import java.util.Objects;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PositionTracker;
 import frc.robot.Subsystems.Cameras.PhotonVision;
@@ -24,26 +18,14 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * @see PhotonVision
  * @see PositionTracker
  * @see CommandSwerveDrivetrain
+ * @see BaseCenterToCommand
  */
-public class CenterToStationCommand extends Command {
-    public PositionTracker m_positionTracker;
-    public PhotonVision m_photonVision;
-    public CommandSwerveDrivetrain m_drivetrain;
-    public CommandXboxController m_driveController;
+public class CenterToStationCommand extends BaseCenterToCommand {
+    private static final double TIMEOUT_DURATION = 5.0;
+    private static final double CORAL_TRAY_TIMEOUT = 0.75;
 
-    private boolean driverInterrupted;
-
-    private final PIDController xController = new PIDController(.3, 0, 0);
-    private final PIDController yController = new PIDController(.1, 0, 0);
-    private final PIDController omegaController = new PIDController(0.03, 0, 0);
-
-    private double AREA_GOAL = 4.2;
-    private double AREA_ERROR = 2;
-    private double CAMERA_X_OFFSET_ERROR = 1;
-    private double ANGLE_ERROR = 3;
-
-    public Timer t = new Timer();
-    public Timer t_tray = new Timer();
+    private final PositionTracker m_positionTracker;
+    private final Timer t_tray = new Timer();
 
     /**
      * Creates a new CenterToStationCommand.
@@ -56,111 +38,86 @@ public class CenterToStationCommand extends Command {
      */
     public CenterToStationCommand(PositionTracker positionTracker, PhotonVision photonVision,
             CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
+        super(createStationConfig(photonVision, drivetrain, driveController));
         m_positionTracker = Objects.requireNonNull(positionTracker, "PositionTracker cannot be null");
-        m_photonVision = Objects.requireNonNull(photonVision, "PhotonVision cannot be null");
-        m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
-        m_driveController = driveController; // Can be null (optional)
-
-        xController.setTolerance(AREA_ERROR);
-        yController.setTolerance(CAMERA_X_OFFSET_ERROR);
-        omegaController.setTolerance(ANGLE_ERROR);
-
-        addRequirements(m_photonVision, m_drivetrain);
     }
 
     /**
-     * Initializes the command by starting the timer and setting PID controller setpoints.
-     * Resets the driver interruption flag.
-     */
-    @Override
-    public void initialize() {
-        t.start();
-
-        xController.setSetpoint(AREA_GOAL);
-        yController.setSetpoint(0);
-        omegaController.setSetpoint(0);
-        driverInterrupted = false;
-    }
-
-    /**
-     * Executes the command by calculating PID outputs based on vision feedback
-     * and applying them to the drivetrain. Monitors the coral tray sensor and
-     * starts a timer when coral is detected. Stops movement if no vision targets are detected.
-     */
-    @Override
-    public void execute() {
-        var xSpeed = -xController.calculate(m_photonVision.getArea());
-        var ySpeed = -yController.calculate(m_photonVision.getX());
-        var omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_photonVision.getYaw()));
-        if (!m_photonVision.hasTargets()) {
-            ySpeed = 0;
-            xSpeed = 0;
-            omegaSpeed = 0;
-        }
-        m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
-        if (m_driveController != null) {
-            m_driveController.povUp().onTrue(Commands.runOnce(() -> {
-                driverInterrupted = true;
-            }));
-        }
-
-        if (m_positionTracker.getCoralInTray() && !t_tray.isRunning()) {
-            t_tray.start();
-        }
-    }
-
-    // Make this return true when this Command no longer needs to run execute()
-    @Override
-    public boolean isFinished() {
-        if (t.hasElapsed(5)) {
-            DataLogManager.log("[CenterToStation] WARN: Command timed out after 5 seconds");
-            return true;
-        }
-        if (driverInterrupted) {
-            DataLogManager.log("[CenterToStation] Command interrupted by driver");
-            return true;
-        }
-        if (t_tray.hasElapsed(.75)) {
-            DataLogManager.log("[CenterToStation] Coral successfully acquired");
-            return true;
-        }
-        if (!m_photonVision.hasTargets()) {
-            DataLogManager.log("[CenterToStation] WARN: Lost AprilTag target");
-            return true;
-        }
-        if (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()) {
-            DataLogManager.log("[CenterToStation] Successfully centered to station");
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Called when the command ends. Stops and resets all timers.
+     * Creates a configuration for the station command with Station-specific parameters.
      * 
-     * @param interrupted true if the command was interrupted, false if it completed normally
+     * @param photonVision The PhotonVision camera subsystem
+     * @param drivetrain The swerve drivetrain to control
+     * @param driveController The Xbox controller for driver interruption
+     * @return The configured Config object
+     */
+    private static Config createStationConfig(PhotonVision photonVision, CommandSwerveDrivetrain drivetrain,
+            CommandXboxController driveController) {
+        Objects.requireNonNull(photonVision, "PhotonVision cannot be null");
+        Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
+
+        Config config = new Config(photonVision, drivetrain, CenterMethod.CAMERA, TIMEOUT_DURATION);
+        config.driveController = driveController;
+        
+        // Station-specific camera method parameters
+        config.cameraAreaGoal = 4.2;
+        config.cameraYOffset = 0.0;
+        config.cameraAreaError = 2.0;
+        config.cameraXOffsetError = 1.0;
+        config.cameraAngleError = 3.0;
+        config.cameraXP = 0.3;
+        config.cameraYP = 0.1;
+        config.cameraOmegaP = 0.03;
+        config.negateCameraSpeeds = true; // Station command negates speeds
+        
+        return config;
+    }
+
+    /**
+     * Initializes the command by resetting the coral tray timer.
      */
     @Override
-    public void end(boolean interrupted) {
-        t.stop();
-        t.reset();
-
+    protected void onInitialize() {
         t_tray.stop();
         t_tray.reset();
     }
 
     /**
-     * Debug method to publish calculated speeds to SmartDashboard.
-     * Currently unused but kept for debugging purposes.
-     * 
-     * @param x The X speed component
-     * @param y The Y speed component
-     * @param omega The rotational speed component
+     * Executes the command and monitors the coral tray sensor.
+     * Starts a timer when coral is detected in the tray.
      */
-    public void getSpeeds(double x, double y, double omega) {
-        SmartDashboard.putNumber("xSpeed", x);
-        SmartDashboard.putNumber("ySpeed", y);
-        SmartDashboard.putNumber("omegaSpeed", omega);
+    @Override
+    protected void onExecute() {
+        if (m_positionTracker.getCoralInTray() && !t_tray.isRunning()) {
+            t_tray.start();
+        }
+    }
+
+    /**
+     * Checks additional finish conditions, specifically coral acquisition.
+     * 
+     * @return true if coral has been in tray for the required duration
+     */
+    @Override
+    protected boolean additionalFinishConditions() {
+        if (t_tray.hasElapsed(CORAL_TRAY_TIMEOUT)) {
+            edu.wpi.first.wpilibj.DataLogManager.log("[CenterToStation] Coral successfully acquired");
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Called when the command ends. Stops and resets the coral tray timer.
+     */
+    @Override
+    public void end(boolean interrupted) {
+        super.end(interrupted);
+        t_tray.stop();
+        t_tray.reset();
+    }
+
+    @Override
+    protected String getCommandName() {
+        return "[CenterToStation]";
     }
 }

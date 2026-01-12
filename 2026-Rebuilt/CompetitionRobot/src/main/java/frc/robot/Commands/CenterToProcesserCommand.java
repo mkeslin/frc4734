@@ -2,12 +2,6 @@ package frc.robot.Commands;
 
 import java.util.Objects;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -20,24 +14,10 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * 
  * @see PhotonVision
  * @see CommandSwerveDrivetrain
+ * @see BaseCenterToCommand
  */
-public class CenterToProcesserCommand extends Command {
-    public PhotonVision m_photonVision;
-    public CommandSwerveDrivetrain m_drivetrain;
-    public CommandXboxController m_driveController;
-
-    private boolean driverInterrupted;
-
-    private final PIDController xController = new PIDController(0.15, 0, 0);
-    private final PIDController yController = new PIDController(0.03, 0, 0);
-    private final PIDController omegaController = new PIDController(0.03, 0, 0);
-
-    private double AREA_GOAL = 7;
-    private double AREA_ERROR = 2;
-    private double CAMERA_X_OFFSET_ERROR = 1;
-    private double ANGLE_ERROR = 3;
-
-    public Timer t = new Timer();
+public class CenterToProcesserCommand extends BaseCenterToCommand {
+    private static final double TIMEOUT_DURATION = 5.0;
 
     /**
      * Creates a new CenterToProcesserCommand.
@@ -48,85 +28,41 @@ public class CenterToProcesserCommand extends Command {
      * @throws NullPointerException if photonVision or drivetrain is null
      */
     public CenterToProcesserCommand(PhotonVision photonVision, CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
-        m_photonVision = Objects.requireNonNull(photonVision, "PhotonVision cannot be null");
-        m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
-        m_driveController = driveController; // Can be null (optional)
-
-        xController.setTolerance(AREA_ERROR);
-        yController.setTolerance(CAMERA_X_OFFSET_ERROR);
-        omegaController.setTolerance(ANGLE_ERROR);
-
-        addRequirements(m_photonVision, m_drivetrain);
+        super(createProcessorConfig(photonVision, drivetrain, driveController));
     }
 
     /**
-     * Initializes the command by starting the timer and setting PID controller setpoints.
-     * Resets the driver interruption flag.
-     */
-    @Override
-    public void initialize() {
-        t.start();
-
-        xController.setSetpoint(AREA_GOAL);
-        yController.setSetpoint(0);
-        omegaController.setSetpoint(0);
-        driverInterrupted = false;
-    }
-
-    /**
-     * Executes the command by calculating PID outputs based on vision feedback
-     * and applying them to the drivetrain. Stops movement if no vision targets are detected.
-     */
-    @Override
-    public void execute() {
-        var xSpeed = -xController.calculate(m_photonVision.getArea());
-        var ySpeed = -yController.calculate(m_photonVision.getX());
-        var omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_photonVision.getYaw()));
-        if (!m_photonVision.hasTargets()) {
-            ySpeed = 0;
-            xSpeed = 0;
-            omegaSpeed = 0;
-        }
-        //getSpeeds(xSpeed, ySpeed, omegaSpeed);
-        m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
-        if(m_driveController != null ) {
-            m_driveController.povUp().onTrue(Commands.runOnce(() -> {driverInterrupted = true;}));
-        }
-    }
-
-    /**
-     * Determines if the command should finish.
+     * Creates a configuration for the processor command with Processor-specific parameters.
      * 
-     * @return true if the timeout has elapsed, driver interrupted, no targets detected,
-     *         or all PID controllers are at their setpoints
+     * @param photonVision The PhotonVision camera subsystem
+     * @param drivetrain The swerve drivetrain to control
+     * @param driveController The Xbox controller for driver interruption
+     * @return The configured Config object
      */
-    @Override
-    public boolean isFinished() {
-        return t.hasElapsed(5) || driverInterrupted || !m_photonVision.hasTargets() || (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()); //|| (area > FINAL_AREA && x_offset < FINAL_X_OFFSET && yaw_degrees < FINAL_ANGLE_DEGREES);
+    private static Config createProcessorConfig(PhotonVision photonVision, CommandSwerveDrivetrain drivetrain,
+            CommandXboxController driveController) {
+        Objects.requireNonNull(photonVision, "PhotonVision cannot be null");
+        Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
+
+        Config config = new Config(photonVision, drivetrain, CenterMethod.CAMERA, TIMEOUT_DURATION);
+        config.driveController = driveController;
+        
+        // Processor-specific camera method parameters
+        config.cameraAreaGoal = 7.0;
+        config.cameraYOffset = 0.0;
+        config.cameraAreaError = 2.0;
+        config.cameraXOffsetError = 1.0;
+        config.cameraAngleError = 3.0;
+        config.cameraXP = 0.15;
+        config.cameraYP = 0.03;
+        config.cameraOmegaP = 0.03;
+        config.negateCameraSpeeds = true; // Processor command negates speeds
+        
+        return config;
     }
 
-    /**
-     * Called when the command ends. Stops and resets the timer.
-     * 
-     * @param interrupted true if the command was interrupted, false if it completed normally
-     */
     @Override
-    public void end(boolean interrupted) {
-        t.stop();
-        t.reset();
-    }
-
-    /**
-     * Debug method to publish calculated speeds to SmartDashboard.
-     * Currently unused but kept for debugging purposes.
-     * 
-     * @param x The X speed component
-     * @param y The Y speed component
-     * @param omega The rotational speed component
-     */
-    public void getSpeeds(double x, double y, double omega) {
-        SmartDashboard.putNumber("xSpeed", x);
-        SmartDashboard.putNumber("ySpeed", y);
-        SmartDashboard.putNumber("omegaSpeed", omega);
+    protected String getCommandName() {
+        return "[CenterToProcesser]";
     }
 }
