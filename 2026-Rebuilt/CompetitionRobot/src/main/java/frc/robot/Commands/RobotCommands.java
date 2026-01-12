@@ -4,35 +4,32 @@ import java.util.Map;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.PositionTracker;
 import frc.robot.Constants.ArmConstants.ArmPosition;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
 import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
-import frc.robot.State.StateMachine;
 import frc.robot.State.StateMachineStateName;
-import frc.robot.Subsystems.Arm;
-import frc.robot.Subsystems.Elevator;
-import frc.robot.Subsystems.Lights;
-import frc.robot.Subsystems.SideToSide;
-import frc.robot.Subsystems.Cameras.Limelight;
-import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
+/**
+ * Factory class for creating robot commands.
+ * Uses RobotContext to reduce parameter count and improve readability.
+ */
 public class RobotCommands {
     private static ScoreLevel lastScoreLevel = ScoreLevel.None;
 
+    /**
+     * Prepares the robot to score coral at the specified level and side.
+     * 
+     * @param context The robot context containing all subsystems
+     * @param level The scoring level (L1, L2, L3, L4)
+     * @param side The scoring side (Left, Right, Center)
+     * @return Command to prepare for scoring
+     */
     public static Command prepareScoreCoralCommand(
-            StateMachine stateMachine,
-            PositionTracker positionTracker,
+            RobotContext context,
             ScoreLevel level,
-            ScoreSide side,
-            CommandSwerveDrivetrain drivetrain,
-            Elevator elevator,
-            Arm arm,
-            SideToSide sideToSide,
-            Lights lights,
-            Limelight reefLimelight) {
+            ScoreSide side) {
         ElevatorPosition elevatorPosition;
         ArmPosition armPosition;
         SideToSidePosition sideToSidePosition;
@@ -84,126 +81,114 @@ public class RobotCommands {
                 Commands.parallel(
                         Commands
                                 .waitSeconds(0.0)
-                                .andThen(sideToSide.moveToSetPositionCommand(() -> sideToSidePosition)
+                                .andThen(context.sideToSide.moveToSetPositionCommand(() -> sideToSidePosition)
                                         .asProxy()),
                         Commands
                                 .waitSeconds(0.0)
-                                .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy()),
+                                .andThen(context.arm.moveToSetPositionCommand(() -> armPosition).asProxy()),
                         Commands
                                 .waitSeconds(0.0)
-                                .andThen(elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy())
-                // Commands
-                // .waitSeconds(0.0)
-                // .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy())
-                // .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
+                                .andThen(context.elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy())
                 )
-                        .onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.PrepareScore))
-                        .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color))
-        //
+                        .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.PrepareScore))
+                        .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color))
         );
     }
 
-    public static Command prepareScoreCoralRetryCommand(
-            StateMachine stateMachine,
-            PositionTracker positionTracker,
-            CommandSwerveDrivetrain drivetrain,
-            Elevator elevator,
-            Arm arm,
-            SideToSide sideToSide,
-            Lights lights,
-            Limelight reefLimelight) {
-                return arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
-                        .onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.PrepareScore))
-                        .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color));
+    /**
+     * Retries preparing to score coral by moving the arm to top position.
+     * 
+     * @param context The robot context containing all subsystems
+     * @return Command to retry preparing for scoring
+     */
+    public static Command prepareScoreCoralRetryCommand(RobotContext context) {
+        return context.arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
+                .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.PrepareScore))
+                .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
     }
 
-    public static Command scoreCoralCommand(
-            StateMachine stateMachine,
-            PositionTracker positionTracker,
-            CommandSwerveDrivetrain drivetrain,
-            Elevator elevator,
-            Arm arm,
-            Lights lights) {
+    /**
+     * Scores coral at the previously prepared level.
+     * 
+     * @param context The robot context containing all subsystems
+     * @return Command to score coral
+     */
+    public static Command scoreCoralCommand(RobotContext context) {
         Map<ScoreLevel, Command> commandMap = Map.ofEntries(
                 Map.entry(ScoreLevel.L1, Commands.none()),
-                Map.entry(ScoreLevel.L2, arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy()),
-                Map.entry(ScoreLevel.L3, arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy()),
-                Map.entry(ScoreLevel.L4, arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy()),
+                Map.entry(ScoreLevel.L2, context.arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy()),
+                Map.entry(ScoreLevel.L3, context.arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy()),
+                Map.entry(ScoreLevel.L4, context.arm.moveToSetPositionCommand(() -> ArmPosition.L4_SCORE).asProxy()),
                 Map.entry(ScoreLevel.None, Commands.none()));
 
         return Commands.select(commandMap, () -> lastScoreLevel)
-                .onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.Score))
-                .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color));
+                .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.Score))
+                .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
     }
 
-    public static Command preIntakeCoralCommand(
-            StateMachine stateMachine,
-            PositionTracker positionTracker,
-            Elevator elevator,
-            Arm arm,
-            SideToSide sideToSide,
-            Lights lights) {
+    /**
+     * Prepares the robot for intake by moving mechanisms to pre-intake positions.
+     * 
+     * @param context The robot context containing all subsystems
+     * @return Command to prepare for intake
+     */
+    public static Command preIntakeCoralCommand(RobotContext context) {
         return Commands.sequence(
-                // elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy(),
                 Commands.parallel(
                         Commands.waitSeconds(0.0)
-                                .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
+                                .andThen(context.arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                         Commands.waitSeconds(0.0)
                                 .andThen(
-                                        sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
+                                        context.sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
                         Commands.waitSeconds(0.0)
-                                .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP)
+                                .andThen(context.elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP)
                                         .asProxy())
-                //
                 )
-        //
-        ).onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.PreIntake))
-                .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color));
+        ).onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.PreIntake))
+                .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
     }
 
-    public static Command intakeCoralCommand(
-            StateMachine stateMachine,
-            PositionTracker positionTracker,
-            Elevator elevator,
-            Arm arm,
-            SideToSide sideToSide,
-            Lights lights) {
+    /**
+     * Moves mechanisms to intake positions to collect coral.
+     * 
+     * @param context The robot context containing all subsystems
+     * @return Command to intake coral
+     */
+    public static Command intakeCoralCommand(RobotContext context) {
         return Commands.parallel(
                 Commands
                         .waitSeconds(0.0)
-                        .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM).asProxy()),
+                        .andThen(context.elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM).asProxy()),
                 Commands
                         .waitSeconds(0.0)
-                        .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
+                        .andThen(context.arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                 Commands
                         .waitSeconds(0.0)
-                        .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
-        //
+                        .andThen(context.sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         )
-                .onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.Intake))
-                .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color));
+                .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.Intake))
+                .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
     }
 
-    public static Command postIntakeCoralCommand(
-            StateMachine stateMachine,
-            PositionTracker positionTracker,
-            Elevator elevator,
-            Arm arm,
-            SideToSide sideToSide,
-            Lights lights) {
+    /**
+     * Moves mechanisms to post-intake positions after collecting coral.
+     * 
+     * @param context The robot context containing all subsystems
+     * @return Command to complete intake sequence
+     */
+    public static Command postIntakeCoralCommand(RobotContext context) {
         return Commands.parallel(
                 Commands
                         .waitSeconds(0.0)
-                        .andThen(elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy()),
+                        .andThen(context.elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy()),
                 Commands
                         .waitSeconds(0.40)
-                        .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
+                        .andThen(context.arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
                 Commands
                         .waitSeconds(0.0)
-                        .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
-        //
+                        .andThen(context.sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         )
-                .onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.PostIntake))
-                .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color));
+                .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.PostIntake))
+                .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
     }
 }
