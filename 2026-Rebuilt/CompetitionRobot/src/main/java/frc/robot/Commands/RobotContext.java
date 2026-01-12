@@ -1,5 +1,7 @@
 package frc.robot.Commands;
 
+import java.util.Objects;
+
 import frc.robot.PositionTracker;
 import frc.robot.State.StateMachine;
 import frc.robot.Subsystems.Arm;
@@ -34,6 +36,7 @@ public class RobotContext {
      * @param sideToSide The side-to-side subsystem
      * @param lights The lights subsystem
      * @param reefPhotonVision The reef PhotonVision camera
+     * @throws NullPointerException if any parameter is null
      */
     public RobotContext(
             StateMachine stateMachine,
@@ -44,13 +47,13 @@ public class RobotContext {
             SideToSide sideToSide,
             Lights lights,
             PhotonVision reefPhotonVision) {
-        this.stateMachine = stateMachine;
-        this.positionTracker = positionTracker;
-        this.drivetrain = drivetrain;
-        this.elevator = elevator;
-        this.arm = arm;
-        this.sideToSide = sideToSide;
-        this.lights = lights;
-        this.reefPhotonVision = reefPhotonVision;
+        this.stateMachine = Objects.requireNonNull(stateMachine, "StateMachine cannot be null");
+        this.positionTracker = Objects.requireNonNull(positionTracker, "PositionTracker cannot be null");
+        this.drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
+        this.elevator = Objects.requireNonNull(elevator, "Elevator cannot be null");
+        this.arm = Objects.requireNonNull(arm, "Arm cannot be null");
+        this.sideToSide = Objects.requireNonNull(sideToSide, "SideToSide cannot be null");
+        this.lights = Objects.requireNonNull(lights, "Lights cannot be null");
+        this.reefPhotonVision = Objects.requireNonNull(reefPhotonVision, "PhotonVision cannot be null");
     }
 }

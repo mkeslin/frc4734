@@ -5,6 +5,8 @@ import static frc.robot.Constants.DigitalInputIds.CORAL_TRAY_SENSOR;
 import static frc.robot.Constants.VisionConstants.APRILTAG_PIPELINE;
 import static frc.robot.Constants.VisionConstants.CAMERA_NAME;
 
+import java.util.Objects;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Commands.RobotContext;
 import frc.robot.Subsystems.Arm;
@@ -15,7 +17,6 @@ import frc.robot.Subsystems.SideToSide;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.State.StateMachine;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
-import frc.robot.SwerveDrivetrain.SwerveDrivetrainA;
 
 /**
  * Factory class for creating and initializing all robot subsystems and related components.
@@ -39,9 +40,10 @@ public class SubsystemFactory {
      * Creates a new SubsystemFactory and initializes all subsystems, sensors, and related components.
      * 
      * @param drivetrain The swerve drivetrain instance
+     * @throws NullPointerException if drivetrain is null
      */
     public SubsystemFactory(CommandSwerveDrivetrain drivetrain) {
-        m_drivetrain = drivetrain;
+        m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
 
         // Create subsystems (PositionTracker will be set after creation)
         m_elevator = new Elevator();

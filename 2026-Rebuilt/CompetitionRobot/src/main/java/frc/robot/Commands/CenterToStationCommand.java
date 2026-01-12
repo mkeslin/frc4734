@@ -1,5 +1,7 @@
 package frc.robot.Commands;
 
+import java.util.Objects;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -34,10 +36,10 @@ public class CenterToStationCommand extends Command {
 
     public CenterToStationCommand(PositionTracker positionTracker, PhotonVision photonVision,
             CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
-        m_positionTracker = positionTracker;
-        m_photonVision = photonVision;
-        m_drivetrain = drivetrain;
-        m_driveController = driveController;
+        m_positionTracker = Objects.requireNonNull(positionTracker, "PositionTracker cannot be null");
+        m_photonVision = Objects.requireNonNull(photonVision, "PhotonVision cannot be null");
+        m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
+        m_driveController = driveController; // Can be null (optional)
 
         xController.setTolerance(AREA_ERROR);
         yController.setTolerance(CAMERA_X_OFFSET_ERROR);

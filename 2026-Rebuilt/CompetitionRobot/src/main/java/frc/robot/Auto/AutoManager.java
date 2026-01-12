@@ -2,11 +2,13 @@ package frc.robot.Auto;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -75,11 +77,19 @@ public class AutoManager {
      * Add a routine to the manager.
      * 
      * @param routine the routine to add
+     * @throws NullPointerException if routine is null
      */
     public void addRoutine(AutoRoutine routine) {
-        routines.put(routine.getName(), routine);
-        chooser.addOption(routine.getName(), routine);
-        // chooser.setDefaultOption(routine.getName(), routine);
+        Objects.requireNonNull(routine, "AutoRoutine cannot be null");
+        String routineName = routine.getName();
+        if (routineName == null || routineName.trim().isEmpty()) {
+            String errorMsg = "[AutoManager] Cannot add routine with null or empty name";
+            DataLogManager.log("ERROR: " + errorMsg);
+            throw new IllegalArgumentException(errorMsg);
+        }
+        routines.put(routineName, routine);
+        chooser.addOption(routineName, routine);
+        DataLogManager.log(String.format("[AutoManager] Added auto routine: %s", routineName));
     }
 
     /**
@@ -108,9 +118,12 @@ public class AutoManager {
      * and set the robot's pose to that value.
      * 
      * @param consumer the {@code Pose2d} consumer
+     * @throws NullPointerException if consumer is null
      */
     public void setResetOdometryConsumer(Consumer<Pose2d> consumer) {
+        Objects.requireNonNull(consumer, "Reset odometry consumer cannot be null");
         this.resetOdometryConsumer = consumer;
+        DataLogManager.log("[AutoManager] Reset odometry consumer set");
     }
 
     /**
@@ -128,11 +141,21 @@ public class AutoManager {
      */
     public void periodicUpdate() {
         AutoRoutine selectedRoutine = getSelectedRoutine();
-        if (getSelectedRoutine() != lastRoutine) {
+        if (selectedRoutine == null) {
+            // No routine selected, nothing to update
+            return;
+        }
+        
+        if (selectedRoutine != lastRoutine) {
             if (resetOdometryConsumer != null) {
-                resetOdometryConsumer.accept(selectedRoutine.getInitialPose());
+                try {
+                    resetOdometryConsumer.accept(selectedRoutine.getInitialPose());
+                } catch (Exception e) {
+                    DataLogManager.log(String.format("[AutoManager] ERROR: Exception resetting odometry: %s", e.getMessage()));
+                    DriverStation.reportError(String.format("[AutoManager] Failed to reset odometry: %s", e.getMessage()), false);
+                }
             }
-            if (selectedRoutine.getPathPlannerPaths().size() > 0) {
+            if (selectedRoutine.getPathPlannerPaths() != null && selectedRoutine.getPathPlannerPaths().size() > 0) {
                 field.getObject("startingPose").setPose(selectedRoutine.getInitialPose());
                 displayPaths(selectedRoutine.getPathPlannerPaths());
             }
@@ -154,27 +177,54 @@ public class AutoManager {
      */
     public void runSelectedRoutine() {
         if (this.resetOdometryConsumer == null) {
-            DriverStation.reportError("[AutoManager] No odometry reset consumer set.", false);
+            String errorMsg = "[AutoManager] No odometry reset consumer set. Autonomous may not work correctly.";
+            DataLogManager.log("ERROR: " + errorMsg);
+            DriverStation.reportError(errorMsg, false);
+            return;
         }
 
-        if (this.getSelectedRoutine() == null) {
-            DriverStation.reportError("[AutoManager] An auto routine must be chosen.", false);
-        } else {
+        AutoRoutine selectedRoutine = this.getSelectedRoutine();
+        if (selectedRoutine == null) {
+            String errorMsg = "[AutoManager] No auto routine selected. Please choose an autonomous routine.";
+            DataLogManager.log("ERROR: " + errorMsg);
+            DriverStation.reportError(errorMsg, false);
+            return;
+        }
+
+        try {
             // the line after this makes the autoroutine command a composition, and
             // commands that are in a composition cannot be recomposed, which is what this
             // would do if auto is run multiple times. this fixes it by removing the
             // composition from the scheduler.
             CommandScheduler.getInstance().removeComposedCommand(baseCommand);
 
-            baseCommand = getSelectedRoutine().getCommand();
+            baseCommand = selectedRoutine.getCommand();
+            if (baseCommand == null) {
+                String errorMsg = String.format("[AutoManager] Selected routine '%s' has a null command.", selectedRoutine.getName());
+                DataLogManager.log("ERROR: " + errorMsg);
+                DriverStation.reportError(errorMsg, false);
+                return;
+            }
 
             timer.reset();
             timer.start();
             currentCommand = baseCommand
-                    .beforeStarting(() -> resetOdometryConsumer.accept(getSelectedRoutine().getInitialPose()))
+                    .beforeStarting(() -> {
+                        try {
+                            resetOdometryConsumer.accept(selectedRoutine.getInitialPose());
+                        } catch (Exception e) {
+                            DataLogManager.log(String.format("[AutoManager] ERROR: Exception resetting odometry before auto: %s", e.getMessage()));
+                            DriverStation.reportError(String.format("[AutoManager] Failed to reset odometry: %s", e.getMessage()), false);
+                        }
+                    })
                     .andThen(Commands.runOnce(timer::stop))
                     .withName("auto");
             currentCommand.schedule();
+            DataLogManager.log(String.format("[AutoManager] Started autonomous routine: %s", selectedRoutine.getName()));
+        } catch (Exception e) {
+            String errorMsg = String.format("[AutoManager] ERROR: Exception starting autonomous routine '%s': %s", selectedRoutine.getName(), e.getMessage());
+            DataLogManager.log(errorMsg);
+            DriverStation.reportError(errorMsg, false);
         }
     }
 

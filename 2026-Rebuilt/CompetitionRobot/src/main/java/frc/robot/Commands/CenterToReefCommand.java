@@ -1,6 +1,7 @@
 package frc.robot.Commands;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -56,9 +57,13 @@ public class CenterToReefCommand extends Command {
 
     public CenterToReefCommand(PhotonVision photonVision, CommandSwerveDrivetrain drivetrain,
             CommandXboxController driveController, double timeoutDuration) {
-        m_photonVision = photonVision;
-        m_drivetrain = drivetrain;
-        m_driveController = driveController;
+        m_photonVision = Objects.requireNonNull(photonVision, "PhotonVision cannot be null");
+        m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
+        m_driveController = driveController; // Can be null (optional)
+        
+        if (timeoutDuration <= 0) {
+            throw new IllegalArgumentException("Timeout duration must be greater than 0, got: " + timeoutDuration);
+        }
         m_timeoutDuration = timeoutDuration;
 
         centerMethod = CAMERA;
