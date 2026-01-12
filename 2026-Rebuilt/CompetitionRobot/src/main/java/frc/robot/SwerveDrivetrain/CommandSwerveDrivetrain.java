@@ -391,6 +391,52 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    /**
+     * SysId routine types available for characterization.
+     */
+    public enum SysIdRoutineType {
+        /** Translation characterization (drive motors) */
+        TRANSLATION,
+        /** Steer characterization (steer motors) */
+        STEER,
+        /** Rotation characterization (rotation control) */
+        ROTATION
+    }
+
+    /**
+     * Sets which SysId routine to use for characterization.
+     * 
+     * @param routineType The type of SysId routine to use
+     */
+    public void setSysIdRoutine(SysIdRoutineType routineType) {
+        switch (routineType) {
+            case TRANSLATION:
+                m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
+                break;
+            case STEER:
+                m_sysIdRoutineToApply = m_sysIdRoutineSteer;
+                break;
+            case ROTATION:
+                m_sysIdRoutineToApply = m_sysIdRoutineRotation;
+                break;
+        }
+    }
+
+    /**
+     * Gets the current SysId routine type being used.
+     * 
+     * @return The current SysId routine type
+     */
+    public SysIdRoutineType getSysIdRoutine() {
+        if (m_sysIdRoutineToApply == m_sysIdRoutineTranslation) {
+            return SysIdRoutineType.TRANSLATION;
+        } else if (m_sysIdRoutineToApply == m_sysIdRoutineSteer) {
+            return SysIdRoutineType.STEER;
+        } else {
+            return SysIdRoutineType.ROTATION;
+        }
+    }
+
     @Override
     public void periodic() {
         /*

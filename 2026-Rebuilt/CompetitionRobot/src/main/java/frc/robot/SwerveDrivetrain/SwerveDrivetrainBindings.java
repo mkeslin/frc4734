@@ -8,7 +8,25 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
+/**
+ * Configures controller bindings for the swerve drivetrain.
+ * Supports two input profiles:
+ * - NORMAL: Standard driving and mechanism control
+ * - SYSID: SysId characterization tests (disables normal driving)
+ */
 public class SwerveDrivetrainBindings {
+    
+    /**
+     * Input profile mode for controller bindings.
+     */
+    public enum InputProfile {
+        /** Normal driving and mechanism control */
+        NORMAL,
+        /** SysId characterization mode (disables normal driving) */
+        SYSID
+    }
+    
+    private static InputProfile currentProfile = InputProfile.NORMAL;
 
     private static final double MaxSpeed = DrivetrainConstants.MaxSpeed;
     private static final double MaxAngularRate = DrivetrainConstants.MaxAngularRate;
@@ -52,14 +70,23 @@ public class SwerveDrivetrainBindings {
     //     coordinateOrientation = isRed ? 1 : -1;
     // }
 
-    public static void configureBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
+    /**
+     * Configures normal driving bindings.
+     * This is the default profile for teleop operation.
+     */
+    private static void configureNormalBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
         // Drivetrain will execute this command periodically
 
         // https://github.com/Operation-P-E-A-C-C-E-Robotics/frc-2025/blob/main/src/main/java/frc/robot/commands/drivetrain/PeaccyTuner.java
 
-        // Sticks
+        // Sticks - only active in NORMAL profile
         drivetrain.setDefaultCommand(
                 drivetrain.applyRequest(() -> {
+                    // Only drive if in NORMAL profile
+                    if (currentProfile != InputProfile.NORMAL) {
+                        return new SwerveRequest.SwerveDriveBrake();
+                    }
+                    
                     // Calculate desired velocities from controller input
                     var desiredVelocityX = coordinateOrientation * driveController.getLeftY() * CurrentSpeed;
                     var desiredVelocityY = coordinateOrientation * driveController.getLeftX() * CurrentSpeed;
@@ -90,8 +117,10 @@ public class SwerveDrivetrainBindings {
          * );
          */
 
-        // RIGHT BUMPER: Reset the field-centric heading
-        driveController.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // RIGHT BUMPER: Reset the field-centric heading (only in NORMAL profile)
+        driveController.rightBumper()
+                .and(() -> currentProfile == InputProfile.NORMAL)
+                .onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         // Turtle Mode while held
         driveController.leftBumper().onTrue(Commands.runOnce(() -> CurrentSpeed = MaxSpeed * TurtleSpeed)
@@ -121,26 +150,103 @@ public class SwerveDrivetrainBindings {
         // TELEMETRY
         // drivetrain.registerTelemetry(m_logger::telemeterize);
 
-        // SYSID
+    }
+
+    /**
+     * Configures SysId characterization bindings.
+     * These bindings are only active when in SYSID profile mode.
+     * 
+     * SysId Bindings (when in SYSID profile):
+     * - Back + Y: Dynamic Forward
+     * - Back + X: Dynamic Reverse
+     * - Start + Y: Quasistatic Forward
+     * - Start + X: Quasistatic Reverse
+     * - A Button (alone): Switch to Translation SysId
+     * - B Button (alone): Switch to Steer SysId
+     * - Right Bumper (alone): Switch to Rotation SysId
+     */
+    private static void configureSysIdBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        // driveController.back().and(driveController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // driveController.back().and(driveController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // driveController.start().and(driveController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // driveController.start().and(driveController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        // These commands only work when in SYSID profile
+        driveController.back().and(driveController.y())
+                .whileTrue(drivetrain.sysIdDynamic(Direction.kForward)
+                        .onlyIf(() -> currentProfile == InputProfile.SYSID));
+        driveController.back().and(driveController.x())
+                .whileTrue(drivetrain.sysIdDynamic(Direction.kReverse)
+                        .onlyIf(() -> currentProfile == InputProfile.SYSID));
+        driveController.start().and(driveController.y())
+                .whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward)
+                        .onlyIf(() -> currentProfile == InputProfile.SYSID));
+        driveController.start().and(driveController.x())
+                .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse)
+                        .onlyIf(() -> currentProfile == InputProfile.SYSID));
+        
+        // SysId routine selection (only active in SYSID profile, and only when buttons are pressed alone)
+        // Use .and() with negated conditions to ensure buttons aren't being used for other purposes
+        driveController.a()
+                .and(() -> !driveController.back().getAsBoolean())
+                .and(() -> !driveController.start().getAsBoolean())
+                .onTrue(Commands.runOnce(() -> {
+                    if (currentProfile == InputProfile.SYSID) {
+                        drivetrain.setSysIdRoutine(CommandSwerveDrivetrain.SysIdRoutineType.TRANSLATION);
+                    }
+                }));
+        driveController.b()
+                .and(() -> !driveController.back().getAsBoolean())
+                .and(() -> !driveController.start().getAsBoolean())
+                .onTrue(Commands.runOnce(() -> {
+                    if (currentProfile == InputProfile.SYSID) {
+                        drivetrain.setSysIdRoutine(CommandSwerveDrivetrain.SysIdRoutineType.STEER);
+                    }
+                }));
+        // Use right bumper for rotation (left bumper is used for turtle mode in normal profile)
+        driveController.rightBumper()
+                .and(() -> !driveController.back().getAsBoolean())
+                .and(() -> !driveController.start().getAsBoolean())
+                .onTrue(Commands.runOnce(() -> {
+                    if (currentProfile == InputProfile.SYSID) {
+                        drivetrain.setSysIdRoutine(CommandSwerveDrivetrain.SysIdRoutineType.ROTATION);
+                    }
+                }));
+    }
 
-        // driveController.x().and(driveController.pov(0)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kForward));
-        // driveController.x().and(driveController.pov(180)).whileTrue(drivetrain.runDriveQuasiTest(Direction.kReverse));
+    /**
+     * Configures all bindings for the drivetrain.
+     * Sets up both normal driving and SysId bindings.
+     * 
+     * @param driveController The drive controller
+     * @param drivetrain The swerve drivetrain
+     */
+    public static void configureBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
+        configureNormalBindings(driveController, drivetrain);
+        configureSysIdBindings(driveController, drivetrain);
+        
+        // Profile switching: Hold Back + Start to toggle between NORMAL and SYSID modes
+        driveController.back().and(driveController.start()).onTrue(
+                Commands.runOnce(() -> {
+                    currentProfile = (currentProfile == InputProfile.NORMAL) 
+                            ? InputProfile.SYSID 
+                            : InputProfile.NORMAL;
+                })
+        );
+    }
 
-        // driveController.y().and(driveController.pov(0)).whileTrue(drivetrain.runDriveDynamTest(Direction.kForward));
-        // driveController.y().and(driveController.pov(180)).whileTrue(drivetrain.runDriveDynamTest(Direction.kReverse));
+    /**
+     * Gets the current input profile.
+     * 
+     * @return The current input profile (NORMAL or SYSID)
+     */
+    public static InputProfile getCurrentProfile() {
+        return currentProfile;
+    }
 
-        // driveController.a().and(driveController.pov(0)).whileTrue(drivetrain.runSteerQuasiTest(Direction.kForward));
-        // driveController.a().and(driveController.pov(180)).whileTrue(drivetrain.runSteerQuasiTest(Direction.kReverse));
-
-        // driveController.b().and(driveController.pov(0)).whileTrue(drivetrain.runSteerDynamTest(Direction.kForward));
-        // driveController.b().and(driveController.pov(180)).whileTrue(drivetrain.runSteerDynamTest(Direction.kReverse));
-
-        // driveController.start().whileTrue(drivetrain.runDriveSlipTest());
+    /**
+     * Sets the input profile.
+     * 
+     * @param profile The profile to set (NORMAL or SYSID)
+     */
+    public static void setProfile(InputProfile profile) {
+        currentProfile = profile;
     }
 }
