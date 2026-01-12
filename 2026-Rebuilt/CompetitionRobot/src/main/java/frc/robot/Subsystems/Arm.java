@@ -18,22 +18,19 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
+import frc.robot.Telemetry;
 import frc.robot.Constants.ArmConstants.ArmPosition;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
 
 // @LoggedObject
 public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPosition> {
-    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    private final NetworkTable table = inst.getTable("Mechanisms");
-    private final DoublePublisher armPub = table.getDoubleTopic("Arm Angle").publish();
+    private final DoublePublisher armPub = Telemetry.createMechanismsPublisher("Arm Angle");
 
     private TalonFX m_armMotor;
     private final VoltageOut m_voltReq = new VoltageOut(0.0);

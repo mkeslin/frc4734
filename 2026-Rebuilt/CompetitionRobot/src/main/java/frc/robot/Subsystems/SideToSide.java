@@ -17,21 +17,18 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
+import frc.robot.Telemetry;
 import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
 
 public class SideToSide extends SubsystemBase implements BaseLinearMechanism<SideToSidePosition> {
-    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    private final NetworkTable table = inst.getTable("Mechanisms");
-    private final DoublePublisher sideToSidePub = table.getDoubleTopic("Side To Side Position").publish();
+    private final DoublePublisher sideToSidePub = Telemetry.createMechanismsPublisher("Side To Side Position");
 
     private TalonFX m_sideToSideMotor;
     private final VoltageOut m_voltReq = new VoltageOut(0.0);

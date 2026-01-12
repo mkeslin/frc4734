@@ -20,21 +20,18 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
+import frc.robot.Telemetry;
 import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
 import frc.robot.Subsystems.Bases.BaseLinearMechanism;
 
 public class Elevator extends SubsystemBase implements BaseLinearMechanism<ElevatorPosition> {
-    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    private final NetworkTable table = inst.getTable("Mechanisms");
-    private final DoublePublisher elevatorPub = table.getDoubleTopic("Elevator Position").publish();
+    private final DoublePublisher elevatorPub = Telemetry.createMechanismsPublisher("Elevator Position");
 
     private TalonFX m_elevatorLeftLeaderMotor;
     private TalonFX m_elevatorRightFollowerMotor;

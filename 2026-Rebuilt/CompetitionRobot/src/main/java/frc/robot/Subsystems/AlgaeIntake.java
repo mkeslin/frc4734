@@ -19,22 +19,19 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
+import frc.robot.Telemetry;
 import frc.robot.Constants.AlgaeIntakeConstants.AlgaeIntakeSpeed;
 import frc.robot.Subsystems.Bases.BaseIntake;
 
 // @LoggedObject
 public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntakeSpeed> {
-    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    private final NetworkTable table = inst.getTable("Mechanisms");
-    private final DoublePublisher algaeIntakePub = table.getDoubleTopic("Intake Speed").publish();
+    private final DoublePublisher algaeIntakePub = Telemetry.createMechanismsPublisher("Intake Speed");
 
     private TalonFX m_algaeIntakeMotor;
     private final VoltageOut m_voltReq = new VoltageOut(0.0);

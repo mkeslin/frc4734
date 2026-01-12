@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
@@ -17,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.Telemetry;
 
 public class SwerveDrivetrainTelemetry {
     private final double MaxSpeed;
@@ -31,11 +31,8 @@ public class SwerveDrivetrainTelemetry {
         // SignalLogger.start();
     }
 
-    /* What to publish over networktables for telemetry */
-    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
-
     /* Robot pose for field positioning */
-    private final NetworkTable table = inst.getTable("Pose");
+    private final NetworkTable table = Telemetry.getPoseTable();
     // private final DoubleArrayPublisher fieldPub =
     // table.getDoubleArrayTopic("robotPose").publish();
     // private final StructArrayPublisher<Pose3d> fieldPub = table.getStructArrayTopic("Robot Pose", Pose3d.struct).publish();
@@ -45,7 +42,7 @@ public class SwerveDrivetrainTelemetry {
             .getStructArrayTopic("Swerve States", SwerveModuleState.struct).publish();
 
     /* Robot speeds for general checking */
-    private final NetworkTable driveStats = inst.getTable("Drive");
+    private final NetworkTable driveStats = Telemetry.getDriveTable();
     private final DoublePublisher velocityX = driveStats.getDoubleTopic("Velocity X").publish();
     private final DoublePublisher velocityY = driveStats.getDoubleTopic("Velocity Y").publish();
     private final DoublePublisher speed = driveStats.getDoubleTopic("Speed").publish();
