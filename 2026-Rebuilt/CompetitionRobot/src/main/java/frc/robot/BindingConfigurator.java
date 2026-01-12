@@ -1,5 +1,18 @@
 package frc.robot;
 
+import static frc.robot.Constants.CommandConstants.APPROACH_SCORE_SPEED;
+import static frc.robot.Constants.CommandConstants.CLIMBER_FAST_VOLTAGE;
+import static frc.robot.Constants.CommandConstants.CLIMBER_SLOW_VOLTAGE;
+import static frc.robot.Constants.CommandConstants.CLIMBER_STOP_VOLTAGE;
+import static frc.robot.Constants.CommandConstants.DEFAULT_WAIT_TIME;
+import static frc.robot.Constants.CommandConstants.LONG_DRIVE_TIMEOUT;
+import static frc.robot.Constants.CommandConstants.MEDIUM_DRIVE_TIMEOUT;
+import static frc.robot.Constants.CommandConstants.PLACE_CORAL_FORWARD_SPEED;
+import static frc.robot.Constants.CommandConstants.POST_SCORE_BACKWARD_SPEED;
+import static frc.robot.Constants.CommandConstants.POST_SCORE_BACKWARD_TIMEOUT;
+import static frc.robot.Constants.CommandConstants.SHORT_DRIVE_TIMEOUT;
+import static frc.robot.Constants.CommandConstants.STOP_SPEED;
+
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -94,97 +107,142 @@ public class BindingConfigurator {
         m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
         m_driveController.x().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
 
-        m_driveController.povRight().whileTrue(Commands.run(() -> m_climber.setVoltage(-1.75)));
-        m_driveController.povRight().onFalse(Commands.run(() -> m_climber.setVoltage(0.0)));
+        m_driveController.povRight().whileTrue(Commands.run(() -> m_climber.setVoltage(CLIMBER_SLOW_VOLTAGE)));
+        m_driveController.povRight().onFalse(Commands.run(() -> m_climber.setVoltage(CLIMBER_STOP_VOLTAGE)));
 
-        m_driveController.povLeft().whileTrue(Commands.run(() -> m_climber.setVoltage(-3.5)));
-        m_driveController.povLeft().onFalse(Commands.run(() -> m_climber.setVoltage(0.0)));
+        m_driveController.povLeft().whileTrue(Commands.run(() -> m_climber.setVoltage(CLIMBER_FAST_VOLTAGE)));
+        m_driveController.povLeft().onFalse(Commands.run(() -> m_climber.setVoltage(CLIMBER_STOP_VOLTAGE)));
     }
 
     /**
      * Configures bindings for the arcade controller.
      */
     public void configureArcadeBindings() {
-        var centerToReef = true;
+        final boolean centerToReef = true;
 
-        m_arcadeController.rightTrigger().onTrue(Commands.sequence(
-                prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef),
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                        .withTimeout(0.15)
-                        .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                        .asProxy()
-        ));
-        m_arcadeController.b()
-                .onTrue(Commands.sequence(
-                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef),
-                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                                .withTimeout(0.12)
-                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                                .asProxy()
-                ));
-        m_arcadeController.a()
-                .onTrue(Commands.sequence(
-                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef),
-                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                                .withTimeout(0.17)
-                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                                .asProxy()
-                ));
-        m_arcadeController.x()
-                .onTrue(Commands.sequence(
-                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef),
-                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                                .withTimeout(0.15)
-                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                                .asProxy()
-                ));
-        m_arcadeController.y()
-                .onTrue(Commands.sequence(
-                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef),
-                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                                .withTimeout(0.12)
-                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                                .asProxy()
-                ));
-        m_arcadeController.rightBumper().onTrue(Commands.sequence(
-                prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                        .withTimeout(0.17)
-                        .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                        .asProxy()
-        ));
+        // Scoring bindings with approach movement
+        m_arcadeController.rightTrigger().onTrue(
+                createScoreAndApproachCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef, MEDIUM_DRIVE_TIMEOUT));
+        
+        m_arcadeController.b().onTrue(
+                createScoreAndApproachCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef, SHORT_DRIVE_TIMEOUT));
+        
+        m_arcadeController.a().onTrue(
+                createScoreAndApproachCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef, LONG_DRIVE_TIMEOUT));
+        
+        m_arcadeController.x().onTrue(
+                createScoreAndApproachCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef, MEDIUM_DRIVE_TIMEOUT));
+        
+        m_arcadeController.y().onTrue(
+                createScoreAndApproachCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef, SHORT_DRIVE_TIMEOUT));
+        
+        m_arcadeController.rightBumper().onTrue(
+                createScoreAndApproachCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef, LONG_DRIVE_TIMEOUT));
 
+        // Center scoring (no approach movement)
         m_arcadeController.start().onTrue(
                 prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Center, centerToReef));
 
-        var scoreCommand = Commands.sequence(
-                // move arm down
+        // Score command sequence
+        Command scoreCommand = createScoreSequenceCommand();
+        m_arcadeController.leftBumper().onTrue(scoreCommand);
+        m_arcadeController.leftTrigger().onTrue(scoreCommand);
+    }
+
+    /**
+     * Creates a command sequence that prepares to score, centers to reef, and approaches the scoring position.
+     * 
+     * @param scoreLevel The scoring level
+     * @param scoreSide The scoring side
+     * @param centerToReef Whether to center to reef
+     * @param approachTimeout Timeout for the approach movement
+     * @return The complete command sequence
+     */
+    private Command createScoreAndApproachCommand(ScoreLevel scoreLevel, ScoreSide scoreSide, 
+            boolean centerToReef, double approachTimeout) {
+        return Commands.sequence(
+                prepareScoreCoralAndCenterToReefCommand(scoreLevel, scoreSide, centerToReef),
+                createApproachMovementCommand(approachTimeout)
+        );
+    }
+
+    /**
+     * Creates a command that moves the drivetrain forward to approach the scoring position.
+     * 
+     * @param timeout The timeout for the movement
+     * @return Command that approaches and then stops
+     */
+    private Command createApproachMovementCommand(double timeout) {
+        return Commands.run(() -> m_drivetrain.setRelativeSpeed(APPROACH_SCORE_SPEED, STOP_SPEED, STOP_SPEED))
+                .withTimeout(timeout)
+                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(STOP_SPEED, STOP_SPEED, STOP_SPEED)))
+                .asProxy();
+    }
+
+    /**
+     * Creates the complete score sequence command.
+     * Includes scoring, placing coral forward, backing away, and conditional post-intake or retry.
+     * 
+     * @return The complete score sequence command
+     */
+    private Command createScoreSequenceCommand() {
+        return Commands.sequence(
+                // Move arm down to score
                 RobotCommands.scoreCoralCommand(m_robotContext),
-                // move forward to set coral if not completely placed
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(0.75, 0, 0)).withTimeout(0.12)
-                        .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                        .asProxy(),
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(-1.0, 0, 0)).withTimeout(0.35)
-                        .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                        .asProxy(),
+                // Move forward to place coral if not completely placed
+                createPlaceCoralForwardCommand(),
+                // Back away from scoring position
+                createBackAwayCommand(),
+                // Conditional: pre-intake if no coral, or retry if coral still in arm
                 RobotCommands.preIntakeCoralCommand(m_robotContext)
                         .onlyIf(() -> !m_positionTracker.getCoralInArm()),
                 RobotCommands.prepareScoreCoralRetryCommand(m_robotContext)
                         .onlyIf(() -> m_positionTracker.getCoralInArm())
         );
-        m_arcadeController.leftBumper().onTrue(scoreCommand);
-        m_arcadeController.leftTrigger().onTrue(scoreCommand);
     }
 
+    /**
+     * Creates a command that moves forward to place coral.
+     * 
+     * @return Command that moves forward and stops
+     */
+    private Command createPlaceCoralForwardCommand() {
+        return Commands.run(() -> m_drivetrain.setRelativeSpeed(PLACE_CORAL_FORWARD_SPEED, STOP_SPEED, STOP_SPEED))
+                .withTimeout(SHORT_DRIVE_TIMEOUT)
+                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(STOP_SPEED, STOP_SPEED, STOP_SPEED)))
+                .asProxy();
+    }
+
+    /**
+     * Creates a command that backs away from the scoring position.
+     * 
+     * @return Command that backs away and stops
+     */
+    private Command createBackAwayCommand() {
+        return Commands.run(() -> m_drivetrain.setRelativeSpeed(POST_SCORE_BACKWARD_SPEED, STOP_SPEED, STOP_SPEED))
+                .withTimeout(POST_SCORE_BACKWARD_TIMEOUT)
+                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(STOP_SPEED, STOP_SPEED, STOP_SPEED)))
+                .asProxy();
+    }
+
+    /**
+     * Creates a command that prepares to score coral and optionally centers to reef.
+     * Both actions run in parallel with default wait times.
+     * 
+     * @param scoreLevel The scoring level
+     * @param scoreSide The scoring side
+     * @param centerToReef Whether to center to reef
+     * @return Command that prepares scoring and centers to reef in parallel
+     */
     private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide,
             boolean centerToReef) {
-        var centerToReefCommand = NamedCommands.getCommand("centerToReefCommand");
+        Command centerToReefCommand = NamedCommands.getCommand("centerToReefCommand");
         return Commands.parallel(
                 Commands
-                        .waitSeconds(0.0)
+                        .waitSeconds(DEFAULT_WAIT_TIME)
                         .andThen(RobotCommands.prepareScoreCoralCommand(m_robotContext, scoreLevel, scoreSide)),
                 Commands
-                        .waitSeconds(0.0)
+                        .waitSeconds(DEFAULT_WAIT_TIME)
                         .andThen(centerToReefCommand.unless(() -> !centerToReef))
         );
     }

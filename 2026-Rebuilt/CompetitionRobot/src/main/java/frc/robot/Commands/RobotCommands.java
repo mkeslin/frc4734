@@ -1,5 +1,8 @@
 package frc.robot.Commands;
 
+import static frc.robot.Constants.CommandConstants.DEFAULT_WAIT_TIME;
+import static frc.robot.Constants.CommandConstants.POST_INTAKE_ARM_DELAY;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -87,14 +90,14 @@ public class RobotCommands {
         }).andThen(
                 Commands.parallel(
                         Commands
-                                .waitSeconds(0.0)
+                                .waitSeconds(DEFAULT_WAIT_TIME)
                                 .andThen(context.sideToSide.moveToSetPositionCommand(() -> sideToSidePosition)
                                         .asProxy()),
                         Commands
-                                .waitSeconds(0.0)
+                                .waitSeconds(DEFAULT_WAIT_TIME)
                                 .andThen(context.arm.moveToSetPositionCommand(() -> armPosition).asProxy()),
                         Commands
-                                .waitSeconds(0.0)
+                                .waitSeconds(DEFAULT_WAIT_TIME)
                                 .andThen(context.elevator.moveToSetPositionCommand(() -> elevatorPosition).asProxy())
                 )
                         .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.PrepareScore))
@@ -148,12 +151,12 @@ public class RobotCommands {
         Objects.requireNonNull(context, "RobotContext cannot be null");
         return Commands.sequence(
                 Commands.parallel(
-                        Commands.waitSeconds(0.0)
+                        Commands.waitSeconds(DEFAULT_WAIT_TIME)
                                 .andThen(context.arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
-                        Commands.waitSeconds(0.0)
+                        Commands.waitSeconds(DEFAULT_WAIT_TIME)
                                 .andThen(
                                         context.sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy()),
-                        Commands.waitSeconds(0.0)
+                        Commands.waitSeconds(DEFAULT_WAIT_TIME)
                                 .andThen(context.elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP)
                                         .asProxy())
                 )
@@ -172,13 +175,13 @@ public class RobotCommands {
         Objects.requireNonNull(context, "RobotContext cannot be null");
         return Commands.parallel(
                 Commands
-                        .waitSeconds(0.0)
+                        .waitSeconds(DEFAULT_WAIT_TIME)
                         .andThen(context.elevator.moveToSetPositionCommand(() -> ElevatorPosition.BOTTOM).asProxy()),
                 Commands
-                        .waitSeconds(0.0)
+                        .waitSeconds(DEFAULT_WAIT_TIME)
                         .andThen(context.arm.moveToSetPositionCommand(() -> ArmPosition.BOTTOM).asProxy()),
                 Commands
-                        .waitSeconds(0.0)
+                        .waitSeconds(DEFAULT_WAIT_TIME)
                         .andThen(context.sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         )
                 .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.Intake))
@@ -196,13 +199,13 @@ public class RobotCommands {
         Objects.requireNonNull(context, "RobotContext cannot be null");
         return Commands.parallel(
                 Commands
-                        .waitSeconds(0.0)
+                        .waitSeconds(DEFAULT_WAIT_TIME)
                         .andThen(context.elevator.moveToSetPositionCommand(() -> ElevatorPosition.INTAKE_PREP).asProxy()),
                 Commands
-                        .waitSeconds(0.40)
+                        .waitSeconds(POST_INTAKE_ARM_DELAY)
                         .andThen(context.arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
                 Commands
-                        .waitSeconds(0.0)
+                        .waitSeconds(DEFAULT_WAIT_TIME)
                         .andThen(context.sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         )
                 .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.PostIntake))
