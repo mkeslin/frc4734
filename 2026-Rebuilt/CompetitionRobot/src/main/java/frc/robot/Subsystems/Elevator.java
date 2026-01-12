@@ -14,6 +14,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -104,8 +105,8 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         m_elevatorLeftLeaderMotor.getConfigurator().apply(talonFxConfigs);
 
         m_elevatorRightFollowerMotor = new TalonFX(ELEVATOR_RIGHT_ID);
-        m_elevatorLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
-        // m_elevatorRightFollowerMotor.setControl(new Follower(m_elevatorLeftLeaderMotor.getDeviceID(), false));
+        m_elevatorRightFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
+        m_elevatorRightFollowerMotor.setControl(new Follower(m_elevatorLeftLeaderMotor.getDeviceID(), MotorAlignmentValue.Aligned));
 
         resetPosition();
     }
