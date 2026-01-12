@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -117,32 +118,32 @@ public class CenterToReefCommand extends Command {
     @Override
     public boolean isFinished() {
         if (!hasPrintedX && xController.atSetpoint()) {
-            System.out.println("Center to Reef: xxxxxxxxxxxxxxx");
+            DataLogManager.log("[CenterToReef] X axis at setpoint");
             hasPrintedX = true;
         }
         if (!hasPrintedY && yController.atSetpoint()) {
-            System.out.println("Center to Reef: yyyyyyyyyyyyyyy");
+            DataLogManager.log("[CenterToReef] Y axis at setpoint");
             hasPrintedY = true;
         }
         if (!hasPrintedZ && omegaController.atSetpoint()) {
-            System.out.println("Center to Reef: zzzzzzzzzzzzzzz");
+            DataLogManager.log("[CenterToReef] Omega (rotation) axis at setpoint");
             hasPrintedZ = true;
         }
         
         if (t.hasElapsed(m_timeoutDuration)) {
-            System.out.println("Center to Reef: time elapsed");
+            DataLogManager.log(String.format("[CenterToReef] WARN: Command timed out after %.2f seconds", m_timeoutDuration));
             return true;
         }
         if (driverInterrupted) {
-            System.out.println("Center to Reef: driver interrupted");
+            DataLogManager.log("[CenterToReef] Command interrupted by driver");
             return true;
         }
         if (centerMethod == CAMERA && !m_photonVision.hasTargets()) {
-            System.out.println("Center to Reef: lost tag");
+            DataLogManager.log("[CenterToReef] WARN: Lost AprilTag target");
             return true;
         }
         if (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()) {
-            System.out.println("Center to Reef: centered");
+            DataLogManager.log("[CenterToReef] Successfully centered to reef");
             return true;
         }
 

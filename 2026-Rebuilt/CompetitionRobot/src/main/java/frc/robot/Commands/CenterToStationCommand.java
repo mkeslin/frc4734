@@ -2,6 +2,7 @@ package frc.robot.Commands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -83,23 +84,23 @@ public class CenterToStationCommand extends Command {
     @Override
     public boolean isFinished() {
         if (t.hasElapsed(5)) {
-            System.out.println("Center to Station: time elapsed");
+            DataLogManager.log("[CenterToStation] WARN: Command timed out after 5 seconds");
             return true;
         }
         if (driverInterrupted) {
-            System.out.println("Center to Station: driver interrupted");
+            DataLogManager.log("[CenterToStation] Command interrupted by driver");
             return true;
         }
         if (t_tray.hasElapsed(.75)) {
-            System.out.println("Center to Station: coral acquired");
+            DataLogManager.log("[CenterToStation] Coral successfully acquired");
             return true;
         }
         if (!m_photonVision.hasTargets()) {
-            System.out.println("Center to Station: lost tag");
+            DataLogManager.log("[CenterToStation] WARN: Lost AprilTag target");
             return true;
         }
         if (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()) {
-            System.out.println("Center to Station: centered");
+            DataLogManager.log("[CenterToStation] Successfully centered to station");
             return true;
         }
 

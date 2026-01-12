@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.PositionTracker;
 
@@ -116,14 +117,14 @@ public class StateMachine {
     public boolean canTransition(
             PositionTracker positionTracker,
             StateMachineStateName toStateName) {
-        System.out.println("From " + m_currentStateName.toString() + " to " + toStateName.toString());
+        DataLogManager.log(String.format("[StateMachine] State transition attempt: %s -> %s", m_currentStateName, toStateName));
 
         // look in map
         var toStates = m_stateMap.get(m_currentStateName);
 
         // from state not found
         if (toStates == null || toStates.isEmpty()) {
-            System.out.println("Failed: from state not found");
+            DataLogManager.log(String.format("[StateMachine] WARN: State transition failed - from state '%s' not found in state map", m_currentStateName));
             return false;
         }
 
@@ -136,29 +137,30 @@ public class StateMachine {
             }
         }
         if (toState == null) {
-            System.out.println("Failed: to state not found");
+            DataLogManager.log(String.format("[StateMachine] WARN: State transition failed - to state '%s' not found in transition list from '%s'", toStateName, m_currentStateName));
             return false;
         }
 
         // check booleans
         if (toState.RequiresIntakeCoral && !positionTracker.getCoralInTray()) {
-            System.out.println("Failed: coral not in tray");
+            DataLogManager.log(String.format("[StateMachine] WARN: State transition failed - coral not in tray (required for %s)", toStateName));
             return false;
         }
         if (toState.RequiresArmCoral && !positionTracker.getCoralInArm()) {
-            System.out.println("Failed: coral not in arm");
+            DataLogManager.log(String.format("[StateMachine] WARN: State transition failed - coral not in arm (required for %s)", toStateName));
             return false;
         }
         if (toState.NotIfIntakeCoral && positionTracker.getCoralInTray()) {
-            System.out.println("Failed: coral in tray");
+            DataLogManager.log(String.format("[StateMachine] WARN: State transition failed - coral in tray (not allowed for %s)", toStateName));
             return false;
         }
         if (toState.NotIfArmCoral && positionTracker.getCoralInArm()) {
-            System.out.println("Failed: coral in arm");
+            DataLogManager.log(String.format("[StateMachine] WARN: State transition failed - coral in arm (not allowed for %s)", toStateName));
             return false;
         }
 
         // can transition
+        DataLogManager.log(String.format("[StateMachine] State transition successful: %s -> %s", m_currentStateName, toStateName));
         m_currentStateName = toStateName;
         return true;
     }
