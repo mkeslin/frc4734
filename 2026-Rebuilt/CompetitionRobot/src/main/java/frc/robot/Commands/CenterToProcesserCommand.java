@@ -1,5 +1,7 @@
 package frc.robot.Commands;
 
+import java.util.Objects;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
@@ -29,9 +31,9 @@ public class CenterToProcesserCommand extends Command {
     public Timer t = new Timer();
 
     public CenterToProcesserCommand(PhotonVision photonVision, CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
-        m_photonVision = photonVision;
-        m_drivetrain = drivetrain;
-        m_driveController = driveController;
+        m_photonVision = Objects.requireNonNull(photonVision, "PhotonVision cannot be null");
+        m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
+        m_driveController = driveController; // Can be null (optional)
 
         xController.setTolerance(AREA_ERROR);
         yController.setTolerance(CAMERA_X_OFFSET_ERROR);

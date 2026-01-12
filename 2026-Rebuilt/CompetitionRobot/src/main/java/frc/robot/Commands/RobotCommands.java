@@ -1,6 +1,7 @@
 package frc.robot.Commands;
 
 import java.util.Map;
+import java.util.Objects;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -25,11 +26,17 @@ public class RobotCommands {
      * @param level The scoring level (L1, L2, L3, L4)
      * @param side The scoring side (Left, Right, Center)
      * @return Command to prepare for scoring
+     * @throws NullPointerException if context is null
+     * @throws IllegalArgumentException if level or side is invalid
      */
     public static Command prepareScoreCoralCommand(
             RobotContext context,
             ScoreLevel level,
             ScoreSide side) {
+        Objects.requireNonNull(context, "RobotContext cannot be null");
+        Objects.requireNonNull(level, "ScoreLevel cannot be null");
+        Objects.requireNonNull(side, "ScoreSide cannot be null");
+        
         ElevatorPosition elevatorPosition;
         ArmPosition armPosition;
         SideToSidePosition sideToSidePosition;
@@ -100,8 +107,10 @@ public class RobotCommands {
      * 
      * @param context The robot context containing all subsystems
      * @return Command to retry preparing for scoring
+     * @throws NullPointerException if context is null
      */
     public static Command prepareScoreCoralRetryCommand(RobotContext context) {
+        Objects.requireNonNull(context, "RobotContext cannot be null");
         return context.arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
                 .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.PrepareScore))
                 .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
@@ -112,8 +121,10 @@ public class RobotCommands {
      * 
      * @param context The robot context containing all subsystems
      * @return Command to score coral
+     * @throws NullPointerException if context is null
      */
     public static Command scoreCoralCommand(RobotContext context) {
+        Objects.requireNonNull(context, "RobotContext cannot be null");
         Map<ScoreLevel, Command> commandMap = Map.ofEntries(
                 Map.entry(ScoreLevel.L1, Commands.none()),
                 Map.entry(ScoreLevel.L2, context.arm.moveToSetPositionCommand(() -> ArmPosition.L3_SCORE).asProxy()),
@@ -131,8 +142,10 @@ public class RobotCommands {
      * 
      * @param context The robot context containing all subsystems
      * @return Command to prepare for intake
+     * @throws NullPointerException if context is null
      */
     public static Command preIntakeCoralCommand(RobotContext context) {
+        Objects.requireNonNull(context, "RobotContext cannot be null");
         return Commands.sequence(
                 Commands.parallel(
                         Commands.waitSeconds(0.0)
@@ -153,8 +166,10 @@ public class RobotCommands {
      * 
      * @param context The robot context containing all subsystems
      * @return Command to intake coral
+     * @throws NullPointerException if context is null
      */
     public static Command intakeCoralCommand(RobotContext context) {
+        Objects.requireNonNull(context, "RobotContext cannot be null");
         return Commands.parallel(
                 Commands
                         .waitSeconds(0.0)
@@ -175,8 +190,10 @@ public class RobotCommands {
      * 
      * @param context The robot context containing all subsystems
      * @return Command to complete intake sequence
+     * @throws NullPointerException if context is null
      */
     public static Command postIntakeCoralCommand(RobotContext context) {
+        Objects.requireNonNull(context, "RobotContext cannot be null");
         return Commands.parallel(
                 Commands
                         .waitSeconds(0.0)
