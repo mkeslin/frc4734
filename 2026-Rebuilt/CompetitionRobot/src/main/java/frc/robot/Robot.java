@@ -39,6 +39,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledInit() {
+        // Cleanup resources when robot is disabled
+        m_robotContainer.cleanup();
     }
 
     @Override

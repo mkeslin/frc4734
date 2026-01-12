@@ -262,4 +262,17 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     // public boolean atGoal() {
     // return pidController.atGoal();
     // }
+
+    /**
+     * Cleans up resources when the robot is disabled.
+     * Stops the motor and closes NetworkTables publishers.
+     */
+    public void cleanup() {
+        if (m_climber != null) {
+            m_climber.stopMotor();
+        }
+        if (climberPub != null) {
+            climberPub.close();
+        }
+    }
 }

@@ -1,7 +1,7 @@
 package frc.robot.Subsystems.Cameras;
 
-import static frc.robot.Constants.VisionConstants.APRILTAG_PIPELINE;
-import static frc.robot.Constants.VisionConstants.CAMERA_NAME;
+// import static frc.robot.Constants.VisionConstants.APRILTAG_PIPELINE;
+// import static frc.robot.Constants.VisionConstants.CAMERA_NAME;
 import static frc.robot.Constants.VisionConstants.CAMERA_POSITION;
 import static frc.robot.Constants.VisionConstants.CAMERA_ROTATION;
 
@@ -15,7 +15,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -237,5 +236,15 @@ public class PhotonVision extends SubsystemBase {
 
     public boolean canClimb() {
         return false;
+    }
+
+    /**
+     * Cleans up resources when the robot is disabled.
+     * PhotonCamera handles its own cleanup, but this method is provided
+     * for consistency with other subsystems.
+     */
+    public void cleanup() {
+        // PhotonCamera automatically handles cleanup when robot shuts down
+        // No explicit cleanup needed, but method provided for consistency
     }
 }

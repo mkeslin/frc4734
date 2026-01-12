@@ -216,4 +216,20 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     public Command sysIdDynamicCommand(SysIdRoutine.Direction direction) {
         return m_sysIdRoutine.dynamic(direction).withName("elevator.sysIdDynamic");
     }
+
+    /**
+     * Cleans up resources when the robot is disabled.
+     * Stops motors and closes NetworkTables publishers.
+     */
+    public void cleanup() {
+        if (m_elevatorLeftLeaderMotor != null) {
+            m_elevatorLeftLeaderMotor.stopMotor();
+        }
+        if (m_elevatorRightFollowerMotor != null) {
+            m_elevatorRightFollowerMotor.stopMotor();
+        }
+        if (elevatorPub != null) {
+            elevatorPub.close();
+        }
+    }
 }

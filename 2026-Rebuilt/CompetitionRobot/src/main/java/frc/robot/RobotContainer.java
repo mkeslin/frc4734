@@ -161,4 +161,20 @@ public class RobotContainer {
     public AutoManager getAutoManager() {
         return m_autoManager;
     }
+
+    /**
+     * Cleans up all resources when the robot is disabled.
+     * Stops all motors, closes NetworkTables publishers, and closes sensors.
+     */
+    public void cleanup() {
+        // Stop drivetrain
+        if (m_drivetrain != null) {
+            m_drivetrain.stop();
+        }
+
+        // Cleanup all subsystems and sensors
+        if (m_subsystemFactory != null) {
+            m_subsystemFactory.cleanup();
+        }
+    }
 }

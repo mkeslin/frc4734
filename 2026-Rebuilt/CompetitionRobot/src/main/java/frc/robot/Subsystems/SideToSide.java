@@ -258,4 +258,17 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
     // // return pidController.atGoal();
     // return false;
     // }
+
+    /**
+     * Cleans up resources when the robot is disabled.
+     * Stops the motor and closes NetworkTables publishers.
+     */
+    public void cleanup() {
+        if (m_sideToSideMotor != null) {
+            m_sideToSideMotor.stopMotor();
+        }
+        if (sideToSidePub != null) {
+            sideToSidePub.close();
+        }
+    }
 }

@@ -139,4 +139,39 @@ public class SubsystemFactory {
         m_elevator.resetPosition();
         m_climber.resetPosition();
     }
+
+    /**
+     * Cleans up all resources when the robot is disabled.
+     * Stops all motors, closes NetworkTables publishers, closes sensors,
+     * and cleans up other subsystem resources.
+     */
+    public void cleanup() {
+        // Cleanup subsystems
+        if (m_elevator != null) {
+            m_elevator.cleanup();
+        }
+        if (m_arm != null) {
+            m_arm.cleanup();
+        }
+        if (m_sideToSide != null) {
+            m_sideToSide.cleanup();
+        }
+        if (m_climber != null) {
+            m_climber.cleanup();
+        }
+        if (m_lights != null) {
+            m_lights.cleanup();
+        }
+        if (m_reefPhotonVision != null) {
+            m_reefPhotonVision.cleanup();
+        }
+
+        // Close sensors
+        if (m_coralTraySensor != null) {
+            m_coralTraySensor.close();
+        }
+        if (m_coralArmSensor != null) {
+            m_coralArmSensor.close();
+        }
+    }
 }

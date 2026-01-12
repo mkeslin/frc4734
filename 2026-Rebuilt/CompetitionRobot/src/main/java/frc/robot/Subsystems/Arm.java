@@ -336,6 +336,19 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         return m_sysIdRoutine.dynamic(direction).withName("arm.sysIdDynamic");
     }
 
+    /**
+     * Cleans up resources when the robot is disabled.
+     * Stops the motor and closes NetworkTables publishers.
+     */
+    public void cleanup() {
+        if (m_armMotor != null) {
+            m_armMotor.stopMotor();
+        }
+        if (armPub != null) {
+            armPub.close();
+        }
+    }
+
     // public Command resetControllersCommand() {
     // return Commands.runOnce(() -> pidController.reset(getPosition()))
     // .andThen(Commands.runOnce(() -> pidController.setGoal(getPosition())));
