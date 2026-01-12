@@ -54,6 +54,9 @@ public class RobotContainer {
     // POSITION TRACKER - created in constructor after subsystems are initialized
     private final PositionTracker m_positionTracker;
 
+    // STATE MACHINE
+    private final StateMachine m_stateMachine;
+
     // COMMANDS
     public CenterToReefCommand m_centerToReefCommand;
 
@@ -94,8 +97,8 @@ public class RobotContainer {
         // configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
 
-        // load state machine
-        StateMachine.Load();
+        // create state machine (loads states automatically in constructor)
+        m_stateMachine = new StateMachine();
 
         // configure bindings for mechanisms
         configureMechanismBindings();
@@ -121,21 +124,21 @@ public class RobotContainer {
     private void configureMechanismBindings() {
         // GO TO PRE-INTAKE
         m_mechanismController.a()
-                .onTrue(RobotCommands.preIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
+                .onTrue(RobotCommands.preIntakeCoralCommand(m_stateMachine, m_positionTracker, m_elevator, m_arm, m_sideToSide,
                         m_lights));
 
         // INTAKE & POST-INTAKE
         m_mechanismController.b().onTrue(
                 Commands.sequence(
-                        RobotCommands.intakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights),
-                        RobotCommands.postIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide,
+                        RobotCommands.intakeCoralCommand(m_stateMachine, m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights),
+                        RobotCommands.postIntakeCoralCommand(m_stateMachine, m_positionTracker, m_elevator, m_arm, m_sideToSide,
                                 m_lights)
                 //
                 ));
 
         // RESET POSE
         m_mechanismController.start()
-                .onTrue(RobotCommands.intakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights));
+                .onTrue(RobotCommands.intakeCoralCommand(m_stateMachine, m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights));
     }
 
     private void configureDriveBindings() {
@@ -158,7 +161,7 @@ public class RobotContainer {
         return Commands.parallel(
                 Commands
                         .waitSeconds(0.0)
-                        .andThen(RobotCommands.prepareScoreCoralCommand(m_positionTracker, scoreLevel, scoreSide,
+                        .andThen(RobotCommands.prepareScoreCoralCommand(m_stateMachine, m_positionTracker, scoreLevel, scoreSide,
                                 m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight)),
                 Commands
                         .waitSeconds(0.0)
@@ -228,7 +231,7 @@ public class RobotContainer {
 
         var scoreCommand = Commands.sequence(
                 // move arm down
-                RobotCommands.scoreCoralCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights),
+                RobotCommands.scoreCoralCommand(m_stateMachine, m_positionTracker, m_drivetrain, m_elevator, m_arm, m_lights),
                 // move forward to set coral if not completely placed
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(0.75, 0, 0)).withTimeout(0.12)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
@@ -236,10 +239,10 @@ public class RobotContainer {
                 Commands.run(() -> m_drivetrain.setRelativeSpeed(-1.0, 0, 0)).withTimeout(0.35)
                         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
                         .asProxy(),
-                RobotCommands.preIntakeCoralCommand(m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights)
+                RobotCommands.preIntakeCoralCommand(m_stateMachine, m_positionTracker, m_elevator, m_arm, m_sideToSide, m_lights)
                         .onlyIf(() -> !m_positionTracker.getCoralInArm()),
                 RobotCommands
-                        .prepareScoreCoralRetryCommand(m_positionTracker, m_drivetrain, m_elevator, m_arm, m_sideToSide,
+                        .prepareScoreCoralRetryCommand(m_stateMachine, m_positionTracker, m_drivetrain, m_elevator, m_arm, m_sideToSide,
                                 m_lights, m_reef_limelight)
                         .onlyIf(() -> m_positionTracker.getCoralInArm())
         //
@@ -253,15 +256,15 @@ public class RobotContainer {
 
     public void configureAuto() {
         AutoManager.getInstance()
-                .addRoutine(AutoCommandA.StartingPosition1(m_positionTracker, m_centerToReefCommand, m_drivetrain,
+                .addRoutine(AutoCommandA.StartingPosition1(m_stateMachine, m_positionTracker, m_centerToReefCommand, m_drivetrain,
                         m_elevator, m_arm,
                         m_sideToSide, m_lights, m_reef_limelight));
         AutoManager.getInstance()
-                .addRoutine(AutoCommandA.StartingPosition2(m_positionTracker, m_centerToReefCommand, m_drivetrain,
+                .addRoutine(AutoCommandA.StartingPosition2(m_stateMachine, m_positionTracker, m_centerToReefCommand, m_drivetrain,
                         m_elevator, m_arm,
                         m_sideToSide, m_lights, m_reef_limelight));
         AutoManager.getInstance()
-                .addRoutine(AutoCommandA.StartingPosition3(m_positionTracker, m_centerToReefCommand, m_drivetrain,
+                .addRoutine(AutoCommandA.StartingPosition3(m_stateMachine, m_positionTracker, m_centerToReefCommand, m_drivetrain,
                         m_elevator, m_arm,
                         m_sideToSide, m_lights, m_reef_limelight));
 

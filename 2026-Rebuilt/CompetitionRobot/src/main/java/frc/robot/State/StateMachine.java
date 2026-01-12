@@ -7,13 +7,24 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.PositionTracker;
 
+/**
+ * State machine for managing robot operational states.
+ * Instance-based design allows for better testability and dependency injection.
+ */
 public class StateMachine {
-    private static Map<StateMachineStateName, ArrayList<StateMachineState>> m_stateMap = new HashMap<StateMachineStateName, ArrayList<StateMachineState>>();
-    private static StateMachineStateName m_currentStateName = StateMachineStateName.Intake;
+    private Map<StateMachineStateName, ArrayList<StateMachineState>> m_stateMap = new HashMap<StateMachineStateName, ArrayList<StateMachineState>>();
+    private StateMachineStateName m_currentStateName = StateMachineStateName.Intake;
 
-    private static Map<StateMachineStateName, StateMachineState> m_allStates = new HashMap<StateMachineStateName, StateMachineState>();
+    private Map<StateMachineStateName, StateMachineState> m_allStates = new HashMap<StateMachineStateName, StateMachineState>();
 
-    public static void Load() {
+    /**
+     * Creates a new StateMachine instance and loads all states and transitions.
+     */
+    public StateMachine() {
+        load();
+    }
+
+    private void load() {
         // states
         var intakeState = new StateMachineState(
                 StateMachineStateName.Intake,
@@ -86,11 +97,23 @@ public class StateMachine {
         m_stateMap.put(preIntakeState.Name, preIntakeList);
     }
 
-    public static StateMachineState GetCurrentState() {
+    /**
+     * Gets the current state of the state machine.
+     * 
+     * @return The current StateMachineState
+     */
+    public StateMachineState getCurrentState() {
         return m_allStates.get(m_currentStateName);
     }
 
-    public static Boolean CanTransition(
+    /**
+     * Attempts to transition to a new state if the transition is valid.
+     * 
+     * @param positionTracker The PositionTracker to check state requirements against
+     * @param toStateName The target state to transition to
+     * @return true if the transition was successful, false otherwise
+     */
+    public boolean canTransition(
             PositionTracker positionTracker,
             StateMachineStateName toStateName) {
         System.out.println("From " + m_currentStateName.toString() + " to " + toStateName.toString());

@@ -23,6 +23,7 @@ public class RobotCommands {
     private static ScoreLevel lastScoreLevel = ScoreLevel.None;
 
     public static Command prepareScoreCoralCommand(
+            StateMachine stateMachine,
             PositionTracker positionTracker,
             ScoreLevel level,
             ScoreSide side,
@@ -96,13 +97,14 @@ public class RobotCommands {
                 // .andThen(arm.moveToSetPositionCommand(() -> armPosition).asProxy())
                 // .andThen(arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()),
                 )
-                        .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore))
-                        .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color))
+                        .onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.PrepareScore))
+                        .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color))
         //
         );
     }
 
     public static Command prepareScoreCoralRetryCommand(
+            StateMachine stateMachine,
             PositionTracker positionTracker,
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
@@ -111,11 +113,12 @@ public class RobotCommands {
             Lights lights,
             Limelight reefLimelight) {
                 return arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
-                        .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PrepareScore))
-                        .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));
+                        .onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.PrepareScore))
+                        .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color));
     }
 
     public static Command scoreCoralCommand(
+            StateMachine stateMachine,
             PositionTracker positionTracker,
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
@@ -129,11 +132,12 @@ public class RobotCommands {
                 Map.entry(ScoreLevel.None, Commands.none()));
 
         return Commands.select(commandMap, () -> lastScoreLevel)
-                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.Score))
-                .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));
+                .onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.Score))
+                .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color));
     }
 
     public static Command preIntakeCoralCommand(
+            StateMachine stateMachine,
             PositionTracker positionTracker,
             Elevator elevator,
             Arm arm,
@@ -153,11 +157,12 @@ public class RobotCommands {
                 //
                 )
         //
-        ).onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PreIntake))
-                .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));
+        ).onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.PreIntake))
+                .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color));
     }
 
     public static Command intakeCoralCommand(
+            StateMachine stateMachine,
             PositionTracker positionTracker,
             Elevator elevator,
             Arm arm,
@@ -175,11 +180,12 @@ public class RobotCommands {
                         .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         //
         )
-                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.Intake))
-                .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));
+                .onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.Intake))
+                .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color));
     }
 
     public static Command postIntakeCoralCommand(
+            StateMachine stateMachine,
             PositionTracker positionTracker,
             Elevator elevator,
             Arm arm,
@@ -197,7 +203,7 @@ public class RobotCommands {
                         .andThen(sideToSide.moveToSetPositionCommand(() -> SideToSidePosition.CENTER).asProxy())
         //
         )
-                .onlyIf(() -> StateMachine.CanTransition(positionTracker, StateMachineStateName.PostIntake))
-                .andThen(() -> lights.setSolidColor(StateMachine.GetCurrentState().Color));
+                .onlyIf(() -> stateMachine.canTransition(positionTracker, StateMachineStateName.PostIntake))
+                .andThen(() -> lights.setSolidColor(stateMachine.getCurrentState().Color));
     }
 }

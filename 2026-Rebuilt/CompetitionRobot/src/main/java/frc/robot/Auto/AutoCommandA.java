@@ -12,6 +12,7 @@ import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
+import frc.robot.State.StateMachine;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
@@ -26,6 +27,7 @@ public class AutoCommandA {
     private static ScoreLevel m_autoScoreLevel = ScoreLevel.L4;
 
     public static AutoRoutine StartingPosition1(
+            StateMachine stateMachine,
             PositionTracker positionTracker,
             CenterToReefCommand centerToReefCommand,
             CommandSwerveDrivetrain drivetrain,
@@ -47,11 +49,11 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
         var command = Commands.sequence(
-                GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
+                GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Right, stateMachine, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight),
-                GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
+                GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, stateMachine, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight),
-                GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
+                GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, stateMachine, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight)
         );
         return new AutoRoutine("Routine 1", command,
@@ -60,6 +62,7 @@ public class AutoCommandA {
     }
 
     public static AutoRoutine StartingPosition2(
+            StateMachine stateMachine,
             PositionTracker positionTracker,
             CenterToReefCommand centerToReefCommand,
             CommandSwerveDrivetrain drivetrain,
@@ -81,11 +84,11 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
         var command = Commands.sequence(
-                GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
+                GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Right, stateMachine, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, stateMachine, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, stateMachine, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight)
         );
         return new AutoRoutine("Routine 2", command,
@@ -94,6 +97,7 @@ public class AutoCommandA {
     }
 
     public static AutoRoutine StartingPosition3(
+            StateMachine stateMachine,
             PositionTracker positionTracker,
             CenterToReefCommand centerToReefCommand,
             CommandSwerveDrivetrain drivetrain,
@@ -115,11 +119,11 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
         var command = Commands.sequence(
-                GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
+                GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Right, stateMachine, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, stateMachine, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
+                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, stateMachine, positionTracker, drivetrain,
                         elevator, arm, sideToSide, lights, reefLimelight)
         );
         return new AutoRoutine("Routine 3", command,
@@ -180,6 +184,7 @@ public class AutoCommandA {
             PathPlannerPath pathToReef,
             PathPlannerPath pathToCoralStation,
             ScoreSide scoreSide,
+            StateMachine stateMachine,
             PositionTracker positionTracker,
             CommandSwerveDrivetrain drivetrain,
             Elevator elevator,
@@ -197,14 +202,14 @@ public class AutoCommandA {
                                 .andThen(drivetrain.followPathCommand(pathToReef)),
                         // PRE-POSITION CORAL
                         Commands.waitSeconds(0.0)
-                                .andThen(RobotCommands.postIntakeCoralCommand(positionTracker, elevator, arm,
+                                .andThen(RobotCommands.postIntakeCoralCommand(stateMachine, positionTracker, elevator, arm,
                                         sideToSide, lights))
                 ),
                 // POSITION CORAL, CENTER, & SCORE
                 Commands.sequence(
                         Commands.parallel(
                                 // POSITION CORAL
-                                RobotCommands.prepareScoreCoralCommand(positionTracker, m_autoScoreLevel, scoreSide,
+                                RobotCommands.prepareScoreCoralCommand(stateMachine, positionTracker, m_autoScoreLevel, scoreSide,
                                         drivetrain, elevator, arm, sideToSide, lights, reefLimelight),
                                 // CENTER
                                 centerToReefCommand
@@ -215,7 +220,7 @@ public class AutoCommandA {
                                 .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
                                 .asProxy(),
                         // SCORE
-                        RobotCommands.scoreCoralCommand(positionTracker, drivetrain, elevator, arm, lights),
+                        RobotCommands.scoreCoralCommand(stateMachine, positionTracker, drivetrain, elevator, arm, lights),
                         // MOVE FORWARD - set coral if not completely placed
                         Commands.run(() -> drivetrain.setRelativeSpeed(0.75, 0, 0)).withTimeout(0.12)
                                 .asProxy(),
@@ -227,7 +232,7 @@ public class AutoCommandA {
                 Commands.parallel(
                         // PRE-INTAKE
                         Commands.waitSeconds(0.0)
-                                .andThen(RobotCommands.preIntakeCoralCommand(positionTracker, elevator, arm, sideToSide,
+                                .andThen(RobotCommands.preIntakeCoralCommand(stateMachine, positionTracker, elevator, arm, sideToSide,
                                         lights)),
                         // DRIVE TO CORAL STATION
                         Commands.waitSeconds(0.35)
@@ -236,7 +241,7 @@ public class AutoCommandA {
                 // INTAKE
                 Commands.waitSeconds(15.0).until(() -> positionTracker.getCoralInTray())
                         .andThen(Commands.waitSeconds(0.15)),
-                RobotCommands.intakeCoralCommand(positionTracker, elevator, arm, sideToSide, lights)
+                RobotCommands.intakeCoralCommand(stateMachine, positionTracker, elevator, arm, sideToSide, lights)
         );
 
         return command;
