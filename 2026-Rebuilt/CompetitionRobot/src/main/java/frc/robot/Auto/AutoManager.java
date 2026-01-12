@@ -198,7 +198,7 @@ public class AutoManager {
                     })
                     .andThen(Commands.runOnce(timer::stop))
                     .withName("auto");
-            currentCommand.schedule();
+            CommandScheduler.getInstance().schedule(currentCommand);
             DataLogManager.log(String.format("[AutoManager] Started autonomous routine: %s", selectedRoutine.getName()));
         } catch (Exception e) {
             String errorMsg = String.format("[AutoManager] ERROR: Exception starting autonomous routine '%s': %s", selectedRoutine.getName(), e.getMessage());
