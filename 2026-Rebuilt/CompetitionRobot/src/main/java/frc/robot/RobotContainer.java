@@ -37,36 +37,62 @@ public class RobotContainer {
     private final CommandXboxController m_mechanismController = new CommandXboxController(ControllerIds.XC2ID);
     private final CommandXboxController m_arcadeController = new CommandXboxController(ControllerIds.XC3ID);
 
-    // POSITION TRACKER
-    private PositionTracker m_positionTracker = new PositionTracker();
-
     // DRIVETRAIN
     public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.createDrivetrain();
 
     // SUBSYSTEMS
     private static Limelight m_reef_limelight = new Limelight("limelight", APRILTAG_PIPELINE);
-    private Elevator m_elevator = new Elevator(m_positionTracker);
-    private Arm m_arm = new Arm(m_positionTracker, m_elevator::getCarriageComponentPose);
-    private SideToSide m_sideToSide = new SideToSide(m_positionTracker);
-    private Climber m_climber = new Climber(m_positionTracker);
-    private Lights m_lights = new Lights();
+    private final Elevator m_elevator;
+    private final Arm m_arm;
+    private final SideToSide m_sideToSide;
+    private final Climber m_climber;
+    private final Lights m_lights;
 
-    private DigitalInput m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
-    private DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
+    private final DigitalInput m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
+    private final DigitalInput m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
+
+    // POSITION TRACKER - created in constructor after subsystems are initialized
+    private final PositionTracker m_positionTracker;
 
     // COMMANDS
-    public CenterToReefCommand m_centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain,
-            m_driveController, 3);
+    public CenterToReefCommand m_centerToReefCommand;
 
     public RobotContainer() {
+        // Create subsystems (PositionTracker will be set after creation)
+        m_elevator = new Elevator();
+        m_arm = new Arm(m_elevator::getCarriageComponentPose);
+        m_sideToSide = new SideToSide();
+        m_climber = new Climber();
+        m_lights = new Lights();
+
+        // Create PositionTracker with all actual suppliers
+        // Method references will work correctly since subsystems are now created
+        m_positionTracker = new PositionTracker(
+                m_elevator::getPosition,
+                m_arm::getPosition,
+                m_sideToSide::getPosition,
+                m_climber::getPosition,
+                m_coralTraySensor::get,
+                m_coralArmSensor::get,
+                () -> 0.0  // algaeIntake not used
+        );
+
+        // Set PositionTracker on all subsystems
+        // This ensures all subsystems share the same PositionTracker instance with real suppliers,
+        // allowing them to query each other's state correctly
+        m_elevator.setPositionTracker(m_positionTracker);
+        m_arm.setPositionTracker(m_positionTracker);
+        m_sideToSide.setPositionTracker(m_positionTracker);
+        m_climber.setPositionTracker(m_positionTracker);
+
+        m_centerToReefCommand = new CenterToReefCommand(m_reef_limelight, m_drivetrain,
+                m_driveController, 3);
+
         // register named commands
         NamedCommands.registerCommand("centerToReefCommand", m_centerToReefCommand);
 
         // configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
-
-        m_positionTracker.setCoralInTraySupplier(m_coralTraySensor::get);
-        m_positionTracker.setCoralInArmSupplier(m_coralArmSensor::get);
 
         // load state machine
         StateMachine.Load();

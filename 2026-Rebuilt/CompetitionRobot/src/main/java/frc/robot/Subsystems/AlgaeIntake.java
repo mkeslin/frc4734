@@ -63,7 +63,7 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
 
     private final SysIdRoutine m_sysIdRoutine;
 
-    private final PositionTracker m_positionTracker;
+    private PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
     // private final Supplier<Pose3d> carriagePoseSupplier;
 
@@ -71,12 +71,7 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
 
     private boolean initialized;
 
-    public AlgaeIntake(
-            PositionTracker positionTracker) {
-        /* MechanismLigament2d ligament */
-        // Supplier<Pose3d> carriagePoseSupplier) {
-        m_positionTracker = positionTracker;
-        positionTracker.setAlgaeIntakeSpeedSupplier(this::getSpeed);
+    public AlgaeIntake() {
 
         // this.carriagePoseSupplier = carriagePoseSupplier;
 
@@ -143,6 +138,14 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
 
     public boolean getInitialized() {
         return initialized;
+    }
+
+    /**
+     * Updates the PositionTracker reference. Used during initialization to ensure
+     * all subsystems share the same PositionTracker instance with real suppliers.
+     */
+    public void setPositionTracker(PositionTracker positionTracker) {
+        m_positionTracker = positionTracker;
     }
 
     // // @Log(groups = "components")

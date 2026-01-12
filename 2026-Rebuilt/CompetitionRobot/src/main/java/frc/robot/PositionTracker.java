@@ -2,41 +2,46 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
+/**
+ * Tracks the positions and states of all robot mechanisms.
+ * Uses constructor injection to ensure all suppliers are provided at creation time,
+ * preventing null pointer exceptions.
+ */
 public class PositionTracker {
-    private Supplier<Double> elevatorPositionSupplier;
-    private Supplier<Double> armAngleSupplier;
-    private Supplier<Double> sideToSidePositionSupplier;
-    private Supplier<Double> climberPositionSupplier;
-    private Supplier<Boolean> coralInTraySupplier;
-    private Supplier<Boolean> coralInArmSupplier;
-    private Supplier<Double> algaeIntakeSpeedSupplier;
+    private final Supplier<Double> elevatorPositionSupplier;
+    private final Supplier<Double> armAngleSupplier;
+    private final Supplier<Double> sideToSidePositionSupplier;
+    private final Supplier<Double> climberPositionSupplier;
+    private final Supplier<Boolean> coralInTraySupplier;
+    private final Supplier<Boolean> coralInArmSupplier;
+    private final Supplier<Double> algaeIntakeSpeedSupplier;
 
-    public void setElevatorPositionSupplier(Supplier<Double> elevatorPositionSupplier) {
+    /**
+     * Creates a new PositionTracker with all required suppliers.
+     * 
+     * @param elevatorPositionSupplier Supplier for elevator position
+     * @param armAngleSupplier Supplier for arm angle
+     * @param sideToSidePositionSupplier Supplier for side-to-side position
+     * @param climberPositionSupplier Supplier for climber position
+     * @param coralInTraySupplier Supplier for coral in tray sensor (inverted logic)
+     * @param coralInArmSupplier Supplier for coral in arm sensor (inverted logic)
+     * @param algaeIntakeSpeedSupplier Supplier for algae intake speed
+     */
+    public PositionTracker(
+            Supplier<Double> elevatorPositionSupplier,
+            Supplier<Double> armAngleSupplier,
+            Supplier<Double> sideToSidePositionSupplier,
+            Supplier<Double> climberPositionSupplier,
+            Supplier<Boolean> coralInTraySupplier,
+            Supplier<Boolean> coralInArmSupplier,
+            Supplier<Double> algaeIntakeSpeedSupplier) {
         this.elevatorPositionSupplier = elevatorPositionSupplier;
-    }
-
-    public void setArmAngleSupplier(Supplier<Double> armAngleSupplier) {
         this.armAngleSupplier = armAngleSupplier;
-    }
-
-    public void setSideToSidePositionSupplier(Supplier<Double> sideToSidePositionSupplier) {
         this.sideToSidePositionSupplier = sideToSidePositionSupplier;
-    }
-
-    public void setClimberPositionSupplier(Supplier<Double> climberPositionSupplier) {
         this.climberPositionSupplier = climberPositionSupplier;
-    }
-
-    public void setCoralInTraySupplier(Supplier<Boolean> coralInTray) {
-        this.coralInTraySupplier = coralInTray;
-    }
-
-    public void setCoralInArmSupplier(Supplier<Boolean> coralInArm) {
-        this.coralInArmSupplier = coralInArm;
-    }
-
-    public void setAlgaeIntakeSpeedSupplier(Supplier<Double> algaeIntakeSpeed) {
-        this.algaeIntakeSpeedSupplier = algaeIntakeSpeed;
+        this.coralInTraySupplier = coralInTraySupplier;
+        this.coralInArmSupplier = coralInArmSupplier;
+        this.algaeIntakeSpeedSupplier = algaeIntakeSpeedSupplier;
     }
 
     public double getElevatorPosition() {
@@ -55,12 +60,22 @@ public class PositionTracker {
         return climberPositionSupplier.get();
     }
 
-    // logic is backwards
+    /**
+     * Gets whether coral is in the tray.
+     * Note: Logic is inverted - returns true when sensor reads false.
+     * 
+     * @return true if coral is in tray, false otherwise
+     */
     public Boolean getCoralInTray() {
         return !coralInTraySupplier.get();
     }
 
-    // logic is backwards
+    /**
+     * Gets whether coral is in the arm.
+     * Note: Logic is inverted - returns true when sensor reads false.
+     * 
+     * @return true if coral is in arm, false otherwise
+     */
     public Boolean getCoralInArm() {
         return !coralInArmSupplier.get();
     }

@@ -42,15 +42,13 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     private final SysIdRoutine m_sysIdRoutine;
 
-    private final PositionTracker m_positionTracker;
+    private PositionTracker m_positionTracker;
 
     private MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
     private boolean initialized;
 
-    public Elevator(PositionTracker positionTracker) {
-        m_positionTracker = positionTracker;
-        positionTracker.setElevatorPositionSupplier(this::getPosition);
+    public Elevator() {
 
         m_sysIdRoutine = new SysIdRoutine(
                 new SysIdRoutine.Config(
@@ -106,6 +104,14 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
         return initialized;
     }
 
+    /**
+     * Updates the PositionTracker reference. Used during initialization to ensure
+     * all subsystems share the same PositionTracker instance with real suppliers.
+     */
+    public void setPositionTracker(PositionTracker positionTracker) {
+        m_positionTracker = positionTracker;
+    }
+
     public Pose3d getCarriageComponentPose() {
         return new Pose3d(0.14, 0, 0.247 + getPosition(), new Rotation3d());
     }
@@ -130,7 +136,9 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
     private Command moveToPositionCommand(double goalPosition) {
         return run(() -> {
             m_elevatorLeftLeaderMotor.setControl(m_request.withPosition(goalPosition));
-            elevatorPub.set(m_positionTracker.getElevatorPosition());
+            if (m_positionTracker != null) {
+                elevatorPub.set(m_positionTracker.getElevatorPosition());
+            }
         })
                 .until(() -> Math.abs(getPosition() - goalPosition) < .5)
                 .withName("elevator.moveToPosition");

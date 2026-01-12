@@ -40,7 +40,7 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
 
     private final SysIdRoutine m_sysIdRoutine;
 
-    private final PositionTracker m_positionTracker;
+    private PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
 
     private MotionMagicVoltage m_request = new MotionMagicVoltage(0);
@@ -57,9 +57,7 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
     // true,
     // ElevatorPosition.BOTTOM.value);
 
-    public SideToSide(PositionTracker positionTracker) {
-        m_positionTracker = positionTracker;
-        positionTracker.setSideToSidePositionSupplier(this::getPosition);
+    public SideToSide() {
 
         m_sysIdRoutine = new SysIdRoutine(
                 new SysIdRoutine.Config(
@@ -125,6 +123,14 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
         return initialized;
     }
 
+    /**
+     * Updates the PositionTracker reference. Used during initialization to ensure
+     * all subsystems share the same PositionTracker instance with real suppliers.
+     */
+    public void setPositionTracker(PositionTracker positionTracker) {
+        m_positionTracker = positionTracker;
+    }
+
     // @Log(groups = "components")
     // public Pose3d getFrameComponentPose() {
     // return new Pose3d(0.14, 0, 0.13, new Rotation3d());
@@ -166,7 +172,9 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
     private Command moveToPositionCommand(double goalPosition) {
         return run(() -> {
             m_sideToSideMotor.setControl(m_request.withPosition(goalPosition));
-            sideToSidePub.set(m_positionTracker.getSideToSidePosition());
+            if (m_positionTracker != null) {
+                sideToSidePub.set(m_positionTracker.getSideToSidePosition());
+            }
         })
                 .until(() -> Math.abs(getPosition() - goalPosition) < .5) // ||                         // abs(goal - position) < error
                         // m_positionTracker.getElevatorPosition() < ElevatorPosition.INTAKE_PREP)     // don't move if too low

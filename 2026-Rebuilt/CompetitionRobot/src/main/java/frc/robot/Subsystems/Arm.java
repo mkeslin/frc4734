@@ -62,7 +62,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     private final SysIdRoutine m_sysIdRoutine;
 
-    private final PositionTracker m_positionTracker;
+    private PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
     private final Supplier<Pose3d> carriagePoseSupplier;
 
@@ -71,12 +71,8 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     private boolean initialized;
 
     public Arm(
-            PositionTracker positionTracker,
             /* MechanismLigament2d ligament */
             Supplier<Pose3d> carriagePoseSupplier) {
-        m_positionTracker = positionTracker;
-        positionTracker.setArmAngleSupplier(this::getPosition);
-
         this.carriagePoseSupplier = carriagePoseSupplier;
 
         // m_arm = TalonFXConfigurator.MOTOR_ID, MotorType.kBrushless, MOTOR_INVERTED,
@@ -152,6 +148,14 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
         return initialized;
     }
 
+    /**
+     * Updates the PositionTracker reference. Used during initialization to ensure
+     * all subsystems share the same PositionTracker instance with real suppliers.
+     */
+    public void setPositionTracker(PositionTracker positionTracker) {
+        m_positionTracker = positionTracker;
+    }
+
     // @Log(groups = "components")
     public Pose3d getArmComponentPose() {
         return carriagePoseSupplier.get()
@@ -217,7 +221,9 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     private Command moveToPositionCommand(double goalPosition) {
         return run(() -> {
             m_armMotor.setControl(m_request.withPosition(goalPosition));
-            armPub.set(m_positionTracker.getArmAngle());
+            if (m_positionTracker != null) {
+                armPub.set(m_positionTracker.getArmAngle());
+            }
         })
                 .until(() -> Math.abs(getPosition() - goalPosition) < .5)
                 .withName("arm.moveToPosition");

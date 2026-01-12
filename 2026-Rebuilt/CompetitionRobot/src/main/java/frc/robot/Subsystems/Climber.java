@@ -30,7 +30,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
 
     private TalonFX m_climber;
 
-    private final PositionTracker m_positionTracker;
+    private PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
     // private final Supplier<Pose3d> carriagePoseSupplier;
 
@@ -38,11 +38,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
 
     private boolean initialized;
 
-    public Climber(PositionTracker positionTracker) {
-        /* MechanismLigament2d ligament */
-        // Supplier<Pose3d> carriagePoseSupplier) {
-        m_positionTracker = positionTracker;
-        positionTracker.setClimberPositionSupplier(this::getPosition);
+    public Climber() {
 
         // this.carriagePoseSupplier = carriagePoseSupplier;
 
@@ -87,6 +83,14 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
 
     public boolean getInitialized() {
         return initialized;
+    }
+
+    /**
+     * Updates the PositionTracker reference. Used during initialization to ensure
+     * all subsystems share the same PositionTracker instance with real suppliers.
+     */
+    public void setPositionTracker(PositionTracker positionTracker) {
+        m_positionTracker = positionTracker;
     }
 
     // @Log(groups = "components")
@@ -159,7 +163,9 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         // }
         return run(() -> {
             m_climber.setControl(m_request.withPosition(goalPosition));
-            climberPub.set(m_positionTracker.getClimberPosition());
+            if (m_positionTracker != null) {
+                climberPub.set(m_positionTracker.getClimberPosition());
+            }
         })
                 .until(() -> Math.abs(getPosition() - goalPosition) < .5) // abs(goal - position) < error or
                                                                              // abs(position) > abs(goal) (so it can't
