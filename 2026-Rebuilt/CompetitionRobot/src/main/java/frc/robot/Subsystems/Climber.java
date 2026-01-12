@@ -2,6 +2,7 @@ package frc.robot.Subsystems;
 
 import static frc.robot.Constants.CANIds.CLIMBER;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -179,6 +180,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
 
     @Override
     public Command moveToSetPositionCommand(Supplier<ClimberPosition> goalPositionSupplier) {
+        Objects.requireNonNull(goalPositionSupplier, "goalPositionSupplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(goalPositionSupplier.get().value))
                 .withTimeout(15)
@@ -187,12 +189,14 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
 
     @Override
     public Command moveToArbitraryPositionCommand(Supplier<Double> goalPositionSupplier) {
+        Objects.requireNonNull(goalPositionSupplier, "goalPositionSupplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(goalPositionSupplier.get())).withName("climber.moveToArbitraryPosition");
     }
 
     @Override
     public Command movePositionDeltaCommand(Supplier<Double> delta) {
+        Objects.requireNonNull(delta, "delta supplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(getPosition() + delta.get())).withName("climber.movePositionDelta");
     }

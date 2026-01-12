@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -35,13 +36,13 @@ public class PositionTracker {
             Supplier<Boolean> coralInTraySupplier,
             Supplier<Boolean> coralInArmSupplier,
             Supplier<Double> algaeIntakeSpeedSupplier) {
-        this.elevatorPositionSupplier = elevatorPositionSupplier;
-        this.armAngleSupplier = armAngleSupplier;
-        this.sideToSidePositionSupplier = sideToSidePositionSupplier;
-        this.climberPositionSupplier = climberPositionSupplier;
-        this.coralInTraySupplier = coralInTraySupplier;
-        this.coralInArmSupplier = coralInArmSupplier;
-        this.algaeIntakeSpeedSupplier = algaeIntakeSpeedSupplier;
+        this.elevatorPositionSupplier = Objects.requireNonNull(elevatorPositionSupplier, "elevatorPositionSupplier cannot be null");
+        this.armAngleSupplier = Objects.requireNonNull(armAngleSupplier, "armAngleSupplier cannot be null");
+        this.sideToSidePositionSupplier = Objects.requireNonNull(sideToSidePositionSupplier, "sideToSidePositionSupplier cannot be null");
+        this.climberPositionSupplier = Objects.requireNonNull(climberPositionSupplier, "climberPositionSupplier cannot be null");
+        this.coralInTraySupplier = Objects.requireNonNull(coralInTraySupplier, "coralInTraySupplier cannot be null");
+        this.coralInArmSupplier = Objects.requireNonNull(coralInArmSupplier, "coralInArmSupplier cannot be null");
+        this.algaeIntakeSpeedSupplier = Objects.requireNonNull(algaeIntakeSpeedSupplier, "algaeIntakeSpeedSupplier cannot be null");
     }
 
     public double getElevatorPosition() {

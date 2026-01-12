@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.CANIds.ARM;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -21,6 +22,7 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
@@ -71,7 +73,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     public Arm(
             /* MechanismLigament2d ligament */
             Supplier<Pose3d> carriagePoseSupplier) {
-        this.carriagePoseSupplier = carriagePoseSupplier;
+        this.carriagePoseSupplier = Objects.requireNonNull(carriagePoseSupplier, "carriagePoseSupplier cannot be null");
 
         // m_arm = TalonFXConfigurator.MOTOR_ID, MotorType.kBrushless, MOTOR_INVERTED,
         // (s) -> s.setIdleMode(IdleMode.kBrake),
@@ -156,7 +158,12 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     // @Log(groups = "components")
     public Pose3d getArmComponentPose() {
-        return carriagePoseSupplier.get()
+        Pose3d carriagePose = carriagePoseSupplier.get();
+        if (carriagePose == null) {
+            DataLogManager.log("[Arm] WARN: carriagePoseSupplier returned null, using default pose");
+            carriagePose = new Pose3d();
+        }
+        return carriagePose
                 .plus(new Transform3d(0.083, 0, 0, new Rotation3d()))
                 .plus(new Transform3d(0, 0, 0, new Rotation3d(0, -getPosition(), 0)));
     }
@@ -234,6 +241,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     @Override
     public Command moveToSetPositionCommand(Supplier<ArmPosition> goalPositionSupplier) {
+        Objects.requireNonNull(goalPositionSupplier, "goalPositionSupplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(goalPositionSupplier.get().value))
                 .withTimeout(3)
@@ -242,12 +250,14 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     @Override
     public Command moveToArbitraryPositionCommand(Supplier<Double> goalPositionSupplier) {
+        Objects.requireNonNull(goalPositionSupplier, "goalPositionSupplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(goalPositionSupplier.get())).withName("arm.moveToArbitraryPosition");
     }
 
     @Override
     public Command movePositionDeltaCommand(Supplier<Double> delta) {
+        Objects.requireNonNull(delta, "delta supplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(getPosition() + delta.get())).withName("arm.movePositionDelta");
     }

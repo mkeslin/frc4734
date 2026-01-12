@@ -3,6 +3,7 @@ package frc.robot.SwerveDrivetrain;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -279,7 +280,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @return Command to run
      */
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
-        return run(() -> this.setControl(requestSupplier.get()));
+        Objects.requireNonNull(requestSupplier, "requestSupplier cannot be null");
+        return run(() -> {
+            SwerveRequest request = requestSupplier.get();
+            if (request != null) {
+                this.setControl(request);
+            }
+        });
     }
 
     // public Command runDriveQuasiTest(Direction direction) {

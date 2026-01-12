@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.CANIds.SIDE_TO_SIDE;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -186,6 +187,7 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
 
     @Override
     public Command moveToSetPositionCommand(Supplier<SideToSidePosition> goalPositionSupplier) {
+        Objects.requireNonNull(goalPositionSupplier, "goalPositionSupplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(goalPositionSupplier.get().value))
                 .withTimeout(3)
@@ -194,12 +196,14 @@ public class SideToSide extends SubsystemBase implements BaseLinearMechanism<Sid
 
     @Override
     public Command moveToArbitraryPositionCommand(Supplier<Double> goalPositionSupplier) {
+        Objects.requireNonNull(goalPositionSupplier, "goalPositionSupplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(goalPositionSupplier.get())).withName("sideToSide.moveToArbitraryPosition");
     }
 
     @Override
     public Command movePositionDeltaCommand(Supplier<Double> delta) {
+        Objects.requireNonNull(delta, "delta supplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(getPosition() + delta.get())).withName("sideToSide.movePositionDelta");
     }

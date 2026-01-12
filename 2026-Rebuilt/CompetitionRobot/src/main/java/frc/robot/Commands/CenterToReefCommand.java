@@ -69,7 +69,12 @@ public class CenterToReefCommand extends Command {
         centerMethod = CAMERA;
 
         for (int i = 6; i <= 11; i++) {
-            tagPose = layout.getTagPose(i).get().toPose2d();
+            var tagPoseOptional = layout.getTagPose(i);
+            if (tagPoseOptional.isEmpty()) {
+                DataLogManager.log(String.format("[CenterToReef] WARN: AprilTag %d not found in layout, skipping", i));
+                continue;
+            }
+            tagPose = tagPoseOptional.get().toPose2d();
             targetPose = new Pose2d(tagPose.getTranslation()
                     .plus(new Translation2d(tagPose.getRotation().getCos() * DISTANCE_FROM_APRILTAG,
                             tagPose.getRotation().getSin() * DISTANCE_FROM_APRILTAG)),
@@ -77,7 +82,12 @@ public class CenterToReefCommand extends Command {
             tagPoses.put(Integer.valueOf(i), targetPose);
         }
         for (int i = 17; i <= 22; i++) {
-            tagPose = layout.getTagPose(i).get().toPose2d();
+            var tagPoseOptional = layout.getTagPose(i);
+            if (tagPoseOptional.isEmpty()) {
+                DataLogManager.log(String.format("[CenterToReef] WARN: AprilTag %d not found in layout, skipping", i));
+                continue;
+            }
+            tagPose = tagPoseOptional.get().toPose2d();
             targetPose = new Pose2d(tagPose.getTranslation()
                     .plus(new Translation2d(tagPose.getRotation().getCos() * DISTANCE_FROM_APRILTAG,
                             tagPose.getRotation().getSin() * DISTANCE_FROM_APRILTAG)),

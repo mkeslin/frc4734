@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.CANIds.ALGAE_INTAKE;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -244,6 +245,7 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
 
     @Override
     public Command moveToSetSpeedCommand(Supplier<AlgaeIntakeSpeed> goalSpeedSupplier) {
+        Objects.requireNonNull(goalSpeedSupplier, "goalSpeedSupplier cannot be null");
         return Commands.sequence(
                 moveToSpeedCommand(goalSpeedSupplier.get().value))
                 .withTimeout(3)
@@ -252,12 +254,14 @@ public class AlgaeIntake extends SubsystemBase implements BaseIntake<AlgaeIntake
 
     @Override
     public Command moveToArbitrarySpeedCommand(Supplier<Double> goalSpeedSupplier) {
+        Objects.requireNonNull(goalSpeedSupplier, "goalSpeedSupplier cannot be null");
         return Commands.sequence(
                 moveToSpeedCommand(goalSpeedSupplier.get())).withName("algaeIntake.moveToArbitrarySpeed");
     }
 
     @Override
     public Command moveSpeedDeltaCommand(Supplier<Double> delta) {
+        Objects.requireNonNull(delta, "delta supplier cannot be null");
         return Commands.sequence(
                 moveToSpeedCommand(getSpeed() + delta.get())).withName("algaeIntake.moveSpeedDelta");
     }

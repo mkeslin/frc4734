@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.CANIds.ELEVATOR_LEFT;
 import static frc.robot.Constants.CANIds.ELEVATOR_RIGHT;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -150,6 +151,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     @Override
     public Command moveToSetPositionCommand(Supplier<ElevatorPosition> goalPositionSupplier) {
+        Objects.requireNonNull(goalPositionSupplier, "goalPositionSupplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(goalPositionSupplier.get().value))
                 .withTimeout(3)
@@ -158,6 +160,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     @Override
     public Command moveToArbitraryPositionCommand(Supplier<Double> goalPositionSupplier) {
+        Objects.requireNonNull(goalPositionSupplier, "goalPositionSupplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(goalPositionSupplier.get()))
                 .withName("elevator.moveToArbitraryPosition");
@@ -165,6 +168,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
     @Override
     public Command movePositionDeltaCommand(Supplier<Double> delta) {
+        Objects.requireNonNull(delta, "delta supplier cannot be null");
         return Commands.sequence(
                 moveToPositionCommand(getPosition() + delta.get()))
                 .withName("elevator.movePositionDelta");
