@@ -26,6 +26,13 @@ import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * Subsystem for controlling CANdle LED lights.
+ * 
+ * Note: Uses Phoenix 5 LED library as Phoenix 6 LED support is not yet complete.
+ * Deprecation warnings are suppressed as this is the recommended approach for 2026.
+ */
+@SuppressWarnings({"deprecation", "removal"})
 public class Lights extends SubsystemBase {
     private final CANdle m_candle = new CANdle(LIGHTS);
     private final int LedCount = 300;
@@ -172,8 +179,7 @@ public class Lights extends SubsystemBase {
         m_candle.configStatusLedState(offWhenActive, 0);
     }
 
-    public void 
-    changeAnimation(AnimationTypes toChangeType) {
+    public void changeAnimation(AnimationTypes toChangeType) {
         m_currentAnimationType = toChangeType;
 
         switch (toChangeType) {
@@ -208,13 +214,8 @@ public class Lights extends SubsystemBase {
                 m_toAnimate = null;
                 break;
         }
-        // System.out.println("Changed to " + m_currentAnimationType.toString());
         m_candle.animate(m_toAnimate);
     }
-
-    // public Command setColors(int r, int g, int b) {
-    //     return Commands.runOnce(() -> m_candle.setLEDs(r, g, b), this);
-    // }
 
     @Override
     public void periodic() {
