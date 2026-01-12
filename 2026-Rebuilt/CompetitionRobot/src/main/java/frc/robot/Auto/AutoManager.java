@@ -156,26 +156,10 @@ public class AutoManager {
 
     /**
      * Display the selected routine's trajectories on the field object.
+     * Currently not implemented - path visualization can be added here if needed.
      */
     private void displayPaths(List<PathPlannerPath> paths) {
-        // ArrayList<Pose2d> poses = new ArrayList<Pose2d>();
-
-        // var pathPlannerRobotConfig = PathPlannerLogging;
-
-        // for (PathPlannerPath path : paths) {
-        //     if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-        //         path = path.flipPath();
-        //     }
-        //     PathPlannerTrajectory trajectory = path.generateTrajectory(new ChassisSpeeds(),
-        //             path.getStartingDifferentialPose().getRotation(),
-        //             pathPlannerRobotConfig);
-
-        //     poses.addAll(trajectory.getStates().stream()
-        //             .map((state) -> state.pose)
-        //             .collect(Collectors.toList()));
-        // }
-
-        // field.getObject("trajectory").setPoses(poses);
+        // Path visualization not currently implemented
     }
 
     /**

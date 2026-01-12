@@ -35,6 +35,13 @@ public class AutoCommandA {
         } catch (Exception exception) {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
+        
+        // Validate paths were loaded successfully
+        if (Start_A == null || A_Pickup1 == null || Pickup1_F == null || F_Pickup1 == null) {
+            DriverStation.reportError("[AutoCommandA] StartingPosition1: Failed to load one or more paths. Returning empty routine.", false);
+            return new AutoRoutine("Routine 1 (Failed)", Commands.none());
+        }
+        
         var command = Commands.sequence(
                 GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Right, context, centerToReefCommand),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, context, centerToReefCommand),
@@ -60,6 +67,13 @@ public class AutoCommandA {
         } catch (Exception exception) {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
+        
+        // Validate paths were loaded successfully
+        if (Start_B == null || B_Pickup2 == null || Pickup2_D == null || D_Pickup2 == null) {
+            DriverStation.reportError("[AutoCommandA] StartingPosition2: Failed to load one or more paths. Returning empty routine.", false);
+            return new AutoRoutine("Routine 2 (Failed)", Commands.none());
+        }
+        
         var command = Commands.sequence(
                 GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Right, context, centerToReefCommand),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, context, centerToReefCommand),
@@ -85,6 +99,13 @@ public class AutoCommandA {
         } catch (Exception exception) {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
+        
+        // Validate paths were loaded successfully
+        if (Start_C == null || C_Pickup2 == null || Pickup2_D == null || D_Pickup2 == null) {
+            DriverStation.reportError("[AutoCommandA] StartingPosition3: Failed to load one or more paths. Returning empty routine.", false);
+            return new AutoRoutine("Routine 3 (Failed)", Commands.none());
+        }
+        
         var command = Commands.sequence(
                 GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Right, context, centerToReefCommand),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, context, centerToReefCommand),
@@ -104,6 +125,11 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
 
+        if (path == null) {
+            DriverStation.reportError("[AutoCommandA] StartingPositionTuning1: Failed to load path. Returning empty routine.", false);
+            return new AutoRoutine("Tuning1 (Failed)", Commands.none());
+        }
+
         Command command = drivetrain.followPathCommand(path);
         return new AutoRoutine("Tuning1", command, List.of(path), path.getStartingDifferentialPose());
     }
@@ -114,6 +140,11 @@ public class AutoCommandA {
             path = PathPlannerPath.fromPathFile("zzTuning-2");
         } catch (Exception exception) {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
+        }
+
+        if (path == null) {
+            DriverStation.reportError("[AutoCommandA] StartingPositionTuning2: Failed to load path. Returning empty routine.", false);
+            return new AutoRoutine("Tuning2 (Failed)", Commands.none());
         }
 
         Command command = drivetrain.followPathCommand(path);
@@ -128,6 +159,11 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
 
+        if (path == null) {
+            DriverStation.reportError("[AutoCommandA] StartingPositionTuning3: Failed to load path. Returning empty routine.", false);
+            return new AutoRoutine("Tuning3 (Failed)", Commands.none());
+        }
+
         Command command = drivetrain.followPathCommand(path);
         return new AutoRoutine("Tuning3", command, List.of(path), path.getStartingDifferentialPose());
     }
@@ -140,6 +176,11 @@ public class AutoCommandA {
             DriverStation.reportError("[AutoCommandA]: " + exception.getMessage(), false);
         }
 
+        if (path == null) {
+            DriverStation.reportError("[AutoCommandA] StartingPositionTuning4: Failed to load path. Returning empty routine.", false);
+            return new AutoRoutine("Tuning4 (Failed)", Commands.none());
+        }
+
         Command command = drivetrain.followPathCommand(path);
         return new AutoRoutine("Tuning4", command, List.of(path), path.getStartingDifferentialPose());
     }
@@ -150,6 +191,12 @@ public class AutoCommandA {
             ScoreSide scoreSide,
             RobotContext context,
             CenterToReefCommand centerToReefCommand) {
+        
+        // Validate paths are not null
+        if (pathToReef == null || pathToCoralStation == null) {
+            DriverStation.reportError("[AutoCommandA] GetCycleCommand: One or more paths are null. Returning empty command.", false);
+            return Commands.none();
+        }
 
         Command command = Commands.sequence(
                 // DRIVE TO REEF & PRE-POSITION CORAL

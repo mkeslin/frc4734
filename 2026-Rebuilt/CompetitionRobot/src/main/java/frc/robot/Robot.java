@@ -20,8 +20,9 @@ public class Robot extends TimedRobot {
 
         m_robotContainer = new RobotContainer();
 
-        FollowPathCommand.warmupCommand().schedule();
-        PathfindingCommand.warmupCommand().schedule();
+        // Warmup PathPlanner commands to reduce first-run latency
+        CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+        CommandScheduler.getInstance().schedule(PathfindingCommand.warmupCommand());
 
         int[] validIDs = {1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 20, 21, 22};
         LimelightHelpers.SetFiducialIDFiltersOverride("limelight", validIDs);

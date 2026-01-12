@@ -410,90 +410,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // For use with PathPlanner
-
-    // public Pose2d getPose() {
-    // return this.getState().Pose;
-    // }
-
-    // public void resetPose(Pose2d pose) {
-    // this.seedFieldRelative(pose);
-    // }
-
-    // public ChassisSpeeds getRobotRelativeSpeeds() {
-    // return this.m_kinematics.toChassisSpeeds(this.getState().ModuleStates);
-    // }
-
-    // public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
-    // this.setControl(m_autoRequest.withSpeeds(chassisSpeeds));
-    // }
-
-    // public Command commandMoveRelative(double x, double y, double rot) {
-    // return Commands.runOnce(() -> moveRelative(x, y, rot));
-    // }
-
     public void setRelativeSpeed(double x, double y, double rot) {
-        // return Commands.runOnce(() -> {
-        // Pose2d currentPose = getState().Pose;
-
-        // The rotation component in these poses represents the direction of travel
-        // Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
-        // Pose2d endPose = new Pose2d(currentPose.getTranslation().plus(new Translation2d(x, y)),
-        // new Rotation2d().plus(new Rotation2d(rot)));
-
-        // List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(startPos,
-        // endPos);
-        // PathPlannerPath path = new PathPlannerPath(
-        // waypoints,
-        // new PathConstraints(
-        // DrivetrainConstants.MaxSpeed,
-        // DrivetrainConstants.MaxAcceleration,
-        // Units.degreesToRadians(360),
-        // Units.degreesToRadians(540)),
-        // new IdealStartingState(0, new Rotation2d()),
-        // new GoalEndState(0.0, currentPose.getRotation()));
-
-        // Prevent this path from being flipped on the red alliance, since the given
-        // positions are already correct
-        // path.preventFlipping = true;
-
-        // Commands.run(() -> AutoBuilder.pathfindToPose(endPos,
-        // new PathConstraints(
-        // DrivetrainConstants.MaxSpeed,
-        // DrivetrainConstants.MaxAcceleration,
-        // Units.degreesToRadians(360),
-        // Units.degreesToRadians(540)),
-        // // new IdealStartingState(0, new Rotation2d()),
-        // 0), this);
-
-        // List<Waypoint> bezierPoints = PathPlannerPath.waypointsFromPoses(currentPose, endPose);
-        // PathPlannerPath path = new PathPlannerPath(
-        // bezierPoints,
-        // new PathConstraints(
-        // DrivetrainConstants.MaxSpeed,
-        // DrivetrainConstants.MaxAcceleration,
-        // Units.degreesToRadians(360),
-        // Units.degreesToRadians(540)),
-        // new IdealStartingState(0, new Rotation2d()),
-        // new GoalEndState(0.0, currentPose.getRotation()));
-
-        // SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric()
-        // .withDriveRequestType(DriveRequestType.OpenLoopVoltage) // field-centric
-        // driving in open loop
-        // .withSteerRequestType(SteerRequestType.MotionMagicExpo);
-
-        // m_drivetrain.driveRobotRelative(new ChassisSpeeds(x, y, rot));
         var chassisSpeeds = new ChassisSpeeds(x, y, rot);
         this.setControl(m_autoRequest.withSpeeds(chassisSpeeds));
-
-        // m_drivetrain.applyRequest(() -> {
-        // driveRequest.withVelocityX(x) // Drive forward with negative Y (forward)
-        // .withVelocityY(y) // Drive left with negative X (left)
-        // .withRotationalRate(rot); // Drive counterclockwise with negative X (left)
-
-        // return driveRequest;
-        // });
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
