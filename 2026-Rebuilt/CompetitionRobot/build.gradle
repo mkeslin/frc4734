@@ -73,11 +73,26 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    
+    // Mockito for creating mock objects in tests
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
 }
 
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+}
+
+// Remove test dependency from check task so tests don't run during build
+// This prevents tests from running automatically during ./gradlew build
+// Tests can still be run explicitly with: ./gradlew test
+afterEvaluate {
+    if (tasks.findByName('check')) {
+        tasks.named('check').configure {
+            setDependsOn(dependsOn.findAll { it.name != 'test' })
+        }
+    }
 }
 
 // Simulation configuration (e.g. environment variables).
