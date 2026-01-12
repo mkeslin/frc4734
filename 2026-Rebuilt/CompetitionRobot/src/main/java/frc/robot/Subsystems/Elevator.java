@@ -105,7 +105,7 @@ public class Elevator extends SubsystemBase implements BaseLinearMechanism<Eleva
 
         m_elevatorRightFollowerMotor = new TalonFX(ELEVATOR_RIGHT_ID);
         m_elevatorLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
-        m_elevatorRightFollowerMotor.setControl(new Follower(m_elevatorLeftLeaderMotor.getDeviceID(), false));
+        // m_elevatorRightFollowerMotor.setControl(new Follower(m_elevatorLeftLeaderMotor.getDeviceID(), false));
 
         resetPosition();
     }

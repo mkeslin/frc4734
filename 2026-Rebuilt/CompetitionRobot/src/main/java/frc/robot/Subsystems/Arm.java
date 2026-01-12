@@ -55,9 +55,9 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
 
     // private double simVelocity = 0.0;
 
-    // private final MutableMeasure<Voltage> sysidAppliedVoltageMeasure = MutableMeasure.mutable(Volts.of(0));
-    // private final MutableMeasure<Angle> sysidPositionMeasure = MutableMeasure.mutable(Radians.of(0));
-    // private final MutableMeasure<Velocity<Angle>> sysidVelocityMeasure =
+    // private final MutVoltage sysidAppliedVoltageMeasure = MutableMeasure.mutable(Volts.of(0));
+    // private final MutAngle sysidPositionMeasure = MutableMeasure.mutable(Radians.of(0));
+    // private final MutAngularVelocity sysidVelocityMeasure =
     // MutableMeasure.mutable(RadiansPerSecond.of(0));
 
     private final SysIdRoutine m_sysIdRoutine;
