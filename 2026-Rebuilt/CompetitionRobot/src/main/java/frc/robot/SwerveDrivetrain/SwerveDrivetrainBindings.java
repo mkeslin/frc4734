@@ -21,9 +21,15 @@ public class SwerveDrivetrainBindings {
     private static double CurrentAngularRate = MaxAngularRate; // This will be updated when turtle and reset to
                                                                // MaxAngularRate
 
-    private static final SlewRateLimiter RateLimiterX = new SlewRateLimiter(0.5);
-    private static final SlewRateLimiter RateLimiterY = new SlewRateLimiter(0.5);
-    private static final SlewRateLimiter RotationLimiter = new SlewRateLimiter(0.5);
+    // Rate limiters to smooth out sudden joystick movements
+    // Values are in units per second (m/s for linear, rad/s for angular)
+    // These values allow reaching max speed/rate in ~0.5-0.7 seconds for smooth control
+    private static final double LINEAR_RATE_LIMIT = 1.5; // m/s per second (meters per second squared)
+    private static final double ANGULAR_RATE_LIMIT = 2.5; // rad/s per second (radians per second squared)
+    
+    private static final SlewRateLimiter RateLimiterX = new SlewRateLimiter(LINEAR_RATE_LIMIT);
+    private static final SlewRateLimiter RateLimiterY = new SlewRateLimiter(LINEAR_RATE_LIMIT);
+    private static final SlewRateLimiter RotationLimiter = new SlewRateLimiter(ANGULAR_RATE_LIMIT);
 
     // field-centric
     private static final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
@@ -49,29 +55,27 @@ public class SwerveDrivetrainBindings {
     public static void configureBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
         // Drivetrain will execute this command periodically
 
-        var velocityX = coordinateOrientation * driveController.getLeftY() * CurrentSpeed;
-        var velocityXLimited = RateLimiterX.calculate(velocityX);
-
-        var velocityY = coordinateOrientation * driveController.getLeftX() * CurrentSpeed;
-        var velocityYLimited = RateLimiterY.calculate(velocityY);
-
         // https://github.com/Operation-P-E-A-C-C-E-Robotics/frc-2025/blob/main/src/main/java/frc/robot/commands/drivetrain/PeaccyTuner.java
 
         // Sticks
         drivetrain.setDefaultCommand(
-                drivetrain.applyRequest(() -> m_drive
-                        .withVelocityX(coordinateOrientation * driveController.getLeftY() * CurrentSpeed) // Drive
-                                                                                                          // forward
-                                                                                                          // with
-                                                                                                          // negative Y
-                                                                                                          // (forward)
-                        .withVelocityY(coordinateOrientation * driveController.getLeftX() * CurrentSpeed) // Drive left
-                                                                                                          // with
-                                                                                                          // negative X
-                                                                                                          // (left)
-                        .withRotationalRate(-driveController.getRightX() * CurrentAngularRate) // Drive counterclockwise
-                                                                                               // with negative X (left)
-                ).ignoringDisable(false));
+                drivetrain.applyRequest(() -> {
+                    // Calculate desired velocities from controller input
+                    var desiredVelocityX = coordinateOrientation * driveController.getLeftY() * CurrentSpeed;
+                    var desiredVelocityY = coordinateOrientation * driveController.getLeftX() * CurrentSpeed;
+                    var desiredRotationalRate = -driveController.getRightX() * CurrentAngularRate;
+                    
+                    // Apply rate limiting to smooth out sudden joystick movements
+                    var velocityXLimited = RateLimiterX.calculate(desiredVelocityX);
+                    var velocityYLimited = RateLimiterY.calculate(desiredVelocityY);
+                    var rotationalRateLimited = RotationLimiter.calculate(desiredRotationalRate);
+                    
+                    // Apply rate-limited velocities to drive command
+                    return m_drive
+                            .withVelocityX(velocityXLimited) // Drive forward with negative Y (forward)
+                            .withVelocityY(velocityYLimited) // Drive left with negative X (left)
+                            .withRotationalRate(rotationalRateLimited); // Drive counterclockwise with negative X (left)
+                }).ignoringDisable(false));
 
         // A Button: Brake
         // driveController.a().whileTrue(drivetrain.applyRequest(() -> m_brake));
