@@ -11,7 +11,7 @@ import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
-import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /*
@@ -25,7 +25,7 @@ public class AutoCommandTest2 {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight) {
+            PhotonVision reefPhotonVision) {
         PathPlannerPath Start_GPath = null; // PathPlannerPath.fromPathFile("Start-G");
         PathPlannerPath G_PickupPath = null; // PathPlannerPath.fromPathFile("G-Pickup");
         PathPlannerPath Pickup_DPath = null; // PathPlannerPath.fromPathFile("Pickup-D");

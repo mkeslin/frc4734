@@ -24,8 +24,8 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
         CommandScheduler.getInstance().schedule(PathfindingCommand.warmupCommand());
 
-        int[] validIDs = {1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 20, 21, 22};
-        LimelightHelpers.SetFiducialIDFiltersOverride("limelight", validIDs);
+        // PhotonVision handles AprilTag filtering through its web interface
+        // No need for programmatic ID filtering like Limelight
 
         // LiveWindow is essentially deprecated, and HoundLog is a much better
         // replacement. LiveWindow is still active during test mode by default, but it

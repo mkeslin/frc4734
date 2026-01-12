@@ -13,11 +13,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class CenterToReefCommand extends Command {
-    public Limelight m_limelight;
+    public PhotonVision m_photonVision;
     public CommandSwerveDrivetrain m_drivetrain;
     public CommandXboxController m_driveController;
 
@@ -53,9 +53,9 @@ public class CenterToReefCommand extends Command {
 
     public Timer t = new Timer();
 
-    public CenterToReefCommand(Limelight limelight, CommandSwerveDrivetrain drivetrain,
+    public CenterToReefCommand(PhotonVision photonVision, CommandSwerveDrivetrain drivetrain,
             CommandXboxController driveController, double timeoutDuration) {
-        m_limelight = limelight;
+        m_photonVision = photonVision;
         m_drivetrain = drivetrain;
         m_driveController = driveController;
         m_timeoutDuration = timeoutDuration;
@@ -82,7 +82,7 @@ public class CenterToReefCommand extends Command {
         setPIDValues(centerMethod);
         setTolerances(centerMethod);
 
-        addRequirements(m_limelight, m_drivetrain);
+        addRequirements(m_photonVision, m_drivetrain);
     }
 
     // Called just before this Command runs the first time
@@ -137,7 +137,7 @@ public class CenterToReefCommand extends Command {
             System.out.println("Center to Reef: driver interrupted");
             return true;
         }
-        if (centerMethod == CAMERA && !m_limelight.hasTargets()) {
+        if (centerMethod == CAMERA && !m_photonVision.hasTargets()) {
             System.out.println("Center to Reef: lost tag");
             return true;
         }
@@ -232,10 +232,10 @@ public class CenterToReefCommand extends Command {
             omegaSpeed = omegaController.calculate(position.getRotation().getDegrees());
             // getSpeeds();
         } else if (method == CAMERA) {
-            xSpeed = xController.calculate(m_limelight.getArea());
-            ySpeed = yController.calculate(m_limelight.getX());
-            omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_limelight.getYaw()));
-            if (!m_limelight.hasTargets()) {
+            xSpeed = xController.calculate(m_photonVision.getArea());
+            ySpeed = yController.calculate(m_photonVision.getX());
+            omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_photonVision.getYaw()));
+            if (!m_photonVision.hasTargets()) {
                 ySpeed = 0;
                 xSpeed = 0;
                 omegaSpeed = 0;

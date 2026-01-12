@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.PositionTracker;
-import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class CenterToStationCommand extends Command {
     public PositionTracker m_positionTracker;
-    public Limelight m_limelight;
+    public PhotonVision m_photonVision;
     public CommandSwerveDrivetrain m_drivetrain;
     public CommandXboxController m_driveController;
 
@@ -31,10 +31,10 @@ public class CenterToStationCommand extends Command {
     public Timer t = new Timer();
     public Timer t_tray = new Timer();
 
-    public CenterToStationCommand(PositionTracker positionTracker, Limelight limelight,
+    public CenterToStationCommand(PositionTracker positionTracker, PhotonVision photonVision,
             CommandSwerveDrivetrain drivetrain, CommandXboxController driveController) {
         m_positionTracker = positionTracker;
-        m_limelight = limelight;
+        m_photonVision = photonVision;
         m_drivetrain = drivetrain;
         m_driveController = driveController;
 
@@ -42,7 +42,7 @@ public class CenterToStationCommand extends Command {
         yController.setTolerance(CAMERA_X_OFFSET_ERROR);
         omegaController.setTolerance(ANGLE_ERROR);
 
-        addRequirements(m_limelight, m_drivetrain);
+        addRequirements(m_photonVision, m_drivetrain);
     }
 
     // Called just before this Command runs the first time
@@ -58,10 +58,10 @@ public class CenterToStationCommand extends Command {
 
     @Override
     public void execute() {
-        var xSpeed = -xController.calculate(m_limelight.getArea());
-        var ySpeed = -yController.calculate(m_limelight.getX());
-        var omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_limelight.getYaw()));
-        if (!m_limelight.hasTargets()) {
+        var xSpeed = -xController.calculate(m_photonVision.getArea());
+        var ySpeed = -yController.calculate(m_photonVision.getX());
+        var omegaSpeed = omegaController.calculate(Units.radiansToDegrees(m_photonVision.getYaw()));
+        if (!m_photonVision.hasTargets()) {
             ySpeed = 0;
             xSpeed = 0;
             omegaSpeed = 0;
@@ -94,7 +94,7 @@ public class CenterToStationCommand extends Command {
             System.out.println("Center to Station: coral acquired");
             return true;
         }
-        if (!m_limelight.hasTargets()) {
+        if (!m_photonVision.hasTargets()) {
             System.out.println("Center to Station: lost tag");
             return true;
         }

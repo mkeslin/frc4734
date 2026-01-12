@@ -6,7 +6,7 @@ import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
-import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /**
@@ -21,7 +21,7 @@ public class RobotContext {
     public final Arm arm;
     public final SideToSide sideToSide;
     public final Lights lights;
-    public final Limelight reefLimelight;
+    public final PhotonVision reefPhotonVision;
 
     /**
      * Creates a new RobotContext with all required dependencies.
@@ -33,7 +33,7 @@ public class RobotContext {
      * @param arm The arm subsystem
      * @param sideToSide The side-to-side subsystem
      * @param lights The lights subsystem
-     * @param reefLimelight The reef limelight camera
+     * @param reefPhotonVision The reef PhotonVision camera
      */
     public RobotContext(
             StateMachine stateMachine,
@@ -43,7 +43,7 @@ public class RobotContext {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight) {
+            PhotonVision reefPhotonVision) {
         this.stateMachine = stateMachine;
         this.positionTracker = positionTracker;
         this.drivetrain = drivetrain;
@@ -51,6 +51,6 @@ public class RobotContext {
         this.arm = arm;
         this.sideToSide = sideToSide;
         this.lights = lights;
-        this.reefLimelight = reefLimelight;
+        this.reefPhotonVision = reefPhotonVision;
     }
 }

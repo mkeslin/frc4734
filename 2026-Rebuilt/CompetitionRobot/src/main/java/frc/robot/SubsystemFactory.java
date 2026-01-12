@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.Constants.DigitalInputIds.CORAL_ARM_SENSOR;
 import static frc.robot.Constants.DigitalInputIds.CORAL_TRAY_SENSOR;
 import static frc.robot.Constants.VisionConstants.APRILTAG_PIPELINE;
+import static frc.robot.Constants.VisionConstants.CAMERA_NAME;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Commands.RobotContext;
@@ -11,7 +12,7 @@ import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
-import frc.robot.Subsystems.Cameras.Limelight;
+import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.State.StateMachine;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA;
@@ -26,7 +27,7 @@ public class SubsystemFactory {
     private final SideToSide m_sideToSide;
     private final Climber m_climber;
     private final Lights m_lights;
-    private final Limelight m_reefLimelight;
+    private final PhotonVision m_reefPhotonVision;
     private final DigitalInput m_coralTraySensor;
     private final DigitalInput m_coralArmSensor;
     private final PositionTracker m_positionTracker;
@@ -53,8 +54,8 @@ public class SubsystemFactory {
         m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
         m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
 
-        // Create limelight
-        m_reefLimelight = new Limelight("limelight", APRILTAG_PIPELINE);
+        // Create PhotonVision camera
+        m_reefPhotonVision = new PhotonVision(CAMERA_NAME, APRILTAG_PIPELINE);
 
         // Create PositionTracker with all actual suppliers
         // Method references will work correctly since subsystems are now created
@@ -88,7 +89,7 @@ public class SubsystemFactory {
                 m_arm,
                 m_sideToSide,
                 m_lights,
-                m_reefLimelight);
+                m_reefPhotonVision);
     }
 
     public Elevator getElevator() {
@@ -111,8 +112,8 @@ public class SubsystemFactory {
         return m_lights;
     }
 
-    public Limelight getReefLimelight() {
-        return m_reefLimelight;
+    public PhotonVision getReefPhotonVision() {
+        return m_reefPhotonVision;
     }
 
     public PositionTracker getPositionTracker() {

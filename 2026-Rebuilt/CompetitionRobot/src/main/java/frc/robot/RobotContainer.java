@@ -2,6 +2,9 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.RobotContext;
@@ -44,7 +47,7 @@ public class RobotContainer {
 
         // Create center to reef command
         m_centerToReefCommand = new CenterToReefCommand(
-                m_subsystemFactory.getReefLimelight(),
+                m_subsystemFactory.getReefPhotonVision(),
                 m_drivetrain,
                 m_driveController,
                 3);
@@ -82,10 +85,35 @@ public class RobotContainer {
     }
 
     /**
-     * Localizes the robot pose. Currently empty, reserved for future implementation.
+     * Localizes the robot pose using PhotonVision AprilTag detection.
+     * Updates the drivetrain's pose estimator with vision measurements.
      */
     public void localizeRobotPose() {
-        // Reserved for future implementation
+        var photonVision = m_subsystemFactory.getReefPhotonVision();
+        
+        // Get estimated robot pose from PhotonVision
+        var estimatedPose = photonVision.getEstimatedRobotPose();
+        
+        if (estimatedPose.isPresent()) {
+            var pose = estimatedPose.get();
+            
+            // Get the pose in the correct alliance coordinate system
+            Pose2d visionPose = pose.estimatedPose.toPose2d();
+            
+            // Handle alliance flipping if needed
+            // PhotonVision should already handle this, but verify
+            if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+                // If field layout needs to be flipped, PhotonVision should handle it
+                // But we can apply additional transformations if needed
+            }
+            
+            // Add vision measurement to drivetrain pose estimator
+            // Timestamp is already in seconds from PhotonVision
+            m_drivetrain.addVisionMeasurement(
+                visionPose,
+                pose.timestampSeconds
+            );
+        }
     }
 
     // Getters for subsystems (for backwards compatibility and external access)
