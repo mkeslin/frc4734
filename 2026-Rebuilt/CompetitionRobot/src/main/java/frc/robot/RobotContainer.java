@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.RobotContext;
 import frc.robot.Controllers.ControllerIds;
@@ -33,6 +34,9 @@ public class RobotContainer {
     // DRIVETRAIN
     public final CommandSwerveDrivetrain m_drivetrain = SwerveDrivetrainA.createDrivetrain();
 
+    // AUTO MANAGER
+    private final AutoManager m_autoManager;
+
     // FACTORY AND CONFIGURATORS
     private final SubsystemFactory m_subsystemFactory;
     private final BindingConfigurator m_bindingConfigurator;
@@ -42,6 +46,13 @@ public class RobotContainer {
     public final CenterToReefCommand m_centerToReefCommand;
 
     public RobotContainer() {
+        // Create AutoManager instance
+        m_autoManager = new AutoManager();
+        m_autoManager.init();
+
+        // Set AutoManager on drivetrain for odometry reset
+        m_drivetrain.setAutoManager(m_autoManager);
+
         // Create subsystem factory (creates all subsystems, PositionTracker, StateMachine, RobotContext)
         m_subsystemFactory = new SubsystemFactory(m_drivetrain);
 
@@ -70,6 +81,7 @@ public class RobotContainer {
 
         // Create auto configurator and configure autonomous routines
         m_autoConfigurator = new AutoConfigurator(
+                m_autoManager,
                 m_subsystemFactory.getRobotContext(),
                 m_centerToReefCommand);
         m_autoConfigurator.configureAuto();
@@ -143,5 +155,9 @@ public class RobotContainer {
 
     public RobotContext getRobotContext() {
         return m_subsystemFactory.getRobotContext();
+    }
+
+    public AutoManager getAutoManager() {
+        return m_autoManager;
     }
 }

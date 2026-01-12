@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
  * routine, and preview the path that will be followed along with the robot's
  * estimated starting position, given any localization.
  * 
- * Uses the {@code /HoundLog/autonomous} table.
+ * Instance-based design allows for better testability and dependency injection.
  * 
  * <p>
  * 
@@ -29,13 +29,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
  * {@code periodicUpdate()} in {@code disabledPeriodic},
  * {@code runSelectedRoutine()} in {@code autonomousInit}, and
  * {@code endRoutine()} in {@code autonomousExit}.
- * 
- * <p>
- * 
- * Note: this is automatically handled by {@code HoundRobot}.
  */
 public class AutoManager {
-    private static AutoManager instance;
     private HashMap<String, AutoRoutine> routines = new HashMap<String, AutoRoutine>();
     private AutoRoutine lastRoutine;
     public SendableChooser<AutoRoutine> chooser = new SendableChooser<AutoRoutine>();
@@ -58,19 +53,10 @@ public class AutoManager {
     // private RobotConfig pathPlannerRobotConfig = new RobotConfig(50, 1,
     //         new ModuleConfig(0.05, 4.5, 1.0, DCMotor.getKrakenX60(1), 60, 1));
 
-    private AutoManager() {
-    }
-
     /**
-     * Returns the AutoManager instance.
-     * 
-     * @return the instance
+     * Creates a new AutoManager instance.
      */
-    public static AutoManager getInstance() {
-        if (instance == null) {
-            instance = new AutoManager();
-        }
-        return instance;
+    public AutoManager() {
     }
 
     /**

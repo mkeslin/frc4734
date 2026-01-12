@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Auto.AutoManager;
 
 public class Robot extends TimedRobot {
 
@@ -16,8 +15,6 @@ public class Robot extends TimedRobot {
     private RobotContainer m_robotContainer;
 
     public Robot() {
-        AutoManager.getInstance().init();
-
         m_robotContainer = new RobotContainer();
 
         // Warmup PathPlanner commands to reduce first-run latency
@@ -54,7 +51,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        AutoManager.getInstance().runSelectedRoutine();
+        m_robotContainer.getAutoManager().runSelectedRoutine();
     }
 
     @Override
@@ -63,7 +60,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousExit() {
-        AutoManager.getInstance().endRoutine();
+        m_robotContainer.getAutoManager().endRoutine();
     }
 
     @Override

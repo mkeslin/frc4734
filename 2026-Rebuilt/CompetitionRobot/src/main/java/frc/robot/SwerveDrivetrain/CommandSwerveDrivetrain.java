@@ -222,6 +222,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return getState().Pose;
     }
 
+    private AutoManager m_autoManager;
+
+    /**
+     * Sets the AutoManager instance for odometry reset functionality.
+     * This should be called after AutoManager is created.
+     * 
+     * @param autoManager The AutoManager instance
+     */
+    public void setAutoManager(AutoManager autoManager) {
+        m_autoManager = autoManager;
+        if (m_autoManager != null) {
+            m_autoManager.setResetOdometryConsumer(this::resetPoseEstimator);
+        }
+    }
+
     private void configureAutoBuilder() {
         try {
             var config = RobotConfig.fromGUISettings();
@@ -245,8 +260,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                     this // Subsystem for requirements
             );
-
-            AutoManager.getInstance().setResetOdometryConsumer(this::resetPoseEstimator);
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder",
                     ex.getStackTrace());
