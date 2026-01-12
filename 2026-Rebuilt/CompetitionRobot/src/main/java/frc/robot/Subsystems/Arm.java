@@ -22,7 +22,7 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj.DataLogManager;
+import frc.robot.Logging.RobotLogger;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
@@ -183,7 +183,7 @@ public class Arm extends SubsystemBase implements BaseSingleJointedArm<ArmPositi
     public Pose3d getArmComponentPose() {
         Pose3d carriagePose = carriagePoseSupplier.get();
         if (carriagePose == null) {
-            DataLogManager.log("[Arm] WARN: carriagePoseSupplier returned null, using default pose");
+            RobotLogger.logWarning("[Arm] carriagePoseSupplier returned null, using default pose");
             carriagePose = new Pose3d();
         }
         return carriagePose

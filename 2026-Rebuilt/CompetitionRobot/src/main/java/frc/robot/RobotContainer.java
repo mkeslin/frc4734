@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.RobotContext;
+import frc.robot.Logging.RobotLogger;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Climber;
@@ -126,7 +127,28 @@ public class RobotContainer {
                 visionPose,
                 pose.timestampSeconds
             );
+            
+            // Log vision pose for debugging
+            RobotLogger.recordPose2d("Vision/Pose", visionPose);
         }
+        
+        // Log robot pose (from drivetrain odometry)
+        RobotLogger.recordPose2d("Drivetrain/Pose", m_drivetrain.getPose());
+        
+        // Log mechanism positions
+        var context = m_subsystemFactory.getRobotContext();
+        RobotLogger.recordDouble("Mechanisms/ElevatorPosition", m_subsystemFactory.getElevator().getPosition());
+        RobotLogger.recordDouble("Mechanisms/ArmAngle", m_subsystemFactory.getArm().getPosition());
+        RobotLogger.recordDouble("Mechanisms/SideToSidePosition", m_subsystemFactory.getSideToSide().getPosition());
+        RobotLogger.recordDouble("Mechanisms/ClimberPosition", m_subsystemFactory.getClimber().getPosition());
+        
+        // Log sensor states
+        var positionTracker = m_subsystemFactory.getPositionTracker();
+        RobotLogger.recordBoolean("Sensors/CoralInTray", positionTracker.getCoralInTray());
+        RobotLogger.recordBoolean("Sensors/CoralInArm", positionTracker.getCoralInArm());
+        
+        // Log current state
+        RobotLogger.recordString("State/CurrentState", context.stateMachine.getCurrentState().Name.toString());
     }
 
     // Getters for subsystems (for backwards compatibility and external access)

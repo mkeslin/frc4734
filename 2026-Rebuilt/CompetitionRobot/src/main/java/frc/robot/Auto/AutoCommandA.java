@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.wpilibj.DataLogManager;
+import frc.robot.Logging.RobotLogger;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -40,7 +40,7 @@ public class AutoCommandA {
             Pickup1_F = PathPlannerPath.fromPathFile("1-Pickup1-F");
             F_Pickup1 = PathPlannerPath.fromPathFile("1-F-Pickup1");
         } catch (Exception exception) {
-            DataLogManager.log(String.format("[AutoCommandA] ERROR: Exception loading paths for StartingPosition1: %s", exception.getMessage()));
+            RobotLogger.logError(String.format("[AutoCommandA] ERROR: Exception loading paths for StartingPosition1: %s", exception.getMessage()));
             DriverStation.reportError(String.format("[AutoCommandA] Failed to load paths for StartingPosition1: %s", exception.getMessage()), false);
         }
         
@@ -53,7 +53,7 @@ public class AutoCommandA {
             if (F_Pickup1 == null) missingPaths.append("1-F-Pickup1 ");
             
             String errorMsg = String.format("[AutoCommandA] StartingPosition1: Failed to load paths: %s. Returning empty routine.", missingPaths.toString().trim());
-            DataLogManager.log("ERROR: " + errorMsg);
+            RobotLogger.logError("ERROR: " + errorMsg);
             DriverStation.reportError(errorMsg, false);
             return new AutoRoutine("Routine 1 (Failed)", Commands.none());
         }
@@ -86,7 +86,7 @@ public class AutoCommandA {
             Pickup2_D = PathPlannerPath.fromPathFile("2-Pickup2-D");
             D_Pickup2 = PathPlannerPath.fromPathFile("2-D-Pickup2");
         } catch (Exception exception) {
-            DataLogManager.log(String.format("[AutoCommandA] ERROR: Exception loading paths for StartingPosition2: %s", exception.getMessage()));
+            RobotLogger.logError(String.format("[AutoCommandA] ERROR: Exception loading paths for StartingPosition2: %s", exception.getMessage()));
             DriverStation.reportError(String.format("[AutoCommandA] Failed to load paths for StartingPosition2: %s", exception.getMessage()), false);
         }
         
@@ -99,7 +99,7 @@ public class AutoCommandA {
             if (D_Pickup2 == null) missingPaths.append("2-D-Pickup2 ");
             
             String errorMsg = String.format("[AutoCommandA] StartingPosition2: Failed to load paths: %s. Returning empty routine.", missingPaths.toString().trim());
-            DataLogManager.log("ERROR: " + errorMsg);
+            RobotLogger.logError("ERROR: " + errorMsg);
             DriverStation.reportError(errorMsg, false);
             return new AutoRoutine("Routine 2 (Failed)", Commands.none());
         }
@@ -132,7 +132,7 @@ public class AutoCommandA {
             Pickup2_D = PathPlannerPath.fromPathFile("2-Pickup2-D");
             D_Pickup2 = PathPlannerPath.fromPathFile("2-D-Pickup2");
         } catch (Exception exception) {
-            DataLogManager.log(String.format("[AutoCommandA] ERROR: Exception loading paths for StartingPosition3: %s", exception.getMessage()));
+            RobotLogger.logError(String.format("[AutoCommandA] ERROR: Exception loading paths for StartingPosition3: %s", exception.getMessage()));
             DriverStation.reportError(String.format("[AutoCommandA] Failed to load paths for StartingPosition3: %s", exception.getMessage()), false);
         }
         
@@ -145,7 +145,7 @@ public class AutoCommandA {
             if (D_Pickup2 == null) missingPaths.append("2-D-Pickup2 ");
             
             String errorMsg = String.format("[AutoCommandA] StartingPosition3: Failed to load paths: %s. Returning empty routine.", missingPaths.toString().trim());
-            DataLogManager.log("ERROR: " + errorMsg);
+            RobotLogger.logError("ERROR: " + errorMsg);
             DriverStation.reportError(errorMsg, false);
             return new AutoRoutine("Routine 3 (Failed)", Commands.none());
         }
@@ -167,13 +167,13 @@ public class AutoCommandA {
         try {
             path = PathPlannerPath.fromPathFile("zzTuning-1");
         } catch (Exception exception) {
-            DataLogManager.log(String.format("[AutoCommandA] ERROR: Exception loading path 'zzTuning-1': %s", exception.getMessage()));
+            RobotLogger.logError(String.format("[AutoCommandA] ERROR: Exception loading path 'zzTuning-1': %s", exception.getMessage()));
             DriverStation.reportError(String.format("[AutoCommandA] Failed to load path 'zzTuning-1': %s", exception.getMessage()), false);
         }
 
         if (path == null) {
             String errorMsg = "[AutoCommandA] StartingPositionTuning1: Failed to load path 'zzTuning-1'. Returning empty routine.";
-            DataLogManager.log("ERROR: " + errorMsg);
+            RobotLogger.logError("ERROR: " + errorMsg);
             DriverStation.reportError(errorMsg, false);
             return new AutoRoutine("Tuning1 (Failed)", Commands.none());
         }
@@ -189,13 +189,13 @@ public class AutoCommandA {
         try {
             path = PathPlannerPath.fromPathFile("zzTuning-2");
         } catch (Exception exception) {
-            DataLogManager.log(String.format("[AutoCommandA] ERROR: Exception loading path 'zzTuning-2': %s", exception.getMessage()));
+            RobotLogger.logError(String.format("[AutoCommandA] ERROR: Exception loading path 'zzTuning-2': %s", exception.getMessage()));
             DriverStation.reportError(String.format("[AutoCommandA] Failed to load path 'zzTuning-2': %s", exception.getMessage()), false);
         }
 
         if (path == null) {
             String errorMsg = "[AutoCommandA] StartingPositionTuning2: Failed to load path 'zzTuning-2'. Returning empty routine.";
-            DataLogManager.log("ERROR: " + errorMsg);
+            RobotLogger.logError("ERROR: " + errorMsg);
             DriverStation.reportError(errorMsg, false);
             return new AutoRoutine("Tuning2 (Failed)", Commands.none());
         }
@@ -211,13 +211,13 @@ public class AutoCommandA {
         try {
             path = PathPlannerPath.fromPathFile("zzTuning-3");
         } catch (Exception exception) {
-            DataLogManager.log(String.format("[AutoCommandA] ERROR: Exception loading path 'zzTuning-3': %s", exception.getMessage()));
+            RobotLogger.logError(String.format("[AutoCommandA] ERROR: Exception loading path 'zzTuning-3': %s", exception.getMessage()));
             DriverStation.reportError(String.format("[AutoCommandA] Failed to load path 'zzTuning-3': %s", exception.getMessage()), false);
         }
 
         if (path == null) {
             String errorMsg = "[AutoCommandA] StartingPositionTuning3: Failed to load path 'zzTuning-3'. Returning empty routine.";
-            DataLogManager.log("ERROR: " + errorMsg);
+            RobotLogger.logError("ERROR: " + errorMsg);
             DriverStation.reportError(errorMsg, false);
             return new AutoRoutine("Tuning3 (Failed)", Commands.none());
         }
@@ -233,13 +233,13 @@ public class AutoCommandA {
         try {
             path = PathPlannerPath.fromPathFile("zzTuning-4");
         } catch (Exception exception) {
-            DataLogManager.log(String.format("[AutoCommandA] ERROR: Exception loading path 'zzTuning-4': %s", exception.getMessage()));
+            RobotLogger.logError(String.format("[AutoCommandA] ERROR: Exception loading path 'zzTuning-4': %s", exception.getMessage()));
             DriverStation.reportError(String.format("[AutoCommandA] Failed to load path 'zzTuning-4': %s", exception.getMessage()), false);
         }
 
         if (path == null) {
             String errorMsg = "[AutoCommandA] StartingPositionTuning4: Failed to load path 'zzTuning-4'. Returning empty routine.";
-            DataLogManager.log("ERROR: " + errorMsg);
+            RobotLogger.logError("ERROR: " + errorMsg);
             DriverStation.reportError(errorMsg, false);
             return new AutoRoutine("Tuning4 (Failed)", Commands.none());
         }

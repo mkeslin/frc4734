@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Logging.RobotLogger;
 import frc.robot.PositionTracker;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -100,7 +101,7 @@ public class CenterToStationCommand extends BaseCenterToCommand {
     @Override
     protected boolean additionalFinishConditions() {
         if (t_tray.hasElapsed(CORAL_TRAY_TIMEOUT)) {
-            edu.wpi.first.wpilibj.DataLogManager.log("[CenterToStation] Coral successfully acquired");
+            RobotLogger.log("[CenterToStation] Coral successfully acquired");
             return true;
         }
         return false;

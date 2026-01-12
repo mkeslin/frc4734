@@ -1,7 +1,7 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.Logging.RobotLogger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -25,9 +25,9 @@ public class RobotState {
         // In simulation, start initialized; on real robot, require explicit initialization
         isInitialized = !RobotBase.isReal();
         if (isInitialized) {
-            DataLogManager.log("[RobotState] Initialized (simulation mode)");
+            RobotLogger.log("[RobotState] Initialized (simulation mode)");
         } else {
-            DataLogManager.log("[RobotState] Not initialized (real robot - requires explicit initialization)");
+            RobotLogger.log("[RobotState] Not initialized (real robot - requires explicit initialization)");
         }
     }
     
@@ -60,7 +60,7 @@ public class RobotState {
     private void setInitialized(boolean initialized) {
         if (this.isInitialized != initialized) {
             this.isInitialized = initialized;
-            DataLogManager.log(String.format("[RobotState] Initialization state changed: %s", initialized ? "INITIALIZED" : "NOT INITIALIZED"));
+            RobotLogger.log(String.format("[RobotState] Initialization state changed: %s", initialized ? "INITIALIZED" : "NOT INITIALIZED"));
         }
     }
     

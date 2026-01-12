@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Logging.RobotLogger;
+import org.littletonrobotics.junction.Logger;
 
 public class Robot extends TimedRobot {
 
@@ -15,6 +17,13 @@ public class Robot extends TimedRobot {
     private RobotContainer m_robotContainer;
 
     public Robot() {
+        // Initialize AdvantageKit logger
+        Logger.recordMetadata("ProjectName", "FRC4734-2026-Rebuilt");
+        Logger.recordMetadata("RobotType", "CompetitionRobot");
+        
+        // Start logging (AdvantageKit will automatically set up receivers)
+        Logger.start();
+
         m_robotContainer = new RobotContainer();
 
         // Warmup PathPlanner commands to reduce first-run latency
@@ -24,10 +33,12 @@ public class Robot extends TimedRobot {
         // PhotonVision handles AprilTag filtering through its web interface
         // No need for programmatic ID filtering like Limelight
 
-        // LiveWindow is essentially deprecated, and HoundLog is a much better
+        // LiveWindow is essentially deprecated, and AdvantageKit is a much better
         // replacement. LiveWindow is still active during test mode by default, but it
         // consumes an inordinate amount of bandwidth, so we disable it.
         LiveWindow.disableAllTelemetry();
+        
+        RobotLogger.log("Robot initialized");
     }
 
     @Override

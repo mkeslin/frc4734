@@ -11,8 +11,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Logging.RobotLogger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -230,7 +230,7 @@ public abstract class BaseCenterToCommand extends Command {
         for (Integer tagId : tagNumbers) {
             var tagPoseOptional = layout.getTagPose(tagId);
             if (tagPoseOptional.isEmpty()) {
-                DataLogManager.log(String.format("[BaseCenterTo] WARN: AprilTag %d not found in layout, skipping", tagId));
+                RobotLogger.logWarning(String.format("[BaseCenterTo] AprilTag %d not found in layout, skipping", tagId));
                 continue;
             }
             Pose2d tagPose = tagPoseOptional.get().toPose2d();
@@ -304,33 +304,33 @@ public abstract class BaseCenterToCommand extends Command {
     public boolean isFinished() {
         // Log setpoint achievements
         if (!hasPrintedX && xController.atSetpoint()) {
-            DataLogManager.log(getCommandName() + " X axis at setpoint");
+            RobotLogger.log(getCommandName() + " X axis at setpoint");
             hasPrintedX = true;
         }
         if (!hasPrintedY && yController.atSetpoint()) {
-            DataLogManager.log(getCommandName() + " Y axis at setpoint");
+            RobotLogger.log(getCommandName() + " Y axis at setpoint");
             hasPrintedY = true;
         }
         if (!hasPrintedZ && omegaController.atSetpoint()) {
-            DataLogManager.log(getCommandName() + " Omega (rotation) axis at setpoint");
+            RobotLogger.log(getCommandName() + " Omega (rotation) axis at setpoint");
             hasPrintedZ = true;
         }
 
         // Check timeout
         if (t.hasElapsed(timeoutDuration)) {
-            DataLogManager.log(String.format("[%s] WARN: Command timed out after %.2f seconds", getCommandName(), timeoutDuration));
+            RobotLogger.logWarning(String.format("[%s] Command timed out after %.2f seconds", getCommandName(), timeoutDuration));
             return true;
         }
 
         // Check driver interruption
         if (driverInterrupted) {
-            DataLogManager.log(getCommandName() + " Command interrupted by driver");
+            RobotLogger.log(getCommandName() + " Command interrupted by driver");
             return true;
         }
 
         // Check vision targets (for camera method)
         if (centerMethod == CenterMethod.CAMERA && !m_photonVision.hasTargets()) {
-            DataLogManager.log(getCommandName() + " WARN: Lost AprilTag target");
+            RobotLogger.logWarning(getCommandName() + " Lost AprilTag target");
             return true;
         }
 
@@ -341,7 +341,7 @@ public abstract class BaseCenterToCommand extends Command {
 
         // Check if all PID controllers are at setpoint
         if (xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint()) {
-            DataLogManager.log(getCommandName() + " Successfully centered");
+            RobotLogger.log(getCommandName() + " Successfully centered");
             return true;
         }
 
