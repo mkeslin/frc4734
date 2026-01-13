@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Logging.LoggingConfig;
 import frc.robot.Logging.RobotLogger;
 
 /**
@@ -198,8 +199,17 @@ public class PerformanceMonitor {
     /**
      * Logs all performance metrics to AdvantageKit.
      * Called automatically every LOGGING_INTERVAL_LOOPS loops.
+     * 
+     * <p>Controlled by {@link LoggingConfig#ENABLE_PERFORMANCE_LOGGING}.
+     * Metrics are still tracked internally even when logging is disabled,
+     * allowing for potential future use or runtime enabling.
      */
     private void logMetrics() {
+        // Check if performance logging is enabled
+        if (!LoggingConfig.ENABLE_PERFORMANCE_LOGGING) {
+            return;
+        }
+        
         // Update CAN utilization estimate before logging
         updateCANUtilizationEstimate();
         
