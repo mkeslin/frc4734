@@ -3,11 +3,13 @@ package frc.robot;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindingCommand;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Logging.RobotLogger;
+import frc.robot.Monitoring.PerformanceMonitor;
 import org.littletonrobotics.junction.Logger;
 
 public class Robot extends TimedRobot {
@@ -15,6 +17,7 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private RobotContainer m_robotContainer;
+    private PerformanceMonitor m_performanceMonitor;
 
     public Robot() {
         // Initialize AdvantageKit logger
@@ -23,6 +26,9 @@ public class Robot extends TimedRobot {
         
         // Start logging (AdvantageKit will automatically set up receivers)
         Logger.start();
+
+        // Initialize performance monitor
+        m_performanceMonitor = PerformanceMonitor.getInstance();
 
         m_robotContainer = new RobotContainer();
 
@@ -43,9 +49,20 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
+        // Start loop timing
+        m_performanceMonitor.startLoop();
+        
+        // Measure command scheduler execution time
+        double schedulerStart = Timer.getFPGATimestamp();
         CommandScheduler.getInstance().run();
-
+        double schedulerTime = Timer.getFPGATimestamp() - schedulerStart;
+        m_performanceMonitor.recordSchedulerTime(schedulerTime);
+        
+        // Vision processing (timing measured inside localizeRobotPose)
         m_robotContainer.localizeRobotPose();
+        
+        // End loop timing and log metrics periodically
+        m_performanceMonitor.endLoop();
     }
 
     @Override

@@ -5,12 +5,14 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.RobotContext;
 import frc.robot.Logging.RobotLogger;
+import frc.robot.Monitoring.PerformanceMonitor;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Lights;
@@ -100,6 +102,9 @@ public class RobotContainer {
      * Updates the drivetrain's pose estimator with vision measurements.
      */
     public void localizeRobotPose() {
+        // Measure vision processing time
+        double visionStart = Timer.getFPGATimestamp();
+        
         var photonVision = m_subsystemFactory.getReefPhotonVision();
         
         // Get estimated robot pose from PhotonVision
@@ -147,6 +152,10 @@ public class RobotContainer {
         
         // Log current state
         RobotLogger.recordString("State/CurrentState", context.stateMachine.getCurrentState().Name.toString());
+        
+        // Record vision processing time
+        double visionTime = Timer.getFPGATimestamp() - visionStart;
+        PerformanceMonitor.getInstance().recordVisionTime(visionTime);
     }
 
     // Getters for subsystems (for backwards compatibility and external access)
