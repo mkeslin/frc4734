@@ -22,6 +22,9 @@ public final class CANIds {
     public static final int INTAKE_DEPLOY = 25;
     public static final int INTAKE_MOTOR = 26;
 
+    // Floor conveyor
+    public static final int FLOOR_CONVEYOR = 27;
+
     // Lights
     public static final int LIGHTS = 40;
 }

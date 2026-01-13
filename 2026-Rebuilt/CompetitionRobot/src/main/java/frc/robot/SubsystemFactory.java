@@ -13,6 +13,7 @@ import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
 import frc.robot.Subsystems.Cameras.PhotonVision;
@@ -29,6 +30,7 @@ public class SubsystemFactory {
     private final SideToSide m_sideToSide;
     private final Climber m_climber;
     private final DeployableIntake m_deployableIntake;
+    private final Floor m_floor;
     private final Lights m_lights;
     private final PhotonVision m_reefPhotonVision;
     private final DigitalInput m_coralTraySensor;
@@ -53,6 +55,7 @@ public class SubsystemFactory {
         m_sideToSide = new SideToSide();
         m_climber = new Climber();
         m_deployableIntake = new DeployableIntake();
+        m_floor = new Floor();
         m_lights = new Lights();
 
         // Create sensors
@@ -72,7 +75,8 @@ public class SubsystemFactory {
                 m_coralTraySensor::get,
                 m_coralArmSensor::get,
                 m_deployableIntake::getDeployPosition,
-                m_deployableIntake::getIntakeSpeed
+                m_deployableIntake::getIntakeSpeed,
+                m_floor::getSpeed
         );
 
         // Set PositionTracker on all subsystems
@@ -83,6 +87,7 @@ public class SubsystemFactory {
         m_sideToSide.setPositionTracker(m_positionTracker);
         m_climber.setPositionTracker(m_positionTracker);
         m_deployableIntake.setPositionTracker(m_positionTracker);
+        m_floor.setPositionTracker(m_positionTracker);
 
         // Create state machine (loads states automatically in constructor)
         m_stateMachine = new StateMachine();
@@ -96,6 +101,7 @@ public class SubsystemFactory {
                 m_arm,
                 m_sideToSide,
                 m_deployableIntake,
+                m_floor,
                 m_lights,
                 m_reefPhotonVision);
     }
@@ -118,6 +124,10 @@ public class SubsystemFactory {
 
     public DeployableIntake getDeployableIntake() {
         return m_deployableIntake;
+    }
+
+    public Floor getFloor() {
+        return m_floor;
     }
 
     public Lights getLights() {
@@ -172,6 +182,9 @@ public class SubsystemFactory {
         }
         if (m_deployableIntake != null) {
             m_deployableIntake.cleanup();
+        }
+        if (m_floor != null) {
+            m_floor.cleanup();
         }
         if (m_lights != null) {
             m_lights.cleanup();
