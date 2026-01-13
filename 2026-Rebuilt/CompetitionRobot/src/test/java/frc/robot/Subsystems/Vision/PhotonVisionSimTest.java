@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
+import frc.robot.PathPlanner.AllianceUtils;
 import frc.robot.SimulationTestBase;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 
@@ -35,8 +35,8 @@ class PhotonVisionSimTest extends SimulationTestBase {
         // Note: In a full simulation, you would set up PhotonCameraSim here
         photonVision = new PhotonVision("TestCamera", 0);
 
-        // Load field layout
-        fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+        // Load field layout using AllianceUtils (handles 2026 field)
+        fieldLayout = AllianceUtils.getFieldLayout();
     }
 
     @Test

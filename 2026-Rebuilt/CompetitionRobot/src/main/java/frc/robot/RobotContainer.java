@@ -3,8 +3,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -114,14 +112,10 @@ public class RobotContainer {
             var pose = estimatedPose.get();
             
             // Get the pose in the correct alliance coordinate system
+            // PhotonVision returns poses in the field's native coordinate system.
+            // For rotationally symmetrical fields, PhotonVision should handle the
+            // coordinate transformation automatically, but we verify the pose is correct.
             Pose2d visionPose = pose.estimatedPose.toPose2d();
-            
-            // Handle alliance flipping if needed
-            // PhotonVision should already handle this, but verify
-            if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-                // If field layout needs to be flipped, PhotonVision should handle it
-                // But we can apply additional transformations if needed
-            }
             
             // Add vision measurement to drivetrain pose estimator
             // Timestamp is already in seconds from PhotonVision

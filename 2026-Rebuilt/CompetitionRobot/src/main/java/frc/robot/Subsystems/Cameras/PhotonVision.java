@@ -16,10 +16,11 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.PathPlanner.AllianceUtils;
 
 /**
  * PhotonVision camera subsystem for AprilTag detection and robot pose estimation.
@@ -28,7 +29,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class PhotonVision extends SubsystemBase {
     private final PhotonCamera camera;
     private final PhotonPoseEstimator poseEstimator;
-    private final AprilTagFieldLayout fieldLayout;
+    private AprilTagFieldLayout fieldLayout;
+    private Alliance lastKnownAlliance;
 
     /**
      * Creates a new PhotonVision subsystem.
@@ -40,8 +42,10 @@ public class PhotonVision extends SubsystemBase {
         camera = new PhotonCamera(cameraName);
         camera.setPipelineIndex(pipelineIndex);
 
-        // Load the field layout for pose estimation
-        fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+        // Load the field layout for pose estimation using AllianceUtils
+        // This will use the 2026 field layout (or kDefaultField as placeholder)
+        fieldLayout = AllianceUtils.getFieldLayout();
+        lastKnownAlliance = AllianceUtils.getAlliance();
 
         // Create camera-to-robot transform
         Transform3d robotToCamera = new Transform3d(CAMERA_POSITION, CAMERA_ROTATION);
@@ -237,8 +241,26 @@ public class PhotonVision extends SubsystemBase {
         SmartDashboard.putNumber("photon-tag-id", getAprilTagID());
     }
 
+    /**
+     * Checks if the alliance has changed and updates the field layout if needed.
+     * For rotationally symmetrical fields, the same layout is used for both alliances,
+     * but this method ensures the layout is current and handles any future changes.
+     */
+    private void checkAndUpdateAlliance() {
+        Alliance currentAlliance = AllianceUtils.getAlliance();
+        if (currentAlliance != lastKnownAlliance) {
+            // Alliance changed - update field layout
+            fieldLayout = AllianceUtils.getFieldLayout();
+            poseEstimator.setFieldTags(fieldLayout);
+            lastKnownAlliance = currentAlliance;
+        }
+    }
+
     @Override
     public void periodic() {
+        // Check for alliance changes and update field layout if needed
+        checkAndUpdateAlliance();
+        
         // Update diagnostics periodically
         putNums();
     }

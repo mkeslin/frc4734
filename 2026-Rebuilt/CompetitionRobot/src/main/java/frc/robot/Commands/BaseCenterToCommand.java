@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Objects;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
+import frc.robot.PathPlanner.AllianceUtils;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -209,8 +209,8 @@ public abstract class BaseCenterToCommand extends Command {
         yController = new PIDController(0.03, 0, 0);
         omegaController = new PIDController(0.03, 0, 0);
 
-        // Load field layout and pre-calculate tag poses if using POSE method
-        layout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+        // Load field layout using AllianceUtils (handles 2026 field and alliance changes)
+        layout = AllianceUtils.getFieldLayout();
         if (centerMethod == CenterMethod.POSE && !tagNumbers.isEmpty()) {
             calculateTagPoses();
         }
