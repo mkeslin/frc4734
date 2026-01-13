@@ -25,6 +25,9 @@ public final class CANIds {
     // Floor conveyor
     public static final int FLOOR_CONVEYOR = 27;
 
+    // Feeder
+    public static final int FEEDER = 28;
+
     // Lights
     public static final int LIGHTS = 40;
 }

@@ -7,6 +7,7 @@ import frc.robot.State.StateMachine;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
@@ -26,6 +27,7 @@ public class RobotContext {
     public final SideToSide sideToSide;
     public final DeployableIntake deployableIntake;
     public final Floor floor;
+    public final Feeder feeder;
     public final Lights lights;
     public final PhotonVision reefPhotonVision;
 
@@ -40,6 +42,7 @@ public class RobotContext {
      * @param sideToSide The side-to-side subsystem
      * @param deployableIntake The deployable intake subsystem
      * @param floor The floor conveyor subsystem
+     * @param feeder The feeder subsystem
      * @param lights The lights subsystem
      * @param reefPhotonVision The reef PhotonVision camera
      * @throws NullPointerException if any parameter is null
@@ -53,6 +56,7 @@ public class RobotContext {
             SideToSide sideToSide,
             DeployableIntake deployableIntake,
             Floor floor,
+            Feeder feeder,
             Lights lights,
             PhotonVision reefPhotonVision) {
         this.stateMachine = Objects.requireNonNull(stateMachine, "StateMachine cannot be null");
@@ -63,6 +67,7 @@ public class RobotContext {
         this.sideToSide = Objects.requireNonNull(sideToSide, "SideToSide cannot be null");
         this.deployableIntake = Objects.requireNonNull(deployableIntake, "DeployableIntake cannot be null");
         this.floor = Objects.requireNonNull(floor, "Floor cannot be null");
+        this.feeder = Objects.requireNonNull(feeder, "Feeder cannot be null");
         this.lights = Objects.requireNonNull(lights, "Lights cannot be null");
         this.reefPhotonVision = Objects.requireNonNull(reefPhotonVision, "PhotonVision cannot be null");
     }

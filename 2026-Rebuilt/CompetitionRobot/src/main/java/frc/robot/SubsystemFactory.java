@@ -13,6 +13,7 @@ import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
@@ -31,6 +32,7 @@ public class SubsystemFactory {
     private final Climber m_climber;
     private final DeployableIntake m_deployableIntake;
     private final Floor m_floor;
+    private final Feeder m_feeder;
     private final Lights m_lights;
     private final PhotonVision m_reefPhotonVision;
     private final DigitalInput m_coralTraySensor;
@@ -56,6 +58,7 @@ public class SubsystemFactory {
         m_climber = new Climber();
         m_deployableIntake = new DeployableIntake();
         m_floor = new Floor();
+        m_feeder = new Feeder();
         m_lights = new Lights();
 
         // Create sensors
@@ -76,7 +79,8 @@ public class SubsystemFactory {
                 m_coralArmSensor::get,
                 m_deployableIntake::getDeployPosition,
                 m_deployableIntake::getIntakeSpeed,
-                m_floor::getSpeed
+                m_floor::getSpeed,
+                m_feeder::getSpeed
         );
 
         // Set PositionTracker on all subsystems
@@ -88,6 +92,7 @@ public class SubsystemFactory {
         m_climber.setPositionTracker(m_positionTracker);
         m_deployableIntake.setPositionTracker(m_positionTracker);
         m_floor.setPositionTracker(m_positionTracker);
+        m_feeder.setPositionTracker(m_positionTracker);
 
         // Create state machine (loads states automatically in constructor)
         m_stateMachine = new StateMachine();
@@ -102,6 +107,7 @@ public class SubsystemFactory {
                 m_sideToSide,
                 m_deployableIntake,
                 m_floor,
+                m_feeder,
                 m_lights,
                 m_reefPhotonVision);
     }
@@ -128,6 +134,10 @@ public class SubsystemFactory {
 
     public Floor getFloor() {
         return m_floor;
+    }
+
+    public Feeder getFeeder() {
+        return m_feeder;
     }
 
     public Lights getLights() {
@@ -185,6 +195,9 @@ public class SubsystemFactory {
         }
         if (m_floor != null) {
             m_floor.cleanup();
+        }
+        if (m_feeder != null) {
+            m_feeder.cleanup();
         }
         if (m_lights != null) {
             m_lights.cleanup();
