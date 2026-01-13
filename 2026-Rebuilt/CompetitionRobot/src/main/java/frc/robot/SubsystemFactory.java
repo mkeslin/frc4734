@@ -15,6 +15,7 @@ import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
+import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
 import frc.robot.Subsystems.Cameras.PhotonVision;
@@ -33,6 +34,7 @@ public class SubsystemFactory {
     private final DeployableIntake m_deployableIntake;
     private final Floor m_floor;
     private final Feeder m_feeder;
+    private final Shooter m_shooter;
     private final Lights m_lights;
     private final PhotonVision m_reefPhotonVision;
     private final DigitalInput m_coralTraySensor;
@@ -59,6 +61,7 @@ public class SubsystemFactory {
         m_deployableIntake = new DeployableIntake();
         m_floor = new Floor();
         m_feeder = new Feeder();
+        m_shooter = new Shooter();
         m_lights = new Lights();
 
         // Create sensors
@@ -80,7 +83,8 @@ public class SubsystemFactory {
                 m_deployableIntake::getDeployPosition,
                 m_deployableIntake::getIntakeSpeed,
                 m_floor::getSpeed,
-                m_feeder::getSpeed
+                m_feeder::getSpeed,
+                m_shooter::getSpeed
         );
 
         // Set PositionTracker on all subsystems
@@ -93,6 +97,7 @@ public class SubsystemFactory {
         m_deployableIntake.setPositionTracker(m_positionTracker);
         m_floor.setPositionTracker(m_positionTracker);
         m_feeder.setPositionTracker(m_positionTracker);
+        m_shooter.setPositionTracker(m_positionTracker);
 
         // Create state machine (loads states automatically in constructor)
         m_stateMachine = new StateMachine();
@@ -108,6 +113,7 @@ public class SubsystemFactory {
                 m_deployableIntake,
                 m_floor,
                 m_feeder,
+                m_shooter,
                 m_lights,
                 m_reefPhotonVision);
     }
@@ -138,6 +144,10 @@ public class SubsystemFactory {
 
     public Feeder getFeeder() {
         return m_feeder;
+    }
+
+    public Shooter getShooter() {
+        return m_shooter;
     }
 
     public Lights getLights() {
@@ -198,6 +208,9 @@ public class SubsystemFactory {
         }
         if (m_feeder != null) {
             m_feeder.cleanup();
+        }
+        if (m_shooter != null) {
+            m_shooter.cleanup();
         }
         if (m_lights != null) {
             m_lights.cleanup();

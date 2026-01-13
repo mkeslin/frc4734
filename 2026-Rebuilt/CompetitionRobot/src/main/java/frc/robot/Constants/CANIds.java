@@ -28,6 +28,10 @@ public final class CANIds {
     // Feeder
     public static final int FEEDER = 28;
 
+    // Shooter
+    public static final int SHOOTER_LEFT = 29;
+    public static final int SHOOTER_RIGHT = 30;
+
     // Lights
     public static final int LIGHTS = 40;
 }

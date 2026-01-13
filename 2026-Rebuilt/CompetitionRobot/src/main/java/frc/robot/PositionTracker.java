@@ -19,6 +19,7 @@ public class PositionTracker {
     private final Supplier<Double> intakeSpeedSupplier;
     private final Supplier<Double> floorSpeedSupplier;
     private final Supplier<Double> feederSpeedSupplier;
+    private final Supplier<Double> shooterSpeedSupplier;
 
     /**
      * Creates a new PositionTracker with all required suppliers.
@@ -33,6 +34,7 @@ public class PositionTracker {
      * @param intakeSpeedSupplier Supplier for intake speed
      * @param floorSpeedSupplier Supplier for floor conveyor speed
      * @param feederSpeedSupplier Supplier for feeder speed
+     * @param shooterSpeedSupplier Supplier for shooter speed
      */
     public PositionTracker(
             Supplier<Double> elevatorPositionSupplier,
@@ -44,7 +46,8 @@ public class PositionTracker {
             Supplier<Double> intakeDeployPositionSupplier,
             Supplier<Double> intakeSpeedSupplier,
             Supplier<Double> floorSpeedSupplier,
-            Supplier<Double> feederSpeedSupplier) {
+            Supplier<Double> feederSpeedSupplier,
+            Supplier<Double> shooterSpeedSupplier) {
         this.elevatorPositionSupplier = Objects.requireNonNull(elevatorPositionSupplier, "elevatorPositionSupplier cannot be null");
         this.armAngleSupplier = Objects.requireNonNull(armAngleSupplier, "armAngleSupplier cannot be null");
         this.sideToSidePositionSupplier = Objects.requireNonNull(sideToSidePositionSupplier, "sideToSidePositionSupplier cannot be null");
@@ -55,6 +58,7 @@ public class PositionTracker {
         this.intakeSpeedSupplier = Objects.requireNonNull(intakeSpeedSupplier, "intakeSpeedSupplier cannot be null");
         this.floorSpeedSupplier = Objects.requireNonNull(floorSpeedSupplier, "floorSpeedSupplier cannot be null");
         this.feederSpeedSupplier = Objects.requireNonNull(feederSpeedSupplier, "feederSpeedSupplier cannot be null");
+        this.shooterSpeedSupplier = Objects.requireNonNull(shooterSpeedSupplier, "shooterSpeedSupplier cannot be null");
     }
 
     public double getElevatorPosition() {
@@ -107,5 +111,9 @@ public class PositionTracker {
 
     public double getFeederSpeed() {
         return feederSpeedSupplier.get();
+    }
+
+    public double getShooterSpeed() {
+        return shooterSpeedSupplier.get();
     }
 }
