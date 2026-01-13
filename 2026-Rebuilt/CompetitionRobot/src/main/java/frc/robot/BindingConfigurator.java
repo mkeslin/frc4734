@@ -81,20 +81,21 @@ public class BindingConfigurator {
      * Configures bindings for the mechanism controller.
      */
     public void configureMechanismBindings() {
+        // Removed for 2026 - commands use deleted subsystems (Elevator, Arm, SideToSide)
         // GO TO PRE-INTAKE
-        m_mechanismController.a()
-                .onTrue(RobotCommands.preIntakeCoralCommand(m_robotContext));
+        // m_mechanismController.a()
+        //         .onTrue(RobotCommands.preIntakeCoralCommand(m_robotContext));
 
         // INTAKE & POST-INTAKE
-        m_mechanismController.b().onTrue(
-                Commands.sequence(
-                        RobotCommands.intakeCoralCommand(m_robotContext),
-                        RobotCommands.postIntakeCoralCommand(m_robotContext)
-                ));
+        // m_mechanismController.b().onTrue(
+        //         Commands.sequence(
+        //                 RobotCommands.intakeCoralCommand(m_robotContext),
+        //                 RobotCommands.postIntakeCoralCommand(m_robotContext)
+        //         ));
 
         // RESET POSE
-        m_mechanismController.start()
-                .onTrue(RobotCommands.intakeCoralCommand(m_robotContext));
+        // m_mechanismController.start()
+        //         .onTrue(RobotCommands.intakeCoralCommand(m_robotContext));
     }
 
     /**
@@ -116,41 +117,47 @@ public class BindingConfigurator {
 
     /**
      * Configures bindings for the arcade controller.
+     * 
+     * NOTE: Most bindings commented out for 2026 - commands use deleted subsystems (Elevator, Arm, SideToSide)
      */
     public void configureArcadeBindings() {
-        final boolean centerToReef = true;
+        // Removed for 2026 - all scoring commands use deleted subsystems
+        // final boolean centerToReef = true;
 
         // Scoring bindings with approach movement
-        m_arcadeController.rightTrigger().onTrue(
-                createScoreAndApproachCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef, MEDIUM_DRIVE_TIMEOUT));
+        // m_arcadeController.rightTrigger().onTrue(
+        //         createScoreAndApproachCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef, MEDIUM_DRIVE_TIMEOUT));
         
-        m_arcadeController.b().onTrue(
-                createScoreAndApproachCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef, SHORT_DRIVE_TIMEOUT));
+        // m_arcadeController.b().onTrue(
+        //         createScoreAndApproachCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef, SHORT_DRIVE_TIMEOUT));
         
-        m_arcadeController.a().onTrue(
-                createScoreAndApproachCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef, LONG_DRIVE_TIMEOUT));
+        // m_arcadeController.a().onTrue(
+        //         createScoreAndApproachCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef, LONG_DRIVE_TIMEOUT));
         
-        m_arcadeController.x().onTrue(
-                createScoreAndApproachCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef, MEDIUM_DRIVE_TIMEOUT));
+        // m_arcadeController.x().onTrue(
+        //         createScoreAndApproachCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef, MEDIUM_DRIVE_TIMEOUT));
         
-        m_arcadeController.y().onTrue(
-                createScoreAndApproachCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef, SHORT_DRIVE_TIMEOUT));
+        // m_arcadeController.y().onTrue(
+        //         createScoreAndApproachCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef, SHORT_DRIVE_TIMEOUT));
         
-        m_arcadeController.rightBumper().onTrue(
-                createScoreAndApproachCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef, LONG_DRIVE_TIMEOUT));
+        // m_arcadeController.rightBumper().onTrue(
+        //         createScoreAndApproachCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef, LONG_DRIVE_TIMEOUT));
 
         // Center scoring (no approach movement)
-        m_arcadeController.start().onTrue(
-                prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Center, centerToReef));
+        // m_arcadeController.start().onTrue(
+        //         prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Center, centerToReef));
 
         // Score command sequence
-        Command scoreCommand = createScoreSequenceCommand();
-        m_arcadeController.leftBumper().onTrue(scoreCommand);
-        m_arcadeController.leftTrigger().onTrue(scoreCommand);
+        // Removed for 2026 - uses deleted subsystems
+        // Command scoreCommand = createScoreSequenceCommand();
+        // m_arcadeController.leftBumper().onTrue(scoreCommand);
+        // m_arcadeController.leftTrigger().onTrue(scoreCommand);
     }
 
     /**
      * Creates a command sequence that prepares to score, centers to reef, and approaches the scoring position.
+     * 
+     * REMOVED FOR 2026 - Uses prepareScoreCoralCommand which requires deleted subsystems
      * 
      * @param scoreLevel The scoring level
      * @param scoreSide The scoring side
@@ -158,6 +165,7 @@ public class BindingConfigurator {
      * @param approachTimeout Timeout for the approach movement
      * @return The complete command sequence
      */
+    /*
     private Command createScoreAndApproachCommand(ScoreLevel scoreLevel, ScoreSide scoreSide, 
             boolean centerToReef, double approachTimeout) {
         return Commands.sequence(
@@ -165,6 +173,7 @@ public class BindingConfigurator {
                 createApproachMovementCommand(approachTimeout)
         );
     }
+    */
 
     /**
      * Creates a command that moves the drivetrain forward to approach the scoring position.
@@ -183,8 +192,11 @@ public class BindingConfigurator {
      * Creates the complete score sequence command.
      * Includes scoring, placing coral forward, backing away, and conditional post-intake or retry.
      * 
+     * REMOVED FOR 2026 - Uses commands that require deleted subsystems
+     * 
      * @return The complete score sequence command
      */
+    /*
     private Command createScoreSequenceCommand() {
         return Commands.sequence(
                 // Move arm down to score
@@ -200,6 +212,7 @@ public class BindingConfigurator {
                         .onlyIf(() -> m_positionTracker.getCoralInArm())
         );
     }
+    */
 
     /**
      * Creates a command that moves forward to place coral.
@@ -229,21 +242,26 @@ public class BindingConfigurator {
      * Creates a command that prepares to score coral and optionally centers to reef.
      * Both actions run in parallel with default wait times.
      * 
+     * REMOVED FOR 2026 - Uses prepareScoreCoralCommand which requires deleted subsystems
+     * 
      * @param scoreLevel The scoring level
      * @param scoreSide The scoring side
      * @param centerToReef Whether to center to reef
      * @return Command that prepares scoring and centers to reef in parallel
      */
+    /*
     private Command prepareScoreCoralAndCenterToReefCommand(ScoreLevel scoreLevel, ScoreSide scoreSide,
             boolean centerToReef) {
         Command centerToReefCommand = NamedCommands.getCommand("centerToReefCommand");
         return Commands.parallel(
-                Commands
-                        .waitSeconds(DEFAULT_WAIT_TIME)
-                        .andThen(RobotCommands.prepareScoreCoralCommand(m_robotContext, scoreLevel, scoreSide)),
+                // Removed for 2026 - prepareScoreCoralCommand uses deleted subsystems
+                // Commands
+                //         .waitSeconds(DEFAULT_WAIT_TIME)
+                //         .andThen(RobotCommands.prepareScoreCoralCommand(m_robotContext, scoreLevel, scoreSide)),
                 Commands
                         .waitSeconds(DEFAULT_WAIT_TIME)
                         .andThen(centerToReefCommand.unless(() -> !centerToReef))
         );
     }
+    */
 }

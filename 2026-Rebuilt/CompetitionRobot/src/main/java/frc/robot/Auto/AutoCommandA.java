@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Commands.CenterToReefCommand;
-import frc.robot.Commands.RobotCommands;
+// import frc.robot.Commands.RobotCommands; // Removed for 2026 - methods using deleted subsystems are commented out
 import frc.robot.Commands.RobotContext;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
@@ -262,31 +262,35 @@ public class AutoCommandA {
         Objects.requireNonNull(context, "RobotContext cannot be null");
         Objects.requireNonNull(centerToReefCommand, "CenterToReefCommand cannot be null");
 
+        // REMOVED FOR 2026 - All RobotCommands methods that use deleted subsystems (Elevator, Arm, SideToSide) are commented out
+        // The following commands are no longer available:
+        // - RobotCommands.postIntakeCoralCommand(context)
+        // - RobotCommands.prepareScoreCoralCommand(context, m_autoScoreLevel, scoreSide)
+        // - RobotCommands.scoreCoralCommand(context)
+        // - RobotCommands.preIntakeCoralCommand(context)
+        // - RobotCommands.intakeCoralCommand(context)
+        
         Command command = Commands.sequence(
                 // DRIVE TO REEF & PRE-POSITION CORAL
-                Commands.parallel(
-                        // DRIVE TO REEF
-                        Commands.waitSeconds(0.1)
-                                .andThen(context.drivetrain.followPathCommand(pathToReef)),
-                        // PRE-POSITION CORAL
-                        Commands.waitSeconds(0.0)
-                                .andThen(RobotCommands.postIntakeCoralCommand(context))
-                ),
+                // DRIVE TO REEF
+                Commands.waitSeconds(0.1)
+                        .andThen(context.drivetrain.followPathCommand(pathToReef)),
+                // PRE-POSITION CORAL - REMOVED FOR 2026
+                // Commands.waitSeconds(0.0)
+                //         .andThen(RobotCommands.postIntakeCoralCommand(context))
                 // POSITION CORAL, CENTER, & SCORE
                 Commands.sequence(
-                        Commands.parallel(
-                                // POSITION CORAL
-                                RobotCommands.prepareScoreCoralCommand(context, m_autoScoreLevel, scoreSide),
-                                // CENTER
-                                centerToReefCommand
-                        ),
+                        // POSITION CORAL - REMOVED FOR 2026
+                        // RobotCommands.prepareScoreCoralCommand(context, m_autoScoreLevel, scoreSide),
+                        // CENTER
+                        centerToReefCommand,
                         // BACK UP A BIT
                         Commands.run(() -> context.drivetrain.setRelativeSpeed(-0.6, 0, 0))
                                 .withTimeout(0.12)
                                 .andThen(Commands.runOnce(() -> context.drivetrain.setRelativeSpeed(0, 0, 0)))
                                 .asProxy(),
-                        // SCORE
-                        RobotCommands.scoreCoralCommand(context),
+                        // SCORE - REMOVED FOR 2026
+                        // RobotCommands.scoreCoralCommand(context),
                         // MOVE FORWARD - set coral if not completely placed
                         Commands.run(() -> context.drivetrain.setRelativeSpeed(0.75, 0, 0)).withTimeout(0.12)
                                 .asProxy(),
@@ -295,18 +299,18 @@ public class AutoCommandA {
                                 .asProxy()
                 ),
                 // PRE-INTAKE & DRIVE TO CORAL STATION
-                Commands.parallel(
-                        // PRE-INTAKE
-                        Commands.waitSeconds(0.0)
-                                .andThen(RobotCommands.preIntakeCoralCommand(context)),
-                        // DRIVE TO CORAL STATION
-                        Commands.waitSeconds(0.35)
-                                .andThen(context.drivetrain.followPathCommand(pathToCoralStation))
-                ),
+                // PRE-INTAKE - REMOVED FOR 2026
+                // Commands.waitSeconds(0.0)
+                //         .andThen(RobotCommands.preIntakeCoralCommand(context)),
+                // DRIVE TO CORAL STATION
+                Commands.waitSeconds(0.35)
+                        .andThen(context.drivetrain.followPathCommand(pathToCoralStation)),
                 // INTAKE
                 Commands.waitSeconds(15.0).until(() -> context.positionTracker.getCoralInTray())
                         .andThen(Commands.waitSeconds(0.15)),
-                RobotCommands.intakeCoralCommand(context)
+                // REMOVED FOR 2026:
+                // RobotCommands.intakeCoralCommand(context)
+                Commands.none() // Placeholder - replace with new intake command when available
         );
 
         return command;

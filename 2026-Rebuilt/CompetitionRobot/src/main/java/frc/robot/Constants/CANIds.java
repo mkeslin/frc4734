@@ -9,13 +9,7 @@ public final class CANIds {
         // Utility class - prevent instantiation
     }
 
-    // Elevator
-    public static final int ELEVATOR_LEFT = 20;
-    public static final int ELEVATOR_RIGHT = 21;
-
-    // Mechanisms
-    public static final int SIDE_TO_SIDE = 22;
-    public static final int ARM = 23;
+    // Climber
     public static final int CLIMBER = 24;
     
     // Intake

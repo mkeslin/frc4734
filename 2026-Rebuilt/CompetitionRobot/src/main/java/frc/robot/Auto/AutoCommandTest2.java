@@ -7,23 +7,27 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.PositionTracker;
-import frc.robot.Subsystems.Arm;
-import frc.robot.Subsystems.Elevator;
+// Removed for 2026:
+// import frc.robot.Subsystems.Arm;
+// import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
-import frc.robot.Subsystems.SideToSide;
+// import frc.robot.Subsystems.SideToSide;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /*
  * Command that executes during autonomous mode
+ * 
+ * NOTE: Method signature updated for 2026 - removed Elevator, Arm, and SideToSide parameters
  */
 public class AutoCommandTest2 {
+    /**
+     * REMOVED FOR 2026 - Method signature updated to remove Elevator, Arm, and SideToSide parameters
+     * Original signature had: Elevator elevator, Arm arm, SideToSide sideToSide
+     */
     public static AutoRoutine GDC(
             PositionTracker positionTracker,
             CommandSwerveDrivetrain drivetrain,
-            Elevator elevator,
-            Arm arm,
-            SideToSide sideToSide,
             Lights lights,
             PhotonVision reefPhotonVision) {
         PathPlannerPath Start_GPath = null; // PathPlannerPath.fromPathFile("Start-G");

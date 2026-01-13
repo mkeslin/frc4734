@@ -9,9 +9,6 @@ import java.util.function.Supplier;
  * preventing null pointer exceptions.
  */
 public class PositionTracker {
-    private final Supplier<Double> elevatorPositionSupplier;
-    private final Supplier<Double> armAngleSupplier;
-    private final Supplier<Double> sideToSidePositionSupplier;
     private final Supplier<Double> climberPositionSupplier;
     private final Supplier<Boolean> coralInTraySupplier;
     private final Supplier<Boolean> coralInArmSupplier;
@@ -24,9 +21,6 @@ public class PositionTracker {
     /**
      * Creates a new PositionTracker with all required suppliers.
      * 
-     * @param elevatorPositionSupplier Supplier for elevator position
-     * @param armAngleSupplier Supplier for arm angle
-     * @param sideToSidePositionSupplier Supplier for side-to-side position
      * @param climberPositionSupplier Supplier for climber position
      * @param coralInTraySupplier Supplier for coral in tray sensor (inverted logic)
      * @param coralInArmSupplier Supplier for coral in arm sensor (inverted logic)
@@ -37,9 +31,6 @@ public class PositionTracker {
      * @param shooterSpeedSupplier Supplier for shooter speed
      */
     public PositionTracker(
-            Supplier<Double> elevatorPositionSupplier,
-            Supplier<Double> armAngleSupplier,
-            Supplier<Double> sideToSidePositionSupplier,
             Supplier<Double> climberPositionSupplier,
             Supplier<Boolean> coralInTraySupplier,
             Supplier<Boolean> coralInArmSupplier,
@@ -48,9 +39,6 @@ public class PositionTracker {
             Supplier<Double> floorSpeedSupplier,
             Supplier<Double> feederSpeedSupplier,
             Supplier<Double> shooterSpeedSupplier) {
-        this.elevatorPositionSupplier = Objects.requireNonNull(elevatorPositionSupplier, "elevatorPositionSupplier cannot be null");
-        this.armAngleSupplier = Objects.requireNonNull(armAngleSupplier, "armAngleSupplier cannot be null");
-        this.sideToSidePositionSupplier = Objects.requireNonNull(sideToSidePositionSupplier, "sideToSidePositionSupplier cannot be null");
         this.climberPositionSupplier = Objects.requireNonNull(climberPositionSupplier, "climberPositionSupplier cannot be null");
         this.coralInTraySupplier = Objects.requireNonNull(coralInTraySupplier, "coralInTraySupplier cannot be null");
         this.coralInArmSupplier = Objects.requireNonNull(coralInArmSupplier, "coralInArmSupplier cannot be null");
@@ -59,18 +47,6 @@ public class PositionTracker {
         this.floorSpeedSupplier = Objects.requireNonNull(floorSpeedSupplier, "floorSpeedSupplier cannot be null");
         this.feederSpeedSupplier = Objects.requireNonNull(feederSpeedSupplier, "feederSpeedSupplier cannot be null");
         this.shooterSpeedSupplier = Objects.requireNonNull(shooterSpeedSupplier, "shooterSpeedSupplier cannot be null");
-    }
-
-    public double getElevatorPosition() {
-        return elevatorPositionSupplier.get();
-    }
-
-    public double getArmAngle() {
-        return armAngleSupplier.get();
-    }
-
-    public double getSideToSidePosition() {
-        return sideToSidePositionSupplier.get();
     }
 
     public double getClimberPosition() {

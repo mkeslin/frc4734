@@ -9,15 +9,12 @@ import java.util.Objects;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Commands.RobotContext;
-import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
-import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Lights;
-import frc.robot.Subsystems.SideToSide;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.State.StateMachine;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -27,9 +24,6 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * Centralizes subsystem creation logic and ensures proper initialization order.
  */
 public class SubsystemFactory {
-    private final Elevator m_elevator;
-    private final Arm m_arm;
-    private final SideToSide m_sideToSide;
     private final Climber m_climber;
     private final DeployableIntake m_deployableIntake;
     private final Floor m_floor;
@@ -54,9 +48,6 @@ public class SubsystemFactory {
         m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
 
         // Create subsystems (PositionTracker will be set after creation)
-        m_elevator = new Elevator();
-        m_arm = new Arm(m_elevator::getCarriageComponentPose);
-        m_sideToSide = new SideToSide();
         m_climber = new Climber();
         m_deployableIntake = new DeployableIntake();
         m_floor = new Floor();
@@ -74,9 +65,6 @@ public class SubsystemFactory {
         // Create PositionTracker with all actual suppliers
         // Method references will work correctly since subsystems are now created
         m_positionTracker = new PositionTracker(
-                m_elevator::getPosition,
-                m_arm::getPosition,
-                m_sideToSide::getPosition,
                 m_climber::getPosition,
                 m_coralTraySensor::get,
                 m_coralArmSensor::get,
@@ -90,9 +78,6 @@ public class SubsystemFactory {
         // Set PositionTracker on all subsystems
         // This ensures all subsystems share the same PositionTracker instance with real suppliers,
         // allowing them to query each other's state correctly
-        m_elevator.setPositionTracker(m_positionTracker);
-        m_arm.setPositionTracker(m_positionTracker);
-        m_sideToSide.setPositionTracker(m_positionTracker);
         m_climber.setPositionTracker(m_positionTracker);
         m_deployableIntake.setPositionTracker(m_positionTracker);
         m_floor.setPositionTracker(m_positionTracker);
@@ -107,27 +92,12 @@ public class SubsystemFactory {
                 m_stateMachine,
                 m_positionTracker,
                 m_drivetrain,
-                m_elevator,
-                m_arm,
-                m_sideToSide,
                 m_deployableIntake,
                 m_floor,
                 m_feeder,
                 m_shooter,
                 m_lights,
                 m_reefPhotonVision);
-    }
-
-    public Elevator getElevator() {
-        return m_elevator;
-    }
-
-    public Arm getArm() {
-        return m_arm;
-    }
-
-    public SideToSide getSideToSide() {
-        return m_sideToSide;
     }
 
     public Climber getClimber() {
@@ -174,9 +144,6 @@ public class SubsystemFactory {
      * Resets all subsystem positions to their zero positions.
      */
     public void resetZeros() {
-        m_sideToSide.resetPosition();
-        m_arm.resetPosition();
-        m_elevator.resetPosition();
         m_climber.resetPosition();
         m_deployableIntake.resetDeployPosition();
     }
@@ -188,15 +155,6 @@ public class SubsystemFactory {
      */
     public void cleanup() {
         // Cleanup subsystems
-        if (m_elevator != null) {
-            m_elevator.cleanup();
-        }
-        if (m_arm != null) {
-            m_arm.cleanup();
-        }
-        if (m_sideToSide != null) {
-            m_sideToSide.cleanup();
-        }
         if (m_climber != null) {
             m_climber.cleanup();
         }

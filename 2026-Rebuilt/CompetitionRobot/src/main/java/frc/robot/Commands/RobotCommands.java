@@ -1,29 +1,36 @@
 package frc.robot.Commands;
 
-import static frc.robot.Constants.CommandConstants.DEFAULT_WAIT_TIME;
-import static frc.robot.Constants.CommandConstants.POST_INTAKE_ARM_DELAY;
+// All imports and methods commented out for 2026 - subsystems removed
+// import static frc.robot.Constants.CommandConstants.DEFAULT_WAIT_TIME;
+// import static frc.robot.Constants.CommandConstants.POST_INTAKE_ARM_DELAY;
 
-import java.util.Map;
-import java.util.Objects;
+// import java.util.Map;
+// import java.util.Objects;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants.ArmConstants.ArmPosition;
-import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
-import frc.robot.Constants.ScoreLevel;
-import frc.robot.Constants.ScoreSide;
-import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
-import frc.robot.State.StateMachineStateName;
+// import edu.wpi.first.wpilibj2.command.Command;
+// import edu.wpi.first.wpilibj2.command.Commands;
+// Removed for 2026:
+// import frc.robot.Constants.ArmConstants.ArmPosition;
+// import frc.robot.Constants.ElevatorConstants.ElevatorPosition;
+// import frc.robot.Constants.ScoreLevel;
+// import frc.robot.Constants.ScoreSide;
+// import frc.robot.Constants.SideToSideConstants.SideToSidePosition;
+// import frc.robot.State.StateMachineStateName;
 
 /**
  * Factory class for creating robot commands.
  * Uses RobotContext to reduce parameter count and improve readability.
+ * 
+ * NOTE: Most methods commented out for 2026 - Elevator, Arm, and SideToSide subsystems removed
  */
 public class RobotCommands {
-    private static ScoreLevel lastScoreLevel = ScoreLevel.None;
+    // Removed for 2026:
+    // private static ScoreLevel lastScoreLevel = ScoreLevel.None;
 
     /**
      * Prepares the robot to score coral at the specified level and side.
+     * 
+     * REMOVED FOR 2026 - Uses Elevator, Arm, and SideToSide subsystems
      * 
      * @param context The robot context containing all subsystems
      * @param level The scoring level (L1, L2, L3, L4)
@@ -32,6 +39,7 @@ public class RobotCommands {
      * @throws NullPointerException if context is null
      * @throws IllegalArgumentException if level or side is invalid
      */
+    /*
     public static Command prepareScoreCoralCommand(
             RobotContext context,
             ScoreLevel level,
@@ -104,28 +112,36 @@ public class RobotCommands {
                         .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color))
         );
     }
+    */
 
     /**
      * Retries preparing to score coral by moving the arm to top position.
+     * 
+     * REMOVED FOR 2026 - Uses Arm subsystem
      * 
      * @param context The robot context containing all subsystems
      * @return Command to retry preparing for scoring
      * @throws NullPointerException if context is null
      */
+    /*
     public static Command prepareScoreCoralRetryCommand(RobotContext context) {
         Objects.requireNonNull(context, "RobotContext cannot be null");
         return context.arm.moveToSetPositionCommand(() -> ArmPosition.TOP).asProxy()
                 .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.PrepareScore))
                 .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
     }
+    */
 
     /**
      * Scores coral at the previously prepared level.
+     * 
+     * REMOVED FOR 2026 - Uses Arm subsystem
      * 
      * @param context The robot context containing all subsystems
      * @return Command to score coral
      * @throws NullPointerException if context is null
      */
+    /*
     public static Command scoreCoralCommand(RobotContext context) {
         Objects.requireNonNull(context, "RobotContext cannot be null");
         Map<ScoreLevel, Command> commandMap = Map.ofEntries(
@@ -139,14 +155,18 @@ public class RobotCommands {
                 .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.Score))
                 .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
     }
+    */
 
     /**
      * Prepares the robot for intake by moving mechanisms to pre-intake positions.
+     * 
+     * REMOVED FOR 2026 - Uses Elevator, Arm, and SideToSide subsystems
      * 
      * @param context The robot context containing all subsystems
      * @return Command to prepare for intake
      * @throws NullPointerException if context is null
      */
+    /*
     public static Command preIntakeCoralCommand(RobotContext context) {
         Objects.requireNonNull(context, "RobotContext cannot be null");
         return Commands.sequence(
@@ -163,14 +183,18 @@ public class RobotCommands {
         ).onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.PreIntake))
                 .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
     }
+    */
 
     /**
      * Moves mechanisms to intake positions to collect coral.
+     * 
+     * REMOVED FOR 2026 - Uses Elevator, Arm, and SideToSide subsystems
      * 
      * @param context The robot context containing all subsystems
      * @return Command to intake coral
      * @throws NullPointerException if context is null
      */
+    /*
     public static Command intakeCoralCommand(RobotContext context) {
         Objects.requireNonNull(context, "RobotContext cannot be null");
         return Commands.parallel(
@@ -187,14 +211,18 @@ public class RobotCommands {
                 .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.Intake))
                 .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
     }
+    */
 
     /**
      * Moves mechanisms to post-intake positions after collecting coral.
+     * 
+     * REMOVED FOR 2026 - Uses Elevator, Arm, and SideToSide subsystems
      * 
      * @param context The robot context containing all subsystems
      * @return Command to complete intake sequence
      * @throws NullPointerException if context is null
      */
+    /*
     public static Command postIntakeCoralCommand(RobotContext context) {
         Objects.requireNonNull(context, "RobotContext cannot be null");
         return Commands.parallel(
@@ -211,4 +239,5 @@ public class RobotCommands {
                 .onlyIf(() -> context.stateMachine.canTransition(context.positionTracker, StateMachineStateName.PostIntake))
                 .andThen(() -> context.lights.setSolidColor(context.stateMachine.getCurrentState().Color));
     }
+    */
 }
