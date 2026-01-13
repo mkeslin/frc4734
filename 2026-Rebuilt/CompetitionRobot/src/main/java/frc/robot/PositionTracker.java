@@ -15,7 +15,8 @@ public class PositionTracker {
     private final Supplier<Double> climberPositionSupplier;
     private final Supplier<Boolean> coralInTraySupplier;
     private final Supplier<Boolean> coralInArmSupplier;
-    private final Supplier<Double> algaeIntakeSpeedSupplier;
+    private final Supplier<Double> intakeDeployPositionSupplier;
+    private final Supplier<Double> intakeSpeedSupplier;
 
     /**
      * Creates a new PositionTracker with all required suppliers.
@@ -26,7 +27,8 @@ public class PositionTracker {
      * @param climberPositionSupplier Supplier for climber position
      * @param coralInTraySupplier Supplier for coral in tray sensor (inverted logic)
      * @param coralInArmSupplier Supplier for coral in arm sensor (inverted logic)
-     * @param algaeIntakeSpeedSupplier Supplier for algae intake speed
+     * @param intakeDeployPositionSupplier Supplier for intake deploy position
+     * @param intakeSpeedSupplier Supplier for intake speed
      */
     public PositionTracker(
             Supplier<Double> elevatorPositionSupplier,
@@ -35,14 +37,16 @@ public class PositionTracker {
             Supplier<Double> climberPositionSupplier,
             Supplier<Boolean> coralInTraySupplier,
             Supplier<Boolean> coralInArmSupplier,
-            Supplier<Double> algaeIntakeSpeedSupplier) {
+            Supplier<Double> intakeDeployPositionSupplier,
+            Supplier<Double> intakeSpeedSupplier) {
         this.elevatorPositionSupplier = Objects.requireNonNull(elevatorPositionSupplier, "elevatorPositionSupplier cannot be null");
         this.armAngleSupplier = Objects.requireNonNull(armAngleSupplier, "armAngleSupplier cannot be null");
         this.sideToSidePositionSupplier = Objects.requireNonNull(sideToSidePositionSupplier, "sideToSidePositionSupplier cannot be null");
         this.climberPositionSupplier = Objects.requireNonNull(climberPositionSupplier, "climberPositionSupplier cannot be null");
         this.coralInTraySupplier = Objects.requireNonNull(coralInTraySupplier, "coralInTraySupplier cannot be null");
         this.coralInArmSupplier = Objects.requireNonNull(coralInArmSupplier, "coralInArmSupplier cannot be null");
-        this.algaeIntakeSpeedSupplier = Objects.requireNonNull(algaeIntakeSpeedSupplier, "algaeIntakeSpeedSupplier cannot be null");
+        this.intakeDeployPositionSupplier = Objects.requireNonNull(intakeDeployPositionSupplier, "intakeDeployPositionSupplier cannot be null");
+        this.intakeSpeedSupplier = Objects.requireNonNull(intakeSpeedSupplier, "intakeSpeedSupplier cannot be null");
     }
 
     public double getElevatorPosition() {
@@ -81,7 +85,11 @@ public class PositionTracker {
         return !coralInArmSupplier.get();
     }
 
-    public double getAlgaeIntakeSpeed() {
-        return algaeIntakeSpeedSupplier.get();
+    public double getIntakeDeployPosition() {
+        return intakeDeployPositionSupplier.get();
+    }
+
+    public double getIntakeSpeed() {
+        return intakeSpeedSupplier.get();
     }
 }

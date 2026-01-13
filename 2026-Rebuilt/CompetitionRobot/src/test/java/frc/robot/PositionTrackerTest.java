@@ -24,7 +24,8 @@ class PositionTrackerTest {
     private Supplier<Double> climberSupplier;
     private Supplier<Boolean> coralTraySupplier;
     private Supplier<Boolean> coralArmSupplier;
-    private Supplier<Double> algaeIntakeSupplier;
+    private Supplier<Double> intakeDeployPositionSupplier;
+    private Supplier<Double> intakeSpeedSupplier;
 
     @BeforeEach
     void setUp() {
@@ -35,7 +36,8 @@ class PositionTrackerTest {
         climberSupplier = () -> 3.0;
         coralTraySupplier = () -> false; // Sensor reads false when coral present (inverted)
         coralArmSupplier = () -> false;  // Sensor reads false when coral present (inverted)
-        algaeIntakeSupplier = () -> 0.3;
+        intakeDeployPositionSupplier = () -> 1.0;
+        intakeSpeedSupplier = () -> 0.3;
 
         positionTracker = new PositionTracker(
                 elevatorSupplier,
@@ -44,7 +46,8 @@ class PositionTrackerTest {
                 climberSupplier,
                 coralTraySupplier,
                 coralArmSupplier,
-                algaeIntakeSupplier
+                intakeDeployPositionSupplier,
+                intakeSpeedSupplier
         );
     }
 
@@ -52,7 +55,7 @@ class PositionTrackerTest {
     void testConstructorWithNullSuppliers() {
         assertThrows(NullPointerException.class, () -> {
             new PositionTracker(null, armSupplier, sideToSideSupplier, climberSupplier,
-                    coralTraySupplier, coralArmSupplier, algaeIntakeSupplier);
+                    coralTraySupplier, coralArmSupplier, intakeDeployPositionSupplier, intakeSpeedSupplier);
         }, "Constructor should throw NullPointerException for null suppliers");
     }
 
@@ -102,7 +105,7 @@ class PositionTrackerTest {
         Supplier<Boolean> noCoralSupplier = () -> true;
         PositionTracker tracker = new PositionTracker(
                 elevatorSupplier, armSupplier, sideToSideSupplier, climberSupplier,
-                noCoralSupplier, coralArmSupplier, algaeIntakeSupplier
+                noCoralSupplier, coralArmSupplier, intakeDeployPositionSupplier, intakeSpeedSupplier
         );
         
         Boolean coralInTray = tracker.getCoralInTray();
@@ -110,9 +113,15 @@ class PositionTrackerTest {
     }
 
     @Test
-    void testGetAlgaeIntakeSpeed() {
-        double speed = positionTracker.getAlgaeIntakeSpeed();
-        assertEquals(0.3, speed, 0.001, "Algae intake speed should match supplier value");
+    void testGetIntakeDeployPosition() {
+        double position = positionTracker.getIntakeDeployPosition();
+        assertEquals(1.0, position, 0.001, "Intake deploy position should match supplier value");
+    }
+
+    @Test
+    void testGetIntakeSpeed() {
+        double speed = positionTracker.getIntakeSpeed();
+        assertEquals(0.3, speed, 0.001, "Intake speed should match supplier value");
     }
 
     @Test
@@ -123,7 +132,7 @@ class PositionTrackerTest {
         
         PositionTracker tracker = new PositionTracker(
                 dynamicSupplier, armSupplier, sideToSideSupplier, climberSupplier,
-                coralTraySupplier, coralArmSupplier, algaeIntakeSupplier
+                coralTraySupplier, coralArmSupplier, intakeDeployPositionSupplier, intakeSpeedSupplier
         );
         
         assertEquals(1.0, tracker.getElevatorPosition(), 0.001);

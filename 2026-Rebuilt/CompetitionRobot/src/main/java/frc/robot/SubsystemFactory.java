@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Commands.RobotContext;
 import frc.robot.Subsystems.Arm;
 import frc.robot.Subsystems.Climber;
+import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.SideToSide;
@@ -27,6 +28,7 @@ public class SubsystemFactory {
     private final Arm m_arm;
     private final SideToSide m_sideToSide;
     private final Climber m_climber;
+    private final DeployableIntake m_deployableIntake;
     private final Lights m_lights;
     private final PhotonVision m_reefPhotonVision;
     private final DigitalInput m_coralTraySensor;
@@ -50,6 +52,7 @@ public class SubsystemFactory {
         m_arm = new Arm(m_elevator::getCarriageComponentPose);
         m_sideToSide = new SideToSide();
         m_climber = new Climber();
+        m_deployableIntake = new DeployableIntake();
         m_lights = new Lights();
 
         // Create sensors
@@ -68,7 +71,8 @@ public class SubsystemFactory {
                 m_climber::getPosition,
                 m_coralTraySensor::get,
                 m_coralArmSensor::get,
-                () -> 0.0  // algaeIntake not used
+                m_deployableIntake::getDeployPosition,
+                m_deployableIntake::getIntakeSpeed
         );
 
         // Set PositionTracker on all subsystems
@@ -78,6 +82,7 @@ public class SubsystemFactory {
         m_arm.setPositionTracker(m_positionTracker);
         m_sideToSide.setPositionTracker(m_positionTracker);
         m_climber.setPositionTracker(m_positionTracker);
+        m_deployableIntake.setPositionTracker(m_positionTracker);
 
         // Create state machine (loads states automatically in constructor)
         m_stateMachine = new StateMachine();
@@ -90,6 +95,7 @@ public class SubsystemFactory {
                 m_elevator,
                 m_arm,
                 m_sideToSide,
+                m_deployableIntake,
                 m_lights,
                 m_reefPhotonVision);
     }
@@ -108,6 +114,10 @@ public class SubsystemFactory {
 
     public Climber getClimber() {
         return m_climber;
+    }
+
+    public DeployableIntake getDeployableIntake() {
+        return m_deployableIntake;
     }
 
     public Lights getLights() {
@@ -138,6 +148,7 @@ public class SubsystemFactory {
         m_arm.resetPosition();
         m_elevator.resetPosition();
         m_climber.resetPosition();
+        m_deployableIntake.resetDeployPosition();
     }
 
     /**
@@ -158,6 +169,9 @@ public class SubsystemFactory {
         }
         if (m_climber != null) {
             m_climber.cleanup();
+        }
+        if (m_deployableIntake != null) {
+            m_deployableIntake.cleanup();
         }
         if (m_lights != null) {
             m_lights.cleanup();

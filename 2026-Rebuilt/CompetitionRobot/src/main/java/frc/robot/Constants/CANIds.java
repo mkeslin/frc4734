@@ -17,7 +17,10 @@ public final class CANIds {
     public static final int SIDE_TO_SIDE = 22;
     public static final int ARM = 23;
     public static final int CLIMBER = 24;
-    public static final int ALGAE_INTAKE = 25;
+    
+    // Intake
+    public static final int INTAKE_DEPLOY = 25;
+    public static final int INTAKE_MOTOR = 26;
 
     // Lights
     public static final int LIGHTS = 40;
