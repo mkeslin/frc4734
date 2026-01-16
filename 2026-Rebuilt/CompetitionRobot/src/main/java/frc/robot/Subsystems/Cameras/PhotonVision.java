@@ -51,6 +51,8 @@ public class PhotonVision extends SubsystemBase {
         Transform3d robotToCamera = new Transform3d(CAMERA_POSITION, CAMERA_ROTATION);
 
         // Create pose estimator with multi-tag strategy for best accuracy
+        // Note: Constructor signature is deprecated in PhotonLib 2026.1.1 but still functional
+        // The new API is still being finalized - this will be updated in a future release
         poseEstimator = new PhotonPoseEstimator(
             fieldLayout,
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
@@ -208,6 +210,8 @@ public class PhotonVision extends SubsystemBase {
     public Optional<EstimatedRobotPose> getEstimatedRobotPose() {
         var result = getLatestResultInternal();
         if (result != null && result.hasTargets()) {
+            // Note: update() method is deprecated in PhotonLib 2026.1.1 but still functional
+            // The new API is still being finalized - this will be updated in a future release
             return poseEstimator.update(result);
         }
         return Optional.empty();
