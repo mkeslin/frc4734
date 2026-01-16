@@ -171,11 +171,18 @@ public class AutoManager {
         }
 
         try {
-            // the line after this makes the autoroutine command a composition, and
-            // commands that are in a composition cannot be recomposed, which is what this
-            // would do if auto is run multiple times. this fixes it by removing the
-            // composition from the scheduler.
-            CommandScheduler.getInstance().removeComposedCommand(baseCommand);
+            // Cancel any currently running command first
+            if (currentCommand != null) {
+                currentCommand.cancel();
+                CommandScheduler.getInstance().removeComposedCommand(currentCommand);
+            }
+            
+            // Remove composition from baseCommand if it exists (for re-running the same routine)
+            // Commands that are in a composition cannot be recomposed, which would happen
+            // if auto is run multiple times. This fixes it by removing the composition.
+            if (baseCommand != null) {
+                CommandScheduler.getInstance().removeComposedCommand(baseCommand);
+            }
 
             baseCommand = selectedRoutine.getCommand();
             if (baseCommand == null) {
