@@ -13,6 +13,7 @@ import frc.robot.Monitoring.PerformanceMonitor;
 
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
 
 public class Robot extends LoggedRobot {
 
@@ -22,11 +23,26 @@ public class Robot extends LoggedRobot {
     private PerformanceMonitor m_performanceMonitor;
 
     public Robot() {
+        // Don't initialize anything here - wait for robotInit()
+        // LoggedRobot base class handles basic setup
+    }
+
+    @Override
+    public void robotInit() {
         // Initialize AdvantageKit logger
         Logger.recordMetadata("ProjectName", "FRC4734-2026-Rebuilt");
         Logger.recordMetadata("RobotType", "CompetitionRobot");
         
-        // Start logging (AdvantageKit will automatically set up receivers)
+        // Set up data receivers before starting logger
+        // NetworkTables publisher works without USB drive
+        Logger.addDataReceiver(new NT4Publisher());
+        
+        // Optional: USB drive logging (requires USB drive mounted at /media/sda1/)
+        // To enable USB logging, uncomment the following lines:
+        // import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+        // Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
+        
+        // Start logging (must be called after adding data receivers)
         Logger.start();
 
         // Initialize performance monitor
