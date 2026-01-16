@@ -38,11 +38,12 @@ public class RobotContainer {
 
     // FACTORY AND CONFIGURATORS
     private final SubsystemFactory m_subsystemFactory;
-    private final BindingConfigurator m_bindingConfigurator;
-    private final AutoConfigurator m_autoConfigurator;
+    // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
+    private final BindingConfigurator m_bindingConfigurator; // May be null during drivetrain-only testing
+    private final AutoConfigurator m_autoConfigurator; // May be null during drivetrain-only testing
 
     // COMMANDS
-    public final CenterToReefCommand m_centerToReefCommand;
+    public final CenterToReefCommand m_centerToReefCommand; // May be null during drivetrain-only testing
 
     public RobotContainer() {
         // Create AutoManager instance
@@ -52,38 +53,44 @@ public class RobotContainer {
         // Set AutoManager on drivetrain for odometry reset
         m_drivetrain.setAutoManager(m_autoManager);
 
+        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Create subsystem factory (creates all subsystems, PositionTracker, StateMachine, RobotContext)
         m_subsystemFactory = new SubsystemFactory(m_drivetrain);
 
         // Create center to reef command
-        m_centerToReefCommand = new CenterToReefCommand(
-                m_subsystemFactory.getReefPhotonVision(),
-                m_drivetrain,
-                m_driveController,
-                3);
+        // m_centerToReefCommand = new CenterToReefCommand(
+        //         m_subsystemFactory.getReefPhotonVision(),
+        //         m_drivetrain,
+        //         m_driveController,
+        //         3);
+        m_centerToReefCommand = null; // Temporary for drivetrain-only testing
 
         // Register named commands
-        NamedCommands.registerCommand("centerToReefCommand", m_centerToReefCommand);
+        // NamedCommands.registerCommand("centerToReefCommand", m_centerToReefCommand);
 
         // Configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
 
+        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Create binding configurator and configure all controller bindings
-        m_bindingConfigurator = new BindingConfigurator(
-                m_driveController,
-                m_mechanismController,
-                m_arcadeController,
-                m_subsystemFactory.getRobotContext(),
-                m_subsystemFactory.getClimber(),
-                m_centerToReefCommand);
-        m_bindingConfigurator.configureAllBindings();
+        // m_bindingConfigurator = new BindingConfigurator(
+        //         m_driveController,
+        //         m_mechanismController,
+        //         m_arcadeController,
+        //         m_subsystemFactory.getRobotContext(),
+        //         m_subsystemFactory.getClimber(),
+        //         m_centerToReefCommand);
+        // m_bindingConfigurator.configureAllBindings();
+        m_bindingConfigurator = null; // Temporary for drivetrain-only testing
 
+        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Create auto configurator and configure autonomous routines
-        m_autoConfigurator = new AutoConfigurator(
-                m_autoManager,
-                m_subsystemFactory.getRobotContext(),
-                m_centerToReefCommand);
-        m_autoConfigurator.configureAuto();
+        // m_autoConfigurator = new AutoConfigurator(
+        //         m_autoManager,
+        //         m_subsystemFactory.getRobotContext(),
+        //         m_centerToReefCommand);
+        // m_autoConfigurator.configureAuto();
+        m_autoConfigurator = null; // Temporary for drivetrain-only testing
 
         // Seed field-centric pose
         m_drivetrain.seedFieldCentric();
@@ -100,56 +107,58 @@ public class RobotContainer {
      * Updates the drivetrain's pose estimator with vision measurements.
      */
     public void localizeRobotPose() {
+        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Measure vision processing time
-        double visionStart = Timer.getFPGATimestamp();
+        // double visionStart = Timer.getFPGATimestamp();
         
-        var photonVision = m_subsystemFactory.getReefPhotonVision();
+        // var photonVision = m_subsystemFactory.getReefPhotonVision();
         
         // Get estimated robot pose from PhotonVision
-        var estimatedPose = photonVision.getEstimatedRobotPose();
+        // var estimatedPose = photonVision.getEstimatedRobotPose();
         
-        if (estimatedPose.isPresent()) {
-            var pose = estimatedPose.get();
+        // if (estimatedPose.isPresent()) {
+        //     var pose = estimatedPose.get();
             
-            // Get the pose in the correct alliance coordinate system
-            // PhotonVision returns poses in the field's native coordinate system.
-            // For rotationally symmetrical fields, PhotonVision should handle the
-            // coordinate transformation automatically, but we verify the pose is correct.
-            Pose2d visionPose = pose.estimatedPose.toPose2d();
+        //     // Get the pose in the correct alliance coordinate system
+        //     // PhotonVision returns poses in the field's native coordinate system.
+        //     // For rotationally symmetrical fields, PhotonVision should handle the
+        //     // coordinate transformation automatically, but we verify the pose is correct.
+        //     Pose2d visionPose = pose.estimatedPose.toPose2d();
             
-            // Add vision measurement to drivetrain pose estimator
-            // Timestamp is already in seconds from PhotonVision
-            m_drivetrain.addVisionMeasurement(
-                visionPose,
-                pose.timestampSeconds
-            );
+        //     // Add vision measurement to drivetrain pose estimator
+        //     // Timestamp is already in seconds from PhotonVision
+        //     m_drivetrain.addVisionMeasurement(
+        //         visionPose,
+        //         pose.timestampSeconds
+        //     );
             
-            // Log vision pose for debugging
-            RobotLogger.recordPose2d("Vision/Pose", visionPose);
-        }
+        //     // Log vision pose for debugging
+        //     RobotLogger.recordPose2d("Vision/Pose", visionPose);
+        // }
         
         // Log robot pose (from drivetrain odometry)
         RobotLogger.recordPose2d("Drivetrain/Pose", m_drivetrain.getPose());
         
+        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Log mechanism positions
-        var context = m_subsystemFactory.getRobotContext();
+        // var context = m_subsystemFactory.getRobotContext();
         // Removed for 2026:
         // RobotLogger.recordDouble("Mechanisms/ElevatorPosition", m_subsystemFactory.getElevator().getPosition());
         // RobotLogger.recordDouble("Mechanisms/ArmAngle", m_subsystemFactory.getArm().getPosition());
         // RobotLogger.recordDouble("Mechanisms/SideToSidePosition", m_subsystemFactory.getSideToSide().getPosition());
-        RobotLogger.recordDouble("Mechanisms/ClimberPosition", m_subsystemFactory.getClimber().getPosition());
+        // RobotLogger.recordDouble("Mechanisms/ClimberPosition", m_subsystemFactory.getClimber().getPosition());
         
         // Log sensor states
-        var positionTracker = m_subsystemFactory.getPositionTracker();
-        RobotLogger.recordBoolean("Sensors/CoralInTray", positionTracker.getCoralInTray());
-        RobotLogger.recordBoolean("Sensors/CoralInArm", positionTracker.getCoralInArm());
+        // var positionTracker = m_subsystemFactory.getPositionTracker();
+        // RobotLogger.recordBoolean("Sensors/CoralInTray", positionTracker.getCoralInTray());
+        // RobotLogger.recordBoolean("Sensors/CoralInArm", positionTracker.getCoralInArm());
         
         // Log current state
-        RobotLogger.recordString("State/CurrentState", context.stateMachine.getCurrentState().Name.toString());
+        // RobotLogger.recordString("State/CurrentState", context.stateMachine.getCurrentState().Name.toString());
         
         // Record vision processing time
-        double visionTime = Timer.getFPGATimestamp() - visionStart;
-        PerformanceMonitor.getInstance().recordVisionTime(visionTime);
+        // double visionTime = Timer.getFPGATimestamp() - visionStart;
+        // PerformanceMonitor.getInstance().recordVisionTime(visionTime);
     }
 
     // Getters for subsystems (for backwards compatibility and external access)
@@ -166,21 +175,22 @@ public class RobotContainer {
     //     return m_subsystemFactory.getSideToSide();
     // }
 
-    public Climber getClimber() {
-        return m_subsystemFactory.getClimber();
-    }
+    // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
+    // public Climber getClimber() {
+    //     return m_subsystemFactory.getClimber();
+    // }
 
-    public Lights getLights() {
-        return m_subsystemFactory.getLights();
-    }
+    // public Lights getLights() {
+    //     return m_subsystemFactory.getLights();
+    // }
 
-    public PositionTracker getPositionTracker() {
-        return m_subsystemFactory.getPositionTracker();
-    }
+    // public PositionTracker getPositionTracker() {
+    //     return m_subsystemFactory.getPositionTracker();
+    // }
 
-    public RobotContext getRobotContext() {
-        return m_subsystemFactory.getRobotContext();
-    }
+    // public RobotContext getRobotContext() {
+    //     return m_subsystemFactory.getRobotContext();
+    // }
 
     public AutoManager getAutoManager() {
         return m_autoManager;

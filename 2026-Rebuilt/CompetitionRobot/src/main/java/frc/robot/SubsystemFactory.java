@@ -24,18 +24,19 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * Centralizes subsystem creation logic and ensures proper initialization order.
  */
 public class SubsystemFactory {
-    private final Climber m_climber;
-    private final DeployableIntake m_deployableIntake;
-    private final Floor m_floor;
-    private final Feeder m_feeder;
-    private final Shooter m_shooter;
-    private final Lights m_lights;
-    private final PhotonVision m_reefPhotonVision;
-    private final DigitalInput m_coralTraySensor;
-    private final DigitalInput m_coralArmSensor;
-    private final PositionTracker m_positionTracker;
-    private final StateMachine m_stateMachine;
-    private final RobotContext m_robotContext;
+    // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
+    // private final Climber m_climber;
+    // private final DeployableIntake m_deployableIntake;
+    // private final Floor m_floor;
+    // private final Feeder m_feeder;
+    // private final Shooter m_shooter;
+    // private final Lights m_lights;
+    // private final PhotonVision m_reefPhotonVision;
+    // private final DigitalInput m_coralTraySensor;
+    // private final DigitalInput m_coralArmSensor;
+    // private final PositionTracker m_positionTracker;
+    // private final StateMachine m_stateMachine;
+    // private final RobotContext m_robotContext;
     private final CommandSwerveDrivetrain m_drivetrain;
 
     /**
@@ -47,105 +48,108 @@ public class SubsystemFactory {
     public SubsystemFactory(CommandSwerveDrivetrain drivetrain) {
         m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
 
+        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Create subsystems (PositionTracker will be set after creation)
-        m_climber = new Climber();
-        m_deployableIntake = new DeployableIntake();
-        m_floor = new Floor();
-        m_feeder = new Feeder();
-        m_shooter = new Shooter();
-        m_lights = new Lights();
+        // m_climber = new Climber();
+        // m_deployableIntake = new DeployableIntake();
+        // m_floor = new Floor();
+        // m_feeder = new Feeder();
+        // m_shooter = new Shooter();
+        // m_lights = new Lights();
 
         // Create sensors
-        m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
-        m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
+        // m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
+        // m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
 
         // Create PhotonVision camera
-        m_reefPhotonVision = new PhotonVision(CAMERA_NAME, APRILTAG_PIPELINE);
+        // m_reefPhotonVision = new PhotonVision(CAMERA_NAME, APRILTAG_PIPELINE);
 
         // Create PositionTracker with all actual suppliers
         // Method references will work correctly since subsystems are now created
-        m_positionTracker = new PositionTracker(
-                m_climber::getPosition,
-                m_coralTraySensor::get,
-                m_coralArmSensor::get,
-                m_deployableIntake::getDeployPosition,
-                m_deployableIntake::getIntakeSpeed,
-                m_floor::getSpeed,
-                m_feeder::getSpeed,
-                m_shooter::getSpeed
-        );
+        // m_positionTracker = new PositionTracker(
+        //         m_climber::getPosition,
+        //         m_coralTraySensor::get,
+        //         m_coralArmSensor::get,
+        //         m_deployableIntake::getDeployPosition,
+        //         m_deployableIntake::getIntakeSpeed,
+        //         m_floor::getSpeed,
+        //         m_feeder::getSpeed,
+        //         m_shooter::getSpeed
+        // );
 
         // Set PositionTracker on all subsystems
         // This ensures all subsystems share the same PositionTracker instance with real suppliers,
         // allowing them to query each other's state correctly
-        m_climber.setPositionTracker(m_positionTracker);
-        m_deployableIntake.setPositionTracker(m_positionTracker);
-        m_floor.setPositionTracker(m_positionTracker);
-        m_feeder.setPositionTracker(m_positionTracker);
-        m_shooter.setPositionTracker(m_positionTracker);
+        // m_climber.setPositionTracker(m_positionTracker);
+        // m_deployableIntake.setPositionTracker(m_positionTracker);
+        // m_floor.setPositionTracker(m_positionTracker);
+        // m_feeder.setPositionTracker(m_positionTracker);
+        // m_shooter.setPositionTracker(m_positionTracker);
 
         // Create state machine (loads states automatically in constructor)
-        m_stateMachine = new StateMachine();
+        // m_stateMachine = new StateMachine();
 
         // Create robot context with all dependencies
-        m_robotContext = new RobotContext(
-                m_stateMachine,
-                m_positionTracker,
-                m_drivetrain,
-                m_deployableIntake,
-                m_floor,
-                m_feeder,
-                m_shooter,
-                m_lights,
-                m_reefPhotonVision);
+        // m_robotContext = new RobotContext(
+        //         m_stateMachine,
+        //         m_positionTracker,
+        //         m_drivetrain,
+        //         m_deployableIntake,
+        //         m_floor,
+        //         m_feeder,
+        //         m_shooter,
+        //         m_lights,
+        //         m_reefPhotonVision);
     }
 
-    public Climber getClimber() {
-        return m_climber;
-    }
+    // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
+    // public Climber getClimber() {
+    //     return m_climber;
+    // }
 
-    public DeployableIntake getDeployableIntake() {
-        return m_deployableIntake;
-    }
+    // public DeployableIntake getDeployableIntake() {
+    //     return m_deployableIntake;
+    // }
 
-    public Floor getFloor() {
-        return m_floor;
-    }
+    // public Floor getFloor() {
+    //     return m_floor;
+    // }
 
-    public Feeder getFeeder() {
-        return m_feeder;
-    }
+    // public Feeder getFeeder() {
+    //     return m_feeder;
+    // }
 
-    public Shooter getShooter() {
-        return m_shooter;
-    }
+    // public Shooter getShooter() {
+    //     return m_shooter;
+    // }
 
-    public Lights getLights() {
-        return m_lights;
-    }
+    // public Lights getLights() {
+    //     return m_lights;
+    // }
 
-    public PhotonVision getReefPhotonVision() {
-        return m_reefPhotonVision;
-    }
+    // public PhotonVision getReefPhotonVision() {
+    //     return m_reefPhotonVision;
+    // }
 
-    public PositionTracker getPositionTracker() {
-        return m_positionTracker;
-    }
+    // public PositionTracker getPositionTracker() {
+    //     return m_positionTracker;
+    // }
 
-    public StateMachine getStateMachine() {
-        return m_stateMachine;
-    }
+    // public StateMachine getStateMachine() {
+    //     return m_stateMachine;
+    // }
 
-    public RobotContext getRobotContext() {
-        return m_robotContext;
-    }
+    // public RobotContext getRobotContext() {
+    //     return m_robotContext;
+    // }
 
     /**
      * Resets all subsystem positions to their zero positions.
      */
     public void resetZeros() {
-        m_climber.resetPosition();
-        m_deployableIntake.resetDeployPosition();
+        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
+        // m_climber.resetPosition();
+        // m_deployableIntake.resetDeployPosition();
     }
 
     /**
@@ -154,35 +158,36 @@ public class SubsystemFactory {
      * and cleans up other subsystem resources.
      */
     public void cleanup() {
+        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Cleanup subsystems
-        if (m_climber != null) {
-            m_climber.cleanup();
-        }
-        if (m_deployableIntake != null) {
-            m_deployableIntake.cleanup();
-        }
-        if (m_floor != null) {
-            m_floor.cleanup();
-        }
-        if (m_feeder != null) {
-            m_feeder.cleanup();
-        }
-        if (m_shooter != null) {
-            m_shooter.cleanup();
-        }
-        if (m_lights != null) {
-            m_lights.cleanup();
-        }
-        if (m_reefPhotonVision != null) {
-            m_reefPhotonVision.cleanup();
-        }
+        // if (m_climber != null) {
+        //     m_climber.cleanup();
+        // }
+        // if (m_deployableIntake != null) {
+        //     m_deployableIntake.cleanup();
+        // }
+        // if (m_floor != null) {
+        //     m_floor.cleanup();
+        // }
+        // if (m_feeder != null) {
+        //     m_feeder.cleanup();
+        // }
+        // if (m_shooter != null) {
+        //     m_shooter.cleanup();
+        // }
+        // if (m_lights != null) {
+        //     m_lights.cleanup();
+        // }
+        // if (m_reefPhotonVision != null) {
+        //     m_reefPhotonVision.cleanup();
+        // }
 
         // Close sensors
-        if (m_coralTraySensor != null) {
-            m_coralTraySensor.close();
-        }
-        if (m_coralArmSensor != null) {
-            m_coralArmSensor.close();
-        }
+        // if (m_coralTraySensor != null) {
+        //     m_coralTraySensor.close();
+        // }
+        // if (m_coralArmSensor != null) {
+        //     m_coralArmSensor.close();
+        // }
     }
 }
