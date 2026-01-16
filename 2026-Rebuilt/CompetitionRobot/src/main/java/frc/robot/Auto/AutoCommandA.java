@@ -287,16 +287,13 @@ public class AutoCommandA {
                         // BACK UP A BIT
                         Commands.run(() -> context.drivetrain.setRelativeSpeed(-0.6, 0, 0))
                                 .withTimeout(0.12)
-                                .andThen(Commands.runOnce(() -> context.drivetrain.setRelativeSpeed(0, 0, 0)))
-                                .asProxy(),
+                                .andThen(Commands.runOnce(() -> context.drivetrain.setRelativeSpeed(0, 0, 0))),
                         // SCORE - REMOVED FOR 2026
                         // RobotCommands.scoreCoralCommand(context),
                         // MOVE FORWARD - set coral if not completely placed
-                        Commands.run(() -> context.drivetrain.setRelativeSpeed(0.75, 0, 0)).withTimeout(0.12)
-                                .asProxy(),
+                        Commands.run(() -> context.drivetrain.setRelativeSpeed(0.75, 0, 0)).withTimeout(0.12),
                         // MOVE REVERSE
                         Commands.run(() -> context.drivetrain.setRelativeSpeed(-1, 0, 0)).withTimeout(0.35)
-                                .asProxy()
                 ),
                 // PRE-INTAKE & DRIVE TO CORAL STATION
                 // PRE-INTAKE - REMOVED FOR 2026

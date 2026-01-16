@@ -184,8 +184,7 @@ public class BindingConfigurator {
     private Command createApproachMovementCommand(double timeout) {
         return Commands.run(() -> m_drivetrain.setRelativeSpeed(APPROACH_SCORE_SPEED, STOP_SPEED, STOP_SPEED))
                 .withTimeout(timeout)
-                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(STOP_SPEED, STOP_SPEED, STOP_SPEED)))
-                .asProxy();
+                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(STOP_SPEED, STOP_SPEED, STOP_SPEED)));
     }
 
     /**
@@ -222,8 +221,7 @@ public class BindingConfigurator {
     private Command createPlaceCoralForwardCommand() {
         return Commands.run(() -> m_drivetrain.setRelativeSpeed(PLACE_CORAL_FORWARD_SPEED, STOP_SPEED, STOP_SPEED))
                 .withTimeout(SHORT_DRIVE_TIMEOUT)
-                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(STOP_SPEED, STOP_SPEED, STOP_SPEED)))
-                .asProxy();
+                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(STOP_SPEED, STOP_SPEED, STOP_SPEED)));
     }
 
     /**
@@ -234,8 +232,7 @@ public class BindingConfigurator {
     private Command createBackAwayCommand() {
         return Commands.run(() -> m_drivetrain.setRelativeSpeed(POST_SCORE_BACKWARD_SPEED, STOP_SPEED, STOP_SPEED))
                 .withTimeout(POST_SCORE_BACKWARD_TIMEOUT)
-                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(STOP_SPEED, STOP_SPEED, STOP_SPEED)))
-                .asProxy();
+                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(STOP_SPEED, STOP_SPEED, STOP_SPEED)));
     }
 
     /**
