@@ -31,28 +31,20 @@ public class SwerveDrivetrainBindings {
     private static final double MaxSpeed = DrivetrainConstants.MaxSpeed;
     private static final double MaxAngularRate = DrivetrainConstants.MaxAngularRate;
 
-    private static final double TurtleSpeed = 0.15; // Reduction in speed from Max Speed, 0.1 = 10%
-    private static final double TurtleAngularRate = Math.PI * 0.5; // .75 rotation per second max angular velocity.
-                                                                   // Adjust for max turning rate speed.
-
     private static double CurrentSpeed = MaxSpeed;
     private static double CurrentAngularRate = MaxAngularRate; // This will be updated when turtle and reset to
                                                                // MaxAngularRate
 
-    // Rate limiters to smooth out sudden joystick movements
-    // Values are in units per second (m/s for linear, rad/s for angular)
-    // These values allow reaching max speed/rate in ~0.5-0.7 seconds for smooth control
-    private static final double LINEAR_RATE_LIMIT = 1.5; // m/s per second (meters per second squared)
-    private static final double ANGULAR_RATE_LIMIT = 2.5; // rad/s per second (radians per second squared)
-    
-    private static final SlewRateLimiter RateLimiterX = new SlewRateLimiter(LINEAR_RATE_LIMIT);
-    private static final SlewRateLimiter RateLimiterY = new SlewRateLimiter(LINEAR_RATE_LIMIT);
-    private static final SlewRateLimiter RotationLimiter = new SlewRateLimiter(ANGULAR_RATE_LIMIT);
+    // Rate limiters applied to normalized joystick inputs (-1..1) before scaling to physical units
+    // These values are in 1/s (per second) and are applied to the joystick command inputs
+    private static final SlewRateLimiter RateLimiterX = new SlewRateLimiter(DrivetrainConstants.kTranslationSlewRate);
+    private static final SlewRateLimiter RateLimiterY = new SlewRateLimiter(DrivetrainConstants.kTranslationSlewRate);
+    private static final SlewRateLimiter RotationLimiter = new SlewRateLimiter(DrivetrainConstants.kRotationSlewRate);
 
     // field-centric
     private static final SwerveRequest.FieldCentric m_drive = new SwerveRequest.FieldCentric()
-            .withDeadband(CurrentSpeed * 0.1)
-            .withRotationalDeadband(CurrentAngularRate * 0.1) // Add a 10% deadband
+            .withDeadband(0.0) // Deadband is now applied to joystick inputs, not physical units
+            .withRotationalDeadband(0.0) // Deadband is now applied to joystick inputs, not physical units
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // field-centric driving in open loop
     // private static final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
     // private static final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
@@ -71,6 +63,20 @@ public class SwerveDrivetrainBindings {
     // }
 
     /**
+     * Applies deadband to a joystick input value.
+     * 
+     * @param value The joystick input value (-1..1)
+     * @param deadband The deadband threshold
+     * @return The deadbanded value, or 0.0 if within deadband
+     */
+    private static double applyJoystickDeadband(double value, double deadband) {
+        if (Math.abs(value) < deadband) {
+            return 0.0;
+        }
+        return value;
+    }
+
+    /**
      * Configures normal driving bindings.
      * This is the default profile for teleop operation.
      */
@@ -87,21 +93,32 @@ public class SwerveDrivetrainBindings {
                         return new SwerveRequest.SwerveDriveBrake();
                     }
                     
-                    // Calculate desired velocities from controller input
-                    var desiredVelocityX = coordinateOrientation * driveController.getLeftY() * CurrentSpeed;
-                    var desiredVelocityY = coordinateOrientation * driveController.getLeftX() * CurrentSpeed;
-                    var desiredRotationalRate = -driveController.getRightX() * CurrentAngularRate;
+                    // Read raw joystick inputs
+                    var rawX = driveController.getLeftY();
+                    var rawY = driveController.getLeftX();
+                    var rawRotation = -driveController.getRightX();
                     
-                    // Apply rate limiting to smooth out sudden joystick movements
-                    var velocityXLimited = RateLimiterX.calculate(desiredVelocityX);
-                    var velocityYLimited = RateLimiterY.calculate(desiredVelocityY);
-                    var rotationalRateLimited = RotationLimiter.calculate(desiredRotationalRate);
+                    // Apply deadband to joystick inputs (preferred order: deadband first)
+                    var xWithDeadband = applyJoystickDeadband(rawX, DrivetrainConstants.kJoystickDeadband);
+                    var yWithDeadband = applyJoystickDeadband(rawY, DrivetrainConstants.kJoystickDeadband);
+                    var rotationWithDeadband = applyJoystickDeadband(rawRotation, DrivetrainConstants.kJoystickDeadband);
+                    
+                    // Apply rate limiting to normalized joystick inputs (-1..1)
+                    // This smooths out sudden joystick movements before scaling to physical units
+                    var xLimited = RateLimiterX.calculate(xWithDeadband);
+                    var yLimited = RateLimiterY.calculate(yWithDeadband);
+                    var rotationLimited = RotationLimiter.calculate(rotationWithDeadband);
+                    
+                    // Scale rate-limited joystick inputs to physical units (m/s and rad/s)
+                    var velocityX = coordinateOrientation * xLimited * CurrentSpeed;
+                    var velocityY = coordinateOrientation * yLimited * CurrentSpeed;
+                    var rotationalRate = rotationLimited * CurrentAngularRate;
                     
                     // Apply rate-limited velocities to drive command
                     return m_drive
-                            .withVelocityX(velocityXLimited) // Drive forward with negative Y (forward)
-                            .withVelocityY(velocityYLimited) // Drive left with negative X (left)
-                            .withRotationalRate(rotationalRateLimited); // Drive counterclockwise with negative X (left)
+                            .withVelocityX(velocityX) // Drive forward with negative Y (forward)
+                            .withVelocityY(velocityY) // Drive left with negative X (left)
+                            .withRotationalRate(rotationalRate); // Drive counterclockwise with negative X (left)
                 }).ignoringDisable(false));
 
         // A Button: Brake
@@ -123,8 +140,8 @@ public class SwerveDrivetrainBindings {
                 .onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         // Turtle Mode while held
-        driveController.leftBumper().onTrue(Commands.runOnce(() -> CurrentSpeed = MaxSpeed * TurtleSpeed)
-                .andThen(() -> CurrentAngularRate = TurtleAngularRate));
+        driveController.leftBumper().onTrue(Commands.runOnce(() -> CurrentSpeed = MaxSpeed * DrivetrainConstants.kTurtleSpeedMultiplier)
+                .andThen(() -> CurrentAngularRate = DrivetrainConstants.kTurtleAngularRate));
         driveController.leftBumper().onFalse(
                 Commands.runOnce(() -> CurrentSpeed = MaxSpeed).andThen(() -> CurrentAngularRate = MaxAngularRate));
 

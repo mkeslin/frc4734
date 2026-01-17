@@ -14,4 +14,17 @@ public class DrivetrainConstants {
     public static final double MaxAngularRate = RotationsPerSecond.of(1).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     public static final double MaxAcceleration = .4; //2;
+
+    // Rate limiting constants for joystick inputs (-1..1 range)
+    // These are baseline defaults and can be tuned for your robot
+    // Units are in 1/s (per second), applied to normalized joystick inputs before scaling to physical units
+    public static final double kTranslationSlewRate = 2.5; // 1/s for X and Y translation inputs
+    public static final double kRotationSlewRate = 4.0; // 1/s for rotation (omega) input
+
+    // Joystick input processing constants
+    public static final double kJoystickDeadband = 0.1; // Deadband threshold for joystick inputs (-1..1 range)
+
+    // Turtle mode constants
+    public static final double kTurtleSpeedMultiplier = 0.15; // Speed multiplier for turtle mode (15% of max speed)
+    public static final double kTurtleAngularRate = Math.PI * 0.5; // Max angular velocity for turtle mode (rad/s)
 }
