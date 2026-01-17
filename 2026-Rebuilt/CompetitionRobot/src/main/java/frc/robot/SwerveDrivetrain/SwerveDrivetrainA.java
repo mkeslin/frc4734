@@ -213,11 +213,16 @@ public class SwerveDrivetrainA {
 
     /**
      * Creates a CommandSwerveDrivetrain instance.
-     * This should only be called once in your robot program,.
+     * This should only be called once in your robot program.
+     * Configures pose estimator with standard deviations for odometry and vision.
      */
     public static CommandSwerveDrivetrain createDrivetrain() {
         return new CommandSwerveDrivetrain(
-            DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight
+            DrivetrainConstants, // SwerveDrivetrainConstants from this class
+            0, // Use default odometry update frequency (250 Hz on CAN FD, 100 Hz on CAN 2.0)
+            frc.robot.SwerveDrivetrain.DrivetrainConstants.kOdometryStandardDeviation,
+            frc.robot.SwerveDrivetrain.DrivetrainConstants.kVisionStandardDeviation,
+            FrontLeft, FrontRight, BackLeft, BackRight
         );
     }
 

@@ -3,6 +3,7 @@ package frc.robot.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -51,7 +52,30 @@ public class SwerveDrivetrainBindings {
 
     // private static final SwerveDrivetrainTelemetry m_logger = new SwerveDrivetrainTelemetry(MaxSpeed);
 
-    // flip the orientation for blue/red
+    /**
+     * Coordinate System Documentation:
+     * 
+     * Field-Centric Coordinate System:
+     * - X+ axis: Away from driver station (toward opponent alliance wall)
+     * - Y+ axis: Left (when facing away from driver station)
+     * - Theta (rotation): Counter-clockwise is positive (0° = facing +X, 90° = facing +Y)
+     * 
+     * Coordinate Orientation:
+     * - coordinateOrientation: Multiplier for field-centric coordinates
+     *   - -1: Blue alliance (default) - standard field coordinates
+     *   - 1: Red alliance - would flip coordinates if needed
+     * - Currently static at -1 (blue alliance default)
+     * - If alliance-based flipping is needed in the future, uncomment setAllianceOrientation()
+     * 
+     * Joystick Mapping:
+     * - Left Stick Y+ (forward): Positive translation in field X direction
+     * - Left Stick X+ (left): Positive translation in field Y direction
+     * - Right Stick X+ (right): Positive rotation (counter-clockwise)
+     * 
+     * Note: The coordinateOrientation is kept static for simplicity. If your field is
+     * rotationally symmetrical or you handle alliance flipping elsewhere (e.g., in PathPlanner),
+     * keeping it static is appropriate.
+     */
     private static int coordinateOrientation = -1;
 
     // public static void setAllianceOrientation(boolean isRed) {
@@ -59,17 +83,20 @@ public class SwerveDrivetrainBindings {
     // }
 
     /**
-     * Applies deadband to a joystick input value.
+     * Applies scaled deadband to a joystick input value.
+     * Scaled deadband provides smoother control near joystick center by scaling
+     * the remaining range after deadband removal to [0, 1].
      * 
      * @param value The joystick input value (-1..1)
      * @param deadband The deadband threshold
-     * @return The deadbanded value, or 0.0 if within deadband
+     * @return The deadbanded and scaled value, or 0.0 if within deadband
      */
     private static double applyJoystickDeadband(double value, double deadband) {
         if (Math.abs(value) < deadband) {
             return 0.0;
         }
-        return value;
+        // Scale the remaining range to [0, 1] for smoother control
+        return Math.signum(value) * ((Math.abs(value) - deadband) / (1.0 - deadband));
     }
 
     /**
@@ -109,6 +136,12 @@ public class SwerveDrivetrainBindings {
                     var velocityX = coordinateOrientation * xLimited * CurrentSpeed;
                     var velocityY = coordinateOrientation * yLimited * CurrentSpeed;
                     var rotationalRate = rotationLimited * CurrentAngularRate;
+                    
+                    // Safety clamping to ensure velocities don't exceed maximums
+                    // This provides a safety layer in case of calculation errors
+                    velocityX = MathUtil.clamp(velocityX, -DrivetrainConstants.MaxSpeed, DrivetrainConstants.MaxSpeed);
+                    velocityY = MathUtil.clamp(velocityY, -DrivetrainConstants.MaxSpeed, DrivetrainConstants.MaxSpeed);
+                    rotationalRate = MathUtil.clamp(rotationalRate, -DrivetrainConstants.MaxAngularRate, DrivetrainConstants.MaxAngularRate);
                     
                     // Apply rate-limited velocities to drive command
                     return m_drive
@@ -265,5 +298,16 @@ public class SwerveDrivetrainBindings {
      */
     public static void setProfile(InputProfile profile) {
         currentProfile = profile;
+    }
+
+    /**
+     * Resets all rate limiters to their initial state.
+     * Should be called when the robot is disabled to prevent stale state
+     * from carrying over to the next enable cycle.
+     */
+    public static void resetRateLimiters() {
+        RateLimiterX.reset(0.0);
+        RateLimiterY.reset(0.0);
+        RotationLimiter.reset(0.0);
     }
 }

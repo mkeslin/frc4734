@@ -206,6 +206,9 @@ public class RobotContainer {
             m_drivetrain.stop();
         }
 
+        // Reset rate limiters to prevent stale state
+        SwerveDrivetrainBindings.resetRateLimiters();
+
         // Cleanup all subsystems and sensors
         if (m_subsystemFactory != null) {
             m_subsystemFactory.cleanup();

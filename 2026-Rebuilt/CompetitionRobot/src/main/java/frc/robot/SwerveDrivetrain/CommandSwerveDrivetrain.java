@@ -12,7 +12,6 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
@@ -24,7 +23,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -252,9 +250,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                                     .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
                     new PPHolonomicDriveController(
                             // PID constants for translation
-                            new PIDConstants(7, 0, 0),
+                            frc.robot.SwerveDrivetrain.DrivetrainConstants.kPathTranslationPID,
                             // PID constants for rotation
-                            new PIDConstants(7, 0, 0)),
+                            frc.robot.SwerveDrivetrain.DrivetrainConstants.kPathRotationPID),
                     config,
                     // Assume the path needs to be flipped for Red vs Blue, this is normally the
                     // case
@@ -502,12 +500,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Command moveToPose(Pose2d pose) {
         var constraints = new PathConstraints(
-                DrivetrainConstants.MaxSpeed,
-                DrivetrainConstants.MaxAcceleration,
-                Units.degreesToRadians(80),
-                Units.degreesToRadians(50)
-        // Units.degreesToRadians(360),
-        // Units.degreesToRadians(540)
+                frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxSpeed,
+                frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxAcceleration,
+                frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxAngularRate,
+                frc.robot.SwerveDrivetrain.DrivetrainConstants.kMaxAngularAcceleration
         );
         return AutoBuilder.pathfindToPose(pose, constraints, 0);
     }
