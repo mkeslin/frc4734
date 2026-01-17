@@ -31,7 +31,7 @@ public class SubsystemFactory {
     // private final Feeder m_feeder;
     // private final Shooter m_shooter;
     // private final Lights m_lights;
-    // private final PhotonVision m_reefPhotonVision;
+    private final PhotonVision m_photonVision;
     // private final DigitalInput m_coralTraySensor;
     // private final DigitalInput m_coralArmSensor;
     // private final PositionTracker m_positionTracker;
@@ -62,7 +62,7 @@ public class SubsystemFactory {
         // m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
 
         // Create PhotonVision camera
-        // m_reefPhotonVision = new PhotonVision(CAMERA_NAME, APRILTAG_PIPELINE);
+        m_photonVision = new PhotonVision(CAMERA_NAME, APRILTAG_PIPELINE);
 
         // Create PositionTracker with all actual suppliers
         // Method references will work correctly since subsystems are now created
@@ -127,9 +127,9 @@ public class SubsystemFactory {
     //     return m_lights;
     // }
 
-    // public PhotonVision getReefPhotonVision() {
-    //     return m_reefPhotonVision;
-    // }
+    public PhotonVision getPhotonVision() {
+        return m_photonVision;
+    }
 
     // public PositionTracker getPositionTracker() {
     //     return m_positionTracker;
@@ -178,9 +178,9 @@ public class SubsystemFactory {
         // if (m_lights != null) {
         //     m_lights.cleanup();
         // }
-        // if (m_reefPhotonVision != null) {
-        //     m_reefPhotonVision.cleanup();
-        // }
+        if (m_photonVision != null) {
+            m_photonVision.cleanup();
+        }
 
         // Close sensors
         // if (m_coralTraySensor != null) {

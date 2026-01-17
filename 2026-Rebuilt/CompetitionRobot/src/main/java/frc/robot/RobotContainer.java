@@ -59,7 +59,7 @@ public class RobotContainer {
 
         // Create center to reef command
         // m_centerToReefCommand = new CenterToReefCommand(
-        //         m_subsystemFactory.getReefPhotonVision(),
+        //         m_subsystemFactory.getPhotonVision(),
         //         m_drivetrain,
         //         m_driveController,
         //         3);
@@ -107,34 +107,33 @@ public class RobotContainer {
      * Updates the drivetrain's pose estimator with vision measurements.
      */
     public void localizeRobotPose() {
-        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Measure vision processing time
-        // double visionStart = Timer.getFPGATimestamp();
+        double visionStart = Timer.getFPGATimestamp();
         
-        // var photonVision = m_subsystemFactory.getReefPhotonVision();
+        var photonVision = m_subsystemFactory.getPhotonVision();
         
         // Get estimated robot pose from PhotonVision
-        // var estimatedPose = photonVision.getEstimatedRobotPose();
+        var estimatedPose = photonVision.getEstimatedRobotPose();
         
-        // if (estimatedPose.isPresent()) {
-        //     var pose = estimatedPose.get();
+        if (estimatedPose.isPresent()) {
+            var pose = estimatedPose.get();
             
-        //     // Get the pose in the correct alliance coordinate system
-        //     // PhotonVision returns poses in the field's native coordinate system.
-        //     // For rotationally symmetrical fields, PhotonVision should handle the
-        //     // coordinate transformation automatically, but we verify the pose is correct.
-        //     Pose2d visionPose = pose.estimatedPose.toPose2d();
+            // Get the pose in the correct alliance coordinate system
+            // PhotonVision returns poses in the field's native coordinate system.
+            // For rotationally symmetrical fields, PhotonVision should handle the
+            // coordinate transformation automatically, but we verify the pose is correct.
+            Pose2d visionPose = pose.estimatedPose.toPose2d();
             
-        //     // Add vision measurement to drivetrain pose estimator
-        //     // Timestamp is already in seconds from PhotonVision
-        //     m_drivetrain.addVisionMeasurement(
-        //         visionPose,
-        //         pose.timestampSeconds
-        //     );
+            // Add vision measurement to drivetrain pose estimator
+            // Timestamp is already in seconds from PhotonVision
+            m_drivetrain.addVisionMeasurement(
+                visionPose,
+                pose.timestampSeconds
+            );
             
-        //     // Log vision pose for debugging
-        //     RobotLogger.recordPose2d("Vision/Pose", visionPose);
-        // }
+            // Log vision pose for debugging
+            RobotLogger.recordPose2d("Vision/Pose", visionPose);
+        }
         
         // Log robot pose (from drivetrain odometry)
         RobotLogger.recordPose2d("Drivetrain/Pose", m_drivetrain.getPose());
@@ -157,8 +156,8 @@ public class RobotContainer {
         // RobotLogger.recordString("State/CurrentState", context.stateMachine.getCurrentState().Name.toString());
         
         // Record vision processing time
-        // double visionTime = Timer.getFPGATimestamp() - visionStart;
-        // PerformanceMonitor.getInstance().recordVisionTime(visionTime);
+        double visionTime = Timer.getFPGATimestamp() - visionStart;
+        PerformanceMonitor.getInstance().recordVisionTime(visionTime);
     }
 
     // Getters for subsystems (for backwards compatibility and external access)
