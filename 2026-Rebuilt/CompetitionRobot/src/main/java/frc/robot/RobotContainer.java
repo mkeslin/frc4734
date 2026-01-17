@@ -17,6 +17,7 @@ import frc.robot.Subsystems.Lights;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
+import static frc.robot.Constants.VisionConstants.*;
 
 /**
  * Main container class for robot subsystems, controllers, and configuration.
@@ -105,6 +106,7 @@ public class RobotContainer {
     /**
      * Localizes the robot pose using PhotonVision AprilTag detection.
      * Updates the drivetrain's pose estimator with vision measurements.
+     * Includes filtering to reject unreliable measurements (pose jumps, stale timestamps, low tag count).
      */
     public void localizeRobotPose() {
         // Measure vision processing time
@@ -112,27 +114,62 @@ public class RobotContainer {
         
         var photonVision = m_subsystemFactory.getPhotonVision();
         
+        // Null check for defensive programming
+        if (photonVision == null) {
+            // Log robot pose (from drivetrain odometry) even if vision is unavailable
+            RobotLogger.recordPose2d("Drivetrain/Pose", m_drivetrain.getPose());
+            return;
+        }
+        
         // Get estimated robot pose from PhotonVision
         var estimatedPose = photonVision.getEstimatedRobotPose();
         
         if (estimatedPose.isPresent()) {
             var pose = estimatedPose.get();
+            double currentTime = Timer.getFPGATimestamp();
             
             // Get the pose in the correct alliance coordinate system
             // PhotonVision returns poses in the field's native coordinate system.
             // For rotationally symmetrical fields, PhotonVision should handle the
             // coordinate transformation automatically, but we verify the pose is correct.
             Pose2d visionPose = pose.estimatedPose.toPose2d();
+            Pose2d currentPose = m_drivetrain.getPose();
             
-            // Add vision measurement to drivetrain pose estimator
-            // Timestamp is already in seconds from PhotonVision
-            m_drivetrain.addVisionMeasurement(
-                visionPose,
-                pose.timestampSeconds
-            );
-            
-            // Log vision pose for debugging
-            RobotLogger.recordPose2d("Vision/Pose", visionPose);
+            // Validate timestamp - reject if too old or in the future
+            double timestampAge = currentTime - pose.timestampSeconds;
+            if (timestampAge < 0 || timestampAge > MAX_TIMESTAMP_AGE) {
+                // Timestamp is invalid (future or too old)
+                RobotLogger.recordDouble("Vision/RejectedTimestampAge", timestampAge);
+                RobotLogger.recordString("Vision/RejectionReason", "InvalidTimestamp");
+            } else {
+                // Validate pose jump distance - reject if too far from current odometry
+                double poseJumpDistance = visionPose.getTranslation().getDistance(currentPose.getTranslation());
+                if (poseJumpDistance > MAX_POSE_JUMP_DISTANCE) {
+                    // Pose jump too large - likely a bad measurement
+                    RobotLogger.recordDouble("Vision/RejectedDistance", poseJumpDistance);
+                    RobotLogger.recordString("Vision/RejectionReason", "PoseJumpTooLarge");
+                } else {
+                    // Get tag count from latest result for validation
+                    var latestResult = photonVision.getLatestResult();
+                    int tagCount = (latestResult != null && latestResult.hasTargets()) 
+                        ? latestResult.getTargets().size() 
+                        : 0;
+                    
+                    // Log tag count for diagnostics
+                    RobotLogger.recordDouble("Vision/TagCount", tagCount);
+                    
+                    // Accept measurement - add to pose estimator
+                    // Timestamp is already in seconds from PhotonVision
+                    m_drivetrain.addVisionMeasurement(
+                        visionPose,
+                        pose.timestampSeconds
+                    );
+                    
+                    // Log vision pose for debugging
+                    RobotLogger.recordPose2d("Vision/Pose", visionPose);
+                    RobotLogger.recordDouble("Vision/PoseJumpDistance", poseJumpDistance);
+                }
+            }
         }
         
         // Log robot pose (from drivetrain odometry)

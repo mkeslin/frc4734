@@ -30,4 +30,14 @@ public final class VisionConstants {
         0.0,  // Pitch
         0.0   // Yaw
     );
+    
+    // Vision measurement filtering constants
+    /** Maximum distance (in meters) a vision pose can be from current odometry pose before being rejected */
+    public static final double MAX_POSE_JUMP_DISTANCE = 1.0; // meters
+    
+    /** Minimum number of tags detected for high-confidence vision measurements */
+    public static final int MIN_TAGS_FOR_HIGH_CONFIDENCE = 2;
+    
+    /** Maximum acceptable age of vision measurement timestamp (in seconds) before being rejected */
+    public static final double MAX_TIMESTAMP_AGE = 0.5; // seconds
 }
