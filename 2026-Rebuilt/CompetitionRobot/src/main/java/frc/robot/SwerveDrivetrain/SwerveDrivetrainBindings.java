@@ -28,12 +28,8 @@ public class SwerveDrivetrainBindings {
     
     private static InputProfile currentProfile = InputProfile.NORMAL;
 
-    private static final double MaxSpeed = DrivetrainConstants.MaxSpeed;
-    private static final double MaxAngularRate = DrivetrainConstants.MaxAngularRate;
-
-    private static double CurrentSpeed = MaxSpeed;
-    private static double CurrentAngularRate = MaxAngularRate; // This will be updated when turtle and reset to
-                                                               // MaxAngularRate
+    private static double CurrentSpeed = DrivetrainConstants.MaxSpeed;
+    private static double CurrentAngularRate = DrivetrainConstants.MaxAngularRate; // This will be updated when turtle and reset to MaxAngularRate
 
     // Rate limiters applied to normalized joystick inputs (-1..1) before scaling to physical units
     // These values are in 1/s (per second) and are applied to the joystick command inputs
@@ -140,10 +136,14 @@ public class SwerveDrivetrainBindings {
                 .onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         // Turtle Mode while held
-        driveController.leftBumper().onTrue(Commands.runOnce(() -> CurrentSpeed = MaxSpeed * DrivetrainConstants.kTurtleSpeedMultiplier)
-                .andThen(() -> CurrentAngularRate = DrivetrainConstants.kTurtleAngularRate));
-        driveController.leftBumper().onFalse(
-                Commands.runOnce(() -> CurrentSpeed = MaxSpeed).andThen(() -> CurrentAngularRate = MaxAngularRate));
+        driveController.leftBumper().onTrue(Commands.runOnce(() -> {
+            CurrentSpeed = DrivetrainConstants.MaxSpeed * DrivetrainConstants.kTurtleSpeedMultiplier;
+            CurrentAngularRate = DrivetrainConstants.kTurtleAngularRate;
+        }));
+        driveController.leftBumper().onFalse(Commands.runOnce(() -> {
+            CurrentSpeed = DrivetrainConstants.MaxSpeed;
+            CurrentAngularRate = DrivetrainConstants.MaxAngularRate;
+        }));
 
         // test path
         // driveController
