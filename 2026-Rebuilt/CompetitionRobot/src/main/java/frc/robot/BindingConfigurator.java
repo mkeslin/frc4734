@@ -18,7 +18,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Commands.RobotContext;
 import frc.robot.Constants.ClimberConstants.ClimberPosition;
@@ -39,7 +38,6 @@ public class BindingConfigurator {
     private final PositionTracker m_positionTracker;
     private final Climber m_climber;
     private final CommandSwerveDrivetrain m_drivetrain;
-    private final CenterToReefCommand m_centerToReefCommand;
 
     /**
      * Creates a new BindingConfigurator with all required dependencies.
@@ -49,15 +47,13 @@ public class BindingConfigurator {
      * @param arcadeController The arcade controller
      * @param robotContext The robot context containing all subsystems
      * @param climber The climber subsystem
-     * @param centerToReefCommand The center to reef command
      */
     public BindingConfigurator(
             CommandXboxController driveController,
             CommandXboxController mechanismController,
             CommandXboxController arcadeController,
             RobotContext robotContext,
-            Climber climber,
-            CenterToReefCommand centerToReefCommand) {
+            Climber climber) {
         m_driveController = driveController;
         m_mechanismController = mechanismController;
         m_arcadeController = arcadeController;
@@ -65,7 +61,6 @@ public class BindingConfigurator {
         m_positionTracker = robotContext.positionTracker;
         m_climber = climber;
         m_drivetrain = robotContext.drivetrain;
-        m_centerToReefCommand = centerToReefCommand;
     }
 
     /**
@@ -102,7 +97,7 @@ public class BindingConfigurator {
      * Configures bindings for the drive controller.
      */
     public void configureDriveBindings() {
-        m_driveController.leftTrigger().onTrue(m_centerToReefCommand);
+        // TODO: Add 2026 drive controller bindings as needed
 
         // CLIMBER
         m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));

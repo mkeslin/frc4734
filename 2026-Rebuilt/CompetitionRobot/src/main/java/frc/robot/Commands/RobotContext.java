@@ -25,7 +25,7 @@ public class RobotContext {
     public final Feeder feeder;
     public final Shooter shooter;
     public final Lights lights;
-    public final PhotonVision reefPhotonVision;
+    public final PhotonVision photonVision;
 
     /**
      * Creates a new RobotContext with all required dependencies.
@@ -38,7 +38,7 @@ public class RobotContext {
      * @param feeder The feeder subsystem
      * @param shooter The shooter subsystem
      * @param lights The lights subsystem
-     * @param reefPhotonVision The reef PhotonVision camera
+     * @param photonVision The PhotonVision camera
      * @throws NullPointerException if any parameter is null
      */
     public RobotContext(
@@ -50,7 +50,7 @@ public class RobotContext {
             Feeder feeder,
             Shooter shooter,
             Lights lights,
-            PhotonVision reefPhotonVision) {
+            PhotonVision photonVision) {
         this.stateMachine = Objects.requireNonNull(stateMachine, "StateMachine cannot be null");
         this.positionTracker = Objects.requireNonNull(positionTracker, "PositionTracker cannot be null");
         this.drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
@@ -59,6 +59,6 @@ public class RobotContext {
         this.feeder = Objects.requireNonNull(feeder, "Feeder cannot be null");
         this.shooter = Objects.requireNonNull(shooter, "Shooter cannot be null");
         this.lights = Objects.requireNonNull(lights, "Lights cannot be null");
-        this.reefPhotonVision = Objects.requireNonNull(reefPhotonVision, "PhotonVision cannot be null");
+        this.photonVision = Objects.requireNonNull(photonVision, "PhotonVision cannot be null");
     }
 }

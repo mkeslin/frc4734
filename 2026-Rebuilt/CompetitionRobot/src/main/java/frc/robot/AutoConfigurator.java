@@ -1,41 +1,46 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Auto.AutoCommandA;
 import frc.robot.Auto.AutoManager;
-import frc.robot.Commands.CenterToReefCommand;
-import frc.robot.Commands.RobotContext;
 
 /**
  * Configures autonomous routines for the robot.
  * Centralizes autonomous setup logic.
+ * 
+ * <p>NOTE: This class is currently a placeholder. The old 2025 auto commands have been removed.
+ * When ready to enable 2026 auto routines, update this class to use the new atomic commands
+ * from frc.robot.Auto.commands.AutoRoutines.
+ * 
+ * <p>Example usage (when ready):
+ * <pre>
+ * Command climberAuto = AutoRoutines.buildClimberAuto(...);
+ * m_autoManager.addRoutine(new AutoRoutine("ClimberAuto", climberAuto));
+ * </pre>
  */
 public class AutoConfigurator {
     private final AutoManager m_autoManager;
-    private final RobotContext m_robotContext;
-    private final CenterToReefCommand m_centerToReefCommand;
 
     /**
      * Creates a new AutoConfigurator with required dependencies.
      * 
      * @param autoManager The AutoManager instance
-     * @param robotContext The robot context containing all subsystems
-     * @param centerToReefCommand The center to reef command
      */
-    public AutoConfigurator(AutoManager autoManager, RobotContext robotContext, CenterToReefCommand centerToReefCommand) {
+    public AutoConfigurator(AutoManager autoManager) {
         m_autoManager = autoManager;
-        m_robotContext = robotContext;
-        m_centerToReefCommand = centerToReefCommand;
     }
 
     /**
      * Configures all autonomous routines and registers them with AutoManager.
+     * 
+     * <p>Currently empty - update this method to register 2026 auto routines
+     * using the atomic commands from frc.robot.Auto.commands.AutoRoutines.
      */
     public void configureAuto() {
-        m_autoManager.addRoutine(AutoCommandA.StartingPosition1(m_robotContext, m_centerToReefCommand));
-        m_autoManager.addRoutine(AutoCommandA.StartingPosition2(m_robotContext, m_centerToReefCommand));
-        m_autoManager.addRoutine(AutoCommandA.StartingPosition3(m_robotContext, m_centerToReefCommand));
-
+        // TODO: Register 2026 auto routines using AutoRoutines builder
+        // Example:
+        // Command climberAuto = AutoRoutines.buildClimberAuto(...);
+        // m_autoManager.addRoutine(new AutoRoutine("ClimberAuto", climberAuto));
+        
         SmartDashboard.putData("Auto Mode (manager)", m_autoManager.chooser);
     }
 }

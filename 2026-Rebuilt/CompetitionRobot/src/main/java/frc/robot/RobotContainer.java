@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoManager;
-import frc.robot.Commands.CenterToReefCommand;
 import frc.robot.Commands.RobotContext;
 import frc.robot.Logging.RobotLogger;
 import frc.robot.Monitoring.PerformanceMonitor;
@@ -43,9 +42,6 @@ public class RobotContainer {
     private final BindingConfigurator m_bindingConfigurator; // May be null during drivetrain-only testing
     private final AutoConfigurator m_autoConfigurator; // May be null during drivetrain-only testing
 
-    // COMMANDS
-    public final CenterToReefCommand m_centerToReefCommand; // May be null during drivetrain-only testing
-
     public RobotContainer() {
         // Create AutoManager instance
         m_autoManager = new AutoManager();
@@ -57,17 +53,6 @@ public class RobotContainer {
         // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Create subsystem factory (creates all subsystems, PositionTracker, StateMachine, RobotContext)
         m_subsystemFactory = new SubsystemFactory(m_drivetrain);
-
-        // Create center to reef command
-        // m_centerToReefCommand = new CenterToReefCommand(
-        //         m_subsystemFactory.getPhotonVision(),
-        //         m_drivetrain,
-        //         m_driveController,
-        //         3);
-        m_centerToReefCommand = null; // Temporary for drivetrain-only testing
-
-        // Register named commands
-        // NamedCommands.registerCommand("centerToReefCommand", m_centerToReefCommand);
 
         // Configure bindings for swerve drivetrain
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
@@ -86,10 +71,7 @@ public class RobotContainer {
 
         // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Create auto configurator and configure autonomous routines
-        // m_autoConfigurator = new AutoConfigurator(
-        //         m_autoManager,
-        //         m_subsystemFactory.getRobotContext(),
-        //         m_centerToReefCommand);
+        // m_autoConfigurator = new AutoConfigurator(m_autoManager);
         // m_autoConfigurator.configureAuto();
         m_autoConfigurator = null; // Temporary for drivetrain-only testing
 
