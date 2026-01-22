@@ -68,6 +68,8 @@ This document outlines recommended improvements to enhance code maintainability,
 - Enabled follower configuration: `m_elevatorRightFollowerMotor.setControl(new Follower(m_elevatorLeftLeaderMotor.getDeviceID(), MotorAlignmentValue.Aligned))`
 - Added proper import for `MotorAlignmentValue`
 
+**Note**: The `Elevator` subsystem was later removed for the 2026 REBUILT game, so this file no longer exists in the codebase.
+
 ### 2. ✅ Remove Commented Code - COMPLETED
 
 **Files:** Multiple files contained large blocks of commented code
@@ -76,7 +78,7 @@ This document outlines recommended improvements to enhance code maintainability,
 
 - `src/main/java/frc/robot/Robot.java` - Removed ~22 lines of commented logging and initialization code
 - `src/main/java/frc/robot/RobotContainer.java` - Removed ~100+ lines including commented subsystems, bindings, and methods
-- `src/main/java/frc/robot/Subsystems/Elevator.java` - Removed commented simulation, telemetry, and method code
+- `src/main/java/frc/robot/Subsystems/Elevator.java` - Removed commented simulation, telemetry, and method code (file later removed entirely for 2026)
 - `src/main/java/frc/robot/Auto/AutoCommandA.java` - Removed commented command methods and inline comments
 - Also removed 3 unused imports from RobotContainer.java
 
@@ -90,11 +92,12 @@ This document outlines recommended improvements to enhance code maintainability,
 
 **Changes Made:**
 
-- Created `CANIds.java` - Contains all CAN device IDs (ELEVATOR_LEFT, ELEVATOR_RIGHT, ARM, SIDE_TO_SIDE, CLIMBER, ALGAE_INTAKE, LIGHTS)
+- Created `CANIds.java` - Contains all CAN device IDs (CLIMBER, ALGAE_INTAKE, LIGHTS, and others)
 - Created `DigitalInputIds.java` - Contains digital input sensor IDs (CORAL_TRAY_SENSOR, CORAL_ARM_SENSOR)
 - Created `VisionConstants.java` - Contains vision-related constants (APRILTAG_PIPELINE)
 - Updated `Constants.java` - Now a utility class with documentation pointing to new constant files
-- Updated all references across codebase (RobotContainer, Elevator, Arm, SideToSide, Climber, Lights, AlgaeIntake)
+- Updated all references across codebase
+- **Note**: `Elevator`, `Arm`, and `SideToSide` subsystems were removed for 2026, so their CAN IDs are no longer used
 
 **Naming Improvements:**
 
@@ -135,15 +138,16 @@ This document outlines recommended improvements to enhance code maintainability,
 **Changes Made:**
 
 - Created `SubsystemFactory.java` - Factory class that:
-  - Creates all subsystems (`Elevator`, `Arm`, `SideToSide`, `Climber`, `Lights`)
+  - Creates all subsystems (`Climber`, `DeployableIntake`, `Floor`, `Feeder`, `Shooter`, `Lights`)
   - Creates sensors (`DigitalInput` for coral tray and arm)
-  - Creates `Limelight` for vision
+  - Creates `PhotonVision` for vision (note: `Limelight` was replaced with `PhotonVision`)
   - Creates and initializes `PositionTracker` with all suppliers
   - Sets `PositionTracker` on all subsystems
   - Creates `StateMachine` instance
   - Creates `RobotContext` with all dependencies
   - Provides getters for all subsystems and components
   - Includes `resetZeros()` method for resetting subsystem positions
+  - **Note**: `Elevator`, `Arm`, and `SideToSide` subsystems were removed for 2026. Many subsystems are currently commented out for drivetrain-only testing.
 - Created `BindingConfigurator.java` - Configurator class that:
   - Consolidates all controller bindings into one class
   - `configureMechanismBindings()` - Mechanism controller bindings

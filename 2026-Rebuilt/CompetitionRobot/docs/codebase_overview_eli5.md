@@ -64,10 +64,12 @@ graph TD
 **Think of it like**: A chef who sets up all the kitchen stations before the restaurant opens.
 
 **What it creates**:
-- All subsystems (drivetrain, arm, elevator, etc.)
+- All subsystems (drivetrain, climber, intake, shooter, etc.)
 - Controller bindings (which button does what)
 - Autonomous routines
 - Vision system
+
+**Note**: Currently many subsystems are commented out for drivetrain-only testing. See `SubsystemFactory.java` for details.
 
 **Location**: `src/main/java/frc/robot/RobotContainer.java`
 
@@ -83,30 +85,42 @@ Subsystems are the different parts of the robot that do specific jobs. Each one 
 - **Special feature**: Swerve drive (wheels can turn independently!)
 - **Location**: `src/main/java/frc/robot/SwerveDrivetrain/`
 
-#### **Elevator** (`Elevator.java`)
-- **What it does**: Moves the arm up and down
-- **Think of it like**: A forklift that raises and lowers
-- **Location**: `src/main/java/frc/robot/Subsystems/Elevator.java`
-
-#### **Arm** (`Arm.java`)
-- **What it does**: Moves the scoring mechanism in and out
-- **Think of it like**: A crane arm that extends and retracts
-- **Location**: `src/main/java/frc/robot/Subsystems/Arm.java`
-
-#### **SideToSide** (`SideToSide.java`)
-- **What it does**: Moves mechanisms left and right
-- **Think of it like**: A sliding door
-- **Location**: `src/main/java/frc/robot/Subsystems/SideToSide.java`
-
 #### **Climber** (`Climber.java`)
 - **What it does**: Helps the robot climb at the end of the match
 - **Think of it like**: A ladder
 - **Location**: `src/main/java/frc/robot/Subsystems/Climber.java`
 
+#### **DeployableIntake** (`DeployableIntake.java`)
+- **What it does**: Picks up game pieces from the ground
+- **Think of it like**: A vacuum cleaner that can extend and retract
+- **Location**: `src/main/java/frc/robot/Subsystems/DeployableIntake.java`
+
+#### **Floor** (`Floor.java`)
+- **What it does**: Moves game pieces from intake to feeder
+- **Think of it like**: A conveyor belt
+- **Location**: `src/main/java/frc/robot/Subsystems/Floor.java`
+
+#### **Feeder** (`Feeder.java`)
+- **What it does**: Moves game pieces from floor to shooter
+- **Think of it like**: A second conveyor belt
+- **Location**: `src/main/java/frc/robot/Subsystems/Feeder.java`
+
+#### **Shooter** (`Shooter.java`)
+- **What it does**: Shoots game pieces at high speed
+- **Think of it like**: A cannon
+- **Location**: `src/main/java/frc/robot/Subsystems/Shooter.java`
+
+#### **Lights** (`Lights.java`)
+- **What it does**: Controls LED lights on the robot
+- **Think of it like**: A light switch
+- **Location**: `src/main/java/frc/robot/Subsystems/Lights.java`
+
 #### **PhotonVision** (`PhotonVision.java`)
 - **What it does**: Uses a camera to see AprilTags and figure out where the robot is
 - **Think of it like**: The robot's eyes
 - **Location**: `src/main/java/frc/robot/Subsystems/Cameras/PhotonVision.java`
+
+**Note**: Many of these subsystems are currently commented out for drivetrain-only testing. See `SubsystemFactory.java` for the current state.
 
 ---
 
@@ -115,23 +129,18 @@ Subsystems are the different parts of the robot that do specific jobs. Each one 
 Commands are step-by-step instructions that tell subsystems what to do. They're like recipes that combine multiple actions.
 
 **Example**: "Pick up coral" command might:
-1. Lower the elevator
-2. Extend the arm
-3. Turn on the intake
+1. Deploy the intake
+2. Turn on the intake motors
+3. Turn on the floor conveyor
 4. Wait until sensor detects coral
-5. Raise the elevator
-
-#### **BaseCenterToCommand** (`BaseCenterToCommand.java`)
-- **What it does**: A reusable command that centers the robot to targets using vision
-- **Think of it like**: A template recipe that can be customized
-- **Used by**: `CenterToReefCommand`, `CenterToProcesserCommand`, `CenterToStationCommand`
-- **Location**: `src/main/java/frc/robot/Commands/BaseCenterToCommand.java`
+5. Retract the intake
 
 #### **RobotCommands** (`RobotCommands.java`)
 - **What it does**: Factory class that creates common commands
 - **Think of it like**: A cookbook with pre-made recipes
 - **Examples**: `prepareScoreCoralCommand()`, `intakeCoralCommand()`
 - **Location**: `src/main/java/frc/robot/Commands/RobotCommands.java`
+- **Note**: Most methods are currently commented out for 2026 as Elevator, Arm, and SideToSide subsystems were removed
 
 ---
 
@@ -157,9 +166,10 @@ Commands are step-by-step instructions that tell subsystems what to do. They're 
 **What it does**: Remembers where all the robot parts are and what sensors are reading.
 
 **Think of it like**: A notebook that tracks:
-- "Elevator is at position 2.5"
-- "Arm is at 45 degrees"
+- "Climber is at position 2.5"
+- "Intake is deployed: YES"
 - "Coral is in the tray: YES"
+- "Shooter speed: 5000 RPM"
 
 **Location**: `src/main/java/frc/robot/PositionTracker.java`
 
@@ -209,7 +219,7 @@ Creates prepareScoreCoralCommand()
     ↓
 Command checks StateMachine: "Can we score?" 
     ↓
-If yes: Moves Elevator, Arm, SideToSide to scoring positions
+If yes: Spins up shooter, feeds game piece, shoots
     ↓
 Hardware motors move the mechanisms
     ↓
@@ -271,10 +281,12 @@ src/main/java/frc/robot/
 │   └── RobotContext.java        # Shared data for commands
 │
 ├── Subsystems/                    # All robot parts
-│   ├── Elevator.java
-│   ├── Arm.java
-│   ├── SideToSide.java
 │   ├── Climber.java
+│   ├── DeployableIntake.java
+│   ├── Floor.java
+│   ├── Feeder.java
+│   ├── Shooter.java
+│   ├── Lights.java
 │   └── Cameras/
 │       └── PhotonVision.java
 │
@@ -286,8 +298,9 @@ src/main/java/frc/robot/
 │   └── StateMachine.java
 │
 ├── Constants/                     # All configuration values
-│   ├── ElevatorConstants.java
-│   ├── ArmConstants.java
+│   ├── CANIds.java
+│   ├── DigitalInputIds.java
+│   ├── VisionConstants.java
 │   └── ...
 │
 └── SwerveDrivetrain/             # Drivetrain code
@@ -328,11 +341,13 @@ src/main/java/frc/robot/
 ## Key Takeaways
 
 1. **Robot.java** runs everything 50 times per second
-2. **Subsystems** are the robot's body parts (drivetrain, arm, etc.)
+2. **Subsystems** are the robot's body parts (drivetrain, climber, intake, shooter, etc.)
 3. **Commands** are recipes that tell subsystems what to do
 4. **State Machine** prevents the robot from doing invalid things
 5. **Vision** helps the robot know where it is on the field
 6. **Autonomous** makes the robot drive itself for the first 15 seconds
+
+**Note**: This codebase is for the 2026 REBUILT game. Many subsystems are currently commented out for drivetrain-only testing. Game element terminology (Coral, Reef) is still used in code but should be updated to FUEL and HUB per the migration plan in `docs/update_codebase_for_2026_rebuilt_game.md`.
 
 ---
 

@@ -48,6 +48,12 @@ todos:
 
 # Update Codebase for 2026 REBUILT Game
 
+## ⚠️ Status: This is a TODO/Plan Document
+
+**This document describes planned changes, not the current state of the codebase.**
+
+As of the last review, the codebase still uses 2025 terminology (Coral, Reef) and has not yet been fully migrated to 2026 REBUILT game elements (FUEL, HUB). Many subsystems (Elevator, Arm, SideToSide) have been removed, but the game element renaming has not been completed.
+
 ## Overview
 
 Transform the codebase from 2025 Reefscape to 2026 REBUILT game. This includes updating field layouts, AprilTag configurations, renaming game elements (Coral→FUEL, Reef→HUB), updating command names, and adjusting scoring logic.
