@@ -34,6 +34,7 @@ public final class AutoConstants {
 
     // Heading control
     public static final int DEFAULT_STABLE_FRAMES = 10; // frames at target before considered stable
+    public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
 
     // Hub position (field-relative, blue alliance origin)
     // TODO: Update with actual 2026 field hub position

@@ -41,6 +41,15 @@ public class RobotContainer {
     // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
     private final BindingConfigurator m_bindingConfigurator; // May be null during drivetrain-only testing
     private final AutoConfigurator m_autoConfigurator; // May be null during drivetrain-only testing
+    
+    /**
+     * Gets the AutoConfigurator instance.
+     * 
+     * @return The AutoConfigurator, or null if not initialized
+     */
+    public AutoConfigurator getAutoConfigurator() {
+        return m_autoConfigurator;
+    }
 
     public RobotContainer() {
         // Create AutoManager instance

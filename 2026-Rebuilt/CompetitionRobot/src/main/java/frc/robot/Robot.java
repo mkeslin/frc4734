@@ -91,6 +91,13 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledPeriodic() {
+        // Update test harness if available (for test execution)
+        if (m_robotContainer != null && m_robotContainer.getAutoConfigurator() != null) {
+            var testHarness = m_robotContainer.getAutoConfigurator().getTestHarness();
+            if (testHarness != null) {
+                testHarness.periodic();
+            }
+        }
     }
 
     @Override
