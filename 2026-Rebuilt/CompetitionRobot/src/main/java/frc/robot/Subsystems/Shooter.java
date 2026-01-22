@@ -3,6 +3,7 @@ package frc.robot.Subsystems;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.Constants.CANIds.SHOOTER_LEFT;
 import static frc.robot.Constants.CANIds.SHOOTER_RIGHT;
+import static frc.robot.Constants.CANIds.SHOOTER_CENTER;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Objects;
@@ -30,7 +31,7 @@ import frc.robot.Subsystems.Bases.BaseIntake;
 
 /**
  * Shooter subsystem that controls the robot's shooter mechanism.
- * Uses two TalonFX motors (leader and follower) with velocity control to shoot balls.
+ * Uses three TalonFX motors (leader and two followers) with velocity control to shoot balls.
  * 
  * <p>Safety features:
  * <ul>
@@ -48,6 +49,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
 
     private TalonFX m_shooterLeftLeaderMotor;
     private TalonFX m_shooterRightFollowerMotor;
+    private TalonFX m_shooterCenterFollowerMotor;
     private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
     private final SysIdRoutine m_sysIdRoutine;
@@ -67,6 +69,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
                         (volts) -> {
                             m_shooterLeftLeaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
                             m_shooterRightFollowerMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
+                            m_shooterCenterFollowerMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
                         },
                         null,
                         this,
@@ -78,6 +81,10 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
         m_shooterRightFollowerMotor = new TalonFX(SHOOTER_RIGHT);
         m_shooterRightFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
         m_shooterRightFollowerMotor.setControl(new Follower(m_shooterLeftLeaderMotor.getDeviceID(), MotorAlignmentValue.Aligned));
+
+        m_shooterCenterFollowerMotor = new TalonFX(SHOOTER_CENTER);
+        m_shooterCenterFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
+        m_shooterCenterFollowerMotor.setControl(new Follower(m_shooterLeftLeaderMotor.getDeviceID(), MotorAlignmentValue.Aligned));
 
         resetSpeed();
     }
@@ -130,6 +137,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
     public void resetSpeed() {
         m_shooterLeftLeaderMotor.stopMotor();
         m_shooterRightFollowerMotor.stopMotor();
+        m_shooterCenterFollowerMotor.stopMotor();
         initialized = true;
     }
 
@@ -144,6 +152,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
             } else {
                 m_shooterLeftLeaderMotor.stopMotor();
                 m_shooterRightFollowerMotor.stopMotor();
+                m_shooterCenterFollowerMotor.stopMotor();
             }
             if (m_positionTracker != null) {
                 shooterSpeedPub.set(m_positionTracker.getShooterSpeed());
@@ -187,10 +196,12 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
         return runOnce(() -> {
             m_shooterLeftLeaderMotor.stopMotor();
             m_shooterRightFollowerMotor.stopMotor();
+            m_shooterCenterFollowerMotor.stopMotor();
         })
                 .andThen(() -> {
                     m_shooterLeftLeaderMotor.setNeutralMode(NeutralModeValue.Coast);
                     m_shooterRightFollowerMotor.setNeutralMode(NeutralModeValue.Coast);
+                    m_shooterCenterFollowerMotor.setNeutralMode(NeutralModeValue.Coast);
                 })
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                 .withName("shooter.coastMotorsCommand");
@@ -206,7 +217,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
 
     /**
      * Cleans up resources when the robot is disabled.
-     * Stops both motors and closes NetworkTables publishers.
+     * Stops all motors and closes NetworkTables publishers.
      */
     public void cleanup() {
         if (m_shooterLeftLeaderMotor != null) {
@@ -214,6 +225,9 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
         }
         if (m_shooterRightFollowerMotor != null) {
             m_shooterRightFollowerMotor.stopMotor();
+        }
+        if (m_shooterCenterFollowerMotor != null) {
+            m_shooterCenterFollowerMotor.stopMotor();
         }
         if (shooterSpeedPub != null) {
             shooterSpeedPub.close();

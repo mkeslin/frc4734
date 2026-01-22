@@ -11,6 +11,7 @@ public final class CANIds {
 
     // Climber
     public static final int CLIMBER = 24;
+    public static final int CLIMBER_2 = 31;
     
     // Intake
     public static final int INTAKE_DEPLOY = 25;
@@ -25,6 +26,7 @@ public final class CANIds {
     // Shooter
     public static final int SHOOTER_LEFT = 29;
     public static final int SHOOTER_RIGHT = 30;
+    public static final int SHOOTER_CENTER = 32;
 
     // Lights
     public static final int LIGHTS = 40;
