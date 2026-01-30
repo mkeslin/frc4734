@@ -31,40 +31,40 @@ class RobotContextTest {
         Arm arm = mock(Arm.class);
         SideToSide sideToSide = mock(SideToSide.class);
         Lights lights = mock(Lights.class);
-        PhotonVision reefPhotonVision = mock(PhotonVision.class);
+        PhotonVision photonVision = mock(PhotonVision.class);
         
         // Test each null parameter
         assertThrows(NullPointerException.class, () -> {
-            new RobotContext(null, positionTracker, drivetrain, elevator, arm, sideToSide, lights, reefPhotonVision);
+            new RobotContext(null, positionTracker, drivetrain, elevator, arm, sideToSide, lights, photonVision);
         }, "Should throw NullPointerException for null stateMachine");
         
         assertThrows(NullPointerException.class, () -> {
-            new RobotContext(stateMachine, null, drivetrain, elevator, arm, sideToSide, lights, reefPhotonVision);
+            new RobotContext(stateMachine, null, drivetrain, elevator, arm, sideToSide, lights, photonVision);
         }, "Should throw NullPointerException for null positionTracker");
         
         assertThrows(NullPointerException.class, () -> {
-            new RobotContext(stateMachine, positionTracker, null, elevator, arm, sideToSide, lights, reefPhotonVision);
+            new RobotContext(stateMachine, positionTracker, null, elevator, arm, sideToSide, lights, photonVision);
         }, "Should throw NullPointerException for null drivetrain");
         
         assertThrows(NullPointerException.class, () -> {
-            new RobotContext(stateMachine, positionTracker, drivetrain, null, arm, sideToSide, lights, reefPhotonVision);
+            new RobotContext(stateMachine, positionTracker, drivetrain, null, arm, sideToSide, lights, photonVision);
         }, "Should throw NullPointerException for null elevator");
         
         assertThrows(NullPointerException.class, () -> {
-            new RobotContext(stateMachine, positionTracker, drivetrain, elevator, null, sideToSide, lights, reefPhotonVision);
+            new RobotContext(stateMachine, positionTracker, drivetrain, elevator, null, sideToSide, lights, photonVision);
         }, "Should throw NullPointerException for null arm");
         
         assertThrows(NullPointerException.class, () -> {
-            new RobotContext(stateMachine, positionTracker, drivetrain, elevator, arm, null, lights, reefPhotonVision);
+            new RobotContext(stateMachine, positionTracker, drivetrain, elevator, arm, null, lights, photonVision);
         }, "Should throw NullPointerException for null sideToSide");
         
         assertThrows(NullPointerException.class, () -> {
-            new RobotContext(stateMachine, positionTracker, drivetrain, elevator, arm, sideToSide, null, reefPhotonVision);
+            new RobotContext(stateMachine, positionTracker, drivetrain, elevator, arm, sideToSide, null, photonVision);
         }, "Should throw NullPointerException for null lights");
         
         assertThrows(NullPointerException.class, () -> {
             new RobotContext(stateMachine, positionTracker, drivetrain, elevator, arm, sideToSide, lights, null);
-        }, "Should throw NullPointerException for null reefPhotonVision");
+        }, "Should throw NullPointerException for null photonVision");
     }
 
     @Test
@@ -91,7 +91,7 @@ class RobotContextTest {
         assertNotNull(context.arm, "arm should not be null");
         assertNotNull(context.sideToSide, "sideToSide should not be null");
         assertNotNull(context.lights, "lights should not be null");
-        assertNotNull(context.reefPhotonVision, "reefPhotonVision should not be null");
+        assertNotNull(context.photonVision, "photonVision should not be null");
     }
 
     @Test
@@ -107,7 +107,7 @@ class RobotContextTest {
         assertNotNull(context.arm);
         assertNotNull(context.sideToSide);
         assertNotNull(context.lights);
-        assertNotNull(context.reefPhotonVision);
+        assertNotNull(context.photonVision);
         // Note: We can't test that fields are final at runtime, but the compiler enforces it
     }
 }
