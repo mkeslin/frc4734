@@ -4,6 +4,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoManager;
@@ -115,13 +116,12 @@ public class RobotContainer {
         
         // Null check for defensive programming
         if (photonVision == null) {
-            // Log robot pose (from drivetrain odometry) even if vision is unavailable
-            RobotLogger.recordPose2d("Drivetrain/Pose", m_drivetrain.getPose());
+            publishRobotPoseToDashboard();
             return;
         }
         // Skip vision when no PhotonVision coprocessor is on NetworkTables (avoids "Could not find any PhotonVision coprocessors" and uses odometry only)
         if (!photonVision.isConnected()) {
-            RobotLogger.recordPose2d("Drivetrain/Pose", m_drivetrain.getPose());
+            publishRobotPoseToDashboard();
             return;
         }
 
@@ -176,8 +176,7 @@ public class RobotContainer {
             }
         }
         
-        // Log robot pose (from drivetrain odometry)
-        RobotLogger.recordPose2d("Drivetrain/Pose", m_drivetrain.getPose());
+        publishRobotPoseToDashboard();
         
         // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Log mechanism positions
@@ -199,6 +198,15 @@ public class RobotContainer {
         // Record vision processing time
         double visionTime = Timer.getFPGATimestamp() - visionStart;
         PerformanceMonitor.getInstance().recordVisionTime(visionTime);
+    }
+
+    /** Publishes fused robot pose to SmartDashboard for Shuffleboard / estimator debugging. */
+    private void publishRobotPoseToDashboard() {
+        Pose2d robotPose = m_drivetrain.getPose();
+        RobotLogger.recordPose2d("Drivetrain/Pose", robotPose);
+        SmartDashboard.putNumber("Robot/PoseX", robotPose.getX());
+        SmartDashboard.putNumber("Robot/PoseY", robotPose.getY());
+        SmartDashboard.putNumber("Robot/PoseRotationDeg", robotPose.getRotation().getDegrees());
     }
 
     /** Updates the driver dashboard. Call from robotPeriodic(). */

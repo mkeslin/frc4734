@@ -17,6 +17,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,6 +32,13 @@ public class PhotonVision extends SubsystemBase {
     private final PhotonPoseEstimator poseEstimator;
     private AprilTagFieldLayout fieldLayout;
     private Alliance lastKnownAlliance;
+
+    /** Cached from last getEstimatedRobotPose() call so putNums() can publish without consuming the camera result. */
+    private double lastPhotonX;
+    private double lastPhotonY;
+    private double lastPhotonArea;
+    private double lastPhotonTagId;
+    private Pose2d lastEstimatedPose2d;
 
     /**
      * Creates a new PhotonVision subsystem.
@@ -220,10 +228,24 @@ public class PhotonVision extends SubsystemBase {
     public Optional<EstimatedRobotPose> getEstimatedRobotPose() {
         var result = getLatestResultInternal();
         if (result != null && result.hasTargets()) {
-            // Note: update() method is deprecated in PhotonLib 2026.1.1 but still functional
-            // The new API is still being finalized - this will be updated in a future release
-            return poseEstimator.update(result);
+            PhotonTrackedTarget best = result.getBestTarget();
+            lastPhotonX = best.getYaw();
+            lastPhotonY = best.getPitch();
+            lastPhotonArea = best.getArea();
+            lastPhotonTagId = best.getFiducialId();
+            Optional<EstimatedRobotPose> estimated = poseEstimator.update(result);
+            if (estimated.isPresent()) {
+                lastEstimatedPose2d = estimated.get().estimatedPose.toPose2d();
+                return estimated;
+            }
+            lastEstimatedPose2d = null;
+            return Optional.empty();
         }
+        lastPhotonX = 0.0;
+        lastPhotonY = 0.0;
+        lastPhotonArea = 0.0;
+        lastPhotonTagId = -1.0;
+        lastEstimatedPose2d = null;
         return Optional.empty();
     }
 
@@ -246,16 +268,26 @@ public class PhotonVision extends SubsystemBase {
     }
 
     /**
-     * Publishes diagnostic information to SmartDashboard.
-     * When not connected, only publishes Vision/Connected = 0 so the driver knows vision is unavailable.
+     * Publishes diagnostic information to SmartDashboard from cached values.
+     * Cache is updated by getEstimatedRobotPose() (called from localizeRobotPose()) so we do not
+     * consume the camera result here; consuming here would prevent vision from updating the pose estimator.
+     * This also fixes photon-y/area/tag-id not updating (they were always 0 because only the first
+     * getLatestResultInternal() call per cycle returns data).
      */
     public void putNums() {
         SmartDashboard.putBoolean("Vision/Connected", isConnected());
-        if (isConnected()) {
-            SmartDashboard.putNumber("photon-x", getX());
-            SmartDashboard.putNumber("photon-y", getY());
-            SmartDashboard.putNumber("photon-area", getArea());
-            SmartDashboard.putNumber("photon-tag-id", getAprilTagID());
+        SmartDashboard.putNumber("photon-x", lastPhotonX);
+        SmartDashboard.putNumber("photon-y", lastPhotonY);
+        SmartDashboard.putNumber("photon-area", lastPhotonArea);
+        SmartDashboard.putNumber("photon-tag-id", lastPhotonTagId);
+        if (lastEstimatedPose2d != null) {
+            SmartDashboard.putNumber("Vision/EstimatedPoseX", lastEstimatedPose2d.getX());
+            SmartDashboard.putNumber("Vision/EstimatedPoseY", lastEstimatedPose2d.getY());
+            SmartDashboard.putNumber("Vision/EstimatedPoseRotationDeg", lastEstimatedPose2d.getRotation().getDegrees());
+        } else {
+            SmartDashboard.putNumber("Vision/EstimatedPoseX", Double.NaN);
+            SmartDashboard.putNumber("Vision/EstimatedPoseY", Double.NaN);
+            SmartDashboard.putNumber("Vision/EstimatedPoseRotationDeg", Double.NaN);
         }
     }
 

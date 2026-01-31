@@ -16,7 +16,11 @@ import edu.wpi.first.math.util.Units;
  *   <li>Connecting the coprocessor and RoboRIO to the same network (same team WiFi or USB)</li>
  *   <li>Checking PhotonVision docs: https://docs.photonvision.org/en/latest/docs/troubleshooting/networking-troubleshooting.html</li>
  * </ul>
- * The robot code will run without vision (odometry only) when no coprocessor is found; check
+ * <p><b>"Has not reported a message interface uuid - is your coprocessor's camera started?"</b> means
+ * the coprocessor is visible but the camera for this name is not started. On the coprocessor:
+ * open the PhotonVision web UI, add/select the camera named {@link #CAMERA_NAME}, and start the
+ * camera (or enable "Start camera on boot" and restart PhotonVision).
+ * <p>The robot code will run without vision (odometry only) when no coprocessor is found; check
  * SmartDashboard "Vision/Connected" to see if vision is available.
  */
 public final class VisionConstants {

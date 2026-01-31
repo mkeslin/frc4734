@@ -1,6 +1,8 @@
 package frc.robot.dashboard;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -24,6 +26,7 @@ import frc.robot.dashboard.MatchTimer.MatchPhase;
  *   <li>Vision status (LOCKED/ODOMETRY ONLY)
  *   <li>Current action/state
  *   <li>Alliance color
+ *   <li>Robot pose (fused) and Vision estimated pose for estimator debugging
  * </ul>
  *
  * <p>All subsystem access is null-safe to handle drivetrain-only testing mode.
@@ -43,6 +46,12 @@ public class DriverDashboard {
     private final GenericEntry visionStatusEntry;
     private final GenericEntry currentActionEntry;
     private final GenericEntry allianceColorEntry;
+    private final GenericEntry robotPoseXEntry;
+    private final GenericEntry robotPoseYEntry;
+    private final GenericEntry robotPoseRotationEntry;
+    private final GenericEntry visionPoseXEntry;
+    private final GenericEntry visionPoseYEntry;
+    private final GenericEntry visionPoseRotationEntry;
 
     public DriverDashboard(
             SubsystemFactory subsystemFactory,
@@ -95,6 +104,40 @@ public class DriverDashboard {
                 .withPosition(0, 4)
                 .withSize(4, 1)
                 .getEntry();
+
+        // Row 4: Robot pose (fused from odometry + vision) for estimator debugging
+        robotPoseXEntry = tab.add("Robot Pose X (m)", 0.0)
+                .withWidget(BuiltInWidgets.kNumberBar)
+                .withPosition(0, 5)
+                .withSize(1, 1)
+                .getEntry();
+        robotPoseYEntry = tab.add("Robot Pose Y (m)", 0.0)
+                .withWidget(BuiltInWidgets.kNumberBar)
+                .withPosition(1, 5)
+                .withSize(1, 1)
+                .getEntry();
+        robotPoseRotationEntry = tab.add("Robot Pose Rotation (deg)", 0.0)
+                .withWidget(BuiltInWidgets.kNumberBar)
+                .withPosition(2, 5)
+                .withSize(1, 1)
+                .getEntry();
+
+        // Row 5: Vision estimated pose (from PhotonVision only; NaN when no estimate)
+        visionPoseXEntry = tab.add("Vision Est. Pose X (m)", 0.0)
+                .withWidget(BuiltInWidgets.kNumberBar)
+                .withPosition(0, 6)
+                .withSize(1, 1)
+                .getEntry();
+        visionPoseYEntry = tab.add("Vision Est. Pose Y (m)", 0.0)
+                .withWidget(BuiltInWidgets.kNumberBar)
+                .withPosition(1, 6)
+                .withSize(1, 1)
+                .getEntry();
+        visionPoseRotationEntry = tab.add("Vision Est. Rotation (deg)", 0.0)
+                .withWidget(BuiltInWidgets.kNumberBar)
+                .withPosition(2, 6)
+                .withSize(1, 1)
+                .getEntry();
     }
 
     /** Updates all dashboard values. Call from robotPeriodic(). */
@@ -105,7 +148,22 @@ public class DriverDashboard {
         updateVisionStatus();
         updateCurrentAction();
         updateAllianceColor();
+        updatePoseEntries();
         MatchTimer.logPhaseChanges();
+    }
+
+    private void updatePoseEntries() {
+        if (m_drivetrain != null) {
+            Pose2d robotPose = m_drivetrain.getPose();
+            robotPoseXEntry.setDouble(robotPose.getX());
+            robotPoseYEntry.setDouble(robotPose.getY());
+            robotPoseRotationEntry.setDouble(robotPose.getRotation().getDegrees());
+        }
+        // Read vision pose from SmartDashboard (published by PhotonVision.putNums()) to avoid consuming camera result twice
+        var smartDashboard = NetworkTableInstance.getDefault().getTable("SmartDashboard");
+        visionPoseXEntry.setDouble(smartDashboard.getEntry("Vision/EstimatedPoseX").getDouble(Double.NaN));
+        visionPoseYEntry.setDouble(smartDashboard.getEntry("Vision/EstimatedPoseY").getDouble(Double.NaN));
+        visionPoseRotationEntry.setDouble(smartDashboard.getEntry("Vision/EstimatedPoseRotationDeg").getDouble(Double.NaN));
     }
 
     private void updateMatchTimer() {
