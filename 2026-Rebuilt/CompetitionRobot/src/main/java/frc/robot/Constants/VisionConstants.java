@@ -6,16 +6,29 @@ import edu.wpi.first.math.util.Units;
 
 /**
  * Vision-related constants including camera pipelines and settings.
+ *
+ * <p><b>PhotonVision "Could not find any PhotonVision coprocessors"</b> means the robot cannot see
+ * a PhotonVision instance on NetworkTables. Fix by:
+ * <ul>
+ *   <li>Running PhotonVision on a coprocessor (e.g. Raspberry Pi) with the camera connected</li>
+ *   <li>Ensuring the camera name in the PhotonVision web UI exactly matches {@link #CAMERA_NAME}
+ *       (currently "Webcam1")</li>
+ *   <li>Connecting the coprocessor and RoboRIO to the same network (same team WiFi or USB)</li>
+ *   <li>Checking PhotonVision docs: https://docs.photonvision.org/en/latest/docs/troubleshooting/networking-troubleshooting.html</li>
+ * </ul>
+ * The robot code will run without vision (odometry only) when no coprocessor is found; check
+ * SmartDashboard "Vision/Connected" to see if vision is available.
  */
 public final class VisionConstants {
     private VisionConstants() {
         // Utility class - prevent instantiation
     }
 
+    /** Pipeline index for AprilTag detection (0 = first pipeline, e.g. "Pipeline1" in PhotonVision UI) */
     public static final int APRILTAG_PIPELINE = 0;
-    
-    /** Camera name as configured in PhotonVision */
-    public static final String CAMERA_NAME = "photonvision";
+
+    /** Camera name as configured in PhotonVision (must match the name in the PhotonVision web UI exactly) */
+    public static final String CAMERA_NAME = "Webcam1";
     
     /** Camera position relative to robot center (in meters) */
     public static final Translation3d CAMERA_POSITION = new Translation3d(

@@ -119,7 +119,12 @@ public class RobotContainer {
             RobotLogger.recordPose2d("Drivetrain/Pose", m_drivetrain.getPose());
             return;
         }
-        
+        // Skip vision when no PhotonVision coprocessor is on NetworkTables (avoids "Could not find any PhotonVision coprocessors" and uses odometry only)
+        if (!photonVision.isConnected()) {
+            RobotLogger.recordPose2d("Drivetrain/Pose", m_drivetrain.getPose());
+            return;
+        }
+
         // Get estimated robot pose from PhotonVision
         var estimatedPose = photonVision.getEstimatedRobotPose();
         

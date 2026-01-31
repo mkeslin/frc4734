@@ -61,6 +61,16 @@ public class PhotonVision extends SubsystemBase {
     }
 
     /**
+     * Returns whether a PhotonVision coprocessor with this camera is present on NetworkTables.
+     * Use this to skip vision-dependent logic when running without a coprocessor (e.g. practice without camera).
+     *
+     * @return true if PhotonVision is running and the camera name matches
+     */
+    public boolean isConnected() {
+        return camera.isConnected();
+    }
+
+    /**
      * Gets the latest camera result using the non-deprecated API.
      * Uses getAllUnreadResults() and returns the most recent result, or null if none available.
      * 
@@ -237,12 +247,16 @@ public class PhotonVision extends SubsystemBase {
 
     /**
      * Publishes diagnostic information to SmartDashboard.
+     * When not connected, only publishes Vision/Connected = 0 so the driver knows vision is unavailable.
      */
     public void putNums() {
-        SmartDashboard.putNumber("photon-x", getX());
-        SmartDashboard.putNumber("photon-y", getY());
-        SmartDashboard.putNumber("photon-area", getArea());
-        SmartDashboard.putNumber("photon-tag-id", getAprilTagID());
+        SmartDashboard.putBoolean("Vision/Connected", isConnected());
+        if (isConnected()) {
+            SmartDashboard.putNumber("photon-x", getX());
+            SmartDashboard.putNumber("photon-y", getY());
+            SmartDashboard.putNumber("photon-area", getArea());
+            SmartDashboard.putNumber("photon-tag-id", getAprilTagID());
+        }
     }
 
     /**
