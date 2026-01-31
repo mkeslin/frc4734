@@ -78,7 +78,10 @@ public class Robot extends LoggedRobot {
         
         // Vision processing (timing measured inside localizeRobotPose)
         m_robotContainer.localizeRobotPose();
-        
+
+        // Update driver dashboard
+        m_robotContainer.updateDriverDashboard();
+
         // End loop timing and log metrics periodically
         m_performanceMonitor.endLoop();
     }

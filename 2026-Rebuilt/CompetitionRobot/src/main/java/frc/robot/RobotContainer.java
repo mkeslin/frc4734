@@ -10,6 +10,7 @@ import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.RobotContext;
 import frc.robot.Logging.RobotLogger;
 import frc.robot.Monitoring.PerformanceMonitor;
+import frc.robot.dashboard.DriverDashboard;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Lights;
@@ -41,7 +42,9 @@ public class RobotContainer {
     // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
     private final BindingConfigurator m_bindingConfigurator; // May be null during drivetrain-only testing
     private final AutoConfigurator m_autoConfigurator; // May be null during drivetrain-only testing
-    
+
+    private final DriverDashboard m_driverDashboard;
+
     /**
      * Gets the AutoConfigurator instance.
      * 
@@ -92,6 +95,11 @@ public class RobotContainer {
 
         // Reset positions
         m_subsystemFactory.resetZeros();
+
+        m_driverDashboard = new DriverDashboard(
+                m_subsystemFactory,
+                m_drivetrain,
+                m_autoManager);
     }
 
     /**
@@ -186,6 +194,13 @@ public class RobotContainer {
         // Record vision processing time
         double visionTime = Timer.getFPGATimestamp() - visionStart;
         PerformanceMonitor.getInstance().recordVisionTime(visionTime);
+    }
+
+    /** Updates the driver dashboard. Call from robotPeriodic(). */
+    public void updateDriverDashboard() {
+        if (m_driverDashboard != null) {
+            m_driverDashboard.update();
+        }
     }
 
     // Getters for subsystems (for backwards compatibility and external access)
