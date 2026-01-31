@@ -1,8 +1,7 @@
 package frc.robot.telemetry;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringEntry;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -32,19 +31,18 @@ import frc.robot.telemetry.MatchTimer.MatchPhase;
 public class DriverDashboard {
     private static final String TAB_NAME = "Driver";
 
-    private final NetworkTable table;
     private final ShuffleboardTab tab;
 
     private final SubsystemFactory m_subsystemFactory;
     private final CommandSwerveDrivetrain m_drivetrain;
     private final AutoManager m_autoManager;
 
-    private final StringEntry matchTimerEntry;
-    private final StringEntry gamePieceCountEntry;
-    private final StringEntry shooterStatusEntry;
-    private final StringEntry visionStatusEntry;
-    private final StringEntry currentActionEntry;
-    private final StringEntry allianceColorEntry;
+    private final GenericEntry matchTimerEntry;
+    private final GenericEntry gamePieceCountEntry;
+    private final GenericEntry shooterStatusEntry;
+    private final GenericEntry visionStatusEntry;
+    private final GenericEntry currentActionEntry;
+    private final GenericEntry allianceColorEntry;
 
     public DriverDashboard(
             SubsystemFactory subsystemFactory,
@@ -54,49 +52,49 @@ public class DriverDashboard {
         this.m_drivetrain = drivetrain;
         this.m_autoManager = autoManager;
 
-        table = NetworkTableInstance.getDefault().getTable(TAB_NAME);
         tab = Shuffleboard.getTab(TAB_NAME);
 
         // Row 0: Match Timer (large, spans 4 columns)
-        matchTimerEntry = table.getStringTopic("MatchTimer").getEntry("--:--");
-        tab.add("Match Timer", matchTimerEntry)
+        // Shuffleboard accepts initial values only; get entry from widget for updates.
+        matchTimerEntry = tab.add("Match Timer", "--:--")
                 .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(0, 0)
                 .withSize(4, 2)
-                .withProperties(java.util.Map.of("fontSize", "48"));
+                .withProperties(java.util.Map.of("fontSize", "48"))
+                .getEntry();
 
         // Row 1: Game Piece Count, Shooter Status
-        gamePieceCountEntry = table.getStringTopic("GamePieceCount").getEntry("-");
-        tab.add("Game Pieces", gamePieceCountEntry)
+        gamePieceCountEntry = tab.add("Game Pieces", "-")
                 .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(0, 2)
-                .withSize(2, 1);
+                .withSize(2, 1)
+                .getEntry();
 
-        shooterStatusEntry = table.getStringTopic("ShooterStatus").getEntry("-");
-        tab.add("Shooter Status", shooterStatusEntry)
+        shooterStatusEntry = tab.add("Shooter Status", "-")
                 .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(2, 2)
-                .withSize(2, 1);
+                .withSize(2, 1)
+                .getEntry();
 
         // Row 2: Vision Status, Alliance Color
-        visionStatusEntry = table.getStringTopic("VisionStatus").getEntry("-");
-        tab.add("Vision Status", visionStatusEntry)
+        visionStatusEntry = tab.add("Vision Status", "-")
                 .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(0, 3)
-                .withSize(2, 1);
+                .withSize(2, 1)
+                .getEntry();
 
-        allianceColorEntry = table.getStringTopic("AllianceColor").getEntry("-");
-        tab.add("Alliance", allianceColorEntry)
+        allianceColorEntry = tab.add("Alliance", "-")
                 .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(2, 3)
-                .withSize(2, 1);
+                .withSize(2, 1)
+                .getEntry();
 
         // Row 3: Current Action
-        currentActionEntry = table.getStringTopic("CurrentAction").getEntry("-");
-        tab.add("Current Action", currentActionEntry)
+        currentActionEntry = tab.add("Current Action", "-")
                 .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(0, 4)
-                .withSize(4, 1);
+                .withSize(4, 1)
+                .getEntry();
     }
 
     /** Updates all dashboard values. Call from robotPeriodic(). */
@@ -148,17 +146,17 @@ public class DriverDashboard {
             colorPrefix = "🟢 ";
         }
 
-        matchTimerEntry.set(colorPrefix + timeString + phaseString);
+        matchTimerEntry.setValue(NetworkTableValue.makeString(colorPrefix + timeString + phaseString));
     }
 
     private void updateGamePieceCount() {
         // PositionTracker is commented out for drivetrain-only testing
-        gamePieceCountEntry.set("N/A (subsystems disabled)");
+        gamePieceCountEntry.setValue(NetworkTableValue.makeString("N/A (subsystems disabled)"));
     }
 
     private void updateShooterStatus() {
         // Shooter is commented out for drivetrain-only testing
-        shooterStatusEntry.set("N/A (subsystems disabled)");
+        shooterStatusEntry.setValue(NetworkTableValue.makeString("N/A (subsystems disabled)"));
     }
 
     private void updateVisionStatus() {
@@ -173,12 +171,12 @@ public class DriverDashboard {
                 tagCount = latestResult.getTargets().size();
             }
             if (hasTargets && tagCount > 0) {
-                visionStatusEntry.set(String.format("🟢 LOCKED (%d tags)", tagCount));
+                visionStatusEntry.setValue(NetworkTableValue.makeString(String.format("🟢 LOCKED (%d tags)", tagCount)));
             } else {
-                visionStatusEntry.set("🟡 ODOMETRY ONLY");
+                visionStatusEntry.setValue(NetworkTableValue.makeString("🟡 ODOMETRY ONLY"));
             }
         } else {
-            visionStatusEntry.set("🔴 NO CAMERA");
+            visionStatusEntry.setValue(NetworkTableValue.makeString("🔴 NO CAMERA"));
         }
     }
 
@@ -198,12 +196,12 @@ public class DriverDashboard {
             }
         }
 
-        currentActionEntry.set(action);
+        currentActionEntry.setValue(NetworkTableValue.makeString(action));
     }
 
     private void updateAllianceColor() {
         var alliance = AllianceUtils.getAlliance();
         String colorString = alliance == DriverStation.Alliance.Red ? "🔴 RED" : "🔵 BLUE";
-        allianceColorEntry.set(colorString);
+        allianceColorEntry.setValue(NetworkTableValue.makeString(colorString));
     }
 }
