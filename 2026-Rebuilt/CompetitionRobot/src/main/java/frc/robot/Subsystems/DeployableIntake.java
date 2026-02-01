@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
 import frc.robot.RobotState;
-import frc.robot.Telemetry;
+import frc.robot.TelemetryCalcs;
 import frc.robot.Constants.IntakeConstants.DeployPosition;
 import frc.robot.Constants.IntakeConstants.IntakeSpeed;
 import frc.robot.Subsystems.Bases.BaseDeployableIntake;
@@ -62,8 +62,8 @@ import frc.robot.Subsystems.Bases.BaseDeployableIntake;
  * @see RobotState
  */
 public class DeployableIntake extends SubsystemBase implements BaseDeployableIntake<DeployPosition, IntakeSpeed> {
-    private final DoublePublisher deployPositionPub = Telemetry.createMechanismsPublisher("Intake Deploy Position");
-    private final DoublePublisher intakeSpeedPub = Telemetry.createMechanismsPublisher("Intake Speed");
+    private final DoublePublisher deployPositionPub = TelemetryCalcs.createMechanismsPublisher("Intake Deploy Position");
+    private final DoublePublisher intakeSpeedPub = TelemetryCalcs.createMechanismsPublisher("Intake Speed");
 
     private TalonFX m_deployMotor;
     private TalonFX m_intakeMotor;

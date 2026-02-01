@@ -9,7 +9,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * Provides shared NetworkTable instances and publisher creation methods
  * to avoid scattered telemetry across multiple subsystem files.
  */
-public class Telemetry {
+public class TelemetryCalcs {
     private static final NetworkTableInstance INSTANCE = NetworkTableInstance.getDefault();
     
     // Shared NetworkTable instances for different telemetry categories
@@ -17,7 +17,7 @@ public class Telemetry {
     private static final NetworkTable POSE_TABLE = INSTANCE.getTable("Pose");
     private static final NetworkTable DRIVE_TABLE = INSTANCE.getTable("Drive");
 
-    private Telemetry() {
+    private TelemetryCalcs() {
         // Utility class - prevent instantiation
     }
 

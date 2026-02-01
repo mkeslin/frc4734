@@ -1,4 +1,4 @@
-package frc.robot.telemetry;
+package frc.robot.Telemetry;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Logging.RobotLogger;

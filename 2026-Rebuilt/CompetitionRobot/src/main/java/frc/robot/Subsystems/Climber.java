@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.PositionTracker;
 import frc.robot.RobotState;
-import frc.robot.Telemetry;
+import frc.robot.TelemetryCalcs;
 import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
 
@@ -44,7 +44,7 @@ import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
  * @see RobotState
  */
 public class Climber extends SubsystemBase implements BaseSingleJointedArm<ClimberPosition> {
-    private final DoublePublisher climberPub = Telemetry.createMechanismsPublisher("Climber Position");
+    private final DoublePublisher climberPub = TelemetryCalcs.createMechanismsPublisher("Climber Position");
 
     private TalonFX m_climber;
     private TalonFX m_climber2;

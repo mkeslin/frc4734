@@ -1,4 +1,4 @@
-package frc.robot.telemetry;
+package frc.robot.Telemetry;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
@@ -11,7 +11,7 @@ import frc.robot.PathPlanner.AllianceUtils;
 import frc.robot.SubsystemFactory;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
-import frc.robot.telemetry.MatchTimer.MatchPhase;
+import frc.robot.Telemetry.MatchTimer.MatchPhase;
 
 /**
  * Driver Dashboard - Shuffleboard tab with critical robot status for drivers.

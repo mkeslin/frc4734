@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.Telemetry;
+import frc.robot.TelemetryCalcs;
 
 public class SwerveDrivetrainTelemetry {
     private final double MaxSpeed;
@@ -32,7 +32,7 @@ public class SwerveDrivetrainTelemetry {
     }
 
     /* Robot pose for field positioning */
-    private final NetworkTable table = Telemetry.getPoseTable();
+    private final NetworkTable table = TelemetryCalcs.getPoseTable();
     // private final DoubleArrayPublisher fieldPub =
     // table.getDoubleArrayTopic("robotPose").publish();
     // private final StructArrayPublisher<Pose3d> fieldPub = table.getStructArrayTopic("Robot Pose", Pose3d.struct).publish();
@@ -42,7 +42,7 @@ public class SwerveDrivetrainTelemetry {
             .getStructArrayTopic("Swerve States", SwerveModuleState.struct).publish();
 
     /* Robot speeds for general checking */
-    private final NetworkTable driveStats = Telemetry.getDriveTable();
+    private final NetworkTable driveStats = TelemetryCalcs.getDriveTable();
     private final DoublePublisher velocityX = driveStats.getDoubleTopic("Velocity X").publish();
     private final DoublePublisher velocityY = driveStats.getDoubleTopic("Velocity Y").publish();
     private final DoublePublisher speed = driveStats.getDoubleTopic("Speed").publish();

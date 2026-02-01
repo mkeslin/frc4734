@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
 import frc.robot.RobotState;
-import frc.robot.Telemetry;
+import frc.robot.TelemetryCalcs;
 import frc.robot.Constants.ShooterConstants.ShooterSpeed;
 import frc.robot.Subsystems.Bases.BaseIntake;
 
@@ -45,7 +45,7 @@ import frc.robot.Subsystems.Bases.BaseIntake;
  * @see RobotState
  */
 public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
-    private final DoublePublisher shooterSpeedPub = Telemetry.createMechanismsPublisher("Shooter Speed");
+    private final DoublePublisher shooterSpeedPub = TelemetryCalcs.createMechanismsPublisher("Shooter Speed");
 
     private TalonFX m_shooterLeftLeaderMotor;
     private TalonFX m_shooterRightFollowerMotor;

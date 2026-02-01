@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
 import frc.robot.RobotState;
-import frc.robot.Telemetry;
+import frc.robot.TelemetryCalcs;
 import frc.robot.Constants.FeederConstants.FeederSpeed;
 import frc.robot.Subsystems.Bases.BaseIntake;
 
@@ -41,7 +41,7 @@ import frc.robot.Subsystems.Bases.BaseIntake;
  * @see RobotState
  */
 public class Feeder extends SubsystemBase implements BaseIntake<FeederSpeed> {
-    private final DoublePublisher feederSpeedPub = Telemetry.createMechanismsPublisher("Feeder Speed");
+    private final DoublePublisher feederSpeedPub = TelemetryCalcs.createMechanismsPublisher("Feeder Speed");
 
     private TalonFX m_feederMotor;
     private final VoltageOut m_voltReq = new VoltageOut(0.0);
