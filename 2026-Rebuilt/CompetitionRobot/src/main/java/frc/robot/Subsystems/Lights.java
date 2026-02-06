@@ -30,9 +30,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * Subsystem for controlling CANdle LED lights.
  * 
  * Note: Uses Phoenix 5 LED library as Phoenix 6 LED support is not yet complete.
- * Deprecation warnings are suppressed as this is the recommended approach for 2026.
+ * Deprecation/removal warnings are suppressed as this is the recommended approach for 2026.
  */
-@SuppressWarnings({"removal"})
+@SuppressWarnings({"removal", "deprecation"})
 public class Lights extends SubsystemBase {
     private final CANdle m_candle = new CANdle(LIGHTS);
     private final int LedCount = 300;
