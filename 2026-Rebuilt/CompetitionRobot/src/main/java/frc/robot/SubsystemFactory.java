@@ -14,6 +14,7 @@ import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.ShooterHood;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.State.StateMachine;
@@ -30,6 +31,7 @@ public class SubsystemFactory {
     // private final Floor m_floor;
     // private final Feeder m_feeder;
     // private final Shooter m_shooter;
+    // private final ShooterHood m_shooterHood;
     // private final Lights m_lights;
     private final PhotonVision m_photonVision;
     // private final DigitalInput m_coralTraySensor;
@@ -55,6 +57,7 @@ public class SubsystemFactory {
         // m_floor = new Floor();
         // m_feeder = new Feeder();
         // m_shooter = new Shooter();
+        // m_shooterHood = new ShooterHood();
         // m_lights = new Lights();
 
         // Create sensors
@@ -123,6 +126,10 @@ public class SubsystemFactory {
     //     return m_shooter;
     // }
 
+    // public ShooterHood getShooterHood() {
+    //     return m_shooterHood;
+    // }
+
     // public Lights getLights() {
     //     return m_lights;
     // }
@@ -150,6 +157,7 @@ public class SubsystemFactory {
         // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // m_climber.resetPosition();
         // m_deployableIntake.resetDeployPosition();
+        // m_shooterHood.resetPosition();
     }
 
     /**
@@ -174,6 +182,9 @@ public class SubsystemFactory {
         // }
         // if (m_shooter != null) {
         //     m_shooter.cleanup();
+        // }
+        // if (m_shooterHood != null) {
+        //     m_shooterHood.cleanup();
         // }
         // if (m_lights != null) {
         //     m_lights.cleanup();
