@@ -10,9 +10,11 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.networktables.DoublePublisher;
@@ -78,12 +80,15 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
         m_shooterLeftLeaderMotor = new TalonFX(SHOOTER_1);
         m_shooterLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
 
-        // Shooter_2 and Shooter_3 are mounted opposite to Shooter_1; we command them with opposite velocity in moveToSpeedCommand so all rollers move the same direction (no Follower mode).
+        // Shooter_2 and Shooter_3 mounted opposite to Shooter_1; followers use Opposite so all rollers move the same direction
+        int leaderId = m_shooterLeftLeaderMotor.getDeviceID();
         m_shooterRightFollowerMotor = new TalonFX(SHOOTER_2);
         m_shooterRightFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
+        m_shooterRightFollowerMotor.setControl(new Follower(leaderId, MotorAlignmentValue.Opposed));
 
         m_shooterCenterFollowerMotor = new TalonFX(SHOOTER_3);
         m_shooterCenterFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
+        m_shooterCenterFollowerMotor.setControl(new Follower(leaderId, MotorAlignmentValue.Opposed));
 
         resetSpeed();
     }
@@ -147,9 +152,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
                 VelocityVoltage velocityOut = new VelocityVoltage(0);
                 velocityOut.Slot = 0;
                 m_shooterLeftLeaderMotor.setControl(velocityOut.withVelocity(goalVelocity));
-                // Shooter_2 and Shooter_3 mounted opposite to Shooter_1; command opposite velocity so all rollers move same direction
-                m_shooterRightFollowerMotor.setControl(velocityOut.withVelocity(-goalVelocity));
-                m_shooterCenterFollowerMotor.setControl(velocityOut.withVelocity(-goalVelocity));
+                // Followers in Follower(Opposite) mode; no need to command them here
             } else {
                 m_shooterLeftLeaderMotor.stopMotor();
                 m_shooterRightFollowerMotor.stopMotor();
