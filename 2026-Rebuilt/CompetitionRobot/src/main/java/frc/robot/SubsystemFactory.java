@@ -29,9 +29,9 @@ public class SubsystemFactory {
     // private final Climber m_climber;
     // private final DeployableIntake m_deployableIntake;
     // private final Floor m_floor;
-    // private final Feeder m_feeder;
-    // private final Shooter m_shooter;
-    // private final ShooterHood m_shooterHood;
+    private final Feeder m_feeder;
+    private final Shooter m_shooter;
+    private final ShooterHood m_shooterHood;
     // private final Lights m_lights;
     private final PhotonVision m_photonVision;
     // private final DigitalInput m_coralTraySensor;
@@ -55,9 +55,9 @@ public class SubsystemFactory {
         // m_climber = new Climber();
         // m_deployableIntake = new DeployableIntake();
         // m_floor = new Floor();
-        // m_feeder = new Feeder();
-        // m_shooter = new Shooter();
-        // m_shooterHood = new ShooterHood();
+        m_feeder = new Feeder();
+        m_shooter = new Shooter();
+        m_shooterHood = new ShooterHood();
         // m_lights = new Lights();
 
         // Create sensors
@@ -118,17 +118,17 @@ public class SubsystemFactory {
     //     return m_floor;
     // }
 
-    // public Feeder getFeeder() {
-    //     return m_feeder;
-    // }
+    public Feeder getFeeder() {
+        return m_feeder;
+    }
 
-    // public Shooter getShooter() {
-    //     return m_shooter;
-    // }
+    public Shooter getShooter() {
+        return m_shooter;
+    }
 
-    // public ShooterHood getShooterHood() {
-    //     return m_shooterHood;
-    // }
+    public ShooterHood getShooterHood() {
+        return m_shooterHood;
+    }
 
     // public Lights getLights() {
     //     return m_lights;
@@ -157,7 +157,9 @@ public class SubsystemFactory {
         // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // m_climber.resetPosition();
         // m_deployableIntake.resetDeployPosition();
-        // m_shooterHood.resetPosition();
+        m_feeder.resetSpeed();
+        m_shooter.resetSpeed();
+        m_shooterHood.resetPosition();
     }
 
     /**
@@ -177,15 +179,15 @@ public class SubsystemFactory {
         // if (m_floor != null) {
         //     m_floor.cleanup();
         // }
-        // if (m_feeder != null) {
-        //     m_feeder.cleanup();
-        // }
-        // if (m_shooter != null) {
-        //     m_shooter.cleanup();
-        // }
-        // if (m_shooterHood != null) {
-        //     m_shooterHood.cleanup();
-        // }
+        if (m_feeder != null) {
+            m_feeder.cleanup();
+        }
+        if (m_shooter != null) {
+            m_shooter.cleanup();
+        }
+        if (m_shooterHood != null) {
+            m_shooterHood.cleanup();
+        }
         // if (m_lights != null) {
         //     m_lights.cleanup();
         // }

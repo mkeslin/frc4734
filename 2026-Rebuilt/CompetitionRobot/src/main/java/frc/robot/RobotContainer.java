@@ -12,9 +12,13 @@ import frc.robot.Commands.RobotContext;
 import frc.robot.Logging.RobotLogger;
 import frc.robot.Monitoring.PerformanceMonitor;
 import frc.robot.dashboard.DriverDashboard;
+import frc.robot.Constants.FeederConstants.FeederSpeed;
+import frc.robot.Constants.ShooterConstants.ShooterSpeed;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.Subsystems.Climber;
+import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Lights;
+import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
@@ -82,11 +86,39 @@ public class RobotContainer {
         // m_bindingConfigurator.configureAllBindings();
         m_bindingConfigurator = null; // Temporary for drivetrain-only testing
 
-        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-        // Create auto configurator and configure autonomous routines
-        // m_autoConfigurator = new AutoConfigurator(m_autoManager);
-        // m_autoConfigurator.configureAuto();
-        m_autoConfigurator = null; // Temporary for drivetrain-only testing
+        // Auto configurator: registers test harness (atoms/molecules) and full autos when subsystems are available
+        m_autoConfigurator = new AutoConfigurator(m_autoManager, m_drivetrain);
+        m_autoConfigurator.configureAuto(
+                m_subsystemFactory.getPhotonVision(),
+                m_subsystemFactory.getShooter(),
+                m_subsystemFactory.getFeeder(),
+                null,  // intake
+                null,  // climber
+                null   // positionTracker
+        );
+
+        // Shooter on mechanism controller: right bumper = on, left bumper = off
+        Shooter shooter = m_subsystemFactory.getShooter();
+        if (shooter != null) {
+            m_mechanismController.rightBumper()
+                    .whileTrue(shooter.moveToSetSpeedCommand(() -> ShooterSpeed.FORWARD))
+                    .onFalse(shooter.resetSpeedCommand());
+            m_mechanismController.leftBumper()
+                    .whileTrue(shooter.moveToSetSpeedCommand(() -> ShooterSpeed.REVERSE))
+                    .onFalse(shooter.resetSpeedCommand());
+            m_mechanismController.back().onTrue(shooter.resetSpeedCommand());
+        }
+        // Feeder on mechanism controller: A = on, X = reverse, B = off
+        Feeder feeder = m_subsystemFactory.getFeeder();
+        if (feeder != null) {
+            m_mechanismController.a()
+                    .whileTrue(feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value))
+                    .onFalse(feeder.resetSpeedCommand());
+            m_mechanismController.x()
+                    .whileTrue(feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value))
+                    .onFalse(feeder.resetSpeedCommand());
+            m_mechanismController.b().onTrue(feeder.resetSpeedCommand());
+        }
 
         // Seed field-centric pose
         m_drivetrain.seedFieldCentric();

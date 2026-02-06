@@ -12,6 +12,7 @@ import frc.robot.Auto.AutoManager;
 import frc.robot.PathPlanner.AllianceUtils;
 import frc.robot.SubsystemFactory;
 import frc.robot.Subsystems.Cameras.PhotonVision;
+import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.dashboard.MatchTimer.MatchPhase;
 
@@ -213,8 +214,14 @@ public class DriverDashboard {
     }
 
     private void updateShooterStatus() {
-        // Shooter is commented out for drivetrain-only testing
-        shooterStatusEntry.setValue(NetworkTableValue.makeString("N/A (subsystems disabled)"));
+        Shooter shooter = m_subsystemFactory != null ? m_subsystemFactory.getShooter() : null;
+        if (shooter == null) {
+            shooterStatusEntry.setValue(NetworkTableValue.makeString("N/A (subsystems disabled)"));
+            return;
+        }
+        double rpm = shooter.getSpeed();
+        String status = rpm > 100 ? String.format("SPINNING %.0f RPM", rpm) : "READY";
+        shooterStatusEntry.setValue(NetworkTableValue.makeString(status));
     }
 
     private void updateVisionStatus() {

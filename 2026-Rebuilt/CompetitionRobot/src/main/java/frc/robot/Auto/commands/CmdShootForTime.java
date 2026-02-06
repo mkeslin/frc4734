@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants.FeederConstants.FeederSpeed;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Shooter;
 
@@ -81,9 +82,7 @@ public class CmdShootForTime extends Command {
         timer.start();
 
         // Create feeder command (run at forward speed for duration)
-        // TODO: Replace with actual feeder forward speed constant
-        double feederSpeed = 0.5; // Placeholder - should come from FeederConstants
-        feederCommand = feeder.moveToArbitrarySpeedCommand(() -> feederSpeed)
+        feederCommand = feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
                 .withTimeout(durationSec)
                 .withName("CmdShootForTime-feeder");
         
