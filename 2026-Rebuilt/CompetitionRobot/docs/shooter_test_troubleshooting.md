@@ -1,5 +1,12 @@
 # Shooter / AutoTest Troubleshooting
 
+## Run Test / Stop Test buttons are disabled (greyed out)
+
+- The Run and Stop toggles must use the same NetworkTable path as the harness (`Shuffleboard/AutoTest/Run` and `.../Stop`). If they were disconnected, the buttons could appear to do nothing or be disabled.
+- In some setups, Shuffleboard or the Driver Station may disable **editing** of widgets when the robot is **enabled** (safety). If the Run/Stop toggles are greyed out, try putting the robot in **Disabled** mode and see if the toggles become clickable. Running tests while Disabled is supported; the command will run when you toggle Run.
+
+---
+
 If **ShooterOn** (or other shooter/feeder test atoms) do nothing when you run them from the AutoTest tab, check the following.
 
 ## 1. Run the test while the robot is **enabled**
