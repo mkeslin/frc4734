@@ -1,9 +1,9 @@
 package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.Constants.CANIds.SHOOTER_LEFT;
-import static frc.robot.Constants.CANIds.SHOOTER_RIGHT;
-import static frc.robot.Constants.CANIds.SHOOTER_CENTER;
+import static frc.robot.Constants.CANIds.SHOOTER_1;
+import static frc.robot.Constants.CANIds.SHOOTER_2;
+import static frc.robot.Constants.CANIds.SHOOTER_3;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Objects;
@@ -12,9 +12,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.networktables.DoublePublisher;
@@ -67,24 +65,25 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
                         (state) -> SignalLogger.writeString("Shooter State", state.toString())),
                 new SysIdRoutine.Mechanism(
                         (volts) -> {
-                            m_shooterLeftLeaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
-                            m_shooterRightFollowerMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
-                            m_shooterCenterFollowerMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
+                            double v = volts.in(Volts);
+                            m_shooterLeftLeaderMotor.setControl(m_voltReq.withOutput(v));
+                            // Followers are mounted opposite to leader; negate so all spin same direction for SysId
+                            m_shooterRightFollowerMotor.setControl(m_voltReq.withOutput(-v));
+                            m_shooterCenterFollowerMotor.setControl(m_voltReq.withOutput(-v));
                         },
                         null,
                         this,
                         "Shooter"));
 
-        m_shooterLeftLeaderMotor = new TalonFX(SHOOTER_LEFT);
+        m_shooterLeftLeaderMotor = new TalonFX(SHOOTER_1);
         m_shooterLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
 
-        m_shooterRightFollowerMotor = new TalonFX(SHOOTER_RIGHT);
+        // Shooter_2 and Shooter_3 are mounted opposite to Shooter_1; we command them with opposite velocity in moveToSpeedCommand so all rollers move the same direction (no Follower mode).
+        m_shooterRightFollowerMotor = new TalonFX(SHOOTER_2);
         m_shooterRightFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
-        m_shooterRightFollowerMotor.setControl(new Follower(m_shooterLeftLeaderMotor.getDeviceID(), MotorAlignmentValue.Aligned));
 
-        m_shooterCenterFollowerMotor = new TalonFX(SHOOTER_CENTER);
+        m_shooterCenterFollowerMotor = new TalonFX(SHOOTER_3);
         m_shooterCenterFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
-        m_shooterCenterFollowerMotor.setControl(new Follower(m_shooterLeftLeaderMotor.getDeviceID(), MotorAlignmentValue.Aligned));
 
         resetSpeed();
     }
@@ -148,7 +147,9 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
                 VelocityVoltage velocityOut = new VelocityVoltage(0);
                 velocityOut.Slot = 0;
                 m_shooterLeftLeaderMotor.setControl(velocityOut.withVelocity(goalVelocity));
-                // Follower motor automatically follows leader
+                // Shooter_2 and Shooter_3 mounted opposite to Shooter_1; command opposite velocity so all rollers move same direction
+                m_shooterRightFollowerMotor.setControl(velocityOut.withVelocity(-goalVelocity));
+                m_shooterCenterFollowerMotor.setControl(velocityOut.withVelocity(-goalVelocity));
             } else {
                 m_shooterLeftLeaderMotor.stopMotor();
                 m_shooterRightFollowerMotor.stopMotor();

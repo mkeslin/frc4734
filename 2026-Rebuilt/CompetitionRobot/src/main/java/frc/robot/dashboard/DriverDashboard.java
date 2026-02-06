@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Auto.AutoManager;
 import frc.robot.PathPlanner.AllianceUtils;
+import frc.robot.RobotState;
 import frc.robot.SubsystemFactory;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.Subsystems.Shooter;
@@ -219,9 +220,11 @@ public class DriverDashboard {
             shooterStatusEntry.setValue(NetworkTableValue.makeString("N/A (subsystems disabled)"));
             return;
         }
-        double rpm = shooter.getSpeed();
+        boolean init = RobotState.getInstance().isInitialized();
+        double rps = shooter.getSpeed();
+        double rpm = rps * 60.0; // TalonFX velocity is rotations per second
         String status = rpm > 100 ? String.format("SPINNING %.0f RPM", rpm) : "READY";
-        shooterStatusEntry.setValue(NetworkTableValue.makeString(status));
+        shooterStatusEntry.setValue(NetworkTableValue.makeString(status + " (init:" + (init ? "yes" : "no") + ")"));
     }
 
     private void updateVisionStatus() {

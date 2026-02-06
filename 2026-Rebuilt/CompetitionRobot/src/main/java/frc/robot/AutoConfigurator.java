@@ -32,7 +32,6 @@ import frc.robot.Auto.commands.CmdWaitShooterAtSpeed;
 import frc.robot.Auto.commands.ShotMode;
 import frc.robot.Auto.commands.StartPoseId;
 import frc.robot.Constants.FeederConstants.FeederSpeed;
-import frc.robot.Constants.ShooterConstants.ShooterSpeed;
 import frc.robot.PathPlanner.Landmarks;
 import frc.robot.autotest.AutoTestHarness;
 import frc.robot.autotest.AutoTestShuffleboard;
@@ -169,12 +168,14 @@ public class AutoConfigurator {
                         AutoConstants.DEFAULT_POSE_TIMEOUT));
         
         // Shooter commands (on / reverse / off for testing)
+        // Use arbitrary speed in RPS so test is visible; ShooterSpeed.FORWARD (0.5 RPS) is too low to see.
         if (shooter != null) {
             Supplier<Double> testRpm = () -> 3000.0; // Test RPM
+            double testShooterRps = 30.0; // RPS for ShooterOn/Reverse (visible; TalonFX velocity = rotations/sec)
             m_testHarness.registerAtom("ShooterOn", () -> 
-                    shooter.moveToSetSpeedCommand(() -> ShooterSpeed.FORWARD));
+                    shooter.moveToArbitrarySpeedCommand(() -> testShooterRps));
             m_testHarness.registerAtom("ShooterReverse", () -> 
-                    shooter.moveToSetSpeedCommand(() -> ShooterSpeed.REVERSE));
+                    shooter.moveToArbitrarySpeedCommand(() -> -testShooterRps));
             m_testHarness.registerAtom("ShooterOff", () -> 
                     new CmdStopShooter(shooter));
             m_testHarness.registerAtom("ShooterSpinUp", () -> 

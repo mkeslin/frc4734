@@ -24,9 +24,9 @@ public final class CANIds {
     public static final int FEEDER = 28;
 
     // Shooter
-    public static final int SHOOTER_LEFT = 29;
-    public static final int SHOOTER_RIGHT = 30;
-    public static final int SHOOTER_CENTER = 32;
+    public static final int SHOOTER_1 = 29;
+    public static final int SHOOTER_2 = 30;
+    public static final int SHOOTER_3 = 32;
 
     // Lights
     public static final int LIGHTS = 40;

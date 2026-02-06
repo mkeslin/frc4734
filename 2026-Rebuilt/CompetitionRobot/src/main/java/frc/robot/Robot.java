@@ -82,6 +82,14 @@ public class Robot extends LoggedRobot {
         // Update driver dashboard
         m_robotContainer.updateDriverDashboard();
 
+        // Poll AutoTest Run/Stop so tests can run when robot is enabled
+        if (m_robotContainer != null && m_robotContainer.getAutoConfigurator() != null) {
+            var testHarness = m_robotContainer.getAutoConfigurator().getTestHarness();
+            if (testHarness != null) {
+                testHarness.periodic();
+            }
+        }
+
         // End loop timing and log metrics periodically
         m_performanceMonitor.endLoop();
     }
