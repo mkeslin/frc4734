@@ -62,6 +62,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
     private TalonFX m_shooterLeftLeaderMotor;
     private TalonFX m_shooterRightFollowerMotor;
     private TalonFX m_shooterCenterFollowerMotor;
+    private final int m_leaderDeviceId;
     private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
     private final SysIdRoutine m_sysIdRoutine;
@@ -119,16 +120,16 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
         applyShooterMotorConfig(m_shooterLeftLeaderMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
 
         // Shooter 2 and 3: same config as leader, then run as followers (mounted opposite to leader)
-        int leaderId = m_shooterLeftLeaderMotor.getDeviceID();
+        m_leaderDeviceId = m_shooterLeftLeaderMotor.getDeviceID();
         m_shooterRightFollowerMotor = new TalonFX(SHOOTER_2);
         m_shooterRightFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
         applyShooterMotorConfig(m_shooterRightFollowerMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
-        m_shooterRightFollowerMotor.setControl(new Follower(leaderId, MotorAlignmentValue.Opposed));
+        m_shooterRightFollowerMotor.setControl(new Follower(m_leaderDeviceId, MotorAlignmentValue.Opposed));
 
         m_shooterCenterFollowerMotor = new TalonFX(SHOOTER_3);
         m_shooterCenterFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
         applyShooterMotorConfig(m_shooterCenterFollowerMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
-        m_shooterCenterFollowerMotor.setControl(new Follower(leaderId, MotorAlignmentValue.Opposed));
+        m_shooterCenterFollowerMotor.setControl(new Follower(m_leaderDeviceId, MotorAlignmentValue.Opposed));
 
         resetSpeed();
     }
@@ -204,6 +205,9 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
                 VelocityVoltage velocityOut = new VelocityVoltage(0);
                 velocityOut.Slot = 0;
                 m_shooterLeftLeaderMotor.setControl(velocityOut.withVelocity(goalVelocity));
+                // Re-apply Follower each cycle; stopMotor() clears it so followers would otherwise stay stopped
+                m_shooterRightFollowerMotor.setControl(new Follower(m_leaderDeviceId, MotorAlignmentValue.Opposed));
+                m_shooterCenterFollowerMotor.setControl(new Follower(m_leaderDeviceId, MotorAlignmentValue.Opposed));
             } else {
                 m_shooterLeftLeaderMotor.stopMotor();
                 m_shooterRightFollowerMotor.stopMotor();
