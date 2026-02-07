@@ -27,7 +27,7 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 public class SubsystemFactory {
     // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
     // private final Climber m_climber;
-    // private final DeployableIntake m_deployableIntake;
+    private final DeployableIntake m_deployableIntake;
     // private final Floor m_floor;
     private final Feeder m_feeder;
     private final Shooter m_shooter;
@@ -53,7 +53,7 @@ public class SubsystemFactory {
         // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Create subsystems (PositionTracker will be set after creation)
         // m_climber = new Climber();
-        // m_deployableIntake = new DeployableIntake();
+        m_deployableIntake = new DeployableIntake();
         // m_floor = new Floor();
         m_feeder = new Feeder();
         m_shooter = new Shooter();
@@ -110,9 +110,9 @@ public class SubsystemFactory {
     //     return m_climber;
     // }
 
-    // public DeployableIntake getDeployableIntake() {
-    //     return m_deployableIntake;
-    // }
+    public DeployableIntake getDeployableIntake() {
+         return m_deployableIntake;
+    }
 
     // public Floor getFloor() {
     //     return m_floor;

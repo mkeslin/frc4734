@@ -14,11 +14,14 @@ import frc.robot.Monitoring.PerformanceMonitor;
 import frc.robot.dashboard.DriverDashboard;
 import frc.robot.Constants.FeederConstants.FeederSpeed;
 import frc.robot.Constants.ShooterConstants.ShooterSpeed;
+import frc.robot.Constants.IntakeConstants.IntakeSpeed;
+import frc.robot.Constants.IntakeConstants.DeployPosition;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
@@ -120,6 +123,16 @@ public class RobotContainer {
             m_mechanismController.b().onTrue(feeder.resetSpeedCommand());
         }
 
+        DeployableIntake intake = m_subsystemFactory.getDeployableIntake();
+        if (intake != null) {
+            m_mechanismController.leftTrigger()
+                    .whileTrue(intake.moveToArbitraryIntakeSpeedCommand(() -> IntakeSpeed.IN.value))
+                    .onFalse(intake.resetIntakeSpeedCommand());
+            m_mechanismController.povUp()
+                    .onTrue(intake.moveToArbitraryDeployPositionCommand(() -> DeployPosition.DEPLOYED.value));
+            m_mechanismController.povDown()
+                    .onTrue(intake.moveToArbitraryDeployPositionCommand(() -> DeployPosition.STOWED.value));
+        }
         // Seed field-centric pose
         m_drivetrain.seedFieldCentric();
 

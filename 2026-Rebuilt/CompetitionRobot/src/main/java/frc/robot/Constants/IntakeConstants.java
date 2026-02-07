@@ -11,7 +11,7 @@ public class IntakeConstants {
      */
     public static enum DeployPosition {
         STOWED(0),
-        DEPLOYED(1.0); // TODO: Update with actual deployed position value
+        DEPLOYED(17.8);
 
         public final double value;
 
@@ -71,5 +71,5 @@ public class IntakeConstants {
     public static final double INTAKE_VELOCITY_KP = 0.1;
     public static final double INTAKE_VELOCITY_KI = 0.0;
     public static final double INTAKE_VELOCITY_KD = 0.0;
-    public static final boolean INTAKE_MOTOR_INVERTED = false;
+    public static final boolean INTAKE_MOTOR_INVERTED = true;
 }
