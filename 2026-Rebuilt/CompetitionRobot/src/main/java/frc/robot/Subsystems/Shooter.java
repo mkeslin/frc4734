@@ -4,18 +4,27 @@ import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.Constants.CANIds.SHOOTER_1;
 import static frc.robot.Constants.CANIds.SHOOTER_2;
 import static frc.robot.Constants.CANIds.SHOOTER_3;
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import frc.robot.Constants.ShooterConstants;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,6 +54,9 @@ import frc.robot.Subsystems.Bases.BaseIntake;
  * @see RobotState
  */
 public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
+    /** When true, shooter runs without requiring RobotState initialization (for bench troubleshooting only). */
+    private static final boolean BYPASS_ROBOT_STATE_FOR_BENCH = true;
+
     private final DoublePublisher shooterSpeedPub = TelemetryCalcs.createMechanismsPublisher("Shooter Speed");
 
     private TalonFX m_shooterLeftLeaderMotor;
@@ -69,7 +81,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
                         (volts) -> {
                             double v = volts.in(Volts);
                             m_shooterLeftLeaderMotor.setControl(m_voltReq.withOutput(v));
-                            // Followers are mounted opposite to leader; negate so all spin same direction for SysId
+                            // Followers mounted opposite to leader; negate so all spin same direction for SysId
                             m_shooterRightFollowerMotor.setControl(m_voltReq.withOutput(-v));
                             m_shooterCenterFollowerMotor.setControl(m_voltReq.withOutput(-v));
                         },
@@ -80,17 +92,56 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
         m_shooterLeftLeaderMotor = new TalonFX(SHOOTER_1);
         m_shooterLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
 
-        // Shooter_2 and Shooter_3 mounted opposite to Shooter_1; followers use Opposite so all rollers move the same direction
+        // Velocity closed-loop Slot0 and current limits in one config
+        Slot0Configs slot0 = new Slot0Configs();
+        slot0.kV = ShooterConstants.VELOCITY_KV;
+        slot0.kS = ShooterConstants.VELOCITY_KS;
+        slot0.kP = ShooterConstants.VELOCITY_KP;
+        slot0.kI = ShooterConstants.VELOCITY_KI;
+        slot0.kD = ShooterConstants.VELOCITY_KD;
+
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(Amps.of(ShooterConstants.SUPPLY_CURRENT_LIMIT_AMPS))
+                .withSupplyCurrentLimitEnable(ShooterConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
+                .withStatorCurrentLimit(Amps.of(ShooterConstants.STATOR_CURRENT_LIMIT_AMPS))
+                .withStatorCurrentLimitEnable(ShooterConstants.STATOR_CURRENT_LIMIT_ENABLE);
+
+        InvertedValue invert = ShooterConstants.MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        MotorOutputConfigs motorOutput = new MotorOutputConfigs().withInverted(invert);
+
+        ClosedLoopRampsConfigs closedLoopRamps = new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(ShooterConstants.CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC);
+
+        VoltageConfigs voltage = new VoltageConfigs()
+                .withPeakForwardVoltage(ShooterConstants.PEAK_FORWARD_VOLTAGE)
+                .withPeakReverseVoltage(ShooterConstants.PEAK_REVERSE_VOLTAGE);
+
+        applyShooterMotorConfig(m_shooterLeftLeaderMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
+
+        // Shooter 2 and 3: same config as leader, then run as followers (mounted opposite to leader)
         int leaderId = m_shooterLeftLeaderMotor.getDeviceID();
         m_shooterRightFollowerMotor = new TalonFX(SHOOTER_2);
         m_shooterRightFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
+        applyShooterMotorConfig(m_shooterRightFollowerMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
         m_shooterRightFollowerMotor.setControl(new Follower(leaderId, MotorAlignmentValue.Opposed));
 
         m_shooterCenterFollowerMotor = new TalonFX(SHOOTER_3);
         m_shooterCenterFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
+        applyShooterMotorConfig(m_shooterCenterFollowerMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
         m_shooterCenterFollowerMotor.setControl(new Follower(leaderId, MotorAlignmentValue.Opposed));
 
         resetSpeed();
+    }
+
+    /** Applies Slot0, current limits, motor output, closed-loop ramps, and voltage config to a shooter Talon FX. */
+    private static void applyShooterMotorConfig(TalonFX motor,
+            Slot0Configs slot0, CurrentLimitsConfigs currentLimits, MotorOutputConfigs motorOutput,
+            ClosedLoopRampsConfigs closedLoopRamps, VoltageConfigs voltage) {
+        motor.getConfigurator().apply(slot0);
+        motor.getConfigurator().apply(currentLimits);
+        motor.getConfigurator().apply(motorOutput);
+        motor.getConfigurator().apply(closedLoopRamps);
+        motor.getConfigurator().apply(voltage);
     }
 
     @Override
@@ -147,12 +198,12 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
 
     private Command moveToSpeedCommand(double goalVelocity) {
         return run(() -> {
-            // Safety check: prevent movement until robot is initialized
-            if (RobotState.getInstance().isInitialized() && canRun()) {
+            boolean skipInitCheck = BYPASS_ROBOT_STATE_FOR_BENCH;
+            boolean allowRun = canRun() && (skipInitCheck || RobotState.getInstance().isInitialized());
+            if (allowRun) {
                 VelocityVoltage velocityOut = new VelocityVoltage(0);
                 velocityOut.Slot = 0;
                 m_shooterLeftLeaderMotor.setControl(velocityOut.withVelocity(goalVelocity));
-                // Followers in Follower(Opposite) mode; no need to command them here
             } else {
                 m_shooterLeftLeaderMotor.stopMotor();
                 m_shooterRightFollowerMotor.stopMotor();
@@ -224,7 +275,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
      * Stops all motors and closes NetworkTables publishers.
      */
     public void cleanup() {
-        if (m_shooterLeftLeaderMotor != null) {
+if (m_shooterLeftLeaderMotor != null) {
             m_shooterLeftLeaderMotor.stopMotor();
         }
         if (m_shooterRightFollowerMotor != null) {
