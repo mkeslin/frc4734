@@ -55,4 +55,21 @@ public class IntakeConstants {
 
     // Safety: minimum deploy position to allow intake operation (rotations)
     public static final double MIN_DEPLOY_POSITION_FOR_INTAKE = 0.5;
+
+    // ---- Current limits, ramp, voltage (deploy and intake motors) ----
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 40;
+    public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 60;
+    public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
+    public static final double CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC = 0.2;
+    public static final double PEAK_FORWARD_VOLTAGE = 12.0;
+    public static final double PEAK_REVERSE_VOLTAGE = -12.0;
+
+    // ---- Intake roller: velocity Slot0 (for intake motor only) ----
+    public static final double INTAKE_VELOCITY_KV = 0.12;
+    public static final double INTAKE_VELOCITY_KS = 0.25;
+    public static final double INTAKE_VELOCITY_KP = 0.1;
+    public static final double INTAKE_VELOCITY_KI = 0.0;
+    public static final double INTAKE_VELOCITY_KD = 0.0;
+    public static final boolean INTAKE_MOTOR_INVERTED = false;
 }

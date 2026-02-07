@@ -1,5 +1,6 @@
 package frc.robot.Subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.Constants.CANIds.FLOOR_CONVEYOR;
 import static edu.wpi.first.units.Units.Volts;
@@ -8,10 +9,18 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import frc.robot.Constants.FloorConstants;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -67,6 +76,28 @@ public class Floor extends SubsystemBase implements BaseIntake<ConveyorSpeed> {
 
         m_floorMotor = new TalonFX(FLOOR_CONVEYOR);
         m_floorMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        Slot0Configs slot0 = new Slot0Configs()
+                .withKV(FloorConstants.VELOCITY_KV).withKS(FloorConstants.VELOCITY_KS)
+                .withKP(FloorConstants.VELOCITY_KP).withKI(FloorConstants.VELOCITY_KI).withKD(FloorConstants.VELOCITY_KD);
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(Amps.of(FloorConstants.SUPPLY_CURRENT_LIMIT_AMPS))
+                .withSupplyCurrentLimitEnable(FloorConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
+                .withStatorCurrentLimit(Amps.of(FloorConstants.STATOR_CURRENT_LIMIT_AMPS))
+                .withStatorCurrentLimitEnable(FloorConstants.STATOR_CURRENT_LIMIT_ENABLE);
+        InvertedValue invert = FloorConstants.MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        MotorOutputConfigs motorOutput = new MotorOutputConfigs().withInverted(invert);
+        ClosedLoopRampsConfigs closedLoopRamps = new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(FloorConstants.CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC);
+        VoltageConfigs voltage = new VoltageConfigs()
+                .withPeakForwardVoltage(FloorConstants.PEAK_FORWARD_VOLTAGE)
+                .withPeakReverseVoltage(FloorConstants.PEAK_REVERSE_VOLTAGE);
+
+        m_floorMotor.getConfigurator().apply(slot0);
+        m_floorMotor.getConfigurator().apply(currentLimits);
+        m_floorMotor.getConfigurator().apply(motorOutput);
+        m_floorMotor.getConfigurator().apply(closedLoopRamps);
+        m_floorMotor.getConfigurator().apply(voltage);
 
         resetSpeed();
     }

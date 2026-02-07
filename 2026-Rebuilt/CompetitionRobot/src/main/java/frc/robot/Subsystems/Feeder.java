@@ -1,5 +1,6 @@
 package frc.robot.Subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.Constants.CANIds.FEEDER;
 import static edu.wpi.first.units.Units.Volts;
@@ -8,10 +9,18 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import frc.robot.Constants.FeederConstants;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -67,6 +76,28 @@ public class Feeder extends SubsystemBase implements BaseIntake<FeederSpeed> {
 
         m_feederMotor = new TalonFX(FEEDER);
         m_feederMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        Slot0Configs slot0 = new Slot0Configs()
+                .withKV(FeederConstants.VELOCITY_KV).withKS(FeederConstants.VELOCITY_KS)
+                .withKP(FeederConstants.VELOCITY_KP).withKI(FeederConstants.VELOCITY_KI).withKD(FeederConstants.VELOCITY_KD);
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(Amps.of(FeederConstants.SUPPLY_CURRENT_LIMIT_AMPS))
+                .withSupplyCurrentLimitEnable(FeederConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
+                .withStatorCurrentLimit(Amps.of(FeederConstants.STATOR_CURRENT_LIMIT_AMPS))
+                .withStatorCurrentLimitEnable(FeederConstants.STATOR_CURRENT_LIMIT_ENABLE);
+        InvertedValue invert = FeederConstants.MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        MotorOutputConfigs motorOutput = new MotorOutputConfigs().withInverted(invert);
+        ClosedLoopRampsConfigs closedLoopRamps = new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(FeederConstants.CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC);
+        VoltageConfigs voltage = new VoltageConfigs()
+                .withPeakForwardVoltage(FeederConstants.PEAK_FORWARD_VOLTAGE)
+                .withPeakReverseVoltage(FeederConstants.PEAK_REVERSE_VOLTAGE);
+
+        m_feederMotor.getConfigurator().apply(slot0);
+        m_feederMotor.getConfigurator().apply(currentLimits);
+        m_feederMotor.getConfigurator().apply(motorOutput);
+        m_feederMotor.getConfigurator().apply(closedLoopRamps);
+        m_feederMotor.getConfigurator().apply(voltage);
 
         resetSpeed();
     }

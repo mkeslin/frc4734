@@ -40,4 +40,13 @@ public class ClimberConstants {
     public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4; // TODO
     public static final TrapezoidProfile.Constraints MOVEMENT_CONSTRAINTS = 
         new TrapezoidProfile.Constraints(MAX_VELOCITY_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+
+    // ---- Talon FX: current limits, ramp, voltage ----
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 40;
+    public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 60;
+    public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
+    public static final double CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC = 0.2;
+    public static final double PEAK_FORWARD_VOLTAGE = 12.0;
+    public static final double PEAK_REVERSE_VOLTAGE = -12.0;
 }

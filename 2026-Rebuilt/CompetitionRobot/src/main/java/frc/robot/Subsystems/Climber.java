@@ -1,12 +1,16 @@
 package frc.robot.Subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.Constants.CANIds.CLIMBER;
 import static frc.robot.Constants.CANIds.CLIMBER_2;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -24,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.PositionTracker;
 import frc.robot.RobotState;
 import frc.robot.TelemetryCalcs;
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
 
@@ -79,17 +84,32 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         motionMagicConfigs.MotionMagicAcceleration = 80; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
+        talonFxConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
         m_climber = new TalonFX(CLIMBER);
         m_climber.setNeutralMode(NeutralModeValue.Brake);
-
-        // talonFxConfigs.CurrentLimits = new CurrentLimitsConfigs();
-        talonFxConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        // configs.CurrentLimits.SupplyCurrentLimit = 20;
-        // configs.CurrentLimits.SupplyCurrentLimit = 40;
         m_climber.getConfigurator().apply(talonFxConfigs);
+
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(Amps.of(ClimberConstants.SUPPLY_CURRENT_LIMIT_AMPS))
+                .withSupplyCurrentLimitEnable(ClimberConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
+                .withStatorCurrentLimit(Amps.of(ClimberConstants.STATOR_CURRENT_LIMIT_AMPS))
+                .withStatorCurrentLimitEnable(ClimberConstants.STATOR_CURRENT_LIMIT_ENABLE);
+        ClosedLoopRampsConfigs closedLoopRamps = new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(ClimberConstants.CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC);
+        VoltageConfigs voltage = new VoltageConfigs()
+                .withPeakForwardVoltage(ClimberConstants.PEAK_FORWARD_VOLTAGE)
+                .withPeakReverseVoltage(ClimberConstants.PEAK_REVERSE_VOLTAGE);
+        m_climber.getConfigurator().apply(currentLimits);
+        m_climber.getConfigurator().apply(closedLoopRamps);
+        m_climber.getConfigurator().apply(voltage);
 
         m_climber2 = new TalonFX(CLIMBER_2);
         m_climber2.setNeutralMode(NeutralModeValue.Brake);
+        m_climber2.getConfigurator().apply(talonFxConfigs);
+        m_climber2.getConfigurator().apply(currentLimits);
+        m_climber2.getConfigurator().apply(closedLoopRamps);
+        m_climber2.getConfigurator().apply(voltage);
         m_climber2.setControl(new Follower(m_climber.getDeviceID(), MotorAlignmentValue.Aligned));
 
         resetPosition();
