@@ -219,7 +219,7 @@ public class SwerveDrivetrainA {
     public static CommandSwerveDrivetrain createDrivetrain() {
         return new CommandSwerveDrivetrain(
             DrivetrainConstants, // SwerveDrivetrainConstants from this class
-            0, // Use default odometry update frequency (250 Hz on CAN FD, 100 Hz on CAN 2.0)
+            100, // Odometry update frequency (Hz). 100 Hz avoids "CAN is stale" on CAN 2.0 or busy bus. Use 0 for default (250 Hz CAN FD / 100 Hz CAN 2.0) if needed.
             frc.robot.SwerveDrivetrain.DrivetrainConstants.kOdometryStandardDeviation,
             frc.robot.SwerveDrivetrain.DrivetrainConstants.kVisionStandardDeviation,
             FrontLeft, FrontRight, BackLeft, BackRight
