@@ -28,7 +28,7 @@ public class SubsystemFactory {
     // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
     // private final Climber m_climber;
     private final DeployableIntake m_deployableIntake;
-    // private final Floor m_floor;
+    private final Floor m_floor;
     private final Feeder m_feeder;
     private final Shooter m_shooter;
     private final ShooterHood m_shooterHood;
@@ -54,7 +54,7 @@ public class SubsystemFactory {
         // Create subsystems (PositionTracker will be set after creation)
         // m_climber = new Climber();
         m_deployableIntake = new DeployableIntake();
-        // m_floor = new Floor();
+        m_floor = new Floor();
         m_feeder = new Feeder();
         m_shooter = new Shooter();
         m_shooterHood = new ShooterHood();
@@ -114,9 +114,9 @@ public class SubsystemFactory {
          return m_deployableIntake;
     }
 
-    // public Floor getFloor() {
-    //     return m_floor;
-    // }
+    public Floor getFloor() {
+        return m_floor;
+    }
 
     public Feeder getFeeder() {
         return m_feeder;
@@ -157,6 +157,7 @@ public class SubsystemFactory {
         // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // m_climber.resetPosition();
         // m_deployableIntake.resetDeployPosition();
+        m_floor.resetSpeed();
         m_feeder.resetSpeed();
         m_shooter.resetSpeed();
         m_shooterHood.resetPosition();
@@ -176,9 +177,9 @@ public class SubsystemFactory {
         // if (m_deployableIntake != null) {
         //     m_deployableIntake.cleanup();
         // }
-        // if (m_floor != null) {
-        //     m_floor.cleanup();
-        // }
+        if (m_floor != null) {
+            m_floor.cleanup();
+        }
         if (m_feeder != null) {
             m_feeder.cleanup();
         }

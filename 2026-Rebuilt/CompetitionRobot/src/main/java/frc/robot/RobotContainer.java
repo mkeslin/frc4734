@@ -13,12 +13,14 @@ import frc.robot.Logging.RobotLogger;
 import frc.robot.Monitoring.PerformanceMonitor;
 import frc.robot.dashboard.DriverDashboard;
 import frc.robot.Constants.FeederConstants.FeederSpeed;
+import frc.robot.Constants.FloorConstants.ConveyorSpeed;
 import frc.robot.Constants.ShooterConstants.ShooterSpeed;
 import frc.robot.Constants.IntakeConstants.IntakeSpeed;
 import frc.robot.Constants.IntakeConstants.DeployPosition;
 import frc.robot.Controllers.ControllerIds;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Feeder;
+import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.DeployableIntake;
@@ -111,7 +113,7 @@ public class RobotContainer {
                     .onFalse(shooter.resetSpeedCommand());
             m_mechanismController.back().onTrue(shooter.resetSpeedCommand());
         }
-        // Feeder on mechanism controller: A = on, X = reverse, B = off
+        // Feeder on mechanism controller: A = forward, X = reverse, B = off
         Feeder feeder = m_subsystemFactory.getFeeder();
         if (feeder != null) {
             m_mechanismController.a()
@@ -121,6 +123,16 @@ public class RobotContainer {
                     .whileTrue(feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value))
                     .onFalse(feeder.resetSpeedCommand());
             m_mechanismController.b().onTrue(feeder.resetSpeedCommand());
+        }
+        // Floor conveyor on mechanism controller: Y = forward, right trigger = reverse
+        Floor floor = m_subsystemFactory.getFloor();
+        if (floor != null) {
+            m_mechanismController.y()
+                    .whileTrue(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value))
+                    .onFalse(floor.resetSpeedCommand());
+            m_mechanismController.rightTrigger()
+                    .whileTrue(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.REVERSE.value))
+                    .onFalse(floor.resetSpeedCommand());
         }
 
         DeployableIntake intake = m_subsystemFactory.getDeployableIntake();
