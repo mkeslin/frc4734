@@ -46,9 +46,8 @@ public class TunerConstants {
     private static final SteerMotorArrangement kSteerMotorType = SteerMotorArrangement.TalonFX_Integrated;
 
     // The remote sensor feedback type to use for the steer motors;
-    // Using RemoteCANcoder (non-Pro) to avoid Pro license requirements
-    // FusedCANcoder requires Pro licenses on both motors and encoders
-    private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.RemoteCANcoder;
+    // Pro mode: FusedCANcoder (requires Pro licenses on steer motors and CANcoders)
+    private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.FusedCANcoder;
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
