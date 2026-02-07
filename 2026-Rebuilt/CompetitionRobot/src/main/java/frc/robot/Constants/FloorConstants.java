@@ -9,11 +9,12 @@ public class FloorConstants {
 
     /**
      * Enumeration of predefined conveyor speeds (rotations per second).
+     * Values high enough to overcome static friction; tune for match as needed.
      */
     public static enum ConveyorSpeed {
         STOPPED(0),
-        FORWARD(0.3),  // TODO: Tune speed value
-        REVERSE(-0.3); // TODO: Tune speed value
+        FORWARD(18.0),   // Toward feeder/shooter; tune as needed
+        REVERSE(-12.0);  // Unjam / reverse
 
         public final double value;
 

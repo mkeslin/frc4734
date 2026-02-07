@@ -9,11 +9,12 @@ public class FeederConstants {
 
     /**
      * Enumeration of predefined feeder speeds (rotations per second).
+     * Values high enough to overcome static friction; tune for match as needed.
      */
     public static enum FeederSpeed {
         STOPPED(0),
-        FORWARD(0.3),  // TODO: Tune speed value
-        REVERSE(-0.3); // TODO: Tune speed value
+        FORWARD(20.0),   // Toward shooter; tune for indexing
+        REVERSE(-15.0);  // Unjam / reverse
 
         public final double value;
 

@@ -21,13 +21,13 @@ public class IntakeConstants {
     }
 
     /**
-     * Enumeration of predefined intake speeds.
-     * STOPPED, IN (intake), and OUT (outtake) speeds.
+     * Enumeration of predefined intake speeds (rotations per second).
+     * Values high enough to overcome static friction; tune for match as needed.
      */
     public static enum IntakeSpeed {
         STOPPED(0),
-        IN(0.3),
-        OUT(-0.3);
+        IN(20.0),    // Intake; tune as needed
+        OUT(-15.0);  // Outtake / reverse
 
         public final double value;
 
