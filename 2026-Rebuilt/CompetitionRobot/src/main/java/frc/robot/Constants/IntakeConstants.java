@@ -11,7 +11,7 @@ public class IntakeConstants {
      */
     public static enum DeployPosition {
         STOWED(0),
-        DEPLOYED(17.8);
+        DEPLOYED(12);
 
         public final double value;
 
@@ -26,7 +26,7 @@ public class IntakeConstants {
      */
     public static enum IntakeSpeed {
         STOPPED(0),
-        IN(20.0),    // Intake; tune as needed
+        IN(200.0),    // Intake; tune as needed
         OUT(-15.0);  // Outtake / reverse
 
         public final double value;

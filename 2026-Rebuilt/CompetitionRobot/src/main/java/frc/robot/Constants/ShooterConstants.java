@@ -15,9 +15,9 @@ public class ShooterConstants {
     public static enum ShooterSpeed {
         STOPPED(0),
         /** RPS for shooting; tune for desired shot distance. */
-        FORWARD(25.0),
+        FORWARD(100.0),
         /** RPS for reverse (e.g. unjam); tune as needed. */
-        REVERSE(-15.0);
+        REVERSE(-100.0);
 
         public final double value;
 
@@ -52,7 +52,7 @@ public class ShooterConstants {
 
     // ---- Motor output ----
     /** Set true to invert motor direction (use if positive velocity spins wrong way). */
-    public static final boolean MOTOR_INVERTED = false;
+    public static final boolean MOTOR_INVERTED = true;
 
     // ---- Closed-loop ramp ----
     /** Time (seconds) for closed-loop voltage output to ramp 0→12V. 0 = no ramp (instant). Smooths spin-up and can reduce current spikes. */

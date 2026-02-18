@@ -13,8 +13,8 @@ public class FloorConstants {
      */
     public static enum ConveyorSpeed {
         STOPPED(0),
-        FORWARD(18.0),   // Toward feeder/shooter; tune as needed
-        REVERSE(-12.0);  // Unjam / reverse
+        FORWARD(180.0),   // Toward feeder/shooter; tune as needed
+        REVERSE(-180.0);  // Unjam / reverse
 
         public final double value;
 
@@ -31,13 +31,13 @@ public class FloorConstants {
     public static final double VELOCITY_KD = 0.0;
 
     // ---- Current limits ----
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 40;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 120;
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 60;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 120;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
 
     // ---- Motor output ----
-    public static final boolean MOTOR_INVERTED = false;
+    public static final boolean MOTOR_INVERTED = true;
 
     // ---- Closed-loop ramp ----
     public static final double CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC = 0.2;
