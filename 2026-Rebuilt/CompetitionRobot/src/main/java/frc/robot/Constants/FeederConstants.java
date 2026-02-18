@@ -13,8 +13,8 @@ public class FeederConstants {
      */
     public static enum FeederSpeed {
         STOPPED(0),
-        FORWARD(20.0),   // Toward shooter; tune for indexing
-        REVERSE(-15.0);  // Unjam / reverse
+        FORWARD(160.0),   // Toward shooter; tune for indexing
+        REVERSE(-160.0);  // Unjam / reverse
 
         public final double value;
 
@@ -31,9 +31,9 @@ public class FeederConstants {
     public static final double VELOCITY_KD = 0.0;
 
     // ---- Current limits ----
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 40;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 80;
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 60;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 120;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
 
     // ---- Motor output ----
