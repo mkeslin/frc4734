@@ -13,8 +13,8 @@ public class FloorConstants {
      */
     public static enum ConveyorSpeed {
         STOPPED(0),
-        FORWARD(180.0),   // Toward feeder/shooter; tune as needed
-        REVERSE(-180.0);  // Unjam / reverse
+        FORWARD(80.0),   // Toward feeder/shooter; tune as needed
+        REVERSE(-80.0);  // Unjam / reverse
 
         public final double value;
 
@@ -31,9 +31,9 @@ public class FloorConstants {
     public static final double VELOCITY_KD = 0.0;
 
     // ---- Current limits ----
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 120;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 60;
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 120;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 80;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
 
     // ---- Motor output ----
