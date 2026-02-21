@@ -1,6 +1,9 @@
 package frc.robot.Controllers;
 
+import java.util.Set;
+
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Auto.commands.AutoConstants;
@@ -86,21 +89,30 @@ public class ControllerBindingFactory {
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
                     .onTrue(m_intake.moveToArbitraryDeployPositionCommand(() -> DeployPosition.STOWED.value));
         }
+        // Defer so each button press gets a fresh command instance; reusing a cancelled command can cause scheduler errors / e-stop
         if (m_intake != null && m_floor != null && m_feeder != null) {
             m_mechanismController.leftTrigger()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
-                    .whileTrue(MechanismMolecules.intakeMolecule(m_intake, m_floor, m_feeder));
+                    .whileTrue(Commands.defer(
+                            () -> MechanismMolecules.intakeMolecule(m_intake, m_floor, m_feeder),
+                            Set.<Subsystem>of(m_intake, m_floor, m_feeder)));
             m_mechanismController.leftBumper()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
-                    .whileTrue(MechanismMolecules.reverseIntakeMolecule(m_intake, m_floor, m_feeder));
+                    .whileTrue(Commands.defer(
+                            () -> MechanismMolecules.reverseIntakeMolecule(m_intake, m_floor, m_feeder),
+                            Set.<Subsystem>of(m_intake, m_floor, m_feeder)));
         }
         if (m_shooter != null && m_feeder != null && m_floor != null) {
             m_mechanismController.rightTrigger()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
-                    .whileTrue(MechanismMolecules.shootMolecule(m_shooter, m_feeder, m_floor));
+                    .whileTrue(Commands.defer(
+                            () -> MechanismMolecules.shootMolecule(m_shooter, m_feeder, m_floor),
+                            Set.<Subsystem>of(m_shooter, m_feeder, m_floor)));
             m_mechanismController.rightBumper()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
-                    .whileTrue(MechanismMolecules.reverseShootMolecule(m_shooter, m_feeder, m_floor));
+                    .whileTrue(Commands.defer(
+                            () -> MechanismMolecules.reverseShootMolecule(m_shooter, m_feeder, m_floor),
+                            Set.<Subsystem>of(m_shooter, m_feeder, m_floor)));
         }
         if (m_shooter != null || m_feeder != null || m_floor != null) {
             m_mechanismController.back()
