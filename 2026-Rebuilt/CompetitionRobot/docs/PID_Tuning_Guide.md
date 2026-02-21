@@ -14,18 +14,19 @@ Step-by-step instructions for tuning PID (and feedforward) on each mechanism, in
 
 ## Tuning Mode and Mechanism Mode
 
-Controller profiles are defined in `SwerveDrivetrainBindings`. **Drive controller** has three profiles; **mechanism controller** has two modes.
+Controller profiles are defined in `SwerveDrivetrainBindings`. **Drive controller** has three profiles; **mechanism controller** has three modes (MECHANISM, SYSID, INDIVIDUAL), set automatically from the drive profile.
 
 - **Drive profiles** (cycle with **Back + Start** on drive controller):
-  - **NORMAL** — Normal driving; mechanism controller uses **Mechanism Mode** (normal bindings).
-  - **SYSID** — Drivetrain SysId only (drive brake; A/B/Right Bumper select translation/steer/rotation; Back+Y/X, Start+Y/X run dynamic/quasistatic).
-  - **TUNING** — Path tuning + mechanism SysId (drive brake; **A** = run tuning path; mechanism controller uses **Tuning Mode** SysId bindings).
+  - **NORMAL** — Normal driving; mechanism controller uses **MECHANISM** (molecule bindings: intake combo, shoot combo, deploy/stow).
+  - **SYSID** — Drivetrain SysId only (drive brake; A/B/Right Bumper select translation/steer/rotation; Back+Y/X, Start+Y/X run dynamic/quasistatic). Mechanism controller uses **SYSID** (SysId bindings for PID tuning).
+  - **TUNING** — Path tuning (drive brake; **A** = run tuning path). Mechanism controller uses **INDIVIDUAL** (one button per mechanism for manual testing).
 
-- **Mechanism Mode** (set automatically from drive profile):
-  - **MECHANISM** — Normal operation: shooter (bumpers), feeder (A/X/B), floor (Y/right trigger), intake (left trigger, POV deploy). Used when drive profile is NORMAL or SYSID.
-  - **TUNING** — SysId bindings for shooter, feeder, floor, deployable intake (deploy + intake motors). Used when drive profile is TUNING.
+- **Mechanism mode** (derived from drive profile):
+  - **MECHANISM** — Competition molecule bindings: D-pad down = deploy intake, D-pad up = stow intake; left trigger = intake+floor+feeder; left bumper = reverse those three; right trigger = shoot (shooter then delayed feeder then floor); right bumper = reverse shooter/feeder/floor; Back = stop all.
+  - **SYSID** — Mechanism SysId bindings (PID tuning): A/B/X/Y = shooter quasi/dynamic; Right bumper + A/B/X/Y = feeder; Left bumper + A/B/X/Y = floor; POV Up/Down + A/B/X/Y = deploy/intake motors.
+  - **INDIVIDUAL** — One button per mechanism: A/X/B = feeder fwd/rev/off; Y/right trigger = floor fwd/rev; left trigger = intake; POV up/down = deploy/stow; right/left bumper = shooter fwd/rev; Back = shooter off.
 
-**Tuning Mode mechanism bindings** (mechanism controller when in TUNING):
+**SysId mechanism bindings** (mechanism controller when drive profile is **SYSID**):
 
 | Mechanism   | Buttons        | A = quasi fwd, B = quasi rev, X = dynamic fwd, Y = dynamic rev |
 |------------|----------------|----------------------------------------------------------------|
@@ -35,13 +36,13 @@ Controller profiles are defined in `SwerveDrivetrainBindings`. **Drive controlle
 | Deploy     | POV Up + A/B/X/Y | Deploy motor SysId                                            |
 | Intake     | POV Down + A/B/X/Y | Intake motor SysId                                           |
 
-**Tuning path (swerve path-following):** In TUNING profile, press **A on the drive controller** to run the built-in tuning path. Path name: `zzTuning-1` (file `src/main/deploy/pathplanner/paths/zzTuning-1.path`). Constant: `AutoConstants.TUNING_PATH_NAME`. Linked paths `zzTuning-2`, `zzTuning-3`, `zzTuning-4` exist for longer runs; you can add a binding or auto sequence for them if needed.
+**Tuning path (swerve path-following):** In **TUNING** profile, press **A on the drive controller** to run the built-in tuning path. Path name: `zzTuning-1` (file `src/main/deploy/pathplanner/paths/zzTuning-1.path`). Constant: `AutoConstants.TUNING_PATH_NAME`. Linked paths `zzTuning-2`, `zzTuning-3`, `zzTuning-4` exist for longer runs; you can add a binding or auto sequence for them if needed.
 
-On **disable**, the robot resets to NORMAL profile and Mechanism Mode so the next enable starts in normal operation.
+On **disable**, the robot resets to NORMAL profile (and MECHANISM mode) so the next enable starts in normal operation.
 
 **Locking to a single profile:** In `Constants/ControllerBindingConstants.java` set `ENABLE_PROFILE_SWITCHING = false` and `DEFAULT_DRIVE_PROFILE` to the desired profile (e.g. `InputProfile.TUNING` for tuning only). Then Back+Start does nothing and the robot stays on that profile for the session. Set `ENABLE_PROFILE_SWITCHING = true` to allow cycling again.
 
-**Encapsulation:** Drive bindings (default command, SysId, profile cycle) live in `SwerveDrivetrainBindings`. Mechanism bindings and the drive tuning-path binding are built by `Controllers/ControllerBindingFactory`, which applies mappings by mode (Mechanism Mode vs Tuning Mode).
+**Encapsulation:** Drive bindings (default command, SysId, profile cycle) live in `SwerveDrivetrainBindings`. Mechanism bindings and the drive tuning-path binding are built by `Controllers/ControllerBindingFactory`, which applies mappings by mode (MECHANISM, SYSID, INDIVIDUAL).
 
 **Dashboard:** On the Shuffleboard **Driver** tab, **Bindings Profile** is a dropdown (default: **NORMAL (Competition)**). Select **SYSID** or **TUNING** to switch without using Back+Start. **Current Profile** shows the active profile (updates when you use the dropdown or Back+Start).
 
@@ -60,7 +61,7 @@ The shooter uses **velocity closed-loop** (Slot0) on the leader TalonFX; followe
 
 ### Step 1.1 — Run SysId (recommended)
 
-1. **Trigger SysId:** Put the drive controller in **Tuning Mode** (Back + Start until you’re in TUNING). On the **mechanism controller**, use **A** (quasistatic forward), **B** (quasistatic reverse), **X** (dynamic forward), **Y** (dynamic reverse) to run:
+1. **Trigger SysId:** Put the drive controller in **SYSID** profile (Back + Start until you’re in SYSID, or select SYSID on the Driver tab). On the **mechanism controller**, use **A** (quasistatic forward), **B** (quasistatic reverse), **X** (dynamic forward), **Y** (dynamic reverse) to run:
    - Quasistatic forward
    - Quasistatic reverse
    - Dynamic forward

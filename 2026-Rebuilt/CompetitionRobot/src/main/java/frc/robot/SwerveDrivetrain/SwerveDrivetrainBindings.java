@@ -13,9 +13,9 @@ import frc.robot.Constants.ControllerBindingConstants;
 /**
  * Configures controller bindings for the swerve drivetrain.
  * Supports three input profiles:
- * - NORMAL: Standard driving; mechanism controller uses Mechanism Mode bindings
- * - SYSID: Drivetrain SysId characterization (disables normal driving)
- * - TUNING: Path-following tuning + mechanism SysId (drive brake, run tuning path; mechanism uses SysId bindings)
+ * - NORMAL: Standard driving; mechanism controller uses MECHANISM mode (molecule bindings).
+ * - SYSID: Drivetrain SysId characterization (disables normal driving); mechanism controller uses SYSID mode (SysId bindings for PID tuning).
+ * - TUNING: Path-following tuning (drive brake, run tuning path); mechanism controller uses INDIVIDUAL mode (one button per mechanism).
  */
 public class SwerveDrivetrainBindings {
     
@@ -32,14 +32,15 @@ public class SwerveDrivetrainBindings {
     }
 
     /**
-     * Mechanism controller mode. When drive profile is TUNING, mechanism mode is TUNING (SysId);
-     * otherwise mechanism mode is MECHANISM (normal shooter/feeder/floor/intake bindings).
+     * Mechanism controller mode. Derived from drive profile: NORMAL → MECHANISM, SYSID → SYSID, TUNING → INDIVIDUAL.
      */
     public enum MechanismMode {
-        /** Normal mechanism operation (shooter, feeder, floor, intake bindings) */
+        /** Competition molecule bindings (intake combo, shoot combo, deploy/stow). */
         MECHANISM,
-        /** Mechanism SysId characterization bindings */
-        TUNING
+        /** Mechanism SysId characterization bindings (PID tuning). */
+        SYSID,
+        /** Individual mechanism buttons (A/B/X/Y feeder, Y/trigger floor, etc.). */
+        INDIVIDUAL
     }
     
     private static InputProfile currentProfile = InputProfile.NORMAL;
@@ -300,12 +301,18 @@ public class SwerveDrivetrainBindings {
                             case SYSID -> currentProfile = InputProfile.TUNING;
                             case TUNING -> currentProfile = InputProfile.NORMAL;
                         }
-                        currentMechanismMode = (currentProfile == InputProfile.TUNING)
-                                ? MechanismMode.TUNING
-                                : MechanismMode.MECHANISM;
+                        currentMechanismMode = profileToMechanismMode(currentProfile);
                     })
             );
         }
+    }
+
+    private static MechanismMode profileToMechanismMode(InputProfile profile) {
+        return switch (profile) {
+            case NORMAL -> MechanismMode.MECHANISM;
+            case SYSID -> MechanismMode.SYSID;
+            case TUNING -> MechanismMode.INDIVIDUAL;
+        };
     }
 
     /**
@@ -318,17 +325,17 @@ public class SwerveDrivetrainBindings {
     }
 
     /**
-     * Sets the input profile. Also updates mechanism mode (TUNING profile → TUNING mode, else MECHANISM).
+     * Sets the input profile. Also updates mechanism mode (NORMAL→MECHANISM, SYSID→SYSID, TUNING→INDIVIDUAL).
      *
      * @param profile The profile to set
      */
     public static void setProfile(InputProfile profile) {
         currentProfile = profile;
-        currentMechanismMode = (profile == InputProfile.TUNING) ? MechanismMode.TUNING : MechanismMode.MECHANISM;
+        currentMechanismMode = profileToMechanismMode(profile);
     }
 
     /**
-     * Gets the current mechanism controller mode. MECHANISM = normal bindings; TUNING = SysId bindings.
+     * Gets the current mechanism controller mode (MECHANISM, SYSID, or INDIVIDUAL).
      *
      * @return The current mechanism mode
      */

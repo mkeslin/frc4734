@@ -1,5 +1,6 @@
 package frc.robot.Controllers;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Auto.commands.AutoConstants;
@@ -20,9 +21,8 @@ import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
 
 /**
  * Builds and applies controller bindings by profile/mode.
- * Encapsulates drive tuning-path bindings and all mechanism bindings (Mechanism Mode and Tuning Mode).
- * Drive default command and profile cycle are configured by {@link SwerveDrivetrainBindings};
- * this factory adds the tuning-path trigger and mechanism mappings.
+ * Encapsulates drive tuning-path bindings and mechanism bindings for MECHANISM (molecules),
+ * SYSID (SysId), and INDIVIDUAL (one button per mechanism) modes.
  */
 public class ControllerBindingFactory {
 
@@ -57,12 +57,13 @@ public class ControllerBindingFactory {
 
     /**
      * Registers all bindings: drive tuning path (when profile is TUNING) and mechanism bindings
-     * for both Mechanism Mode and Tuning Mode. Call once during robot initialization.
+     * for MECHANISM, SYSID, and INDIVIDUAL modes. Call once during robot initialization.
      */
     public void configureBindings() {
         configureDriveTuningBindings();
         configureMechanismModeBindings();
-        configureMechanismTuningBindings();
+        configureMechanismSysIdBindings();
+        configureMechanismIndividualBindings();
     }
 
     /** Drive controller: A = run tuning path when profile is TUNING. */
@@ -75,107 +76,145 @@ public class ControllerBindingFactory {
                         m_drivetrain));
     }
 
-    /** Mechanism controller: normal operation (shooter, feeder, floor, intake). Active when mechanism mode is MECHANISM. */
+    /** Mechanism controller: molecule bindings (intake combo, shoot combo, deploy/stow). Active when mechanism mode is MECHANISM. */
     private void configureMechanismModeBindings() {
-        if (m_shooter != null) {
+        if (m_intake != null) {
+            m_mechanismController.povDown()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .onTrue(m_intake.moveToArbitraryDeployPositionCommand(() -> DeployPosition.DEPLOYED.value));
+            m_mechanismController.povUp()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .onTrue(m_intake.moveToArbitraryDeployPositionCommand(() -> DeployPosition.STOWED.value));
+        }
+        if (m_intake != null && m_floor != null && m_feeder != null) {
+            m_mechanismController.leftTrigger()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .whileTrue(MechanismMolecules.intakeMolecule(m_intake, m_floor, m_feeder));
+            m_mechanismController.leftBumper()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .whileTrue(MechanismMolecules.reverseIntakeMolecule(m_intake, m_floor, m_feeder));
+        }
+        if (m_shooter != null && m_feeder != null && m_floor != null) {
+            m_mechanismController.rightTrigger()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .whileTrue(MechanismMolecules.shootMolecule(m_shooter, m_feeder, m_floor));
             m_mechanismController.rightBumper()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .whileTrue(MechanismMolecules.reverseShootMolecule(m_shooter, m_feeder, m_floor));
+        }
+        if (m_shooter != null || m_feeder != null || m_floor != null) {
+            m_mechanismController.back()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .onTrue(Commands.runOnce(() -> {
+                        if (m_shooter != null) m_shooter.resetSpeed();
+                        if (m_feeder != null) m_feeder.resetSpeed();
+                        if (m_floor != null) m_floor.resetSpeed();
+                        if (m_intake != null) m_intake.resetIntakeSpeed();
+                    }));
+        }
+    }
+
+    /** Mechanism controller: SysId bindings (PID tuning). Active when mechanism mode is SYSID. */
+    private void configureMechanismSysIdBindings() {
+        if (m_shooter != null) {
+            m_mechanismController.a().and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_shooter.sysIdQuasistaticCommand(Direction.kForward));
+            m_mechanismController.b().and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_shooter.sysIdQuasistaticCommand(Direction.kReverse));
+            m_mechanismController.x().and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_shooter.sysIdDynamicCommand(Direction.kForward));
+            m_mechanismController.y().and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_shooter.sysIdDynamicCommand(Direction.kReverse));
+        }
+        if (m_feeder != null) {
+            m_mechanismController.rightBumper().and(m_mechanismController.a()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_feeder.sysIdQuasistaticCommand(Direction.kForward));
+            m_mechanismController.rightBumper().and(m_mechanismController.b()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_feeder.sysIdQuasistaticCommand(Direction.kReverse));
+            m_mechanismController.rightBumper().and(m_mechanismController.x()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_feeder.sysIdDynamicCommand(Direction.kForward));
+            m_mechanismController.rightBumper().and(m_mechanismController.y()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_feeder.sysIdDynamicCommand(Direction.kReverse));
+        }
+        if (m_floor != null) {
+            m_mechanismController.leftBumper().and(m_mechanismController.a()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_floor.sysIdQuasistaticCommand(Direction.kForward));
+            m_mechanismController.leftBumper().and(m_mechanismController.b()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_floor.sysIdQuasistaticCommand(Direction.kReverse));
+            m_mechanismController.leftBumper().and(m_mechanismController.x()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_floor.sysIdDynamicCommand(Direction.kForward));
+            m_mechanismController.leftBumper().and(m_mechanismController.y()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_floor.sysIdDynamicCommand(Direction.kReverse));
+        }
+        if (m_intake != null) {
+            m_mechanismController.povUp().and(m_mechanismController.a()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_intake.sysIdDeployQuasistaticCommand(Direction.kForward));
+            m_mechanismController.povUp().and(m_mechanismController.b()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_intake.sysIdDeployQuasistaticCommand(Direction.kReverse));
+            m_mechanismController.povUp().and(m_mechanismController.x()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_intake.sysIdDeployDynamicCommand(Direction.kForward));
+            m_mechanismController.povUp().and(m_mechanismController.y()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_intake.sysIdDeployDynamicCommand(Direction.kReverse));
+            m_mechanismController.povDown().and(m_mechanismController.a()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_intake.sysIdIntakeQuasistaticCommand(Direction.kForward));
+            m_mechanismController.povDown().and(m_mechanismController.b()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_intake.sysIdIntakeQuasistaticCommand(Direction.kReverse));
+            m_mechanismController.povDown().and(m_mechanismController.x()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_intake.sysIdIntakeDynamicCommand(Direction.kForward));
+            m_mechanismController.povDown().and(m_mechanismController.y()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                    .whileTrue(m_intake.sysIdIntakeDynamicCommand(Direction.kReverse));
+        }
+    }
+
+    /** Mechanism controller: individual mechanism buttons. Active when mechanism mode is INDIVIDUAL. */
+    private void configureMechanismIndividualBindings() {
+        if (m_shooter != null) {
+            m_mechanismController.rightBumper()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .whileTrue(m_shooter.moveToSetSpeedCommand(() -> ShooterSpeed.FORWARD))
                     .onFalse(m_shooter.resetSpeedCommand());
             m_mechanismController.leftBumper()
-                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .whileTrue(m_shooter.moveToSetSpeedCommand(() -> ShooterSpeed.REVERSE))
                     .onFalse(m_shooter.resetSpeedCommand());
             m_mechanismController.back()
-                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .onTrue(m_shooter.resetSpeedCommand());
         }
         if (m_feeder != null) {
             m_mechanismController.a()
-                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .whileTrue(m_feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value))
                     .onFalse(m_feeder.resetSpeedCommand());
             m_mechanismController.x()
-                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .whileTrue(m_feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value))
                     .onFalse(m_feeder.resetSpeedCommand());
             m_mechanismController.b()
-                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .onTrue(m_feeder.resetSpeedCommand());
         }
         if (m_floor != null) {
             m_mechanismController.y()
-                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .whileTrue(m_floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value))
                     .onFalse(m_floor.resetSpeedCommand());
             m_mechanismController.rightTrigger()
-                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .whileTrue(m_floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.REVERSE.value))
                     .onFalse(m_floor.resetSpeedCommand());
         }
         if (m_intake != null) {
             m_mechanismController.leftTrigger()
-                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .whileTrue(m_intake.moveToArbitraryIntakeSpeedCommand(() -> IntakeSpeed.IN.value))
                     .onFalse(m_intake.resetIntakeSpeedCommand());
             m_mechanismController.povUp()
-                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .onTrue(m_intake.moveToArbitraryDeployPositionCommand(() -> DeployPosition.DEPLOYED.value));
             m_mechanismController.povDown()
-                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .onTrue(m_intake.moveToArbitraryDeployPositionCommand(() -> DeployPosition.STOWED.value));
-        }
-    }
-
-    /** Mechanism controller: SysId bindings. Active when mechanism mode is TUNING. */
-    private void configureMechanismTuningBindings() {
-        if (m_shooter != null) {
-            m_mechanismController.a().and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_shooter.sysIdQuasistaticCommand(Direction.kForward));
-            m_mechanismController.b().and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_shooter.sysIdQuasistaticCommand(Direction.kReverse));
-            m_mechanismController.x().and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_shooter.sysIdDynamicCommand(Direction.kForward));
-            m_mechanismController.y().and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_shooter.sysIdDynamicCommand(Direction.kReverse));
-        }
-        if (m_feeder != null) {
-            m_mechanismController.rightBumper().and(m_mechanismController.a()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_feeder.sysIdQuasistaticCommand(Direction.kForward));
-            m_mechanismController.rightBumper().and(m_mechanismController.b()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_feeder.sysIdQuasistaticCommand(Direction.kReverse));
-            m_mechanismController.rightBumper().and(m_mechanismController.x()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_feeder.sysIdDynamicCommand(Direction.kForward));
-            m_mechanismController.rightBumper().and(m_mechanismController.y()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_feeder.sysIdDynamicCommand(Direction.kReverse));
-        }
-        if (m_floor != null) {
-            m_mechanismController.leftBumper().and(m_mechanismController.a()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_floor.sysIdQuasistaticCommand(Direction.kForward));
-            m_mechanismController.leftBumper().and(m_mechanismController.b()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_floor.sysIdQuasistaticCommand(Direction.kReverse));
-            m_mechanismController.leftBumper().and(m_mechanismController.x()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_floor.sysIdDynamicCommand(Direction.kForward));
-            m_mechanismController.leftBumper().and(m_mechanismController.y()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_floor.sysIdDynamicCommand(Direction.kReverse));
-        }
-        if (m_intake != null) {
-            m_mechanismController.povUp().and(m_mechanismController.a()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_intake.sysIdDeployQuasistaticCommand(Direction.kForward));
-            m_mechanismController.povUp().and(m_mechanismController.b()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_intake.sysIdDeployQuasistaticCommand(Direction.kReverse));
-            m_mechanismController.povUp().and(m_mechanismController.x()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_intake.sysIdDeployDynamicCommand(Direction.kForward));
-            m_mechanismController.povUp().and(m_mechanismController.y()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_intake.sysIdDeployDynamicCommand(Direction.kReverse));
-            m_mechanismController.povDown().and(m_mechanismController.a()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_intake.sysIdIntakeQuasistaticCommand(Direction.kForward));
-            m_mechanismController.povDown().and(m_mechanismController.b()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_intake.sysIdIntakeQuasistaticCommand(Direction.kReverse));
-            m_mechanismController.povDown().and(m_mechanismController.x()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_intake.sysIdIntakeDynamicCommand(Direction.kForward));
-            m_mechanismController.povDown().and(m_mechanismController.y()).and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TUNING)
-                    .whileTrue(m_intake.sysIdIntakeDynamicCommand(Direction.kReverse));
         }
     }
 }
