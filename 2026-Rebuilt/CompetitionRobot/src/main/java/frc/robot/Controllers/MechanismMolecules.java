@@ -31,12 +31,14 @@ public final class MechanismMolecules {
     public static Command intakeMolecule(DeployableIntake intake, Floor floor, Feeder feeder) {
         return new ParallelCommandGroup(
                 intake.moveToArbitraryIntakeSpeedCommand(() -> IntakeSpeed.IN.value),
-                floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value),
-                feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value))
+                floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)
+                // Temporarily comment out feeder when intake runs:
+                // feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
+                )
                 .finallyDo(interrupted -> {
                     intake.resetIntakeSpeed();
                     floor.resetSpeed();
-                    feeder.resetSpeed();
+                    // feeder.resetSpeed();
                 })
                 .withName("MechanismMolecules.intake");
     }

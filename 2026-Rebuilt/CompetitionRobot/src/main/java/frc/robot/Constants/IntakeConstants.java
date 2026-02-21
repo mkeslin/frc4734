@@ -57,7 +57,7 @@ public class IntakeConstants {
     public static final double MIN_DEPLOY_POSITION_FOR_INTAKE = 0.5;
 
     /** When intake roller is running, deploy motor gets this forward voltage to keep pressure and hold intake in place (volts). */
-    public static final double INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE = 0.5;
+    public static final double INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE = 0.7;
 
     // ---- Current limits, ramp, voltage (deploy and intake motors) ----
     public static final double SUPPLY_CURRENT_LIMIT_AMPS = 40;
