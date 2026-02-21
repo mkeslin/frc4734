@@ -25,7 +25,8 @@ public final class MechanismMolecules {
     private MechanismMolecules() {}
 
     /**
-     * Intake molecule: runs intake, floor, and feeder forward. On end, resets all three.
+     * Intake molecule: runs intake, floor, and feeder forward. The intake command also applies
+     * slight forward voltage to the deploy motor while running to keep the intake in place. On end, resets all three.
      */
     public static Command intakeMolecule(DeployableIntake intake, Floor floor, Feeder feeder) {
         return new ParallelCommandGroup(

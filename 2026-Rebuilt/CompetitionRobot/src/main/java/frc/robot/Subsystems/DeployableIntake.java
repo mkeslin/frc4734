@@ -9,6 +9,7 @@ import static frc.robot.Constants.IntakeConstants.DEPLOY_TOLERANCE;
 import static frc.robot.Constants.IntakeConstants.MIN_DEPLOY_POSITION_FOR_INTAKE;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_ACCELERATION;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_CRUISE_VELOCITY;
+import static frc.robot.Constants.IntakeConstants.INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_JERK;
 import static frc.robot.Constants.IntakeConstants.kA;
 import static frc.robot.Constants.IntakeConstants.kD;
@@ -286,9 +287,16 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
                     VelocityVoltage velocityOut = new VelocityVoltage(0);
                     velocityOut.Slot = 0;
                     m_intakeMotor.setControl(velocityOut.withVelocity(goalVelocity));
+                    // While intake roller is running, apply slight forward voltage to deploy to keep intake in place
+                    if (Math.abs(goalVelocity) >= 0.01 && isDeployed()) {
+                        m_deployMotor.setControl(m_deployVoltReq.withOutput(INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE));
+                    } else {
+                        m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+                    }
                 } else {
                     // Stop intake if not deployed
                     m_intakeMotor.stopMotor();
+                    m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
                 }
             } else {
                 m_intakeMotor.stopMotor();
@@ -297,6 +305,7 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
                 intakeSpeedPub.set(m_positionTracker.getIntakeSpeed());
             }
         })
+                .finallyDo(interrupted -> m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition())))
                 .withName("deployableIntake.moveToIntakeSpeed");
     }
 
