@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -15,6 +16,8 @@ import frc.robot.SubsystemFactory;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
+import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
+import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings.InputProfile;
 import frc.robot.dashboard.MatchTimer.MatchPhase;
 
 /**
@@ -29,6 +32,7 @@ import frc.robot.dashboard.MatchTimer.MatchPhase;
  *   <li>Current action/state
  *   <li>Alliance color
  *   <li>Robot pose (fused) and Vision estimated pose for estimator debugging
+ *   <li>Bindings profile selector (NORMAL/Competition, SYSID, TUNING) — default is NORMAL
  * </ul>
  *
  * <p>All subsystem access is null-safe to handle drivetrain-only testing mode.
@@ -36,11 +40,19 @@ import frc.robot.dashboard.MatchTimer.MatchPhase;
 public class DriverDashboard {
     private static final String TAB_NAME = "Driver";
 
+    /** Display label for competition/normal bindings (default). */
+    private static final String PROFILE_NORMAL_LABEL = "NORMAL (Competition)";
+    private static final String PROFILE_SYSID_LABEL = "SYSID";
+    private static final String PROFILE_TUNING_LABEL = "TUNING";
+
     private final ShuffleboardTab tab;
 
     private final SubsystemFactory m_subsystemFactory;
     private final CommandSwerveDrivetrain m_drivetrain;
     private final AutoManager m_autoManager;
+
+    private final SendableChooser<String> m_profileChooser;
+    private final GenericEntry m_currentProfileEntry;
 
     private final GenericEntry matchTimerEntry;
     private final GenericEntry gamePieceCountEntry;
@@ -64,6 +76,22 @@ public class DriverDashboard {
         this.m_autoManager = autoManager;
 
         tab = Shuffleboard.getTab(TAB_NAME);
+
+        // Bindings profile: dropdown to switch mode; default is NORMAL (Competition)
+        m_profileChooser = new SendableChooser<>();
+        m_profileChooser.setDefaultOption(PROFILE_NORMAL_LABEL, PROFILE_NORMAL_LABEL);
+        m_profileChooser.addOption(PROFILE_SYSID_LABEL, PROFILE_SYSID_LABEL);
+        m_profileChooser.addOption(PROFILE_TUNING_LABEL, PROFILE_TUNING_LABEL);
+        tab.add("Bindings Profile", m_profileChooser)
+                .withWidget(BuiltInWidgets.kComboBoxChooser)
+                .withPosition(4, 2)
+                .withSize(2, 1);
+
+        m_currentProfileEntry = tab.add("Current Profile", PROFILE_NORMAL_LABEL)
+                .withWidget(BuiltInWidgets.kTextView)
+                .withPosition(4, 3)
+                .withSize(2, 1)
+                .getEntry();
 
         // Row 0: Match Timer (large, spans 4 columns)
         // Shuffleboard accepts initial values only; get entry from widget for updates.
@@ -144,6 +172,7 @@ public class DriverDashboard {
 
     /** Updates all dashboard values. Call from robotPeriodic(). */
     public void update() {
+        updateBindingsProfile();
         updateMatchTimer();
         updateGamePieceCount();
         updateShooterStatus();
@@ -152,6 +181,42 @@ public class DriverDashboard {
         updateAllianceColor();
         updatePoseEntries();
         MatchTimer.logPhaseChanges();
+    }
+
+    /** Applies dashboard profile selection to bindings and refreshes current profile display. */
+    private void updateBindingsProfile() {
+        String selected = m_profileChooser.getSelected();
+        if (selected != null) {
+            InputProfile desired = labelToProfile(selected);
+            if (desired != null && SwerveDrivetrainBindings.getCurrentProfile() != desired) {
+                SwerveDrivetrainBindings.setProfile(desired);
+            }
+        }
+        m_currentProfileEntry.setString(profileToLabel(SwerveDrivetrainBindings.getCurrentProfile()));
+    }
+
+    private static InputProfile labelToProfile(String label) {
+        if (PROFILE_NORMAL_LABEL.equals(label)) {
+            return InputProfile.NORMAL;
+        }
+        if (PROFILE_SYSID_LABEL.equals(label)) {
+            return InputProfile.SYSID;
+        }
+        if (PROFILE_TUNING_LABEL.equals(label)) {
+            return InputProfile.TUNING;
+        }
+        return null;
+    }
+
+    private static String profileToLabel(InputProfile profile) {
+        if (profile == null) {
+            return PROFILE_NORMAL_LABEL;
+        }
+        return switch (profile) {
+            case NORMAL -> PROFILE_NORMAL_LABEL;
+            case SYSID -> PROFILE_SYSID_LABEL;
+            case TUNING -> PROFILE_TUNING_LABEL;
+        };
     }
 
     private void updatePoseEntries() {

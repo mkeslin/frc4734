@@ -13,6 +13,9 @@ public final class AutoConstants {
         // Utility class - prevent instantiation
     }
 
+    /** Path name (without .path) for drivetrain path-following PID tuning. File: zzTuning-1.path. */
+    public static final String TUNING_PATH_NAME = "zzTuning-1";
+
     // Default timeouts (seconds)
     public static final double DEFAULT_PATH_TIMEOUT = 10.0;
     public static final double DEFAULT_POSE_TIMEOUT = 5.0;

@@ -8,26 +8,42 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants.ControllerBindingConstants;
 
 /**
  * Configures controller bindings for the swerve drivetrain.
- * Supports two input profiles:
- * - NORMAL: Standard driving and mechanism control
- * - SYSID: SysId characterization tests (disables normal driving)
+ * Supports three input profiles:
+ * - NORMAL: Standard driving; mechanism controller uses Mechanism Mode bindings
+ * - SYSID: Drivetrain SysId characterization (disables normal driving)
+ * - TUNING: Path-following tuning + mechanism SysId (drive brake, run tuning path; mechanism uses SysId bindings)
  */
 public class SwerveDrivetrainBindings {
     
     /**
-     * Input profile mode for controller bindings.
+     * Input profile mode for drive controller bindings.
      */
     public enum InputProfile {
-        /** Normal driving and mechanism control */
+        /** Normal driving; mechanism controller in Mechanism Mode */
         NORMAL,
-        /** SysId characterization mode (disables normal driving) */
-        SYSID
+        /** Drivetrain SysId characterization (disables normal driving) */
+        SYSID,
+        /** Tuning mode: drive brake + run tuning path; mechanism controller uses SysId bindings */
+        TUNING
+    }
+
+    /**
+     * Mechanism controller mode. When drive profile is TUNING, mechanism mode is TUNING (SysId);
+     * otherwise mechanism mode is MECHANISM (normal shooter/feeder/floor/intake bindings).
+     */
+    public enum MechanismMode {
+        /** Normal mechanism operation (shooter, feeder, floor, intake bindings) */
+        MECHANISM,
+        /** Mechanism SysId characterization bindings */
+        TUNING
     }
     
     private static InputProfile currentProfile = InputProfile.NORMAL;
+    private static MechanismMode currentMechanismMode = MechanismMode.MECHANISM;
 
     private static double CurrentSpeed = DrivetrainConstants.MaxSpeed;
     private static double CurrentAngularRate = DrivetrainConstants.MaxAngularRate; // This will be updated when turtle and reset to MaxAngularRate
@@ -271,33 +287,53 @@ public class SwerveDrivetrainBindings {
     public static void configureBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
         configureNormalBindings(driveController, drivetrain);
         configureSysIdBindings(driveController, drivetrain);
-        
-        // Profile switching: Hold Back + Start to toggle between NORMAL and SYSID modes
-        driveController.back().and(driveController.start()).onTrue(
-                Commands.runOnce(() -> {
-                    currentProfile = (currentProfile == InputProfile.NORMAL) 
-                            ? InputProfile.SYSID 
-                            : InputProfile.NORMAL;
-                })
-        );
+
+        // Initial profile from constants; when switching is disabled this is the only profile
+        setProfile(ControllerBindingConstants.DEFAULT_DRIVE_PROFILE);
+
+        if (ControllerBindingConstants.ENABLE_PROFILE_SWITCHING) {
+            // Profile switching: Hold Back + Start to cycle NORMAL → SYSID → TUNING → NORMAL
+            driveController.back().and(driveController.start()).onTrue(
+                    Commands.runOnce(() -> {
+                        switch (currentProfile) {
+                            case NORMAL -> currentProfile = InputProfile.SYSID;
+                            case SYSID -> currentProfile = InputProfile.TUNING;
+                            case TUNING -> currentProfile = InputProfile.NORMAL;
+                        }
+                        currentMechanismMode = (currentProfile == InputProfile.TUNING)
+                                ? MechanismMode.TUNING
+                                : MechanismMode.MECHANISM;
+                    })
+            );
+        }
     }
 
     /**
      * Gets the current input profile.
-     * 
-     * @return The current input profile (NORMAL or SYSID)
+     *
+     * @return The current input profile (NORMAL, SYSID, or TUNING)
      */
     public static InputProfile getCurrentProfile() {
         return currentProfile;
     }
 
     /**
-     * Sets the input profile.
-     * 
-     * @param profile The profile to set (NORMAL or SYSID)
+     * Sets the input profile. Also updates mechanism mode (TUNING profile → TUNING mode, else MECHANISM).
+     *
+     * @param profile The profile to set
      */
     public static void setProfile(InputProfile profile) {
         currentProfile = profile;
+        currentMechanismMode = (profile == InputProfile.TUNING) ? MechanismMode.TUNING : MechanismMode.MECHANISM;
+    }
+
+    /**
+     * Gets the current mechanism controller mode. MECHANISM = normal bindings; TUNING = SysId bindings.
+     *
+     * @return The current mechanism mode
+     */
+    public static MechanismMode getMechanismMode() {
+        return currentMechanismMode;
     }
 
     /**
