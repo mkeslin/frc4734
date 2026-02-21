@@ -26,8 +26,8 @@ public class IntakeConstants {
      */
     public static enum IntakeSpeed {
         STOPPED(0),
-        IN(200.0),    // Intake; tune as needed
-        OUT(-15.0);  // Outtake / reverse
+        IN(100.0),    // Intake; tune as needed
+        OUT(-40.0);  // Outtake / reverse
 
         public final double value;
 
