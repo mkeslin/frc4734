@@ -24,7 +24,7 @@ Controller profiles are defined in `SwerveDrivetrainBindings`. **Drive controlle
 - **Mechanism mode** (derived from drive profile):
   - **MECHANISM** — Competition molecule bindings: D-pad down = deploy intake, D-pad up = stow intake; left trigger = intake+floor+feeder; left bumper = reverse those three; right trigger = shoot (shooter then delayed feeder then floor); right bumper = reverse shooter/feeder/floor; Back = stop all.
   - **SYSID** — Mechanism SysId bindings (PID tuning): A/B/X/Y = shooter quasi/dynamic; Right bumper + A/B/X/Y = feeder; Left bumper + A/B/X/Y = floor; POV Up/Down + A/B/X/Y = deploy/intake motors.
-  - **INDIVIDUAL** — One button per mechanism: A/X/B = feeder fwd/rev/off; Y/right trigger = floor fwd/rev; left trigger = intake; POV up/down = deploy/stow; right/left bumper = shooter fwd/rev; Back = shooter off.
+  - **INDIVIDUAL** — One button per mechanism: A/X/B = feeder fwd/rev/off; Y/right trigger = floor fwd/rev; left trigger = intake; D-pad down = deploy, D-pad up = stow; right/left bumper = shooter fwd/rev; Back = shooter off.
 
 **SysId mechanism bindings** (mechanism controller when drive profile is **SYSID**):
 

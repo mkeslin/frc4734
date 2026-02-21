@@ -209,10 +209,10 @@ public class ControllerBindingFactory {
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .whileTrue(m_intake.moveToArbitraryIntakeSpeedCommand(() -> IntakeSpeed.IN.value))
                     .onFalse(m_intake.resetIntakeSpeedCommand());
-            m_mechanismController.povUp()
+            m_mechanismController.povDown()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .onTrue(m_intake.moveToArbitraryDeployPositionCommand(() -> DeployPosition.DEPLOYED.value));
-            m_mechanismController.povDown()
+            m_mechanismController.povUp()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.INDIVIDUAL)
                     .onTrue(m_intake.moveToArbitraryDeployPositionCommand(() -> DeployPosition.STOWED.value));
         }
