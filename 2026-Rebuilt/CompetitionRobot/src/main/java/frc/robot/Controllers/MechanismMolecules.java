@@ -1,5 +1,6 @@
 package frc.robot.Controllers;
 
+import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_BACKOFF;
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_DELAY;
 import static frc.robot.Constants.CommandConstants.SHOOT_FLOOR_DELAY;
 import static frc.robot.Constants.FeederConstants.FeederSpeed;
@@ -56,16 +57,21 @@ public final class MechanismMolecules {
     }
 
     /**
-     * Shoot molecule: starts shooter, then feeder after SHOOT_FEEDER_DELAY, then floor after SHOOT_FLOOR_DELAY.
-     * On end, stops shooter, feeder, and floor.
+     * Shoot molecule: backs feeder off (reverse) for SHOOT_FEEDER_BACKOFF so the ball clears the shooter
+     * wheels, then starts shooter and runs feeder/floor after their delays. On end, stops shooter, feeder, and floor.
      */
     public static Command shootMolecule(Shooter shooter, Feeder feeder, Floor floor) {
-        return new ParallelCommandGroup(
-                shooter.moveToArbitrarySpeedCommand(() -> ShooterSpeed.FORWARD.value),
-                Commands.waitSeconds(SHOOT_FEEDER_DELAY)
-                        .andThen(feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)),
-                Commands.waitSeconds(SHOOT_FLOOR_DELAY)
-                        .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)))
+        Command backoffThenShoot = Commands.sequence(
+                feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
+                        .withTimeout(SHOOT_FEEDER_BACKOFF),
+                Commands.runOnce(feeder::resetSpeed, feeder),
+                new ParallelCommandGroup(
+                        shooter.moveToArbitrarySpeedCommand(() -> ShooterSpeed.FORWARD.value),
+                        Commands.waitSeconds(SHOOT_FEEDER_DELAY)
+                                .andThen(feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)),
+                        Commands.waitSeconds(SHOOT_FLOOR_DELAY)
+                                .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value))));
+        return backoffThenShoot
                 .finallyDo(interrupted -> {
                     shooter.resetSpeed();
                     feeder.resetSpeed();
