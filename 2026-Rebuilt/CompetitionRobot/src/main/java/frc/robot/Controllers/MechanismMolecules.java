@@ -59,19 +59,20 @@ public final class MechanismMolecules {
     /**
      * Shoot molecule: backs feeder off (reverse) for SHOOT_FEEDER_BACKOFF so the ball clears the shooter
      * wheels, then starts shooter and runs feeder/floor after their delays. On end, stops shooter, feeder, and floor.
+     * Backoff is one command with finallyDo so feeder isn't handed off through a separate runOnce (avoids scheduler edge cases).
      */
     public static Command shootMolecule(Shooter shooter, Feeder feeder, Floor floor) {
-        Command backoffThenShoot = Commands.sequence(
-                feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
-                        .withTimeout(SHOOT_FEEDER_BACKOFF),
-                Commands.runOnce(feeder::resetSpeed, feeder),
-                new ParallelCommandGroup(
-                        shooter.moveToArbitrarySpeedCommand(() -> ShooterSpeed.FORWARD.value),
-                        Commands.waitSeconds(SHOOT_FEEDER_DELAY)
-                                .andThen(feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)),
-                        Commands.waitSeconds(SHOOT_FLOOR_DELAY)
-                                .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value))));
-        return backoffThenShoot
+        Command backoff = feeder
+                .moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
+                .withTimeout(SHOOT_FEEDER_BACKOFF)
+                .finallyDo(interrupted -> feeder.resetSpeed());
+        Command shootPhase = new ParallelCommandGroup(
+                shooter.moveToArbitrarySpeedCommand(() -> ShooterSpeed.FORWARD.value),
+                Commands.waitSeconds(SHOOT_FEEDER_DELAY)
+                        .andThen(feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)),
+                Commands.waitSeconds(SHOOT_FLOOR_DELAY)
+                        .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)));
+        return Commands.sequence(backoff, shootPhase)
                 .finallyDo(interrupted -> {
                     shooter.resetSpeed();
                     feeder.resetSpeed();
