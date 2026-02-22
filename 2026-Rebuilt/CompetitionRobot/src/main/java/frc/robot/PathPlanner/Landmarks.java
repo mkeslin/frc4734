@@ -41,18 +41,72 @@ public class Landmarks {
     }
 
     /**
-     * Gets the hub (scoring target) center for the current alliance.
-     * Stub: coordinates are (0, 0, 0); replace in BlueLandmarks with actual 2026 field position.
+     * Gets the hub (scoring target / diamond plate) center for the current alliance.
      */
     public static Pose2d OurHub() {
         return AllianceUtils.getAlliancePose(BlueLandmarks.Hub);
     }
 
     /**
-     * Gets the tower alignment pose for the current alliance.
-     * Stub: coordinates are (0, 0, 0); replace in BlueLandmarks with actual 2026 field position.
+     * Gets the tower (uprights reference) pose for the current alliance.
      */
     public static Pose2d OurTower() {
         return AllianceUtils.getAlliancePose(BlueLandmarks.Tower);
+    }
+
+    /**
+     * Gets the field center for the current alliance.
+     */
+    public static Pose2d OurFieldCenter() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.FieldCenter);
+    }
+
+    /**
+     * Gets the upright near hub, top, for the current alliance.
+     */
+    public static Pose2d OurUprightNearHubTop() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.UprightNearHubTop);
+    }
+
+    /**
+     * Gets the upright near hub, bottom, for the current alliance.
+     */
+    public static Pose2d OurUprightNearHubBottom() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.UprightNearHubBottom);
+    }
+
+    /**
+     * Gets our feeder note stack bottom center for the current alliance.
+     */
+    public static Pose2d OurFeederStackBottom() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.FeederStackBottom);
+    }
+
+    /**
+     * Gets our feeder note stack top center for the current alliance.
+     */
+    public static Pose2d OurFeederStackTop() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.FeederStackTop);
+    }
+
+    /**
+     * Gets our alliance station entry, bottom center, for the current alliance.
+     */
+    public static Pose2d OurEntryBottom() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.EntryBottom);
+    }
+
+    /**
+     * Gets our alliance station entry, top center, for the current alliance.
+     */
+    public static Pose2d OurEntryTop() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.EntryTop);
+    }
+
+    /**
+     * Gets the center note stack center for the current alliance.
+     */
+    public static Pose2d OurCenterStackCenter() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.CenterStackCenter);
     }
 }

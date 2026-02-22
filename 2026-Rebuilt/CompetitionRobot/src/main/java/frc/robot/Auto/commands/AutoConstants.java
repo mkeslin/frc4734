@@ -39,9 +39,9 @@ public final class AutoConstants {
     public static final int DEFAULT_STABLE_FRAMES = 10; // frames at target before considered stable
     public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
 
-    // Hub position (field-relative, blue alliance origin)
+    // Hub position (field-relative, blue alliance origin). From 2026 field diagram: blue diamond plate center 197.61", 158.845" (m)
     public static final Pose2d HUB_POSE = new Pose2d(
-            new Translation2d(4.625, 4.035), // Approximate center of hub (update with actual field measurements)
+            new Translation2d(5.019, 4.035),
             Rotation2d.fromDegrees(0)
     );
 }
