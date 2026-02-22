@@ -1,22 +1,22 @@
 # Controller Bindings Reference
 
-Print this for driver/pit reference. **Drive profile** is selected on the Driver tab (or Back+Start on drive controller). Mechanism mode follows automatically.
+Print this for driver/pit reference. **Mode** is selected on the Driver tab (or Back+Start on drive controller). Modes: Auto (no bindings), Teleop, SysId, Mechanism.
 
 ---
 
-## Drive profile → mechanism mode
+## Mode summary
 
-| Drive profile | Mechanism mode | Drive controller | Mechanism controller |
-|---------------|----------------|------------------|----------------------|
-| **NORMAL**    | MECHANISM      | Normal driving   | Molecule bindings    |
-| **SYSID**     | SYSID          | Drivetrain SysId | SysId (PID tuning)   |
-| **TUNING**    | INDIVIDUAL     | Brake; A = tuning path | One button per mechanism |
+| Mode | Drive controller | Mechanism controller |
+|------|------------------|----------------------|
+| **Teleop** | Normal driving | Teleop commands (intake combo, shoot combo, deploy/stow) |
+| **SysId** | Drivetrain SysId | SysId (PID tuning) |
+| **Mechanism** | Brake; A = tuning path | Individual mechanism commands (one button per mechanism) |
 
-**Switch profile:** Driver tab dropdown **Bindings Profile** (default: NORMAL), or hold **Back + Start** on drive controller to cycle NORMAL → SYSID → TUNING → NORMAL.
+**Switch mode:** Driver tab dropdown **Bindings Profile** (default: Teleop), or hold **Back + Start** on drive controller to cycle Teleop → SysId → Mechanism → Teleop.
 
 ---
 
-## Drive controller (all profiles)
+## Drive controller (all modes)
 
 | Action | Binding |
 |--------|--------|
@@ -26,21 +26,21 @@ Print this for driver/pit reference. **Drive profile** is selected on the Driver
 | Reset heading | Right bumper |
 | **Profile cycle** | **Back + Start** (when enabled) |
 
-**SYSID profile only:** A = translation SysId, B = steer SysId, Right bumper = rotation SysId; Back+Y / Back+X = dynamic; Start+Y / Start+X = quasistatic.
+**SysId mode only:** A = translation SysId, B = steer SysId, Right bumper = rotation SysId; Back+Y / Back+X = dynamic; Start+Y / Start+X = quasistatic.
 
-**TUNING profile only:** A = run tuning path (zzTuning-1).
+**Mechanism mode only:** A = run tuning path (zzTuning-1).
 
 ---
 
-## Mechanism controller — MECHANISM (competition)
+## Mechanism controller — Teleop (competition)
 
-*When drive profile is NORMAL.*
+*When mode is Teleop.*
 
 | Button | Action |
 |--------|--------|
 | **D-pad down** | Deploy intake (single press) |
 | **D-pad up** | Stow intake (single press) |
-| **Left trigger** (held) | Intake + floor + feeder (forward) |
+| **Left trigger** (held) | Intake + floor (forward) |
 | **Left bumper** (held) | Reverse intake, floor, feeder |
 | **Right trigger** (held) | Shoot: shooter, then delayed feeder, then delayed floor |
 | **Right bumper** (held) | Reverse shooter, feeder, floor |
@@ -48,9 +48,9 @@ Print this for driver/pit reference. **Drive profile** is selected on the Driver
 
 ---
 
-## Mechanism controller — SYSID (PID tuning)
+## Mechanism controller — SysId (PID tuning)
 
-*When drive profile is SYSID. A/B/X/Y = quasi fwd, quasi rev, dynamic fwd, dynamic rev.*
+*When mode is SysId. A/B/X/Y = quasi fwd, quasi rev, dynamic fwd, dynamic rev.*
 
 | Mechanism | Buttons |
 |-----------|---------|
@@ -62,9 +62,9 @@ Print this for driver/pit reference. **Drive profile** is selected on the Driver
 
 ---
 
-## Mechanism controller — INDIVIDUAL (one button per mechanism)
+## Mechanism controller — Mechanism (one button per mechanism)
 
-*When drive profile is TUNING.*
+*When mode is Mechanism (tuning).*
 
 | Button | Action |
 |--------|--------|
@@ -82,4 +82,4 @@ Print this for driver/pit reference. **Drive profile** is selected on the Driver
 
 ---
 
-*Generated from ControllerBindingFactory and SwerveDrivetrainBindings. Default profile: NORMAL (Competition).*
+*Generated from ControllerBindingFactory and SwerveDrivetrainBindings. Default mode: Teleop (Competition).*

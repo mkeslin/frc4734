@@ -277,9 +277,9 @@ public class RobotContainer {
             m_drivetrain.stop();
         }
 
-        // Reset rate limiters and profile so next enable starts in NORMAL / Mechanism Mode
+        // Reset rate limiters and profile so next enable starts in Teleop mode
         SwerveDrivetrainBindings.resetRateLimiters();
-        SwerveDrivetrainBindings.setProfile(InputProfile.NORMAL);
+        SwerveDrivetrainBindings.setProfile(InputProfile.TELEOP);
 
         // Cleanup all subsystems and sensors
         if (m_subsystemFactory != null) {

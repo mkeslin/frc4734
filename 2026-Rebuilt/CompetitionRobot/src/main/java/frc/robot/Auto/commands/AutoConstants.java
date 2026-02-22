@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 /**
  * Constants for autonomous commands.
  * Contains default timeouts, tolerances, vision thresholds, and field element positions.
+ * Commands in this package are used for autonomous routines and time-based sequences (not teleop bindings).
  */
 public final class AutoConstants {
     private AutoConstants() {

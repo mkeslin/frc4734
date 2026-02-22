@@ -1,4 +1,4 @@
-package frc.robot.Controllers;
+package frc.robot.Commands.teleop;
 
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_BACKOFF;
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_DELAY;
@@ -17,36 +17,23 @@ import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
 
 /**
- * Factory for molecule commands used in competition bindings: intake (intake+floor+feeder),
- * reverse intake, shoot (shooter then delayed feeder then delayed floor), reverse shoot.
- * All commands run while held and reset subsystems on release.
+ * Teleop mechanism combo commands (Teleop mode). Run while held; reset on release.
  */
-public final class MechanismMolecules {
-    private MechanismMolecules() {}
+public final class TeleopMechanismCommands {
+    private TeleopMechanismCommands() {}
 
-    /**
-     * Intake molecule: runs intake, floor, and feeder forward. The intake command also applies
-     * slight forward voltage to the deploy motor while running to keep the intake in place. On end, resets all three.
-     */
-    public static Command intakeMolecule(DeployableIntake intake, Floor floor, Feeder feeder) {
+    public static Command intake(DeployableIntake intake, Floor floor, Feeder feeder) {
         return new ParallelCommandGroup(
                 intake.moveToArbitraryIntakeSpeedCommand(() -> IntakeSpeed.IN.value),
-                floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)
-                // Temporarily comment out feeder when intake runs:
-                // feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
-                )
+                floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value))
                 .finallyDo(interrupted -> {
                     intake.resetIntakeSpeed();
                     floor.resetSpeed();
-                    // feeder.resetSpeed();
                 })
-                .withName("MechanismMolecules.intake");
+                .withName("TeleopMechanismCommands.intake");
     }
 
-    /**
-     * Reverse intake molecule: runs intake, floor, and feeder reverse. On end, resets all three.
-     */
-    public static Command reverseIntakeMolecule(DeployableIntake intake, Floor floor, Feeder feeder) {
+    public static Command reverseIntake(DeployableIntake intake, Floor floor, Feeder feeder) {
         return new ParallelCommandGroup(
                 intake.moveToArbitraryIntakeSpeedCommand(() -> IntakeSpeed.OUT.value),
                 floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.REVERSE.value),
@@ -56,15 +43,10 @@ public final class MechanismMolecules {
                     floor.resetSpeed();
                     feeder.resetSpeed();
                 })
-                .withName("MechanismMolecules.reverseIntake");
+                .withName("TeleopMechanismCommands.reverseIntake");
     }
 
-    /**
-     * Shoot molecule: backs feeder off (reverse) for SHOOT_FEEDER_BACKOFF so the ball clears the shooter
-     * wheels, then starts shooter and runs feeder/floor after their delays. On end, stops shooter, feeder, and floor.
-     * Backoff is one command with finallyDo so feeder isn't handed off through a separate runOnce (avoids scheduler edge cases).
-     */
-    public static Command shootMolecule(Shooter shooter, Feeder feeder, Floor floor) {
+    public static Command shoot(Shooter shooter, Feeder feeder, Floor floor) {
         Command backoff = feeder
                 .moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
                 .withTimeout(SHOOT_FEEDER_BACKOFF)
@@ -81,13 +63,10 @@ public final class MechanismMolecules {
                     feeder.resetSpeed();
                     floor.resetSpeed();
                 })
-                .withName("MechanismMolecules.shoot");
+                .withName("TeleopMechanismCommands.shoot");
     }
 
-    /**
-     * Reverse shoot molecule: runs shooter, feeder, and floor reverse. On end, resets all three.
-     */
-    public static Command reverseShootMolecule(Shooter shooter, Feeder feeder, Floor floor) {
+    public static Command reverseShoot(Shooter shooter, Feeder feeder, Floor floor) {
         return new ParallelCommandGroup(
                 shooter.moveToArbitrarySpeedCommand(() -> ShooterSpeed.REVERSE.value),
                 feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value),
@@ -97,6 +76,6 @@ public final class MechanismMolecules {
                     feeder.resetSpeed();
                     floor.resetSpeed();
                 })
-                .withName("MechanismMolecules.reverseShoot");
+                .withName("TeleopMechanismCommands.reverseShoot");
     }
 }

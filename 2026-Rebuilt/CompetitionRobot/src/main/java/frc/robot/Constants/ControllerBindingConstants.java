@@ -10,7 +10,7 @@ public final class ControllerBindingConstants {
     private ControllerBindingConstants() {}
 
     /**
-     * When true, Back + Start on the drive controller cycles NORMAL → SYSID → TUNING → NORMAL.
+     * When true, Back + Start on the drive controller cycles TELEOP → SYSID → MECHANISM → TELEOP.
      * When false, the drive profile stays at {@link #DEFAULT_DRIVE_PROFILE} for the session.
      */
     public static final boolean ENABLE_PROFILE_SWITCHING = true;
@@ -19,5 +19,5 @@ public final class ControllerBindingConstants {
      * Initial drive profile at boot. If {@link #ENABLE_PROFILE_SWITCHING} is false,
      * this is the only profile used for the session.
      */
-    public static final InputProfile DEFAULT_DRIVE_PROFILE = InputProfile.NORMAL;
+    public static final InputProfile DEFAULT_DRIVE_PROFILE = InputProfile.TELEOP;
 }
