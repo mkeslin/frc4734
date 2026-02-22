@@ -24,17 +24,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  *   <li>Load the appropriate field layout for the current alliance</li>
  * </ul>
  * 
- * <p><b>Field Layout Note:</b> The 2026 field layout constant name is not yet known.
- * This class uses {@code AprilTagFields.kDefaultField} as a placeholder, which should
- * be updated to the specific 2026 constant (e.g., {@code AprilTagFields.k2026RebuiltAndyMark})
- * once the name is confirmed.
+ * <p>Field dimensions ({@code FIELD_WIDTH}, {@code FIELD_LENGTH}) and the AprilTag layout
+ * ({@code AprilTagFields.k2026RebuiltAndymark}) are set for the 2026 Rebuilt (Andymark) field.
  */
 public final class AllianceUtils {
-    /** Field width in meters (used for rotation calculations) */
+    /** Field width in meters (used for rotation calculations). Verified for 2026 Rebuilt field. */
     private static final double FIELD_WIDTH = 16.54; // meters
     
-    /** Field length in meters (used for rotation calculations) */
-    private static final double FIELD_LENGTH = 8.02; // meters
+    /** Field length in meters (used for rotation calculations). Verified for 2026 Rebuilt field. */
+    private static final double FIELD_LENGTH = 8.07; // meters
     
     /** Field center X coordinate in meters */
     private static final double FIELD_CENTER_X = FIELD_LENGTH / 2.0;
@@ -152,11 +150,7 @@ public final class AllianceUtils {
 
     /**
      * Loads the AprilTag field layout for the current alliance.
-     * 
-     * <p><b>Note:</b> The 2026 field layout constant name is not yet known.
-     * This method uses {@code AprilTagFields.kDefaultField} as a placeholder.
-     * Update this method to use the specific 2026 constant (e.g.,
-     * {@code AprilTagFields.k2026RebuiltAndyMark}) once the name is confirmed.
+     * Uses the 2026 Rebuilt (Andymark) field layout for AprilTag-based pose estimation.
      * 
      * <p>For rotationally symmetrical fields, the same field layout is used for
      * both alliances, but poses must be transformed using the rotation methods.
@@ -164,10 +158,7 @@ public final class AllianceUtils {
      * @return The AprilTag field layout for the current game
      */
     public static AprilTagFieldLayout getFieldLayout() {
-        // TODO: Update to use the specific 2026 field constant once the name is known
-        // Example: return AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndyMark);
-        // For now, use kDefaultField which should point to the current game
-        return AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+        return AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
     }
 
     /**
@@ -176,7 +167,6 @@ public final class AllianceUtils {
      * @return A string representation of the field layout being used
      */
     public static String getFieldLayoutName() {
-        // TODO: Update this when the 2026 constant name is known
-        return "kDefaultField (update to 2026 constant when known)";
+        return "k2026RebuiltAndymark";
     }
 }

@@ -40,5 +40,19 @@ public class Landmarks {
         return AllianceUtils.getAlliancePose(BlueLandmarks.Start3);
     }
 
-    // TODO: Add 2026 field landmark methods (hub, tower, etc.) as needed
+    /**
+     * Gets the hub (scoring target) center for the current alliance.
+     * Stub: coordinates are (0, 0, 0); replace in BlueLandmarks with actual 2026 field position.
+     */
+    public static Pose2d OurHub() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.Hub);
+    }
+
+    /**
+     * Gets the tower alignment pose for the current alliance.
+     * Stub: coordinates are (0, 0, 0); replace in BlueLandmarks with actual 2026 field position.
+     */
+    public static Pose2d OurTower() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.Tower);
+    }
 }

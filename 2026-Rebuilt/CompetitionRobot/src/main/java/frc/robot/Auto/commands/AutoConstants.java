@@ -40,9 +40,8 @@ public final class AutoConstants {
     public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
 
     // Hub position (field-relative, blue alliance origin)
-    // TODO: Update with actual 2026 field hub position
     public static final Pose2d HUB_POSE = new Pose2d(
-            new Translation2d(8.27, 4.11), // Approximate center of hub (update with actual field measurements)
+            new Translation2d(4.625, 4.035), // Approximate center of hub (update with actual field measurements)
             Rotation2d.fromDegrees(0)
     );
 }
