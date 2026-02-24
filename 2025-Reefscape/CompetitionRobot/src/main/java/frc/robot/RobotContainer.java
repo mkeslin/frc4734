@@ -174,10 +174,10 @@ public class RobotContainer {
                 Commands
                         .waitSeconds(0.0)
                         .andThen(RobotCommands.prepareScoreCoralCommand(m_positionTracker, scoreLevel, scoreSide,
-                                m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight)),
-                Commands
-                        .waitSeconds(0.0)
-                        .andThen(centerToReefCommand.unless(() -> !centerToReef))
+                                m_drivetrain, m_elevator, m_arm, m_sideToSide, m_lights, m_reef_limelight))
+                // Commands
+                //         .waitSeconds(0.0)
+                //         .andThen(centerToReefCommand.unless(() -> !centerToReef))
         //
         );
     }
@@ -186,55 +186,55 @@ public class RobotContainer {
         var centerToReef = true;
 
         m_arcadeController.rightTrigger().onTrue(Commands.sequence(
-                prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef),
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                        .withTimeout(0.15)
-                        .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                        .asProxy()
+                prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Left, centerToReef)
+                // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                //         .withTimeout(0.15)
+                //         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                //         .asProxy()
         //
         ));
         m_arcadeController.b()
                 .onTrue(Commands.sequence(
-                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef),
-                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                                .withTimeout(0.12)
-                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                                .asProxy()
+                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Left, centerToReef)
+                        // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                        //         .withTimeout(0.12)
+                        //         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                        //         .asProxy()
                 //
                 ));
         m_arcadeController.a()
                 .onTrue(Commands.sequence(
-                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef),
-                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                                .withTimeout(0.17)
-                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                                .asProxy()
+                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Left, centerToReef)
+                        // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                        //         .withTimeout(0.17)
+                        //         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                        //         .asProxy()
                 //
                 ));
         m_arcadeController.x()
                 .onTrue(Commands.sequence(
-                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef),
-                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                                .withTimeout(0.15)
-                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                                .asProxy()
+                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L4, ScoreSide.Right, centerToReef)
+                        // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                        //         .withTimeout(0.15)
+                        //         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                        //         .asProxy()
                 //
                 ));
         m_arcadeController.y()
                 .onTrue(Commands.sequence(
-                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef),
-                        Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                                .withTimeout(0.12)
-                                .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                                .asProxy()
+                        prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L3, ScoreSide.Right, centerToReef)
+                        // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                        //         .withTimeout(0.12)
+                        //         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                        //         .asProxy()
                 //
                 ));
         m_arcadeController.rightBumper().onTrue(Commands.sequence(
-                prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef),
-                Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
-                        .withTimeout(0.17)
-                        .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
-                        .asProxy()
+                prepareScoreCoralAndCenterToReefCommand(ScoreLevel.L2, ScoreSide.Right, centerToReef)
+                // Commands.run(() -> m_drivetrain.setRelativeSpeed(-0.5, 0, 0))
+                //         .withTimeout(0.17)
+                //         .andThen(Commands.runOnce(() -> m_drivetrain.setRelativeSpeed(0, 0, 0)))
+                //         .asProxy()
         //
         ));
 

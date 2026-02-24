@@ -18,6 +18,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -53,6 +54,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
     private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
     private final SysIdRoutine m_sysIdRoutine;
+    private final Timer m_sysIdTimer = new Timer();
 
     private PositionTracker m_positionTracker;
 
@@ -60,20 +62,37 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
 
     public Shooter() {
         m_sysIdRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config(
-                        Volts.of(0.5).div(Seconds.of(1)),
-                        Volts.of(0.5),
-                        null,
-                        (state) -> SignalLogger.writeString("Shooter State", state.toString())),
-                new SysIdRoutine.Mechanism(
-                        (volts) -> {
-                            m_shooterLeftLeaderMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
-                            m_shooterRightFollowerMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
-                            m_shooterCenterFollowerMotor.setControl(m_voltReq.withOutput(volts.in(Volts)));
-                        },
-                        null,
-                        this,
-                        "Shooter"));
+        new SysIdRoutine.Config(
+            Volts.of(0.5).div(Seconds.of(1)),
+            Volts.of(0.5),
+            null,
+            (state) -> {
+                m_sysIdTimer.reset();
+                m_sysIdTimer.start();
+                SignalLogger.writeString("Shooter State", state.toString());
+            }),
+        new SysIdRoutine.Mechanism(
+            (volts) -> {
+                double v = volts.in(Volts);
+                double elapsed = m_sysIdTimer.get();
+
+                m_shooterLeftLeaderMotor.setControl(m_voltReq.withOutput(v));
+
+                if (elapsed >= 0.2) {
+                    m_shooterRightFollowerMotor.setControl(m_voltReq.withOutput(v));
+                } else {
+                    m_shooterRightFollowerMotor.setControl(m_voltReq.withOutput(0));
+                }
+
+                if (elapsed >= 0.4) {
+                    m_shooterCenterFollowerMotor.setControl(m_voltReq.withOutput(v));
+                } else {
+                    m_shooterCenterFollowerMotor.setControl(m_voltReq.withOutput(0));
+                }
+            },
+            null,
+            this,
+            "Shooter"));
 
         m_shooterLeftLeaderMotor = new TalonFX(SHOOTER_LEFT);
         m_shooterLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
