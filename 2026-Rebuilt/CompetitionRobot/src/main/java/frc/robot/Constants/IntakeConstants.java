@@ -60,10 +60,14 @@ public class IntakeConstants {
     public static final double INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE = 0.7;
 
     // ---- Current limits, ramp, voltage (deploy and intake motors) ----
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 40;
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 60;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
+    /** Intake roller: supply and stator limits (amps). */
+    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 15;
+    public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 40;
+    /** Intake deploy: supply and stator limits (amps). */
+    public static final double INTAKE_DEPLOY_SUPPLY_CURRENT_LIMIT_AMPS = 15;
+    public static final double INTAKE_DEPLOY_STATOR_CURRENT_LIMIT_AMPS = 30;
     public static final double CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC = 0.2;
     public static final double PEAK_FORWARD_VOLTAGE = 12.0;
     public static final double PEAK_REVERSE_VOLTAGE = -12.0;

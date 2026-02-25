@@ -42,11 +42,11 @@ public class ShooterConstants {
     // ---- Current limits ----
     // Protects battery/breaker and reduces brownout risk. Tune to your breaker and load.
     /** Supply current limit (amps). Current drawn from the bus. */
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 30;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 20;
     /** Enable supply current limiting. */
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
     /** Stator current limit (amps). Motor current; limits torque (e.g. during jam). */
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 50;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 60;
     /** Enable stator current limiting. */
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
 

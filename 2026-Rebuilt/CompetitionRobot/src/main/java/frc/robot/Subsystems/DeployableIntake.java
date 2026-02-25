@@ -137,9 +137,9 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
         m_deployMotor.setNeutralMode(NeutralModeValue.Brake);
         m_deployMotor.getConfigurator().apply(deployConfigs);
         CurrentLimitsConfigs deployCurrentLimits = new CurrentLimitsConfigs()
-                .withSupplyCurrentLimit(Amps.of(IntakeConstants.SUPPLY_CURRENT_LIMIT_AMPS))
+                .withSupplyCurrentLimit(Amps.of(IntakeConstants.INTAKE_DEPLOY_SUPPLY_CURRENT_LIMIT_AMPS))
                 .withSupplyCurrentLimitEnable(IntakeConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
-                .withStatorCurrentLimit(Amps.of(IntakeConstants.STATOR_CURRENT_LIMIT_AMPS))
+                .withStatorCurrentLimit(Amps.of(IntakeConstants.INTAKE_DEPLOY_STATOR_CURRENT_LIMIT_AMPS))
                 .withStatorCurrentLimitEnable(IntakeConstants.STATOR_CURRENT_LIMIT_ENABLE);
         ClosedLoopRampsConfigs deployRamps = new ClosedLoopRampsConfigs()
                 .withVoltageClosedLoopRampPeriod(IntakeConstants.CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC);
@@ -157,9 +157,9 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
                 .withKV(IntakeConstants.INTAKE_VELOCITY_KV).withKS(IntakeConstants.INTAKE_VELOCITY_KS)
                 .withKP(IntakeConstants.INTAKE_VELOCITY_KP).withKI(IntakeConstants.INTAKE_VELOCITY_KI).withKD(IntakeConstants.INTAKE_VELOCITY_KD);
         CurrentLimitsConfigs intakeCurrentLimits = new CurrentLimitsConfigs()
-                .withSupplyCurrentLimit(Amps.of(IntakeConstants.SUPPLY_CURRENT_LIMIT_AMPS))
+                .withSupplyCurrentLimit(Amps.of(IntakeConstants.INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS))
                 .withSupplyCurrentLimitEnable(IntakeConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
-                .withStatorCurrentLimit(Amps.of(IntakeConstants.STATOR_CURRENT_LIMIT_AMPS))
+                .withStatorCurrentLimit(Amps.of(IntakeConstants.INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS))
                 .withStatorCurrentLimitEnable(IntakeConstants.STATOR_CURRENT_LIMIT_ENABLE);
         InvertedValue intakeInvert = IntakeConstants.INTAKE_MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
         MotorOutputConfigs intakeMotorOutput = new MotorOutputConfigs().withInverted(intakeInvert);

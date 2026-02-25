@@ -31,9 +31,9 @@ public class FloorConstants {
     public static final double VELOCITY_KD = 0.0;
 
     // ---- Current limits ----
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 40;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 15;
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 60;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 30;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
 
     // ---- Motor output ----

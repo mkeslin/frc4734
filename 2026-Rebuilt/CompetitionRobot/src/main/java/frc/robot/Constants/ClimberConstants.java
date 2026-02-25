@@ -44,7 +44,7 @@ public class ClimberConstants {
     // ---- Talon FX: current limits, ramp, voltage ----
     public static final double SUPPLY_CURRENT_LIMIT_AMPS = 40;
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 60;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 80;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
     public static final double CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC = 0.2;
     public static final double PEAK_FORWARD_VOLTAGE = 12.0;
