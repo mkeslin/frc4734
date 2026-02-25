@@ -29,11 +29,13 @@ public class ShooterConstants {
     // ---- Velocity closed-loop (Slot0) ----
     // Tune via SysId quasistatic/dynamic or manual tuning. These are safe placeholders.
     /** Velocity feedforward: volts per (rps). Approx 12V / free-speed-rps. */
-    public static final double VELOCITY_KV = 0.12;
+    public static final double VELOCITY_KV = 0.018652;
     /** Static friction feedforward (volts). Minimum voltage to overcome friction; helps at low speed. */
-    public static final double VELOCITY_KS = 0.25;
-    /** Proportional gain on velocity error. */
-    public static final double VELOCITY_KP = 0.1;
+    public static final double VELOCITY_KS = 0.13243;
+    /** Acceleration feedforward (volts per rps/s). From SysId; improves transient response. */
+    public static final double VELOCITY_KA = 0.011159;
+    /** Proportional gain on velocity error (Phoenix 6 SysId preset). */
+    public static final double VELOCITY_KP = 0.028084;
     /** Integral gain (use 0 or small to avoid windup). */
     public static final double VELOCITY_KI = 0.0;
     /** Derivative gain on velocity error rate. */

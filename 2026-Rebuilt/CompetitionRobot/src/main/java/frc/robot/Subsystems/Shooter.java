@@ -98,6 +98,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
         Slot0Configs slot0 = new Slot0Configs();
         slot0.kV = ShooterConstants.VELOCITY_KV;
         slot0.kS = ShooterConstants.VELOCITY_KS;
+        slot0.kA = ShooterConstants.VELOCITY_KA;
         slot0.kP = ShooterConstants.VELOCITY_KP;
         slot0.kI = ShooterConstants.VELOCITY_KI;
         slot0.kD = ShooterConstants.VELOCITY_KD;
