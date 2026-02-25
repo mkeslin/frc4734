@@ -1,6 +1,7 @@
 package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
+import static frc.robot.Constants.CANIds.CAN_BUS;
 import static frc.robot.Constants.CANIds.CLIMBER;
 import static frc.robot.Constants.CANIds.CLIMBER_2;
 
@@ -86,7 +87,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
 
         talonFxConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        m_climber = new TalonFX(CLIMBER);
+        m_climber = new TalonFX(CLIMBER, CAN_BUS);
         m_climber.setNeutralMode(NeutralModeValue.Brake);
         m_climber.getConfigurator().apply(talonFxConfigs);
 
@@ -104,7 +105,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         m_climber.getConfigurator().apply(closedLoopRamps);
         m_climber.getConfigurator().apply(voltage);
 
-        m_climber2 = new TalonFX(CLIMBER_2);
+        m_climber2 = new TalonFX(CLIMBER_2, CAN_BUS);
         m_climber2.setNeutralMode(NeutralModeValue.Brake);
         m_climber2.getConfigurator().apply(talonFxConfigs);
         m_climber2.getConfigurator().apply(currentLimits);

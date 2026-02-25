@@ -2,6 +2,7 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.Constants.CANIds.CAN_BUS;
 import static frc.robot.Constants.CANIds.FLOOR_CONVEYOR;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -74,7 +75,7 @@ public class Floor extends SubsystemBase implements BaseIntake<ConveyorSpeed> {
                         this,
                         "Floor"));
 
-        m_floorMotor = new TalonFX(FLOOR_CONVEYOR);
+        m_floorMotor = new TalonFX(FLOOR_CONVEYOR, CAN_BUS);
         m_floorMotor.setNeutralMode(NeutralModeValue.Brake);
 
         Slot0Configs slot0 = new Slot0Configs()

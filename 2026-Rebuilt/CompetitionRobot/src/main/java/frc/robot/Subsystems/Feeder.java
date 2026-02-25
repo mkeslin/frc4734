@@ -2,6 +2,7 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.Constants.CANIds.CAN_BUS_NAME;
 import static frc.robot.Constants.CANIds.FEEDER;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -74,7 +75,7 @@ public class Feeder extends SubsystemBase implements BaseIntake<FeederSpeed> {
                         this,
                         "Feeder"));
 
-        m_feederMotor = new TalonFX(FEEDER);
+        m_feederMotor = new TalonFX(FEEDER, CAN_BUS);
         m_feederMotor.setNeutralMode(NeutralModeValue.Brake);
 
         Slot0Configs slot0 = new Slot0Configs()

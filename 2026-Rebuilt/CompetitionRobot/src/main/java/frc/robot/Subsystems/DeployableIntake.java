@@ -3,6 +3,7 @@ package frc.robot.Subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.CANIds.CAN_BUS;
 import static frc.robot.Constants.CANIds.INTAKE_DEPLOY;
 import static frc.robot.Constants.CANIds.INTAKE_MOTOR;
 import static frc.robot.Constants.IntakeConstants.DEPLOY_TOLERANCE;
@@ -133,7 +134,7 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
 
         deployConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        m_deployMotor = new TalonFX(INTAKE_DEPLOY);
+        m_deployMotor = new TalonFX(INTAKE_DEPLOY, CAN_BUS);
         m_deployMotor.setNeutralMode(NeutralModeValue.Brake);
         m_deployMotor.getConfigurator().apply(deployConfigs);
         CurrentLimitsConfigs deployCurrentLimits = new CurrentLimitsConfigs()
@@ -151,7 +152,7 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
         m_deployMotor.getConfigurator().apply(deployVoltage);
 
         // Configure intake motor (velocity control): Slot0, current limits, motor output, ramp, voltage
-        m_intakeMotor = new TalonFX(INTAKE_MOTOR);
+        m_intakeMotor = new TalonFX(INTAKE_MOTOR, CAN_BUS);
         m_intakeMotor.setNeutralMode(NeutralModeValue.Brake);
         Slot0Configs intakeSlot0 = new Slot0Configs()
                 .withKV(IntakeConstants.INTAKE_VELOCITY_KV).withKS(IntakeConstants.INTAKE_VELOCITY_KS)

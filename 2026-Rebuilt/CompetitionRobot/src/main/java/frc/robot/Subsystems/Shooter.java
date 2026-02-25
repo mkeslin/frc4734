@@ -1,6 +1,7 @@
 package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.Constants.CANIds.CAN_BUS;
 import static frc.robot.Constants.CANIds.SHOOTER_1;
 import static frc.robot.Constants.CANIds.SHOOTER_2;
 import static frc.robot.Constants.CANIds.SHOOTER_3;
@@ -90,7 +91,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
                         this,
                         "Shooter"));
 
-        m_shooterLeftLeaderMotor = new TalonFX(SHOOTER_1);
+        m_shooterLeftLeaderMotor = new TalonFX(SHOOTER_1, CAN_BUS);
         m_shooterLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
 
         // Velocity closed-loop Slot0 and current limits in one config
@@ -121,12 +122,12 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
 
         // Shooter 2 and 3: same config as leader, then run as followers (mounted opposite to leader)
         m_leaderDeviceId = m_shooterLeftLeaderMotor.getDeviceID();
-        m_shooterRightFollowerMotor = new TalonFX(SHOOTER_2);
+        m_shooterRightFollowerMotor = new TalonFX(SHOOTER_2, CAN_BUS);
         m_shooterRightFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
         applyShooterMotorConfig(m_shooterRightFollowerMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
         m_shooterRightFollowerMotor.setControl(new Follower(m_leaderDeviceId, MotorAlignmentValue.Opposed));
 
-        m_shooterCenterFollowerMotor = new TalonFX(SHOOTER_3);
+        m_shooterCenterFollowerMotor = new TalonFX(SHOOTER_3, CAN_BUS);
         m_shooterCenterFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
         applyShooterMotorConfig(m_shooterCenterFollowerMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
         m_shooterCenterFollowerMotor.setControl(new Follower(m_leaderDeviceId, MotorAlignmentValue.Opposed));

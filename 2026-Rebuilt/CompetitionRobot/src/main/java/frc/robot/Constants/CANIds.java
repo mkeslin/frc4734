@@ -1,13 +1,21 @@
 package frc.robot.Constants;
 
+import com.ctre.phoenix6.CANBus;
+
 /**
- * CAN device IDs for all CAN-based devices on the robot.
+ * CAN device IDs and bus for all CAN-based devices on the robot.
  * These include motors, lights, and other CAN devices.
  */
 public final class CANIds {
     private CANIds() {
         // Utility class - prevent instantiation
     }
+
+    /** CAN bus name for all CTRE devices (e.g. "Canivore" when using a CANivore). Empty string = roboRIO built-in CAN. */
+    public static final String CAN_BUS_NAME = "Canivore";
+
+    /** CAN bus instance for TalonFX and other CTRE hardware (preferred over string to avoid deprecation). */
+    public static final CANBus CAN_BUS = new CANBus(CAN_BUS_NAME);
 
     // Climber
     public static final int CLIMBER = 24;
