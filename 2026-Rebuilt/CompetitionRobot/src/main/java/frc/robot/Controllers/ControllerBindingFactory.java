@@ -2,6 +2,8 @@ package frc.robot.Controllers;
 
 import java.util.Set;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -125,6 +127,14 @@ public class ControllerBindingFactory {
 
     /** Mechanism controller: SysId bindings (PID tuning). Active when mechanism mode is SYSID. */
     private void configureMechanismSysIdBindings() {
+        // Phoenix 6 SignalLogger: start before running the four tests, stop after (one log file for SysId tool).
+        m_mechanismController.back()
+                .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                .onTrue(Commands.runOnce(SignalLogger::start));
+        m_mechanismController.start()
+                .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
+                .onTrue(Commands.runOnce(SignalLogger::stop));
+
         if (m_shooter != null) {
             m_mechanismController.a().and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.SYSID)
                     .whileTrue(m_shooter.sysIdQuasistaticCommand(Direction.kForward));

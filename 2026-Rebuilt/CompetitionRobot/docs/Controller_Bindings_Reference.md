@@ -50,7 +50,12 @@ Print this for driver/pit reference. **Mode** is selected on the Driver tab (or 
 
 ## Mechanism controller — SysId (PID tuning)
 
-*When mode is SysId. A/B/X/Y = quasi fwd, quasi rev, dynamic fwd, dynamic rev.*
+*When mode is SysId. Start Signal Logger before running tests; stop after all four runs. A/B/X/Y = quasi fwd, quasi rev, dynamic fwd, dynamic rev.*
+
+| Action | Button |
+|--------|--------|
+| **Start Signal Logger** (press once before tests) | **Back** |
+| **Stop Signal Logger** (press once after all four tests) | **Start** |
 
 | Mechanism | Buttons |
 |-----------|---------|
