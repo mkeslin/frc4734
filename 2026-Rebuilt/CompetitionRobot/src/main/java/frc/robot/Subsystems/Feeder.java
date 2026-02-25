@@ -2,7 +2,7 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.Constants.CANIds.CAN_BUS_NAME;
+import static frc.robot.Constants.CANIds.CAN_BUS;
 import static frc.robot.Constants.CANIds.FEEDER;
 import static edu.wpi.first.units.Units.Volts;
 
