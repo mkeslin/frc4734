@@ -78,7 +78,8 @@ public class RobotContainer {
                 m_subsystemFactory.getShooter(),
                 m_subsystemFactory.getFeeder(),
                 m_subsystemFactory.getFloor(),
-                m_subsystemFactory.getDeployableIntake())
+                m_subsystemFactory.getDeployableIntake(),
+                m_subsystemFactory.getClimber())
                 .configureBindings();
 
         // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING

@@ -25,8 +25,7 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * Centralizes subsystem creation logic and ensures proper initialization order.
  */
 public class SubsystemFactory {
-    // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-    // private final Climber m_climber;
+    private final Climber m_climber;
     private final DeployableIntake m_deployableIntake;
     private final Floor m_floor;
     private final Feeder m_feeder;
@@ -50,9 +49,8 @@ public class SubsystemFactory {
     public SubsystemFactory(CommandSwerveDrivetrain drivetrain) {
         m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
 
-        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-        // Create subsystems (PositionTracker will be set after creation)
-        // m_climber = new Climber();
+        // Create subsystems (PositionTracker will be set after creation if needed)
+        m_climber = new Climber();
         m_deployableIntake = new DeployableIntake();
         m_floor = new Floor();
         m_feeder = new Feeder();
@@ -105,10 +103,9 @@ public class SubsystemFactory {
         //         m_photonVision);
     }
 
-    // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-    // public Climber getClimber() {
-    //     return m_climber;
-    // }
+    public Climber getClimber() {
+        return m_climber;
+    }
 
     public DeployableIntake getDeployableIntake() {
          return m_deployableIntake;
@@ -154,8 +151,7 @@ public class SubsystemFactory {
      * Resets all subsystem positions to their zero positions.
      */
     public void resetZeros() {
-        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-        // m_climber.resetPosition();
+        m_climber.resetPosition();
         // m_deployableIntake.resetDeployPosition();
         m_floor.resetSpeed();
         m_feeder.resetSpeed();
@@ -169,11 +165,9 @@ public class SubsystemFactory {
      * and cleans up other subsystem resources.
      */
     public void cleanup() {
-        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-        // Cleanup subsystems
-        // if (m_climber != null) {
-        //     m_climber.cleanup();
-        // }
+        if (m_climber != null) {
+            m_climber.cleanup();
+        }
         // if (m_deployableIntake != null) {
         //     m_deployableIntake.cleanup();
         // }

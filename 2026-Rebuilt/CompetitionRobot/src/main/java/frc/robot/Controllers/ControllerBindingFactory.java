@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Auto.commands.AutoConstants;
+import frc.robot.Auto.commands.ClimbWhileHeldCommand;
 import frc.robot.Auto.commands.CmdFollowPath;
 import frc.robot.Commands.individual.IndividualMechanismCommands;
 import frc.robot.Commands.teleop.TeleopMechanismCommands;
 import frc.robot.Constants.IntakeConstants.DeployPosition;
+import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
@@ -35,6 +37,7 @@ public class ControllerBindingFactory {
     private final Feeder m_feeder;
     private final Floor m_floor;
     private final DeployableIntake m_intake;
+    private final Climber m_climber;
 
     /**
      * Creates a factory that will bind the given controllers and subsystems.
@@ -47,7 +50,8 @@ public class ControllerBindingFactory {
             Shooter shooter,
             Feeder feeder,
             Floor floor,
-            DeployableIntake intake) {
+            DeployableIntake intake,
+            Climber climber) {
         m_driveController = driveController;
         m_mechanismController = mechanismController;
         m_drivetrain = drivetrain;
@@ -55,6 +59,7 @@ public class ControllerBindingFactory {
         m_feeder = feeder;
         m_floor = floor;
         m_intake = intake;
+        m_climber = climber;
     }
 
     /**
@@ -252,6 +257,27 @@ public class ControllerBindingFactory {
             m_mechanismController.povUp()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
                     .onTrue(IndividualMechanismCommands.intakeStow(m_intake));
+        }
+        // Climber (lift + jaws): only when mechanism profile is MECHANISM
+        if (m_climber != null) {
+            m_mechanismController.povRight()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .whileTrue(ClimbWhileHeldCommand.ascent(m_climber));
+            m_mechanismController.povLeft()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .whileTrue(ClimbWhileHeldCommand.descent(m_climber));
+            m_mechanismController.start().and(m_mechanismController.a())
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .onTrue(m_climber.openLeftJawCommand());
+            m_mechanismController.start().and(m_mechanismController.b())
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .onTrue(m_climber.closeLeftJawCommand());
+            m_mechanismController.start().and(m_mechanismController.x())
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .onTrue(m_climber.openRightJawCommand());
+            m_mechanismController.start().and(m_mechanismController.y())
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
+                    .onTrue(m_climber.closeRightJawCommand());
         }
     }
 }
