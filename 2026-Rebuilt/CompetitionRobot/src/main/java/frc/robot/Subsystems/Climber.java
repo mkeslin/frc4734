@@ -212,6 +212,25 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         return Math.abs(current - goal);
     }
 
+    /**
+     * Sets the lift goal position (MotionMagic). Used by climb/descend commands that drive the lift from their execute().
+     * Only applies when robot is initialized; otherwise stops the lift motor.
+     */
+    public void setLiftGoalPosition(double positionRotations) {
+        if (RobotState.getInstance().isInitialized()) {
+            m_climber.setControl(m_request.withPosition(positionRotations));
+        } else {
+            m_climber.stopMotor();
+        }
+    }
+
+    /**
+     * Stops the lift motor. Used when a climb/descend command is interrupted (e.g. button released).
+     */
+    public void stopLift() {
+        m_climber.stopMotor();
+    }
+
     // @Override
     public void setVoltage(double voltage) {
         voltage = MathUtil.clamp(voltage, -12, 12);

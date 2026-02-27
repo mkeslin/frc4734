@@ -83,4 +83,21 @@ public class ClimberConstants {
     public static final double JAW_SUPPLY_CURRENT_LIMIT_AMPS = 25;
     /** Jaw stator current limit (amps). */
     public static final double JAW_STATOR_CURRENT_LIMIT_AMPS = 40;
+
+    // ---- Climb cycle (rotation-based, run-while-held) ----
+    /** Position tolerance in rotations for "at target" during climb/descend. */
+    public static final double CLIMB_POSITION_TOLERANCE_ROTATIONS = 0.5;
+
+    /** Level 1: extend target (head at bar), start target (retracted). */
+    public static final double CLIMB_L1_EXTEND_ROTATIONS = ClimberPosition.ACQUIRE.value;
+    public static final double CLIMB_L1_START_ROTATIONS = ClimberPosition.DOWN.value;
+    /** Level 2: extend and start (tune to match mechanism). */
+    public static final double CLIMB_L2_EXTEND_ROTATIONS = -150;
+    public static final double CLIMB_L2_START_ROTATIONS = ClimberPosition.DOWN.value;
+    /** Level 3: full extend and start. */
+    public static final double CLIMB_L3_EXTEND_ROTATIONS = ClimberPosition.CLIMB.value;
+    public static final double CLIMB_L3_START_ROTATIONS = ClimberPosition.DOWN.value;
+
+    /** Descend v1: single target (retract to rest). Multi-level descend can use same L1/L2/L3 extend values in reverse. */
+    public static final double DESCEND_TARGET_ROTATIONS = ClimberPosition.DOWN.value;
 }
