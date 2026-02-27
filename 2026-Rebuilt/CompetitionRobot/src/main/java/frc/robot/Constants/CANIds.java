@@ -17,8 +17,10 @@ public final class CANIds {
     /** CAN bus instance for TalonFX and other CTRE hardware (preferred over string to avoid deprecation). */
     public static final CANBus CAN_BUS = new CANBus(CAN_BUS_NAME);
 
-    // Climber
+    // Climber (lift + jaws)
     public static final int CLIMBER = 24;
+    public static final int CLIMBER_JAW_LEFT = 31;
+    public static final int CLIMBER_JAW_RIGHT = 33;
 
     // Intake
     public static final int INTAKE_DEPLOY = 25;

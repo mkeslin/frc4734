@@ -3,6 +3,8 @@ package frc.robot.Subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.Constants.CANIds.CAN_BUS;
 import static frc.robot.Constants.CANIds.CLIMBER;
+import static frc.robot.Constants.CANIds.CLIMBER_JAW_LEFT;
+import static frc.robot.Constants.CANIds.CLIMBER_JAW_RIGHT;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -28,34 +30,40 @@ import frc.robot.RobotState;
 import frc.robot.TelemetryCalcs;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.ClimberConstants.ClimberPosition;
+import frc.robot.Constants.ClimberConstants.JawPosition;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
 
 /**
- * Climber subsystem that controls the robot's climbing mechanism.
- * Uses one TalonFX motor with MotionMagic control for smooth position-based movement.
- * The climber can move to predefined positions (via ClimberPosition enum) or arbitrary positions.
- * 
+ * Climber subsystem that controls the robot's climbing mechanism: a lift motor and left/right jaw motors.
+ * Lift: one TalonFX with MotionMagic for position-based movement (ClimberPosition).
+ * Jaws: two independent TalonFX motors, each with open/closed positions (JawPosition).
+ *
  * <p>Safety features:
  * <ul>
  *   <li>Prevents movement until robot is initialized via RobotState</li>
  *   <li>Uses MotionMagic for smooth, controlled motion</li>
  *   <li>Publishes climber position to NetworkTables for telemetry</li>
  * </ul>
- * 
+ *
  * @see BaseSingleJointedArm
  * @see ClimberPosition
+ * @see JawPosition
  * @see RobotState
  */
 public class Climber extends SubsystemBase implements BaseSingleJointedArm<ClimberPosition> {
     private final DoublePublisher climberPub = TelemetryCalcs.createMechanismsPublisher("Climber Position");
 
     private TalonFX m_climber;
+    private TalonFX m_jawLeft;
+    private TalonFX m_jawRight;
 
     private PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
     // private final Supplier<Pose3d> carriagePoseSupplier;
 
     private MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+    private final MotionMagicVoltage m_jawLeftRequest = new MotionMagicVoltage(0);
+    private final MotionMagicVoltage m_jawRightRequest = new MotionMagicVoltage(0);
 
     private boolean initialized;
 
@@ -100,6 +108,36 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         m_climber.getConfigurator().apply(currentLimits);
         m_climber.getConfigurator().apply(closedLoopRamps);
         m_climber.getConfigurator().apply(voltage);
+
+        // Jaws: position control (open/closed) with MotionMagic
+        var jawConfigs = new TalonFXConfiguration();
+        jawConfigs.Slot0.kP = ClimberConstants.JAW_KP;
+        jawConfigs.Slot0.kI = ClimberConstants.JAW_KI;
+        jawConfigs.Slot0.kD = ClimberConstants.JAW_KD;
+        jawConfigs.MotionMagic.MotionMagicCruiseVelocity = ClimberConstants.JAW_MOTION_MAGIC_CRUISE_VELOCITY;
+        jawConfigs.MotionMagic.MotionMagicAcceleration = ClimberConstants.JAW_MOTION_MAGIC_ACCELERATION;
+        jawConfigs.MotionMagic.MotionMagicJerk = ClimberConstants.JAW_MOTION_MAGIC_JERK;
+        jawConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+        CurrentLimitsConfigs jawCurrentLimits = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(Amps.of(ClimberConstants.JAW_SUPPLY_CURRENT_LIMIT_AMPS))
+                .withSupplyCurrentLimitEnable(ClimberConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
+                .withStatorCurrentLimit(Amps.of(ClimberConstants.JAW_STATOR_CURRENT_LIMIT_AMPS))
+                .withStatorCurrentLimitEnable(ClimberConstants.STATOR_CURRENT_LIMIT_ENABLE);
+
+        m_jawLeft = new TalonFX(CLIMBER_JAW_LEFT, CAN_BUS);
+        m_jawLeft.setNeutralMode(NeutralModeValue.Brake);
+        m_jawLeft.getConfigurator().apply(jawConfigs);
+        m_jawLeft.getConfigurator().apply(jawCurrentLimits);
+        m_jawLeft.getConfigurator().apply(closedLoopRamps);
+        m_jawLeft.getConfigurator().apply(voltage);
+
+        m_jawRight = new TalonFX(CLIMBER_JAW_RIGHT, CAN_BUS);
+        m_jawRight.setNeutralMode(NeutralModeValue.Brake);
+        m_jawRight.getConfigurator().apply(jawConfigs);
+        m_jawRight.getConfigurator().apply(jawCurrentLimits);
+        m_jawRight.getConfigurator().apply(closedLoopRamps);
+        m_jawRight.getConfigurator().apply(voltage);
 
         resetPosition();
     }
@@ -155,8 +193,23 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     @Override
     public void resetPosition() {
         m_climber.setPosition(ClimberPosition.DOWN.value);
-
+        m_jawLeft.setPosition(JawPosition.CLOSED.value);
+        m_jawRight.setPosition(JawPosition.CLOSED.value);
         initialized = true;
+    }
+
+    /** Left jaw position in rotations. */
+    public double getLeftJawPosition() {
+        return m_jawLeft.getPosition().getValueAsDouble();
+    }
+
+    /** Right jaw position in rotations. */
+    public double getRightJawPosition() {
+        return m_jawRight.getPosition().getValueAsDouble();
+    }
+
+    private static double jawPositionError(double current, double goal) {
+        return Math.abs(current - goal);
     }
 
     // @Override
@@ -245,6 +298,66 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         return runOnce(this::resetPosition).withName("climber.resetPosition");
     }
 
+    // ---- Jaw commands (independent left/right, open/closed) ----
+
+    private Command moveLeftJawToCommand(JawPosition position) {
+        double goal = position.value;
+        return run(() -> {
+            if (RobotState.getInstance().isInitialized()) {
+                m_jawLeft.setControl(m_jawLeftRequest.withPosition(goal));
+            } else {
+                m_jawLeft.stopMotor();
+            }
+        })
+                .until(() -> jawPositionError(getLeftJawPosition(), goal) < ClimberConstants.JAW_POSITION_TOLERANCE_ROTATIONS)
+                .withTimeout(5)
+                .withName("climber.moveLeftJawTo");
+    }
+
+    private Command moveRightJawToCommand(JawPosition position) {
+        double goal = position.value;
+        return run(() -> {
+            if (RobotState.getInstance().isInitialized()) {
+                m_jawRight.setControl(m_jawRightRequest.withPosition(goal));
+            } else {
+                m_jawRight.stopMotor();
+            }
+        })
+                .until(() -> jawPositionError(getRightJawPosition(), goal) < ClimberConstants.JAW_POSITION_TOLERANCE_ROTATIONS)
+                .withTimeout(5)
+                .withName("climber.moveRightJawTo");
+    }
+
+    /** Command to open the left jaw. */
+    public Command openLeftJawCommand() {
+        return moveLeftJawToCommand(JawPosition.OPEN).withName("climber.openLeftJaw");
+    }
+
+    /** Command to close the left jaw. */
+    public Command closeLeftJawCommand() {
+        return moveLeftJawToCommand(JawPosition.CLOSED).withName("climber.closeLeftJaw");
+    }
+
+    /** Command to open the right jaw. */
+    public Command openRightJawCommand() {
+        return moveRightJawToCommand(JawPosition.OPEN).withName("climber.openRightJaw");
+    }
+
+    /** Command to close the right jaw. */
+    public Command closeRightJawCommand() {
+        return moveRightJawToCommand(JawPosition.CLOSED).withName("climber.closeRightJaw");
+    }
+
+    /** Command to open both jaws (runs in parallel). */
+    public Command openBothJawsCommand() {
+        return Commands.parallel(openLeftJawCommand(), openRightJawCommand()).withName("climber.openBothJaws");
+    }
+
+    /** Command to close both jaws (runs in parallel). */
+    public Command closeBothJawsCommand() {
+        return Commands.parallel(closeLeftJawCommand(), closeRightJawCommand()).withName("climber.closeBothJaws");
+    }
+
     // @Override
     // public Command setOverridenSpeedCommand(Supplier<Double> speed) {
     // return runEnd(() -> setVoltage(12.0 * speed.get()), () -> setVoltage(0))
@@ -253,8 +366,16 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
 
     @Override
     public Command coastMotorsCommand() {
-        return runOnce(() -> m_climber.stopMotor())
-                .andThen(() -> m_climber.setNeutralMode(NeutralModeValue.Coast))
+        return runOnce(() -> {
+                    m_climber.stopMotor();
+                    m_jawLeft.stopMotor();
+                    m_jawRight.stopMotor();
+                })
+                .andThen(() -> {
+                    m_climber.setNeutralMode(NeutralModeValue.Coast);
+                    m_jawLeft.setNeutralMode(NeutralModeValue.Coast);
+                    m_jawRight.setNeutralMode(NeutralModeValue.Coast);
+                })
                 .finallyDo((d) -> {
                     // motor.setIdleMode(IdleMode.kBrake);
                     // pidController.reset(getPosition());
@@ -287,6 +408,12 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     public void cleanup() {
         if (m_climber != null) {
             m_climber.stopMotor();
+        }
+        if (m_jawLeft != null) {
+            m_jawLeft.stopMotor();
+        }
+        if (m_jawRight != null) {
+            m_jawRight.stopMotor();
         }
         if (climberPub != null) {
             climberPub.close();

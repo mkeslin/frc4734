@@ -49,4 +49,38 @@ public class ClimberConstants {
     public static final double CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC = 0.2;
     public static final double PEAK_FORWARD_VOLTAGE = 12.0;
     public static final double PEAK_REVERSE_VOLTAGE = -12.0;
+
+    // ---- Jaws (left and right, independent open/closed) ----
+    /** Position tolerance in rotations for considering a jaw at goal. */
+    public static final double JAW_POSITION_TOLERANCE_ROTATIONS = 0.1;
+
+    /** Predefined jaw positions in rotations. Tune to match mechanism. */
+    public static enum JawPosition {
+        OPEN(0.0),
+        CLOSED(1.0);
+
+        public final double value;
+
+        private JawPosition(double value) {
+            this.value = value;
+        }
+    }
+
+    /** MotionMagic cruise velocity for jaw motors (rot/s). */
+    public static final double JAW_MOTION_MAGIC_CRUISE_VELOCITY = 20;
+    /** MotionMagic acceleration for jaw motors (rot/s²). */
+    public static final double JAW_MOTION_MAGIC_ACCELERATION = 40;
+    /** MotionMagic jerk for jaw motors (rot/s³). */
+    public static final double JAW_MOTION_MAGIC_JERK = 400;
+
+    /** Jaw Slot0 kP for position control. */
+    public static final double JAW_KP = 4.0;
+    /** Jaw Slot0 kI. */
+    public static final double JAW_KI = 0.0;
+    /** Jaw Slot0 kD. */
+    public static final double JAW_KD = 0.05;
+    /** Jaw supply current limit (amps). */
+    public static final double JAW_SUPPLY_CURRENT_LIMIT_AMPS = 25;
+    /** Jaw stator current limit (amps). */
+    public static final double JAW_STATOR_CURRENT_LIMIT_AMPS = 40;
 }
