@@ -19,8 +19,7 @@ public final class CANIds {
 
     // Climber
     public static final int CLIMBER = 24;
-    public static final int CLIMBER_2 = 31;
-    
+
     // Intake
     public static final int INTAKE_DEPLOY = 25;
     public static final int INTAKE_MOTOR = 26;

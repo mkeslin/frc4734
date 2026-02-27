@@ -3,7 +3,6 @@ package frc.robot.Subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.Constants.CANIds.CAN_BUS;
 import static frc.robot.Constants.CANIds.CLIMBER;
-import static frc.robot.Constants.CANIds.CLIMBER_2;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -13,10 +12,8 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
@@ -35,7 +32,7 @@ import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
 
 /**
  * Climber subsystem that controls the robot's climbing mechanism.
- * Uses two TalonFX motors (leader and follower) with MotionMagic control for smooth position-based movement.
+ * Uses one TalonFX motor with MotionMagic control for smooth position-based movement.
  * The climber can move to predefined positions (via ClimberPosition enum) or arbitrary positions.
  * 
  * <p>Safety features:
@@ -53,7 +50,6 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     private final DoublePublisher climberPub = TelemetryCalcs.createMechanismsPublisher("Climber Position");
 
     private TalonFX m_climber;
-    private TalonFX m_climber2;
 
     private PositionTracker m_positionTracker;
     // private final MechanismLigament2d ligament;
@@ -104,14 +100,6 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         m_climber.getConfigurator().apply(currentLimits);
         m_climber.getConfigurator().apply(closedLoopRamps);
         m_climber.getConfigurator().apply(voltage);
-
-        m_climber2 = new TalonFX(CLIMBER_2, CAN_BUS);
-        m_climber2.setNeutralMode(NeutralModeValue.Brake);
-        m_climber2.getConfigurator().apply(talonFxConfigs);
-        m_climber2.getConfigurator().apply(currentLimits);
-        m_climber2.getConfigurator().apply(closedLoopRamps);
-        m_climber2.getConfigurator().apply(voltage);
-        m_climber2.setControl(new Follower(m_climber.getDeviceID(), MotorAlignmentValue.Aligned));
 
         resetPosition();
     }
@@ -189,7 +177,6 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         }
 
         m_climber.setVoltage(voltage);
-        // Follower motor automatically follows leader
     }
 
     // @Override
@@ -211,10 +198,8 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
             // Safety check: prevent movement until robot is initialized
             if (RobotState.getInstance().isInitialized()) {
                 m_climber.setControl(m_request.withPosition(goalPosition));
-                // Follower motor automatically follows leader
             } else {
                 m_climber.stopMotor();
-                m_climber2.stopMotor();
             }
             if (m_positionTracker != null) {
                 climberPub.set(m_positionTracker.getClimberPosition());
@@ -268,14 +253,8 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
 
     @Override
     public Command coastMotorsCommand() {
-        return runOnce(() -> {
-            m_climber.stopMotor();
-            m_climber2.stopMotor();
-        })
-                .andThen(() -> {
-                    m_climber.setNeutralMode(NeutralModeValue.Coast);
-                    m_climber2.setNeutralMode(NeutralModeValue.Coast);
-                })
+        return runOnce(() -> m_climber.stopMotor())
+                .andThen(() -> m_climber.setNeutralMode(NeutralModeValue.Coast))
                 .finallyDo((d) -> {
                     // motor.setIdleMode(IdleMode.kBrake);
                     // pidController.reset(getPosition());
@@ -308,9 +287,6 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     public void cleanup() {
         if (m_climber != null) {
             m_climber.stopMotor();
-        }
-        if (m_climber2 != null) {
-            m_climber2.stopMotor();
         }
         if (climberPub != null) {
             climberPub.close();
