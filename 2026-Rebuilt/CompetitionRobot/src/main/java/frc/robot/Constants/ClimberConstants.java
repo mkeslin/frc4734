@@ -50,6 +50,11 @@ public class ClimberConstants {
     public static final double PEAK_FORWARD_VOLTAGE = 12.0;
     public static final double PEAK_REVERSE_VOLTAGE = -12.0;
 
+    /** Lift MotionMagic: slow cruise/accel for safe mechanism tuning and ascent. */
+    public static final double LIFT_MOTION_MAGIC_CRUISE_VELOCITY = 15;   // rot/s
+    public static final double LIFT_MOTION_MAGIC_ACCELERATION = 25;      // rot/s²
+    public static final double LIFT_MOTION_MAGIC_JERK = 300;             // rot/s³
+
     // ---- Jaws (left and right, independent open/closed) ----
     /** Position tolerance in rotations for considering a jaw at goal. */
     public static final double JAW_POSITION_TOLERANCE_ROTATIONS = 0.1;
