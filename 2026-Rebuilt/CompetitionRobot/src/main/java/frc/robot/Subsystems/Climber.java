@@ -89,7 +89,8 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         motionMagicConfigs.MotionMagicAcceleration = 80; // Target acceleration of 160 rps/s (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = 1600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-        talonFxConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        // Positive motor rotation = ascent (raise climber); position setpoints for extend are negative
+        talonFxConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         m_climber = new TalonFX(CLIMBER, CAN_BUS);
         m_climber.setNeutralMode(NeutralModeValue.Brake);
