@@ -18,9 +18,9 @@ public final class CANIds {
     public static final CANBus CAN_BUS = new CANBus(CAN_BUS_NAME);
 
     // Climber (lift + jaws)
-    public static final int CLIMBER = 24;
-    public static final int CLIMBER_JAW_LEFT = 31;
-    public static final int CLIMBER_JAW_RIGHT = 33;
+    public static final int CLIMBER = 40;
+    public static final int CLIMBER_JAW_LEFT = 41;
+    public static final int CLIMBER_JAW_RIGHT = 42;
 
     // Intake
     public static final int INTAKE_DEPLOY = 25;
@@ -37,6 +37,6 @@ public final class CANIds {
     public static final int SHOOTER_2 = 30;
     public static final int SHOOTER_3 = 32;
 
-    // Lights
-    public static final int LIGHTS = 40;
+    // Lights (moved from 40 to avoid conflict with climber)
+    public static final int LIGHTS = 50;
 }
