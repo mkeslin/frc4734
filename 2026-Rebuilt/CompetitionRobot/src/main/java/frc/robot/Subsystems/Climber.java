@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -136,6 +137,8 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         m_jawRight = new TalonFX(CLIMBER_JAW_RIGHT, CAN_BUS);
         m_jawRight.setNeutralMode(NeutralModeValue.Brake);
         m_jawRight.getConfigurator().apply(jawConfigs);
+        // Right jaw: positive rotation = clamping (mirror of left)
+        m_jawRight.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         m_jawRight.getConfigurator().apply(jawCurrentLimits);
         m_jawRight.getConfigurator().apply(closedLoopRamps);
         m_jawRight.getConfigurator().apply(voltage);
