@@ -197,8 +197,8 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     @Override
     public void resetPosition() {
         m_climber.setPosition(ClimberPosition.DOWN.value);
-        m_jawLeft.setPosition(JawPosition.CLOSED.value);
-        m_jawRight.setPosition(JawPosition.CLOSED.value);
+        m_jawLeft.setPosition(ClimberConstants.LEFT_JAW_CLOSED_ROTATIONS);
+        m_jawRight.setPosition(ClimberConstants.RIGHT_JAW_CLOSED_ROTATIONS);
         initialized = true;
     }
 
@@ -324,7 +324,9 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     // ---- Jaw commands (independent left/right, open/closed) ----
 
     private Command moveLeftJawToCommand(JawPosition position) {
-        double goal = position.value;
+        double goal = position == JawPosition.OPEN
+                ? ClimberConstants.LEFT_JAW_OPEN_ROTATIONS
+                : ClimberConstants.LEFT_JAW_CLOSED_ROTATIONS;
         return run(() -> {
             if (RobotState.getInstance().isInitialized()) {
                 m_jawLeft.setControl(m_jawLeftRequest.withPosition(goal));
@@ -338,7 +340,9 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     }
 
     private Command moveRightJawToCommand(JawPosition position) {
-        double goal = position.value;
+        double goal = position == JawPosition.OPEN
+                ? ClimberConstants.RIGHT_JAW_OPEN_ROTATIONS
+                : ClimberConstants.RIGHT_JAW_CLOSED_ROTATIONS;
         return run(() -> {
             if (RobotState.getInstance().isInitialized()) {
                 m_jawRight.setControl(m_jawRightRequest.withPosition(goal));

@@ -54,17 +54,21 @@ public class ClimberConstants {
     /** Position tolerance in rotations for considering a jaw at goal. */
     public static final double JAW_POSITION_TOLERANCE_ROTATIONS = 0.1;
 
-    /** Predefined jaw positions in rotations. Tune to match mechanism. */
+    /** Logical open/closed; actual positions use LEFT_JAW_* and RIGHT_JAW_* constants. */
     public static enum JawPosition {
-        OPEN(0.0),
-        CLOSED(1.0);
-
-        public final double value;
-
-        private JawPosition(double value) {
-            this.value = value;
-        }
+        OPEN,
+        CLOSED
     }
+
+    /** Left jaw open position (rotations). */
+    public static final double LEFT_JAW_OPEN_ROTATIONS = 0.0;
+    /** Left jaw closed position (rotations); positive = clamping. */
+    public static final double LEFT_JAW_CLOSED_ROTATIONS = 0.082;
+
+    /** Right jaw open position (rotations). */
+    public static final double RIGHT_JAW_OPEN_ROTATIONS = 0.0;
+    /** Right jaw closed position (rotations). */
+    public static final double RIGHT_JAW_CLOSED_ROTATIONS = 0.095;
 
     /** MotionMagic cruise velocity for jaw motors (rot/s). */
     public static final double JAW_MOTION_MAGIC_CRUISE_VELOCITY = 20;
