@@ -65,6 +65,7 @@ public class Landmarks {
     /**
      * Gets the tower align pose for the given start. Robot backs into the circle end of the tower bar;
      * Y is chosen so we climb the side of the tower nearest that start (left → high Y, center → mid, right → low Y).
+     * Prefer {@link #OurTowerAlignLeft()} / {@link #OurTowerAlignRight()} with a climb-side chooser when center is not usable.
      */
     public static Pose2d OurTowerAlign(StartPoseId startId) {
         if (startId == StartPoseId.POS_1) {
@@ -73,6 +74,22 @@ public class Landmarks {
         if (startId == StartPoseId.POS_2) {
             return AllianceUtils.getAlliancePose(BlueLandmarks.TowerAlignCenter);
         }
+        return AllianceUtils.getAlliancePose(BlueLandmarks.TowerAlignRight);
+    }
+
+    /**
+     * Tower align pose for climbing on the left side of the bar (high Y in blue).
+     * Use when climb side is selected via Shuffleboard; center climb is not physically possible.
+     */
+    public static Pose2d OurTowerAlignLeft() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.TowerAlignLeft);
+    }
+
+    /**
+     * Tower align pose for climbing on the right side of the bar (low Y in blue).
+     * Use when climb side is selected via Shuffleboard; center climb is not physically possible.
+     */
+    public static Pose2d OurTowerAlignRight() {
         return AllianceUtils.getAlliancePose(BlueLandmarks.TowerAlignRight);
     }
 

@@ -6,11 +6,13 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Auto.AutoRoutine;
 import frc.robot.Auto.commands.AutoConstants;
+import frc.robot.Auto.commands.ClimbSide;
 import frc.robot.Auto.commands.AutoRoutines;
 import frc.robot.Auto.commands.CmdAcquireHubAim;
 import frc.robot.Auto.commands.CmdApplyTagSnapIfGood;
@@ -52,6 +54,9 @@ public class AutoConfigurator {
     private final AutoManager m_autoManager;
     private final CommandSwerveDrivetrain m_drivetrain;
     private AutoTestHarness m_testHarness;
+
+    /** Chooser for which side of the tower to climb (left or right). Shown on Shuffleboard. */
+    private final SendableChooser<ClimbSide> m_climbSideChooser = new SendableChooser<>();
 
     /**
      * Creates a new AutoConfigurator with required dependencies.
@@ -112,6 +117,11 @@ public class AutoConfigurator {
         
         // Publish AutoManager chooser
         SmartDashboard.putData("Auto Mode (manager)", m_autoManager.chooser);
+
+        // Climber auto: choose which side of tower to climb (center not physically possible)
+        m_climbSideChooser.setDefaultOption("Climb side: Left", ClimbSide.LEFT);
+        m_climbSideChooser.addOption("Climb side: Right", ClimbSide.RIGHT);
+        SmartDashboard.putData("Climb Side", m_climbSideChooser);
     }
 
     /**
@@ -317,16 +327,19 @@ public class AutoConfigurator {
 
         Pose2d shotPose = Landmarks.OurShotPosition();
 
-        // Climber Auto: three start positions (left, middle, right); tower pose = side nearest start, back to circle end
+        // Climber Auto: three start positions; tower side is chosen via Shuffleboard "Climb Side" (center not usable)
         if (climber != null) {
+            Supplier<Pose2d> towerAlignPoseSupplier = () -> {
+                ClimbSide side = m_climbSideChooser.getSelected();
+                return (side == ClimbSide.RIGHT) ? Landmarks.OurTowerAlignRight() : Landmarks.OurTowerAlignLeft();
+            };
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_2, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : (startId == StartPoseId.POS_2 ? "Middle" : "Right");
-                Pose2d towerAlignPose = Landmarks.OurTowerAlign(startId);
                 Command climberAuto = AutoRoutines.buildClimberAuto(
                         startId,
                         startPoses,
                         shotPose,
-                        towerAlignPose,
+                        towerAlignPoseSupplier,
                         AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
                         3000.0, // Target RPM
                         100.0, // RPM tolerance

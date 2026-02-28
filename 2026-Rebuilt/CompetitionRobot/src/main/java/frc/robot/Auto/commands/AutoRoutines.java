@@ -59,7 +59,7 @@ public class AutoRoutines {
      * @param id Start pose identifier
      * @param startPoses Map of start pose IDs to their Pose2d values
      * @param shotPose Target pose for shooting (e.g. Landmarks.OurShotPosition())
-     * @param towerAlignPose Target pose for tower/climb (e.g. Landmarks.OurTowerAlign(startId))
+     * @param towerAlignPose Supplier of target pose for tower/climb (e.g. from Shuffleboard climb-side chooser)
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
      * @param targetRpm Target shooter RPM
      * @param rpmTol RPM tolerance for shooter at-speed check
@@ -76,7 +76,7 @@ public class AutoRoutines {
             StartPoseId id,
             Map<StartPoseId, Pose2d> startPoses,
             Pose2d shotPose,
-            Pose2d towerAlignPose,
+            Supplier<Pose2d> towerAlignPose,
             double fallbackHeadingDeg,
             double targetRpm,
             double rpmTol,
@@ -130,10 +130,10 @@ public class AutoRoutines {
                 // 6. Shoot for time (preload)
                 CmdShootForTime.create(shooter, feeder, shootDuration),
 
-                // 7. Drive to tower align pose
+                // 7. Drive to tower align pose (side from Shuffleboard "Climb Side" chooser)
                 new CmdDriveToPose(
                         drivetrain,
-                        () -> towerAlignPose,
+                        towerAlignPose,
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
@@ -149,7 +149,7 @@ public class AutoRoutines {
                 // 9. Drive to tower align pose again (fine alignment)
                 new CmdDriveToPose(
                         drivetrain,
-                        () -> towerAlignPose,
+                        towerAlignPose,
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),

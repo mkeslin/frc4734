@@ -49,6 +49,12 @@ public final class VisionConstants {
     );
     
     // Vision measurement filtering constants
+    /**
+     * When true, timestamp and pose-jump guards are skipped so every vision estimate is applied.
+     * Use only for testing (e.g. tuning or debugging); set to false for competition.
+     */
+    public static final boolean DISABLE_VISION_GUARDS_FOR_TESTING = false;
+
     /** Maximum distance (in meters) a vision pose can be from current odometry pose before being rejected */
     public static final double MAX_POSE_JUMP_DISTANCE = 1.0; // meters
     

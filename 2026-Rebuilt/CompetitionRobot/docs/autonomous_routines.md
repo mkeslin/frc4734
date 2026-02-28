@@ -6,7 +6,7 @@ This document describes the autonomous routines available on the robot: how they
 
 ## How Auto Is Run
 
-- **Selection**: The drive team chooses a routine from the **"Auto Mode (manager)"** chooser on SmartDashboard. `AutoManager` holds a `SendableChooser<AutoRoutine>` and publishes it there.
+- **Selection**: The drive team chooses a routine from the **"Auto Mode (manager)"** chooser on SmartDashboard. `AutoManager` holds a `SendableChooser<AutoRoutine>` and publishes it there. For ClimberAuto, **"Climb Side"** (Left / Right) is also on SmartDashboard; the robot cannot climb in the center of the tower, so only left or right is used.
 - **Start**: When the match enters autonomous, `Robot.autonomousInit()` calls `AutoManager.runSelectedRoutine()`. That:
   - Resets odometry to the routine’s **initial pose**
   - Schedules the routine’s command (with a one-time timer stop when the command finishes)
@@ -20,9 +20,9 @@ Landmarks and paths are **alliance-aware**: `Landmarks` uses `AllianceUtils` so 
 
 | Routine               | Start position | Description                                      |
 |-----------------------|----------------|--------------------------------------------------|
-| ClimberAuto (Left)    | POS_1 (left)   | Shoot preload, drive to tower, climb L1, hold    |
-| ClimberAuto (Middle)  | POS_2 (center) | Same, tower align at bar center                  |
-| ClimberAuto (Right)   | POS_3 (right)  | Same, tower align on right side                  |
+| ClimberAuto (Left)    | POS_1 (left)   | Shoot preload, drive to tower, climb L1, hold. Tower side from **Climb Side** chooser. |
+| ClimberAuto (Middle)  | POS_2 (center) | Same; tower side from **Climb Side** chooser (left or right only).                      |
+| ClimberAuto (Right)   | POS_3 (right)  | Same; tower side from **Climb Side** chooser.                                           |
 | ShooterAuto           | POS_1 (left)   | Shoot preload → center → intake 1 → return → shoot |
 
 ---
@@ -41,10 +41,9 @@ Landmarks and paths are **alliance-aware**: `Landmarks` uses `AllianceUtils` so 
 4. **Acquire hub aim** – Vision-based heading to hub; fallback heading 180° if no target.
 5. **Wait shooter at speed** – Block until shooter is at 3000 RPM ± 100.
 6. **Shoot preload** – Feed for 1.0 s (`CmdShootForTime`).
-7. **Drive to tower align pose** – `CmdDriveToPose` to `Landmarks.OurTowerAlign(startId)`:
-   - **Left (POS_1):** TowerAlignLeft (high Y, climb side nearest left start).
-   - **Center (POS_2):** TowerAlignCenter (bar center).
-   - **Right (POS_3):** TowerAlignRight (low Y).
+7. **Drive to tower align pose** – `CmdDriveToPose` to the pose from the **"Climb Side"** Shuffleboard chooser (Left or Right only; center is not physically possible):
+   - **Climb side: Left** → `Landmarks.OurTowerAlignLeft()` (high Y in blue).
+   - **Climb side: Right** → `Landmarks.OurTowerAlignRight()` (low Y in blue).
    Pose is “back into circle end of tower bar” (e.g. 270° in blue).
 8. **Tag snap again** – Same vision snap for better alignment.
 9. **Drive to tower align again** – Same pose as step 7 for fine alignment.
@@ -111,6 +110,7 @@ Routine-specific values (in `AutoConfigurator` when building autos): shooter 300
 |----------------------|----------|
 | Routine builders     | `frc.robot.Auto.commands.AutoRoutines` |
 | Registration         | `frc.robot.AutoConfigurator` (`registerFullAutos`) |
+| Climb side chooser   | SmartDashboard **"Climb Side"** (Left / Right); `ClimbSide` enum, `Landmarks.OurTowerAlignLeft()` / `OurTowerAlignRight()` |
 | Selection & execution| `frc.robot.Auto.AutoManager` |
 | Start poses & landmarks | `frc.robot.PathPlanner.Landmarks`, `BlueLandmarks` |
 | Path names (L/C/R)   | `frc.robot.autotest.MoleculeTests.getPathNameForPose()` |

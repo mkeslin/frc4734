@@ -155,41 +155,34 @@ public class RobotContainer {
             // coordinate transformation automatically, but we verify the pose is correct.
             Pose2d visionPose = pose.estimatedPose.toPose2d();
             Pose2d currentPose = m_drivetrain.getPose();
-            
-            // Validate timestamp - reject if too old or in the future
             double timestampAge = currentTime - pose.timestampSeconds;
-            if (timestampAge < 0 || timestampAge > MAX_TIMESTAMP_AGE) {
-                // Timestamp is invalid (future or too old)
-                RobotLogger.recordDouble("Vision/RejectedTimestampAge", timestampAge);
-                RobotLogger.recordString("Vision/RejectionReason", "InvalidTimestamp");
-            } else {
-                // Validate pose jump distance - reject if too far from current odometry
-                double poseJumpDistance = visionPose.getTranslation().getDistance(currentPose.getTranslation());
-                if (poseJumpDistance > MAX_POSE_JUMP_DISTANCE) {
-                    // Pose jump too large - likely a bad measurement
+            double poseJumpDistance = visionPose.getTranslation().getDistance(currentPose.getTranslation());
+
+            boolean timestampOk = timestampAge >= 0 && timestampAge <= MAX_TIMESTAMP_AGE;
+            boolean poseJumpOk = poseJumpDistance <= MAX_POSE_JUMP_DISTANCE;
+            boolean accept = DISABLE_VISION_GUARDS_FOR_TESTING || (timestampOk && poseJumpOk);
+
+            if (!accept) {
+                if (!timestampOk) {
+                    RobotLogger.recordDouble("Vision/RejectedTimestampAge", timestampAge);
+                    RobotLogger.recordString("Vision/RejectionReason", "InvalidTimestamp");
+                } else {
                     RobotLogger.recordDouble("Vision/RejectedDistance", poseJumpDistance);
                     RobotLogger.recordString("Vision/RejectionReason", "PoseJumpTooLarge");
-                } else {
-                    // Get tag count from latest result for validation
-                    var latestResult = photonVision.getLatestResult();
-                    int tagCount = (latestResult != null && latestResult.hasTargets()) 
-                        ? latestResult.getTargets().size() 
+                }
+            } else {
+                var latestResult = photonVision.getLatestResult();
+                int tagCount = (latestResult != null && latestResult.hasTargets())
+                        ? latestResult.getTargets().size()
                         : 0;
-                    
-                    // Log tag count for diagnostics
-                    RobotLogger.recordDouble("Vision/TagCount", tagCount);
-                    
-                    // Accept measurement - add to pose estimator
-                    // Timestamp is already in seconds from PhotonVision
-                    m_drivetrain.addVisionMeasurement(
+                RobotLogger.recordDouble("Vision/TagCount", tagCount);
+
+                m_drivetrain.addVisionMeasurement(
                         visionPose,
                         pose.timestampSeconds
-                    );
-                    
-                    // Log vision pose for debugging
-                    RobotLogger.recordPose2d("Vision/Pose", visionPose);
-                    RobotLogger.recordDouble("Vision/PoseJumpDistance", poseJumpDistance);
-                }
+                );
+                RobotLogger.recordPose2d("Vision/Pose", visionPose);
+                RobotLogger.recordDouble("Vision/PoseJumpDistance", poseJumpDistance);
             }
         }
         
