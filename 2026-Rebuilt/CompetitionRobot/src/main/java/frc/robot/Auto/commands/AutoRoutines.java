@@ -39,28 +39,27 @@ public class AutoRoutines {
     }
 
     /**
-     * Builds a climber autonomous routine.
+     * Builds a climber autonomous routine using drive-to poses (no PathPlanner paths).
      * 
      * <p>This routine:
      * <ol>
      *   <li>Seeds odometry from start pose</li>
      *   <li>Applies tag snap if vision quality is good</li>
-     *   <li>Follows path to shot position (parallel: spins up shooter)</li>
+     *   <li>Drives to shot position (parallel: spins up shooter)</li>
      *   <li>Acquires hub aim</li>
      *   <li>Waits for shooter at speed</li>
      *   <li>Shoots preload for specified duration</li>
-     *   <li>Follows path to tower stage</li>
-     *   <li>Applies tag snap before alignment</li>
      *   <li>Drives to tower align pose</li>
+     *   <li>Applies tag snap before final alignment</li>
+     *   <li>Drives to tower align pose again (fine alignment)</li>
      *   <li>Climbs L1 (with timeout)</li>
      *   <li>Holds climb until auto end</li>
      * </ol>
      * 
      * @param id Start pose identifier
      * @param startPoses Map of start pose IDs to their Pose2d values
-     * @param pathToShot Path name to shooting position
-     * @param pathToTowerStage Path name to tower stage
-     * @param towerAlignPose Target pose for tower alignment
+     * @param shotPose Target pose for shooting (e.g. Landmarks.OurShotPosition())
+     * @param towerAlignPose Target pose for tower/climb (e.g. Landmarks.OurTowerAlign())
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
      * @param targetRpm Target shooter RPM
      * @param rpmTol RPM tolerance for shooter at-speed check
@@ -76,8 +75,7 @@ public class AutoRoutines {
     public static Command buildClimberAuto(
             StartPoseId id,
             Map<StartPoseId, Pose2d> startPoses,
-            String pathToShot,
-            String pathToTowerStage,
+            Pose2d shotPose,
             Pose2d towerAlignPose,
             double fallbackHeadingDeg,
             double targetRpm,
@@ -91,8 +89,7 @@ public class AutoRoutines {
         
         Objects.requireNonNull(id, "id cannot be null");
         Objects.requireNonNull(startPoses, "startPoses cannot be null");
-        Objects.requireNonNull(pathToShot, "pathToShot cannot be null");
-        Objects.requireNonNull(pathToTowerStage, "pathToTowerStage cannot be null");
+        Objects.requireNonNull(shotPose, "shotPose cannot be null");
         Objects.requireNonNull(towerAlignPose, "towerAlignPose cannot be null");
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
         Objects.requireNonNull(vision, "vision cannot be null");
@@ -114,9 +111,14 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // 3. Follow path to shot (parallel: spin up shooter)
+                // 3. Drive to shot pose (parallel: spin up shooter)
                 Commands.parallel(
-                        new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                        new CmdDriveToPose(
+                                drivetrain,
+                                () -> shotPose,
+                                AutoConstants.DEFAULT_XY_TOLERANCE,
+                                AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                                AutoConstants.DEFAULT_PATH_TIMEOUT),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
 
                 // 4. Acquire hub aim
@@ -128,10 +130,15 @@ public class AutoRoutines {
                 // 6. Shoot for time (preload)
                 CmdShootForTime.create(shooter, feeder, shootDuration),
 
-                // 7. Follow path to tower stage
-                new CmdFollowPath(pathToTowerStage, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                // 7. Drive to tower align pose
+                new CmdDriveToPose(
+                        drivetrain,
+                        () -> towerAlignPose,
+                        AutoConstants.DEFAULT_XY_TOLERANCE,
+                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                        AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 8. Tag snap before alignment
+                // 8. Tag snap before final alignment
                 new CmdApplyTagSnapIfGood(
                         vision,
                         drivetrain,
@@ -139,7 +146,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // 9. Drive to tower align pose
+                // 9. Drive to tower align pose again (fine alignment)
                 new CmdDriveToPose(
                         drivetrain,
                         () -> towerAlignPose,

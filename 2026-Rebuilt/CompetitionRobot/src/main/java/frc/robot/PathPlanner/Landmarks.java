@@ -48,10 +48,24 @@ public class Landmarks {
     }
 
     /**
+     * Gets the shot position (in front of hub, facing hub) for the current alliance.
+     */
+    public static Pose2d OurShotPosition() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.ShotPosition);
+    }
+
+    /**
      * Gets the tower (uprights reference) pose for the current alliance.
      */
     public static Pose2d OurTower() {
         return AllianceUtils.getAlliancePose(BlueLandmarks.Tower);
+    }
+
+    /**
+     * Gets the tower align pose (at tower for climb) for the current alliance.
+     */
+    public static Pose2d OurTowerAlign() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.TowerAlign);
     }
 
     /**

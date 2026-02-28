@@ -90,20 +90,16 @@ public class AutoRoutine {
      *         trajectories are used.
      */
     public Pose2d getInitialPose() {
-        if (pathPlannerPaths.size() > 0) {
-            if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-                var newPose1 = Reflector.reflectPose2d(initialPose, 17.521);
-
-                var newY2 = ((newPose1.getY() - 4.009) * -1) + 4.009;
-                var newPose2 = new Pose2d(newPose1.getX(), newY2, newPose1.getRotation());
-
-                return newPose2;
-            } else {
-                return initialPose;
-            }
-        } else {
+        Pose2d base = (pathPlannerPaths.size() > 0 || initialPose != null) ? initialPose : new Pose2d();
+        if (base == null) {
             return new Pose2d();
         }
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+            var newPose1 = Reflector.reflectPose2d(base, 17.521);
+            var newY2 = ((newPose1.getY() - 4.009) * -1) + 4.009;
+            return new Pose2d(newPose1.getX(), newY2, newPose1.getRotation());
+        }
+        return base;
     }
 
 }
