@@ -55,11 +55,11 @@ public class AutoCommandA {
                 // stationLimelight)
 
                 GetCycleCommand(Start_A, A_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
+                        elevator, arm, sideToSide, lights, reefLimelight, true),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
+                        elevator, arm, sideToSide, lights, reefLimelight, true),
                 GetCycleCommand(Pickup1_F, F_Pickup1, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */)
+                        elevator, arm, sideToSide, lights, reefLimelight, true)
         //
         );
         return new AutoRoutine("Routine 1", command,
@@ -97,11 +97,11 @@ public class AutoCommandA {
                 // stationLimelight)
 
                 GetCycleCommand(Start_B, B_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
-                GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */)
+                        elevator, arm, sideToSide, lights, reefLimelight, false)//,
+                //GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
+                //        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
+                //GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
+                //        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */)
         //
         );
         return new AutoRoutine("Routine 2", command,
@@ -139,11 +139,11 @@ public class AutoCommandA {
                 // stationLimelight)
 
                 GetCycleCommand(Start_C, C_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
+                        elevator, arm, sideToSide, lights, reefLimelight, true),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Right, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */),
+                        elevator, arm, sideToSide, lights, reefLimelight, true),
                 GetCycleCommand(Pickup2_D, D_Pickup2, ScoreSide.Left, positionTracker, drivetrain,
-                        elevator, arm, sideToSide, lights, reefLimelight/* , stationLimelight */)
+                        elevator, arm, sideToSide, lights, reefLimelight, true)
         //
         );
         return new AutoRoutine("Routine 3", command,
@@ -228,7 +228,8 @@ public class AutoCommandA {
             Arm arm,
             SideToSide sideToSide,
             Lights lights,
-            Limelight reefLimelight) {
+            Limelight reefLimelight,
+            boolean goToStation) {
         var centerToReefCommand = new CenterToReefCommand(reefLimelight, drivetrain, null, 1.5);
         // var centerToStationCommand = new CenterToStationCommand(positionTracker, stationLimelight, drivetrain, null);
 
@@ -268,7 +269,8 @@ public class AutoCommandA {
                         // MOVE REVERSE
                         Commands.run(() -> drivetrain.setRelativeSpeed(-1, 0, 0)).withTimeout(0.35)
                                 // .andThen(Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)))
-                                .asProxy()
+                                .asProxy(),
+                        Commands.runOnce(() -> drivetrain.setRelativeSpeed(0, 0, 0)).onlyIf(() -> !goToStation)
                 //
                 ),
                 // .until(() -> !positionTracker.getCoralInArm())
@@ -285,7 +287,7 @@ public class AutoCommandA {
                                         lights)),
                         // DRIVE TO CORAL STATION
                         Commands.waitSeconds(0.35)
-                                .andThen(drivetrain.followPathCommand(pathToCoralStation))
+                                .andThen(drivetrain.followPathCommand(pathToCoralStation)).onlyIf(() -> goToStation)
                 //
                 ),
                 // centerToStationCommand,

@@ -28,6 +28,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.Constants.ShooterConstants;
 
 import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -67,6 +68,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
     private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
     private final SysIdRoutine m_sysIdRoutine;
+    private final Timer m_sysIdTimer = new Timer();
 
     private PositionTracker m_positionTracker;
 
