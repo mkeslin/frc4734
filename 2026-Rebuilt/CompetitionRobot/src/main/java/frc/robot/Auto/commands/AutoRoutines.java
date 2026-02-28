@@ -147,8 +147,9 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 10. Climb L1 (with timeout)
-                CmdClimbL1.create(climber),
+                // 10. One climb cycle (extend L1 → retract), then end
+                ClimbWhileHeldCommand.ascentToCompletion(climber)
+                        .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
                 // 11. Hold climb until end
                 new CmdHoldClimbUntilEnd(climber, drivetrain)
