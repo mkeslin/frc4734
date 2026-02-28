@@ -23,6 +23,7 @@ Print this for driver/pit reference. **Mode** is selected on the Driver tab (or 
 | Drive | Left stick (field-centric) |
 | Rotate | Right stick X |
 | Turtle mode | Left bumper (held) |
+| Face hub (held) | Right bumper |
 | Reset heading | Start (alone) |
 | **Profile cycle** | **Back + Start** (when enabled) |
 

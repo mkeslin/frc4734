@@ -1,9 +1,6 @@
 package frc.robot;
 
 import static frc.robot.Constants.CommandConstants.APPROACH_SCORE_SPEED;
-import static frc.robot.Constants.CommandConstants.CLIMBER_FAST_VOLTAGE;
-import static frc.robot.Constants.CommandConstants.CLIMBER_SLOW_VOLTAGE;
-import static frc.robot.Constants.CommandConstants.CLIMBER_STOP_VOLTAGE;
 import static frc.robot.Constants.CommandConstants.DEFAULT_WAIT_TIME;
 import static frc.robot.Constants.CommandConstants.LONG_DRIVE_TIMEOUT;
 import static frc.robot.Constants.CommandConstants.MEDIUM_DRIVE_TIMEOUT;
@@ -18,10 +15,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Auto.commands.ClimbWhileHeldCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Commands.RobotContext;
-import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Constants.ScoreLevel;
 import frc.robot.Constants.ScoreSide;
 import frc.robot.Subsystems.Climber;
@@ -98,21 +93,8 @@ public class BindingConfigurator {
      * Configures bindings for the drive controller.
      */
     public void configureDriveBindings() {
-        // TODO: Add 2026 drive controller bindings as needed
-
-        // CLIMBER
-        m_driveController.y().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.ACQUIRE));
-        m_driveController.x().onTrue(m_climber.moveToSetPositionCommand(() -> ClimberPosition.CLIMB));
-
-        m_driveController.povRight().whileTrue(Commands.run(() -> m_climber.setVoltage(CLIMBER_SLOW_VOLTAGE)));
-        m_driveController.povRight().onFalse(Commands.run(() -> m_climber.setVoltage(CLIMBER_STOP_VOLTAGE)));
-
-        m_driveController.povLeft().whileTrue(Commands.run(() -> m_climber.setVoltage(CLIMBER_FAST_VOLTAGE)));
-        m_driveController.povLeft().onFalse(Commands.run(() -> m_climber.setVoltage(CLIMBER_STOP_VOLTAGE)));
-
-        // Climb while held: ascend on right bumper, descend on left bumper; release to stop
-        m_driveController.rightBumper().whileTrue(ClimbWhileHeldCommand.ascent(m_climber));
-        m_driveController.leftBumper().whileTrue(ClimbWhileHeldCommand.descent(m_climber));
+        // Drive controller: drive bindings (including turtle, face-hub, reset heading) are in SwerveDrivetrainBindings.
+        // Climber has been moved off the drive controller; bind on mechanism or arcade controller if needed.
     }
 
     /**
