@@ -21,8 +21,17 @@ public class BlueLandmarks {
     public static final Pose2d ShotPosition = getPose(6.2, 4.035, 180);
     /** Tower / uprights reference: midpoint between uprights near blue diamond. 312.66", 158.845" */
     public static final Pose2d Tower = getPose(7.942, 4.035, 0);
-    /** Pose at tower for climb alignment (robot backs into uprights). Used by drive-to auto. */
-    public static final Pose2d TowerAlign = getPose(7.6, 4.035, 180);
+    /**
+     * Pose at tower for climb: back of robot toward circle end of tower bar (looking down the pipe).
+     * Left start: climb side nearest start → high Y (between center and top upright).
+     */
+    public static final Pose2d TowerAlignLeft = getPose(7.6, 4.85, 270);
+    /** Center start: climb at bar center. */
+    public static final Pose2d TowerAlignCenter = getPose(7.6, 4.035, 270);
+    /**
+     * Right start: climb side nearest start → low Y (between center and bottom upright).
+     */
+    public static final Pose2d TowerAlignRight = getPose(7.6, 3.2, 270);
     /** Field center. 523.22", 158.845" */
     public static final Pose2d FieldCenter = getPose(13.290, 4.035, 0);
 

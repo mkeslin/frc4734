@@ -59,7 +59,7 @@ public class AutoRoutines {
      * @param id Start pose identifier
      * @param startPoses Map of start pose IDs to their Pose2d values
      * @param shotPose Target pose for shooting (e.g. Landmarks.OurShotPosition())
-     * @param towerAlignPose Target pose for tower/climb (e.g. Landmarks.OurTowerAlign())
+     * @param towerAlignPose Target pose for tower/climb (e.g. Landmarks.OurTowerAlign(startId))
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
      * @param targetRpm Target shooter RPM
      * @param rpmTol RPM tolerance for shooter at-speed check

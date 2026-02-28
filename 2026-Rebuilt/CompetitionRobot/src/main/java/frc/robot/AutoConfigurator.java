@@ -316,12 +316,12 @@ public class AutoConfigurator {
         String pathBackToShot = MoleculeTests.getPathNameForPose(defaultPose, "CenterToShot");
 
         Pose2d shotPose = Landmarks.OurShotPosition();
-        Pose2d towerAlignPose = Landmarks.OurTowerAlign();
 
-        // Climber Auto: three start positions (left, middle, right) using drive-to poses
+        // Climber Auto: three start positions (left, middle, right); tower pose = side nearest start, back to circle end
         if (climber != null) {
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_2, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : (startId == StartPoseId.POS_2 ? "Middle" : "Right");
+                Pose2d towerAlignPose = Landmarks.OurTowerAlign(startId);
                 Command climberAuto = AutoRoutines.buildClimberAuto(
                         startId,
                         startPoses,

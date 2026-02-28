@@ -1,6 +1,7 @@
 package frc.robot.PathPlanner;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.Auto.commands.StartPoseId;
 
 /**
  * Alliance-aware landmark positions for the robot.
@@ -62,10 +63,17 @@ public class Landmarks {
     }
 
     /**
-     * Gets the tower align pose (at tower for climb) for the current alliance.
+     * Gets the tower align pose for the given start. Robot backs into the circle end of the tower bar;
+     * Y is chosen so we climb the side of the tower nearest that start (left → high Y, center → mid, right → low Y).
      */
-    public static Pose2d OurTowerAlign() {
-        return AllianceUtils.getAlliancePose(BlueLandmarks.TowerAlign);
+    public static Pose2d OurTowerAlign(StartPoseId startId) {
+        if (startId == StartPoseId.POS_1) {
+            return AllianceUtils.getAlliancePose(BlueLandmarks.TowerAlignLeft);
+        }
+        if (startId == StartPoseId.POS_2) {
+            return AllianceUtils.getAlliancePose(BlueLandmarks.TowerAlignCenter);
+        }
+        return AllianceUtils.getAlliancePose(BlueLandmarks.TowerAlignRight);
     }
 
     /**
