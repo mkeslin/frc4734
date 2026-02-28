@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.IntakeConstants.IntakeSpeed;
 import frc.robot.Subsystems.DeployableIntake;
 
 /**
@@ -18,7 +19,7 @@ import frc.robot.Subsystems.DeployableIntake;
  * </ul>
  * 
  * @param intake The intake subsystem
- * @param speedSupplier Supplier of intake speed (optional, defaults to forward)
+ * @param speedSupplier Supplier of intake speed (optional; default is {@link IntakeSpeed#IN})
  */
 public class CmdIntakeOn extends Command {
     private final DeployableIntake intake;
@@ -41,8 +42,7 @@ public class CmdIntakeOn extends Command {
 
     @Override
     public void initialize() {
-        double speed = speedSupplier != null ? speedSupplier.get() : 0.5; // Default forward speed
-        // TODO: Replace with actual intake speed constant from IntakeConstants
+        double speed = speedSupplier != null ? speedSupplier.get() : IntakeSpeed.IN.value;
         intakeCommand = intake.moveToArbitraryIntakeSpeedCommand(() -> speed);
         intakeCommand.initialize();
     }

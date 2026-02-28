@@ -18,6 +18,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Auto.commands.ClimbWhileHeldCommand;
 import frc.robot.Commands.RobotCommands;
 import frc.robot.Commands.RobotContext;
 import frc.robot.Constants.ClimberConstants.ClimberPosition;
@@ -108,6 +109,10 @@ public class BindingConfigurator {
 
         m_driveController.povLeft().whileTrue(Commands.run(() -> m_climber.setVoltage(CLIMBER_FAST_VOLTAGE)));
         m_driveController.povLeft().onFalse(Commands.run(() -> m_climber.setVoltage(CLIMBER_STOP_VOLTAGE)));
+
+        // Climb while held: ascend on right bumper, descend on left bumper; release to stop
+        m_driveController.rightBumper().whileTrue(ClimbWhileHeldCommand.ascent(m_climber));
+        m_driveController.leftBumper().whileTrue(ClimbWhileHeldCommand.descent(m_climber));
     }
 
     /**

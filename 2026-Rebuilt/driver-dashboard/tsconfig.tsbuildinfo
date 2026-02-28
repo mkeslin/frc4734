@@ -1,0 +1,1 @@
+{"root":["./src/main.ts","./src/vite-env.d.ts","./src/composables/usedashboardsocket.ts","./src/app.vue","./src/components/autoselector.vue","./src/components/connectionbar.vue","./src/components/matchtimer.vue","./src/components/posedisplay.vue","./src/components/statuscard.vue"],"version":"5.6.3"}

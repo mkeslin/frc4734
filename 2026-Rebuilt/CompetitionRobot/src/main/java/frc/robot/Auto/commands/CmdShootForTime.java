@@ -1,12 +1,19 @@
 package frc.robot.Auto.commands;
 
+import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_BACKOFF;
+import static frc.robot.Constants.CommandConstants.SHOOT_FLOOR_DELAY;
+
 import java.util.Objects;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.Constants.FeederConstants.FeederSpeed;
+import frc.robot.Constants.FloorConstants.ConveyorSpeed;
 import frc.robot.Subsystems.Feeder;
+import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
 
 /**
@@ -34,24 +41,65 @@ import frc.robot.Subsystems.Shooter;
 public class CmdShootForTime extends Command {
     private final Shooter shooter;
     private final Feeder feeder;
+    private final Floor floor;
     private final double durationSec;
     private final boolean requireAtSpeed;
+    private final boolean useFeederBackoff;
     private final Supplier<Double> targetRpmSupplier;
     private final double rpmTol;
     private final Timer timer = new Timer();
     private Command feederCommand;
 
     /**
-     * Creates a new CmdShootForTime command.
-     * 
+     * Full constructor with optional feeder backoff and optional floor.
+     *
+     * @param shooter The shooter subsystem
+     * @param feeder The feeder subsystem
+     * @param floor Optional floor subsystem; if non-null, floor runs after {@code SHOOT_FLOOR_DELAY} and is stopped in end()
+     * @param durationSec Duration to feed in seconds
+     * @param requireAtSpeed If true, wait for shooter at speed before feeding
+     * @param useFeederBackoff If true, run feeder reverse for {@code SHOOT_FEEDER_BACKOFF} first to clear ball from wheels
+     * @param targetRpmSupplier Supplier of target RPM (required if requireAtSpeed is true)
+     * @param rpmTol RPM tolerance (required if requireAtSpeed is true)
+     */
+    public CmdShootForTime(
+            Shooter shooter,
+            Feeder feeder,
+            Floor floor,
+            double durationSec,
+            boolean requireAtSpeed,
+            boolean useFeederBackoff,
+            Supplier<Double> targetRpmSupplier,
+            double rpmTol) {
+        this.shooter = Objects.requireNonNull(shooter, "shooter cannot be null");
+        this.feeder = Objects.requireNonNull(feeder, "feeder cannot be null");
+        this.floor = floor;
+        if (durationSec <= 0) {
+            throw new IllegalArgumentException("durationSec must be greater than 0, got: " + durationSec);
+        }
+        this.durationSec = durationSec;
+        this.requireAtSpeed = requireAtSpeed;
+        this.useFeederBackoff = useFeederBackoff;
+        this.targetRpmSupplier = requireAtSpeed
+                ? Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null if requireAtSpeed is true")
+                : targetRpmSupplier;
+        this.rpmTol = rpmTol;
+
+        addRequirements(shooter, feeder);
+        if (floor != null) {
+            addRequirements(floor);
+        }
+    }
+
+    /**
+     * Creates a new CmdShootForTime command (no floor, no feeder backoff).
+     *
      * @param shooter The shooter subsystem
      * @param feeder The feeder subsystem
      * @param durationSec Duration to feed in seconds
      * @param requireAtSpeed If true, wait for shooter at speed before feeding
      * @param targetRpmSupplier Supplier of target RPM (required if requireAtSpeed is true)
      * @param rpmTol RPM tolerance (required if requireAtSpeed is true)
-     * @throws NullPointerException if shooter or feeder is null
-     * @throws IllegalArgumentException if durationSec is less than or equal to 0
      */
     public CmdShootForTime(
             Shooter shooter,
@@ -60,19 +108,7 @@ public class CmdShootForTime extends Command {
             boolean requireAtSpeed,
             Supplier<Double> targetRpmSupplier,
             double rpmTol) {
-        this.shooter = Objects.requireNonNull(shooter, "shooter cannot be null");
-        this.feeder = Objects.requireNonNull(feeder, "feeder cannot be null");
-        if (durationSec <= 0) {
-            throw new IllegalArgumentException("durationSec must be greater than 0, got: " + durationSec);
-        }
-        this.durationSec = durationSec;
-        this.requireAtSpeed = requireAtSpeed;
-        this.targetRpmSupplier = requireAtSpeed 
-                ? Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null if requireAtSpeed is true")
-                : targetRpmSupplier;
-        this.rpmTol = rpmTol;
-
-        addRequirements(shooter, feeder);
+        this(shooter, feeder, null, durationSec, requireAtSpeed, false, targetRpmSupplier, rpmTol);
     }
 
     @Override
@@ -80,24 +116,34 @@ public class CmdShootForTime extends Command {
         timer.reset();
         timer.start();
 
-        // Create feeder command (run at forward speed for duration)
-        // TODO: Replace with actual feeder forward speed constant
-        double feederSpeed = 0.5; // Placeholder - should come from FeederConstants
-        feederCommand = feeder.moveToArbitrarySpeedCommand(() -> feederSpeed)
+        Command feedPhase = feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
                 .withTimeout(durationSec)
                 .withName("CmdShootForTime-feeder");
-        
+
+        if (floor != null) {
+            Command floorPhase = Commands.waitSeconds(SHOOT_FLOOR_DELAY)
+                    .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value).withTimeout(Math.max(0, durationSec - SHOOT_FLOOR_DELAY)));
+            feedPhase = new ParallelCommandGroup(feedPhase, floorPhase);
+        }
+
         if (requireAtSpeed) {
-            // Wait for shooter at speed first
             Command waitCommand = new CmdWaitShooterAtSpeed(
                     shooter,
                     targetRpmSupplier,
                     rpmTol,
                     AutoConstants.DEFAULT_SHOOTER_SPINUP_TIMEOUT);
-            
-            feederCommand = Commands.sequence(waitCommand, feederCommand);
+            feedPhase = Commands.sequence(waitCommand, feedPhase);
         }
-        
+
+        if (useFeederBackoff) {
+            Command backoff = feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
+                    .withTimeout(SHOOT_FEEDER_BACKOFF)
+                    .finallyDo(interrupted -> feeder.resetSpeed());
+            feederCommand = Commands.sequence(backoff, feedPhase);
+        } else {
+            feederCommand = feedPhase;
+        }
+
         feederCommand.initialize();
     }
 
@@ -127,8 +173,11 @@ public class CmdShootForTime extends Command {
         if (feederCommand != null) {
             feederCommand.end(interrupted);
         }
-        // Stop feeder on end
-        edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance().schedule(feeder.resetSpeedCommand());
+        var scheduler = edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance();
+        scheduler.schedule(feeder.resetSpeedCommand());
+        if (floor != null) {
+            scheduler.schedule(floor.resetSpeedCommand());
+        }
     }
 
     /**

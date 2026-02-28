@@ -11,7 +11,7 @@ public class IntakeConstants {
      */
     public static enum DeployPosition {
         STOWED(0),
-        DEPLOYED(1.0); // TODO: Update with actual deployed position value
+        DEPLOYED(12);
 
         public final double value;
 
@@ -21,13 +21,13 @@ public class IntakeConstants {
     }
 
     /**
-     * Enumeration of predefined intake speeds.
-     * STOPPED, IN (intake), and OUT (outtake) speeds.
+     * Enumeration of predefined intake speeds (rotations per second).
+     * Values high enough to overcome static friction; tune for match as needed.
      */
     public static enum IntakeSpeed {
         STOPPED(0),
-        IN(0.3),
-        OUT(-0.3);
+        IN(125.0),    // Intake; tune as needed
+        OUT(-60.0);  // Outtake / reverse
 
         public final double value;
 
@@ -55,4 +55,28 @@ public class IntakeConstants {
 
     // Safety: minimum deploy position to allow intake operation (rotations)
     public static final double MIN_DEPLOY_POSITION_FOR_INTAKE = 0.5;
+
+    /** When intake roller is running, deploy motor gets this forward voltage to keep pressure and hold intake in place (volts). */
+    public static final double INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE = 0.5;
+
+    // ---- Current limits, ramp, voltage (deploy and intake motors) ----
+    public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
+    public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
+    /** Intake roller: supply and stator limits (amps). */
+    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 15;
+    public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 40;
+    /** Intake deploy: supply and stator limits (amps). */
+    public static final double INTAKE_DEPLOY_SUPPLY_CURRENT_LIMIT_AMPS = 15;
+    public static final double INTAKE_DEPLOY_STATOR_CURRENT_LIMIT_AMPS = 30;
+    public static final double CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC = 0.2;
+    public static final double PEAK_FORWARD_VOLTAGE = 12.0;
+    public static final double PEAK_REVERSE_VOLTAGE = -12.0;
+
+    // ---- Intake roller: velocity Slot0 (for intake motor only) ----
+    public static final double INTAKE_VELOCITY_KV = 0.12;
+    public static final double INTAKE_VELOCITY_KS = 0.25;
+    public static final double INTAKE_VELOCITY_KP = 0.1;
+    public static final double INTAKE_VELOCITY_KI = 0.0;
+    public static final double INTAKE_VELOCITY_KD = 0.0;
+    public static final boolean INTAKE_MOTOR_INVERTED = true;
 }

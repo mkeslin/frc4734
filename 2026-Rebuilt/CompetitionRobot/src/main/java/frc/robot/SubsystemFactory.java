@@ -14,6 +14,7 @@ import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.Subsystems.ShooterHood;
 import frc.robot.Subsystems.Lights;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.State.StateMachine;
@@ -24,12 +25,12 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * Centralizes subsystem creation logic and ensures proper initialization order.
  */
 public class SubsystemFactory {
-    // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-    // private final Climber m_climber;
-    // private final DeployableIntake m_deployableIntake;
-    // private final Floor m_floor;
-    // private final Feeder m_feeder;
-    // private final Shooter m_shooter;
+    private final Climber m_climber;
+    private final DeployableIntake m_deployableIntake;
+    private final Floor m_floor;
+    private final Feeder m_feeder;
+    private final Shooter m_shooter;
+    private final ShooterHood m_shooterHood;
     // private final Lights m_lights;
     private final PhotonVision m_photonVision;
     // private final DigitalInput m_coralTraySensor;
@@ -48,13 +49,13 @@ public class SubsystemFactory {
     public SubsystemFactory(CommandSwerveDrivetrain drivetrain) {
         m_drivetrain = Objects.requireNonNull(drivetrain, "CommandSwerveDrivetrain cannot be null");
 
-        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-        // Create subsystems (PositionTracker will be set after creation)
-        // m_climber = new Climber();
-        // m_deployableIntake = new DeployableIntake();
-        // m_floor = new Floor();
-        // m_feeder = new Feeder();
-        // m_shooter = new Shooter();
+        // Create subsystems (PositionTracker will be set after creation if needed)
+        m_climber = new Climber();
+        m_deployableIntake = new DeployableIntake();
+        m_floor = new Floor();
+        m_feeder = new Feeder();
+        m_shooter = new Shooter();
+        m_shooterHood = new ShooterHood();
         // m_lights = new Lights();
 
         // Create sensors
@@ -102,26 +103,29 @@ public class SubsystemFactory {
         //         m_photonVision);
     }
 
-    // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-    // public Climber getClimber() {
-    //     return m_climber;
-    // }
+    public Climber getClimber() {
+        return m_climber;
+    }
 
-    // public DeployableIntake getDeployableIntake() {
-    //     return m_deployableIntake;
-    // }
+    public DeployableIntake getDeployableIntake() {
+         return m_deployableIntake;
+    }
 
-    // public Floor getFloor() {
-    //     return m_floor;
-    // }
+    public Floor getFloor() {
+        return m_floor;
+    }
 
-    // public Feeder getFeeder() {
-    //     return m_feeder;
-    // }
+    public Feeder getFeeder() {
+        return m_feeder;
+    }
 
-    // public Shooter getShooter() {
-    //     return m_shooter;
-    // }
+    public Shooter getShooter() {
+        return m_shooter;
+    }
+
+    public ShooterHood getShooterHood() {
+        return m_shooterHood;
+    }
 
     // public Lights getLights() {
     //     return m_lights;
@@ -147,9 +151,12 @@ public class SubsystemFactory {
      * Resets all subsystem positions to their zero positions.
      */
     public void resetZeros() {
-        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-        // m_climber.resetPosition();
+        m_climber.resetPosition();
         // m_deployableIntake.resetDeployPosition();
+        m_floor.resetSpeed();
+        m_feeder.resetSpeed();
+        m_shooter.resetSpeed();
+        m_shooterHood.resetPosition();
     }
 
     /**
@@ -158,23 +165,24 @@ public class SubsystemFactory {
      * and cleans up other subsystem resources.
      */
     public void cleanup() {
-        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-        // Cleanup subsystems
-        // if (m_climber != null) {
-        //     m_climber.cleanup();
-        // }
+        if (m_climber != null) {
+            m_climber.cleanup();
+        }
         // if (m_deployableIntake != null) {
         //     m_deployableIntake.cleanup();
         // }
-        // if (m_floor != null) {
-        //     m_floor.cleanup();
-        // }
-        // if (m_feeder != null) {
-        //     m_feeder.cleanup();
-        // }
-        // if (m_shooter != null) {
-        //     m_shooter.cleanup();
-        // }
+        if (m_floor != null) {
+            m_floor.cleanup();
+        }
+        if (m_feeder != null) {
+            m_feeder.cleanup();
+        }
+        if (m_shooter != null) {
+            m_shooter.cleanup();
+        }
+        if (m_shooterHood != null) {
+            m_shooterHood.cleanup();
+        }
         // if (m_lights != null) {
         //     m_lights.cleanup();
         // }

@@ -119,8 +119,8 @@ public class AutoTestHarness {
         this.climber = climber;
         this.positionTracker = positionTracker;
         
-        // Setup NetworkTable entries
-        testTable = NetworkTableInstance.getDefault().getTable("AutoTest");
+        // Use same path as Shuffleboard tab so Run/Stop widgets and harness share the same entries (path: Shuffleboard/AutoTest/Run, .../Stop)
+        testTable = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("AutoTest");
         runEntry = testTable.getBooleanTopic("Run").getEntry(false);
         stopEntry = testTable.getBooleanTopic("Stop").getEntry(false);
     }

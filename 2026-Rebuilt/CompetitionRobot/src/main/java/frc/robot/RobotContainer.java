@@ -9,15 +9,15 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Commands.RobotContext;
+import frc.robot.Controllers.ControllerBindingFactory;
 import frc.robot.Logging.RobotLogger;
 import frc.robot.Monitoring.PerformanceMonitor;
 import frc.robot.dashboard.DriverDashboard;
 import frc.robot.Controllers.ControllerIds;
-import frc.robot.Subsystems.Climber;
-import frc.robot.Subsystems.Lights;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
+import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings.InputProfile;
 import static frc.robot.Constants.VisionConstants.*;
 
 /**
@@ -67,8 +67,20 @@ public class RobotContainer {
         // Create subsystem factory (creates all subsystems, PositionTracker, StateMachine, RobotContext)
         m_subsystemFactory = new SubsystemFactory(m_drivetrain);
 
-        // Configure bindings for swerve drivetrain
+        // Configure bindings for swerve drivetrain (drive default command, SysId, profile cycle per constants)
         SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
+
+        // Drive tuning path + mechanism bindings (Mechanism Mode and Tuning Mode) via factory
+        new ControllerBindingFactory(
+                m_driveController,
+                m_mechanismController,
+                m_drivetrain,
+                m_subsystemFactory.getShooter(),
+                m_subsystemFactory.getFeeder(),
+                m_subsystemFactory.getFloor(),
+                m_subsystemFactory.getDeployableIntake(),
+                m_subsystemFactory.getClimber())
+                .configureBindings();
 
         // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
         // Create binding configurator and configure all controller bindings
@@ -82,11 +94,16 @@ public class RobotContainer {
         // m_bindingConfigurator.configureAllBindings();
         m_bindingConfigurator = null; // Temporary for drivetrain-only testing
 
-        // TEMPORARILY COMMENTED OUT FOR DRIVETRAIN-ONLY TESTING
-        // Create auto configurator and configure autonomous routines
-        // m_autoConfigurator = new AutoConfigurator(m_autoManager);
-        // m_autoConfigurator.configureAuto();
-        m_autoConfigurator = null; // Temporary for drivetrain-only testing
+        // Auto configurator: registers test harness (atoms/molecules) and full autos when subsystems are available
+        m_autoConfigurator = new AutoConfigurator(m_autoManager, m_drivetrain);
+        m_autoConfigurator.configureAuto(
+                m_subsystemFactory.getPhotonVision(),
+                m_subsystemFactory.getShooter(),
+                m_subsystemFactory.getFeeder(),
+                null,  // intake
+                null,  // climber
+                null   // positionTracker
+        );
 
         // Seed field-centric pose
         m_drivetrain.seedFieldCentric();
@@ -261,8 +278,9 @@ public class RobotContainer {
             m_drivetrain.stop();
         }
 
-        // Reset rate limiters to prevent stale state
+        // Reset rate limiters and profile so next enable starts in Teleop mode
         SwerveDrivetrainBindings.resetRateLimiters();
+        SwerveDrivetrainBindings.setProfile(InputProfile.TELEOP);
 
         // Cleanup all subsystems and sensors
         if (m_subsystemFactory != null) {

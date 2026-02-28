@@ -2,17 +2,19 @@ package frc.robot.Constants;
 
 /**
  * Constants for the Feeder subsystem.
- * Contains predefined feeder speeds for different operational modes.
+ * Contains predefined feeder speeds and Talon FX config (Slot0, current limits, ramp, voltage).
  */
 public class FeederConstants {
+    private FeederConstants() {}
+
     /**
-     * Enumeration of predefined feeder speeds.
-     * STOPPED, FORWARD (moves balls toward shooter), and REVERSE (moves balls away, for clearing jams).
+     * Enumeration of predefined feeder speeds (rotations per second).
+     * Values high enough to overcome static friction; tune for match as needed.
      */
     public static enum FeederSpeed {
         STOPPED(0),
-        FORWARD(0.3),  // TODO: Tune speed value
-        REVERSE(-0.3); // TODO: Tune speed value
+        FORWARD(100.0),   // Toward shooter; tune for indexing
+        REVERSE(-60.0);  // Unjam / reverse
 
         public final double value;
 
@@ -21,9 +23,26 @@ public class FeederConstants {
         }
     }
 
-    // Placeholder constants for future safety coordination
-    // TODO: Add safety constants when safety conditions are determined
-    // Examples:
-    // public static final boolean REQUIRE_SHOOTER_READY = true;
-    // public static final boolean COORDINATE_WITH_FLOOR = true;
+    // ---- Velocity closed-loop (Slot0) ----
+    public static final double VELOCITY_KV = 0.12;
+    public static final double VELOCITY_KS = 0.25;
+    public static final double VELOCITY_KP = 0.1;
+    public static final double VELOCITY_KI = 0.0;
+    public static final double VELOCITY_KD = 0.0;
+
+    // ---- Current limits ----
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 15;
+    public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 30;
+    public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
+
+    // ---- Motor output ----
+    public static final boolean MOTOR_INVERTED = false;
+
+    // ---- Closed-loop ramp ----
+    public static final double CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC = 0.2;
+
+    // ---- Peak output voltage ----
+    public static final double PEAK_FORWARD_VOLTAGE = 12.0;
+    public static final double PEAK_REVERSE_VOLTAGE = -12.0;
 }

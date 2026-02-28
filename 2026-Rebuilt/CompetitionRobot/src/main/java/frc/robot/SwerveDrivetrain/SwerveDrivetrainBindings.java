@@ -8,26 +8,43 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants.ControllerBindingConstants;
 
 /**
  * Configures controller bindings for the swerve drivetrain.
- * Supports two input profiles:
- * - NORMAL: Standard driving and mechanism control
- * - SYSID: SysId characterization tests (disables normal driving)
+ * Supports three modes (Auto has no bindings; robot runs auto commands):
+ * - TELEOP: Normal drive + teleop mechanism combos (intake/shoot/deploy).
+ * - SYSID: Drivetrain and mechanism SysId characterization (PID tuning).
+ * - MECHANISM: Tuning path + one button per mechanism (individual mechanism commands).
  */
 public class SwerveDrivetrainBindings {
-    
+
     /**
-     * Input profile mode for controller bindings.
+     * Input profile / mode for drive controller bindings.
      */
     public enum InputProfile {
-        /** Normal driving and mechanism control */
-        NORMAL,
-        /** SysId characterization mode (disables normal driving) */
-        SYSID
+        /** Teleop: normal driving; mechanism controller uses teleop commands. */
+        TELEOP,
+        /** SysId: drivetrain SysId; mechanism controller uses SysId commands. */
+        SYSID,
+        /** Mechanism: tuning path; mechanism controller uses individual mechanism commands. */
+        MECHANISM
     }
-    
-    private static InputProfile currentProfile = InputProfile.NORMAL;
+
+    /**
+     * Mechanism controller mode. Matches drive profile: TELEOP → TELEOP, SYSID → SYSID, MECHANISM → MECHANISM.
+     */
+    public enum MechanismMode {
+        /** Teleop combo bindings (intake, shoot, deploy/stow). */
+        TELEOP,
+        /** SysId bindings (PID tuning). */
+        SYSID,
+        /** Individual mechanism buttons (one per mechanism for tuning). */
+        MECHANISM
+    }
+
+    private static InputProfile currentProfile = InputProfile.TELEOP;
+    private static MechanismMode currentMechanismMode = MechanismMode.TELEOP;
 
     private static double CurrentSpeed = DrivetrainConstants.MaxSpeed;
     private static double CurrentAngularRate = DrivetrainConstants.MaxAngularRate; // This will be updated when turtle and reset to MaxAngularRate
@@ -108,11 +125,11 @@ public class SwerveDrivetrainBindings {
 
         // https://github.com/Operation-P-E-A-C-C-E-Robotics/frc-2025/blob/main/src/main/java/frc/robot/commands/drivetrain/PeaccyTuner.java
 
-        // Sticks - only active in NORMAL profile
+        // Sticks - only active in TELEOP profile
         drivetrain.setDefaultCommand(
                 drivetrain.applyRequest(() -> {
-                    // Only drive if in NORMAL profile
-                    if (currentProfile != InputProfile.NORMAL) {
+                    // Only drive if in TELEOP profile
+                    if (currentProfile != InputProfile.TELEOP) {
                         return new SwerveRequest.SwerveDriveBrake();
                     }
                     
@@ -163,9 +180,9 @@ public class SwerveDrivetrainBindings {
          * );
          */
 
-        // RIGHT BUMPER: Reset the field-centric heading (only in NORMAL profile)
+        // RIGHT BUMPER: Reset the field-centric heading (only in TELEOP profile)
         driveController.rightBumper()
-                .and(() -> currentProfile == InputProfile.NORMAL)
+                .and(() -> currentProfile == InputProfile.TELEOP)
                 .onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         // Turtle Mode while held
@@ -271,33 +288,59 @@ public class SwerveDrivetrainBindings {
     public static void configureBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
         configureNormalBindings(driveController, drivetrain);
         configureSysIdBindings(driveController, drivetrain);
-        
-        // Profile switching: Hold Back + Start to toggle between NORMAL and SYSID modes
-        driveController.back().and(driveController.start()).onTrue(
-                Commands.runOnce(() -> {
-                    currentProfile = (currentProfile == InputProfile.NORMAL) 
-                            ? InputProfile.SYSID 
-                            : InputProfile.NORMAL;
-                })
-        );
+
+        // Initial profile from constants; when switching is disabled this is the only profile
+        setProfile(ControllerBindingConstants.DEFAULT_DRIVE_PROFILE);
+
+        if (ControllerBindingConstants.ENABLE_PROFILE_SWITCHING) {
+            // Profile switching: Hold Back + Start to cycle TELEOP → SYSID → MECHANISM → TELEOP
+            driveController.back().and(driveController.start()).onTrue(
+                    Commands.runOnce(() -> {
+                        switch (currentProfile) {
+                            case TELEOP -> currentProfile = InputProfile.SYSID;
+                            case SYSID -> currentProfile = InputProfile.MECHANISM;
+                            case MECHANISM -> currentProfile = InputProfile.TELEOP;
+                        }
+                        currentMechanismMode = profileToMechanismMode(currentProfile);
+                    })
+            );
+        }
+    }
+
+    private static MechanismMode profileToMechanismMode(InputProfile profile) {
+        return switch (profile) {
+            case TELEOP -> MechanismMode.TELEOP;
+            case SYSID -> MechanismMode.SYSID;
+            case MECHANISM -> MechanismMode.MECHANISM;
+        };
     }
 
     /**
-     * Gets the current input profile.
-     * 
-     * @return The current input profile (NORMAL or SYSID)
+     * Gets the current input profile (mode).
+     *
+     * @return The current profile (TELEOP, SYSID, or MECHANISM)
      */
     public static InputProfile getCurrentProfile() {
         return currentProfile;
     }
 
     /**
-     * Sets the input profile.
-     * 
-     * @param profile The profile to set (NORMAL or SYSID)
+     * Sets the input profile. Also updates mechanism mode to match.
+     *
+     * @param profile The profile to set (TELEOP, SYSID, MECHANISM)
      */
     public static void setProfile(InputProfile profile) {
         currentProfile = profile;
+        currentMechanismMode = profileToMechanismMode(profile);
+    }
+
+    /**
+     * Gets the current mechanism controller mode (TELEOP, SYSID, or MECHANISM).
+     *
+     * @return The current mechanism mode
+     */
+    public static MechanismMode getMechanismMode() {
+        return currentMechanismMode;
     }
 
     /**

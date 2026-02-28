@@ -5,14 +5,19 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Auto.AutoManager;
 import frc.robot.PathPlanner.AllianceUtils;
+import frc.robot.RobotState;
 import frc.robot.SubsystemFactory;
 import frc.robot.Subsystems.Cameras.PhotonVision;
+import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
+import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
+import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings.InputProfile;
 import frc.robot.dashboard.MatchTimer.MatchPhase;
 
 /**
@@ -27,6 +32,7 @@ import frc.robot.dashboard.MatchTimer.MatchPhase;
  *   <li>Current action/state
  *   <li>Alliance color
  *   <li>Robot pose (fused) and Vision estimated pose for estimator debugging
+ *   <li>Bindings profile selector (Teleop, SysId, Mechanism) — default is Teleop
  * </ul>
  *
  * <p>All subsystem access is null-safe to handle drivetrain-only testing mode.
@@ -34,11 +40,19 @@ import frc.robot.dashboard.MatchTimer.MatchPhase;
 public class DriverDashboard {
     private static final String TAB_NAME = "Driver";
 
+    /** Display label for Teleop mode (default). */
+    private static final String PROFILE_TELEOP_LABEL = "Teleop (Competition)";
+    private static final String PROFILE_SYSID_LABEL = "SysId";
+    private static final String PROFILE_MECHANISM_LABEL = "Mechanism (Tuning)";
+
     private final ShuffleboardTab tab;
 
     private final SubsystemFactory m_subsystemFactory;
     private final CommandSwerveDrivetrain m_drivetrain;
     private final AutoManager m_autoManager;
+
+    private final SendableChooser<String> m_profileChooser;
+    private final GenericEntry m_currentProfileEntry;
 
     private final GenericEntry matchTimerEntry;
     private final GenericEntry gamePieceCountEntry;
@@ -62,6 +76,22 @@ public class DriverDashboard {
         this.m_autoManager = autoManager;
 
         tab = Shuffleboard.getTab(TAB_NAME);
+
+        // Bindings profile: dropdown to switch mode; default is Teleop
+        m_profileChooser = new SendableChooser<>();
+        m_profileChooser.setDefaultOption(PROFILE_TELEOP_LABEL, PROFILE_TELEOP_LABEL);
+        m_profileChooser.addOption(PROFILE_SYSID_LABEL, PROFILE_SYSID_LABEL);
+        m_profileChooser.addOption(PROFILE_MECHANISM_LABEL, PROFILE_MECHANISM_LABEL);
+        tab.add("Bindings Profile", m_profileChooser)
+                .withWidget(BuiltInWidgets.kComboBoxChooser)
+                .withPosition(4, 2)
+                .withSize(2, 1);
+
+        m_currentProfileEntry = tab.add("Current Profile", PROFILE_TELEOP_LABEL)
+                .withWidget(BuiltInWidgets.kTextView)
+                .withPosition(4, 3)
+                .withSize(2, 1)
+                .getEntry();
 
         // Row 0: Match Timer (large, spans 4 columns)
         // Shuffleboard accepts initial values only; get entry from widget for updates.
@@ -142,6 +172,7 @@ public class DriverDashboard {
 
     /** Updates all dashboard values. Call from robotPeriodic(). */
     public void update() {
+        updateBindingsProfile();
         updateMatchTimer();
         updateGamePieceCount();
         updateShooterStatus();
@@ -150,6 +181,42 @@ public class DriverDashboard {
         updateAllianceColor();
         updatePoseEntries();
         MatchTimer.logPhaseChanges();
+    }
+
+    /** Applies dashboard profile selection to bindings and refreshes current profile display. */
+    private void updateBindingsProfile() {
+        String selected = m_profileChooser.getSelected();
+        if (selected != null) {
+            InputProfile desired = labelToProfile(selected);
+            if (desired != null && SwerveDrivetrainBindings.getCurrentProfile() != desired) {
+                SwerveDrivetrainBindings.setProfile(desired);
+            }
+        }
+        m_currentProfileEntry.setString(profileToLabel(SwerveDrivetrainBindings.getCurrentProfile()));
+    }
+
+    private static InputProfile labelToProfile(String label) {
+        if (PROFILE_TELEOP_LABEL.equals(label)) {
+            return InputProfile.TELEOP;
+        }
+        if (PROFILE_SYSID_LABEL.equals(label)) {
+            return InputProfile.SYSID;
+        }
+        if (PROFILE_MECHANISM_LABEL.equals(label)) {
+            return InputProfile.MECHANISM;
+        }
+        return null;
+    }
+
+    private static String profileToLabel(InputProfile profile) {
+        if (profile == null) {
+            return PROFILE_TELEOP_LABEL;
+        }
+        return switch (profile) {
+            case TELEOP -> PROFILE_TELEOP_LABEL;
+            case SYSID -> PROFILE_SYSID_LABEL;
+            case MECHANISM -> PROFILE_MECHANISM_LABEL;
+        };
     }
 
     private void updatePoseEntries() {
@@ -213,8 +280,16 @@ public class DriverDashboard {
     }
 
     private void updateShooterStatus() {
-        // Shooter is commented out for drivetrain-only testing
-        shooterStatusEntry.setValue(NetworkTableValue.makeString("N/A (subsystems disabled)"));
+        Shooter shooter = m_subsystemFactory != null ? m_subsystemFactory.getShooter() : null;
+        if (shooter == null) {
+            shooterStatusEntry.setValue(NetworkTableValue.makeString("N/A (subsystems disabled)"));
+            return;
+        }
+        boolean init = RobotState.getInstance().isInitialized();
+        double rps = shooter.getSpeed();
+        double rpm = rps * 60.0; // TalonFX velocity is rotations per second
+        String status = rpm > 100 ? String.format("SPINNING %.0f RPM", rpm) : "READY";
+        shooterStatusEntry.setValue(NetworkTableValue.makeString(status + " (init:" + (init ? "yes" : "no") + ")"));
     }
 
     private void updateVisionStatus() {

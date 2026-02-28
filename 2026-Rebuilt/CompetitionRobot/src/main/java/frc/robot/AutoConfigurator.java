@@ -31,6 +31,7 @@ import frc.robot.Auto.commands.CmdStopShooter;
 import frc.robot.Auto.commands.CmdWaitShooterAtSpeed;
 import frc.robot.Auto.commands.ShotMode;
 import frc.robot.Auto.commands.StartPoseId;
+import frc.robot.Constants.FeederConstants.FeederSpeed;
 import frc.robot.PathPlanner.Landmarks;
 import frc.robot.autotest.AutoTestHarness;
 import frc.robot.autotest.AutoTestShuffleboard;
@@ -166,25 +167,42 @@ public class AutoConfigurator {
                         () -> m_drivetrain.getPose(),
                         AutoConstants.DEFAULT_POSE_TIMEOUT));
         
-        // Shooter commands
+        // Shooter commands (on / reverse / off for testing)
+        // Use arbitrary speed in RPS so test is visible; ShooterSpeed.FORWARD (0.5 RPS) is too low to see.
         if (shooter != null) {
             Supplier<Double> testRpm = () -> 3000.0; // Test RPM
+            double testShooterRps = 30.0; // RPS for ShooterOn/Reverse (visible; TalonFX velocity = rotations/sec)
+            m_testHarness.registerAtom("ShooterOn", () -> 
+                    shooter.moveToArbitrarySpeedCommand(() -> testShooterRps));
+            m_testHarness.registerAtom("ShooterReverse", () -> 
+                    shooter.moveToArbitrarySpeedCommand(() -> -testShooterRps));
+            m_testHarness.registerAtom("ShooterOff", () -> 
+                    new CmdStopShooter(shooter));
             m_testHarness.registerAtom("ShooterSpinUp", () -> 
                     new CmdShooterSpinUp(shooter, testRpm));
-            
             m_testHarness.registerAtom("WaitShooterAtSpeed", () -> 
                     CmdWaitShooterAtSpeed.create(shooter, testRpm, 100.0));
-            
             m_testHarness.registerAtom("SetShotMode", () -> 
                     new CmdSetShotMode(shooter, ShotMode.AUTO_SHOT));
-            
             if (feeder != null) {
                 m_testHarness.registerAtom("ShootForTime", () -> 
                         CmdShootForTime.create(shooter, feeder, 1.0));
+                // Coordinated shoot: wait for shooter at speed, then feed for duration
+                m_testHarness.registerAtom("Shoot", () -> 
+                        new CmdShootForTime(shooter, feeder, 1.5, true, testRpm, 100.0));
             }
-            
             m_testHarness.registerAtom("StopShooter", () -> 
                     new CmdStopShooter(shooter));
+        }
+
+        // Feeder commands (on / reverse / off; run until cancelled or FeederOff)
+        if (feeder != null) {
+            m_testHarness.registerAtom("FeederOn", () -> 
+                    feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value));
+            m_testHarness.registerAtom("FeederReverse", () -> 
+                    feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value));
+            m_testHarness.registerAtom("FeederOff", () -> 
+                    feeder.resetSpeedCommand());
         }
         
         // Intake commands

@@ -7,11 +7,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 /**
  * Constants for autonomous commands.
  * Contains default timeouts, tolerances, vision thresholds, and field element positions.
+ * Commands in this package are used for autonomous routines and time-based sequences (not teleop bindings).
  */
 public final class AutoConstants {
     private AutoConstants() {
         // Utility class - prevent instantiation
     }
+
+    /** Path name (without .path) for drivetrain path-following PID tuning. File: zzTuning-1.path. */
+    public static final String TUNING_PATH_NAME = "zzTuning-1";
 
     // Default timeouts (seconds)
     public static final double DEFAULT_PATH_TIMEOUT = 10.0;
@@ -36,10 +40,9 @@ public final class AutoConstants {
     public static final int DEFAULT_STABLE_FRAMES = 10; // frames at target before considered stable
     public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
 
-    // Hub position (field-relative, blue alliance origin)
-    // TODO: Update with actual 2026 field hub position
+    // Hub position (field-relative, blue alliance origin). From 2026 field diagram: blue diamond plate center 197.61", 158.845" (m)
     public static final Pose2d HUB_POSE = new Pose2d(
-            new Translation2d(8.27, 4.11), // Approximate center of hub (update with actual field measurements)
+            new Translation2d(5.019, 4.035),
             Rotation2d.fromDegrees(0)
     );
 }

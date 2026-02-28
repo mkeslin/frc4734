@@ -25,6 +25,8 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 
+import frc.robot.Constants.CANIds;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -65,9 +67,8 @@ public class SwerveDrivetrainA {
     private static final SteerMotorArrangement kSteerMotorType = SteerMotorArrangement.TalonFX_Integrated;
 
     // The remote sensor feedback type to use for the steer motors;
-    // Using RemoteCANcoder (non-Pro) to avoid Pro license requirements
-    // FusedCANcoder requires Pro licenses on both motors and encoders
-    private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.RemoteCANcoder;
+    // Pro mode: FusedCANcoder (requires Pro licenses on steer motors and CANcoders)
+    private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.FusedCANcoder;
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
@@ -75,22 +76,30 @@ public class SwerveDrivetrainA {
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
-    private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration();
+    private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration()
+        .withCurrentLimits(
+            new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(Amps.of(35))
+                .withSupplyCurrentLimitEnable(true)
+                .withStatorCurrentLimit(Amps.of(80))
+                .withStatorCurrentLimitEnable(true)
+        );
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
         .withCurrentLimits(
             new CurrentLimitsConfigs()
                 // Swerve azimuth does not require much torque output, so we can set a relatively low
                 // stator current limit to help avoid brownouts without impacting performance.
-                .withStatorCurrentLimit(Amps.of(60))
+                .withSupplyCurrentLimit(Amps.of(15))
+                .withSupplyCurrentLimitEnable(true)
+                .withStatorCurrentLimit(Amps.of(40))
                 .withStatorCurrentLimitEnable(true)
         );
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
     private static final Pigeon2Configuration pigeonConfigs = null;
 
-    // CAN bus that the devices are located on;
-    // All swerve devices must share the same CAN bus
-    public static final CANBus kCANBus = new CANBus("", "./logs/example.hoot");
+    // CAN bus that the devices are located on; all swerve devices must share the same CAN bus
+    public static final CANBus kCANBus = new CANBus(CANIds.CAN_BUS_NAME, "./logs/example.hoot");
 
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
@@ -153,8 +162,8 @@ public class SwerveDrivetrainA {
     private static final boolean kFrontLeftSteerMotorInverted = false;
     private static final boolean kFrontLeftEncoderInverted = false;
 
-    private static final Distance kFrontLeftXPos = Inches.of(9.75);
-    private static final Distance kFrontLeftYPos = Inches.of(9.75);
+    private static final Distance kFrontLeftXPos = Inches.of(10.875);
+    private static final Distance kFrontLeftYPos = Inches.of(9.5);
 
     // Front Right
     private static final int kFrontRightDriveMotorId = 5;
@@ -164,8 +173,8 @@ public class SwerveDrivetrainA {
     private static final boolean kFrontRightSteerMotorInverted = false;
     private static final boolean kFrontRightEncoderInverted = false;
 
-    private static final Distance kFrontRightXPos = Inches.of(9.75);
-    private static final Distance kFrontRightYPos = Inches.of(-9.75);
+    private static final Distance kFrontRightXPos = Inches.of(10.875);
+    private static final Distance kFrontRightYPos = Inches.of(-9.5);
 
     // Back Left
     private static final int kBackLeftDriveMotorId = 6;
@@ -175,8 +184,8 @@ public class SwerveDrivetrainA {
     private static final boolean kBackLeftSteerMotorInverted = false;
     private static final boolean kBackLeftEncoderInverted = false;
 
-    private static final Distance kBackLeftXPos = Inches.of(-9.75);
-    private static final Distance kBackLeftYPos = Inches.of(9.75);
+    private static final Distance kBackLeftXPos = Inches.of(-10.875);
+    private static final Distance kBackLeftYPos = Inches.of(9.5);
 
     // Back Right
     private static final int kBackRightDriveMotorId = 7;
@@ -186,8 +195,8 @@ public class SwerveDrivetrainA {
     private static final boolean kBackRightSteerMotorInverted = false;
     private static final boolean kBackRightEncoderInverted = false;
 
-    private static final Distance kBackRightXPos = Inches.of(-9.75);
-    private static final Distance kBackRightYPos = Inches.of(-9.75);
+    private static final Distance kBackRightXPos = Inches.of(-10.875);
+    private static final Distance kBackRightYPos = Inches.of(-9.5);
 
 
     public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft =
@@ -219,7 +228,7 @@ public class SwerveDrivetrainA {
     public static CommandSwerveDrivetrain createDrivetrain() {
         return new CommandSwerveDrivetrain(
             DrivetrainConstants, // SwerveDrivetrainConstants from this class
-            0, // Use default odometry update frequency (250 Hz on CAN FD, 100 Hz on CAN 2.0)
+            100, // Odometry update frequency (Hz). 100 Hz avoids "CAN is stale" on CAN 2.0 or busy bus. Use 0 for default (250 Hz CAN FD / 100 Hz CAN 2.0) if needed.
             frc.robot.SwerveDrivetrain.DrivetrainConstants.kOdometryStandardDeviation,
             frc.robot.SwerveDrivetrain.DrivetrainConstants.kVisionStandardDeviation,
             FrontLeft, FrontRight, BackLeft, BackRight

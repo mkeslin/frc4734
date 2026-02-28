@@ -1,13 +1,16 @@
 package frc.robot.Subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.CANIds.CAN_BUS;
 import static frc.robot.Constants.CANIds.INTAKE_DEPLOY;
 import static frc.robot.Constants.CANIds.INTAKE_MOTOR;
 import static frc.robot.Constants.IntakeConstants.DEPLOY_TOLERANCE;
 import static frc.robot.Constants.IntakeConstants.MIN_DEPLOY_POSITION_FOR_INTAKE;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_ACCELERATION;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_CRUISE_VELOCITY;
+import static frc.robot.Constants.IntakeConstants.INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_JERK;
 import static frc.robot.Constants.IntakeConstants.kA;
 import static frc.robot.Constants.IntakeConstants.kD;
@@ -21,13 +24,20 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import frc.robot.Constants.IntakeConstants;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -124,14 +134,46 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
 
         deployConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        m_deployMotor = new TalonFX(INTAKE_DEPLOY);
+        m_deployMotor = new TalonFX(INTAKE_DEPLOY, CAN_BUS);
         m_deployMotor.setNeutralMode(NeutralModeValue.Brake);
         m_deployMotor.getConfigurator().apply(deployConfigs);
+        CurrentLimitsConfigs deployCurrentLimits = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(Amps.of(IntakeConstants.INTAKE_DEPLOY_SUPPLY_CURRENT_LIMIT_AMPS))
+                .withSupplyCurrentLimitEnable(IntakeConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
+                .withStatorCurrentLimit(Amps.of(IntakeConstants.INTAKE_DEPLOY_STATOR_CURRENT_LIMIT_AMPS))
+                .withStatorCurrentLimitEnable(IntakeConstants.STATOR_CURRENT_LIMIT_ENABLE);
+        ClosedLoopRampsConfigs deployRamps = new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(IntakeConstants.CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC);
+        VoltageConfigs deployVoltage = new VoltageConfigs()
+                .withPeakForwardVoltage(IntakeConstants.PEAK_FORWARD_VOLTAGE)
+                .withPeakReverseVoltage(IntakeConstants.PEAK_REVERSE_VOLTAGE);
+        m_deployMotor.getConfigurator().apply(deployCurrentLimits);
+        m_deployMotor.getConfigurator().apply(deployRamps);
+        m_deployMotor.getConfigurator().apply(deployVoltage);
 
-        // Configure intake motor (velocity control)
-        m_intakeMotor = new TalonFX(INTAKE_MOTOR);
+        // Configure intake motor (velocity control): Slot0, current limits, motor output, ramp, voltage
+        m_intakeMotor = new TalonFX(INTAKE_MOTOR, CAN_BUS);
         m_intakeMotor.setNeutralMode(NeutralModeValue.Brake);
-        // Intake motor uses simple velocity control, no special config needed
+        Slot0Configs intakeSlot0 = new Slot0Configs()
+                .withKV(IntakeConstants.INTAKE_VELOCITY_KV).withKS(IntakeConstants.INTAKE_VELOCITY_KS)
+                .withKP(IntakeConstants.INTAKE_VELOCITY_KP).withKI(IntakeConstants.INTAKE_VELOCITY_KI).withKD(IntakeConstants.INTAKE_VELOCITY_KD);
+        CurrentLimitsConfigs intakeCurrentLimits = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(Amps.of(IntakeConstants.INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS))
+                .withSupplyCurrentLimitEnable(IntakeConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
+                .withStatorCurrentLimit(Amps.of(IntakeConstants.INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS))
+                .withStatorCurrentLimitEnable(IntakeConstants.STATOR_CURRENT_LIMIT_ENABLE);
+        InvertedValue intakeInvert = IntakeConstants.INTAKE_MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        MotorOutputConfigs intakeMotorOutput = new MotorOutputConfigs().withInverted(intakeInvert);
+        ClosedLoopRampsConfigs intakeRamps = new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(IntakeConstants.CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC);
+        VoltageConfigs intakeVoltage = new VoltageConfigs()
+                .withPeakForwardVoltage(IntakeConstants.PEAK_FORWARD_VOLTAGE)
+                .withPeakReverseVoltage(IntakeConstants.PEAK_REVERSE_VOLTAGE);
+        m_intakeMotor.getConfigurator().apply(intakeSlot0);
+        m_intakeMotor.getConfigurator().apply(intakeCurrentLimits);
+        m_intakeMotor.getConfigurator().apply(intakeMotorOutput);
+        m_intakeMotor.getConfigurator().apply(intakeRamps);
+        m_intakeMotor.getConfigurator().apply(intakeVoltage);
 
         resetDeployPosition();
         resetIntakeSpeed();
@@ -246,9 +288,16 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
                     VelocityVoltage velocityOut = new VelocityVoltage(0);
                     velocityOut.Slot = 0;
                     m_intakeMotor.setControl(velocityOut.withVelocity(goalVelocity));
+                    // While intake roller is running, apply slight forward voltage to deploy to keep intake in place
+                    if (Math.abs(goalVelocity) >= 0.01 && isDeployed()) {
+                        m_deployMotor.setControl(m_deployVoltReq.withOutput(INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE));
+                    } else {
+                        m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+                    }
                 } else {
                     // Stop intake if not deployed
                     m_intakeMotor.stopMotor();
+                    m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
                 }
             } else {
                 m_intakeMotor.stopMotor();
@@ -257,6 +306,7 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
                 intakeSpeedPub.set(m_positionTracker.getIntakeSpeed());
             }
         })
+                .finallyDo(interrupted -> m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition())))
                 .withName("deployableIntake.moveToIntakeSpeed");
     }
 

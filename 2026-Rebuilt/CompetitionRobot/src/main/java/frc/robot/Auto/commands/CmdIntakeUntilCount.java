@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.IntakeConstants.IntakeSpeed;
 import frc.robot.PositionTracker;
 import frc.robot.Subsystems.DeployableIntake;
 
@@ -65,9 +66,7 @@ public class CmdIntakeUntilCount extends Command {
         timer.reset();
         timer.start();
         
-        // Start intake at forward speed
-        // TODO: Replace with actual intake speed constant from IntakeConstants
-        double intakeSpeed = 0.5; // Placeholder
+        double intakeSpeed = IntakeSpeed.IN.value;
         intakeCommand = intake.moveToArbitraryIntakeSpeedCommand(() -> intakeSpeed);
         intakeCommand.initialize();
     }

@@ -30,14 +30,13 @@ public final class AutoTestShuffleboard {
                 .withPosition(2, 0)
                 .withSize(3, 1);
         
-        // Run toggle (NetworkTable boolean - already set up in harness)
-        tab.add("Run Test", false)
+        // Run/Stop toggles: use keys "Run" and "Stop" so they match the harness (Shuffleboard/AutoTest/Run, .../Stop)
+        tab.add("Run", false)
                 .withPosition(0, 1)
                 .withSize(1, 1)
                 .withWidget(BuiltInWidgets.kToggleButton);
         
-        // Stop toggle
-        tab.add("Stop Test", false)
+        tab.add("Stop", false)
                 .withPosition(1, 1)
                 .withSize(1, 1)
                 .withWidget(BuiltInWidgets.kToggleButton);
