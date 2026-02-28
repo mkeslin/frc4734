@@ -180,8 +180,9 @@ public class SwerveDrivetrainBindings {
          * );
          */
 
-        // RIGHT BUMPER: Reset the field-centric heading (only in TELEOP profile)
-        driveController.rightBumper()
+        // Start (alone): Reset field-centric heading in TELEOP. Back+Start cycles profile, so require Back not pressed.
+        driveController.start()
+                .and(() -> !driveController.back().getAsBoolean())
                 .and(() -> currentProfile == InputProfile.TELEOP)
                 .onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 

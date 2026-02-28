@@ -23,7 +23,7 @@ Print this for driver/pit reference. **Mode** is selected on the Driver tab (or 
 | Drive | Left stick (field-centric) |
 | Rotate | Right stick X |
 | Turtle mode | Left bumper (held) |
-| Reset heading | Right bumper |
+| Reset heading | Start (alone) |
 | **Profile cycle** | **Back + Start** (when enabled) |
 
 **SysId mode only:** A = translation SysId, B = steer SysId, Right bumper = rotation SysId; Back+Y / Back+X = dynamic; Start+Y / Start+X = quasistatic.

@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -15,6 +16,7 @@ import frc.robot.Auto.commands.CmdAcquireHubAim;
 import frc.robot.Auto.commands.CmdApplyTagSnapIfGood;
 import frc.robot.Auto.commands.CmdClimbL1;
 import frc.robot.Auto.commands.CmdDriveToPose;
+import frc.robot.Auto.commands.CmdFollowPath;
 import frc.robot.Auto.commands.CmdHoldClimbUntilEnd;
 import frc.robot.Auto.commands.CmdHoldPose;
 import frc.robot.Auto.commands.CmdIntakeOff;
