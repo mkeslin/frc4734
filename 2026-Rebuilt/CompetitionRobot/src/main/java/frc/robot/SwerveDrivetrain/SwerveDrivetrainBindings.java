@@ -5,7 +5,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.PathPlanner.Landmarks;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.ControllerBindingConstants;
@@ -60,6 +64,12 @@ public class SwerveDrivetrainBindings {
             .withDeadband(0.0) // Deadband is now applied to joystick inputs, not physical units
             .withRotationalDeadband(0.0) // Deadband is now applied to joystick inputs, not physical units
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // field-centric driving in open loop
+
+    // Face-hub mode: same translation as normal drive, rotation overridden to face hub center
+    private static final ProfiledFieldCentricFacingAngle m_facingHub = new ProfiledFieldCentricFacingAngle(
+            new TrapezoidProfile.Constraints(
+                    DrivetrainConstants.MaxAngularRate,
+                    DrivetrainConstants.kMaxAngularAcceleration));
     // private static final SwerveRequest.SwerveDriveBrake m_brake = new SwerveRequest.SwerveDriveBrake();
     // private static final SwerveRequest.PointWheelsAt m_point = new SwerveRequest.PointWheelsAt();
 
@@ -159,8 +169,21 @@ public class SwerveDrivetrainBindings {
                     velocityX = MathUtil.clamp(velocityX, -DrivetrainConstants.MaxSpeed, DrivetrainConstants.MaxSpeed);
                     velocityY = MathUtil.clamp(velocityY, -DrivetrainConstants.MaxSpeed, DrivetrainConstants.MaxSpeed);
                     rotationalRate = MathUtil.clamp(rotationalRate, -DrivetrainConstants.MaxAngularRate, DrivetrainConstants.MaxAngularRate);
-                    
-                    // Apply rate-limited velocities to drive command
+
+                    // Right bumper held: drive normally but override rotation to face hub center
+                    if (driveController.rightBumper().getAsBoolean()) {
+                        Translation2d hub = Landmarks.OurHub().getTranslation();
+                        Translation2d robot = drivetrain.getPose().getTranslation();
+                        Translation2d toHub = hub.minus(robot);
+                        Rotation2d targetDirection = Rotation2d.fromRadians(Math.atan2(toHub.getY(), toHub.getX()));
+                        return m_facingHub
+                                .withVelocityX(velocityX)
+                                .withVelocityY(velocityY)
+                                .withTargetDirection(targetDirection)
+                                .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+                    }
+
+                    // Normal drive: left stick translation, right stick rotation
                     return m_drive
                             .withVelocityX(velocityX) // Drive forward with negative Y (forward)
                             .withVelocityY(velocityY) // Drive left with negative X (left)
@@ -180,10 +203,16 @@ public class SwerveDrivetrainBindings {
          * );
          */
 
-        // RIGHT BUMPER: Reset the field-centric heading (only in TELEOP profile)
-        driveController.rightBumper()
+        // Start (alone): Reset field-centric heading in TELEOP. Back+Start cycles profile, so require Back not pressed.
+        driveController.start()
+                .and(() -> !driveController.back().getAsBoolean())
                 .and(() -> currentProfile == InputProfile.TELEOP)
                 .onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        // Right bumper (TELEOP): reset face-hub profile when entering face-hub so rotation doesn't jump
+        driveController.rightBumper()
+                .and(() -> currentProfile == InputProfile.TELEOP)
+                .onTrue(Commands.runOnce(() -> m_facingHub.resetProfile(drivetrain.getPose().getRotation())));
 
         // Turtle Mode while held
         driveController.leftBumper().onTrue(Commands.runOnce(() -> {

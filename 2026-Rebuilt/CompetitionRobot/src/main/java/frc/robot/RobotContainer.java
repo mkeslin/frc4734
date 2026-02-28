@@ -101,7 +101,7 @@ public class RobotContainer {
                 m_subsystemFactory.getShooter(),
                 m_subsystemFactory.getFeeder(),
                 null,  // intake
-                null,  // climber
+                m_subsystemFactory.getClimber(),
                 null   // positionTracker
         );
 

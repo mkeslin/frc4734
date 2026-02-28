@@ -20,6 +20,8 @@ public class ClimbWhileHeldCommand extends Command {
 
     private final Climber m_climber;
     private final boolean m_ascend;
+    private final boolean m_runToCompletion;
+    private final int m_maxLevels;
 
     private enum AscendState {
         Extending,
@@ -38,18 +40,27 @@ public class ClimbWhileHeldCommand extends Command {
 
     private static final double TOLERANCE = ClimberConstants.CLIMB_POSITION_TOLERANCE_ROTATIONS;
 
-    public ClimbWhileHeldCommand(Climber climber, boolean ascend) {
+    public ClimbWhileHeldCommand(Climber climber, boolean ascend, boolean runToCompletion, int maxLevels) {
         this.m_climber = Objects.requireNonNull(climber, "climber cannot be null");
         this.m_ascend = ascend;
+        this.m_runToCompletion = runToCompletion;
+        this.m_maxLevels = maxLevels;
         addRequirements(climber);
     }
 
+    /** Teleop: ascend while held (up to 3 levels), never finishes. */
     public static ClimbWhileHeldCommand ascent(Climber climber) {
-        return new ClimbWhileHeldCommand(climber, true);
+        return new ClimbWhileHeldCommand(climber, true, false, 3);
     }
 
+    /** Teleop: descend while held, never finishes. */
     public static ClimbWhileHeldCommand descent(Climber climber) {
-        return new ClimbWhileHeldCommand(climber, false);
+        return new ClimbWhileHeldCommand(climber, false, false, 3);
+    }
+
+    /** Auto: one climb cycle (extend L1 → retract), then command ends. */
+    public static ClimbWhileHeldCommand ascentToCompletion(Climber climber) {
+        return new ClimbWhileHeldCommand(climber, true, true, 1);
     }
 
     @Override
@@ -104,7 +115,7 @@ public class ClimbWhileHeldCommand extends Command {
                     double target = getStartTarget(m_level);
                     m_climber.setLiftGoalPosition(target);
                     if (atTarget(position, target)) {
-                        if (m_level >= 3) {
+                        if (m_level >= m_maxLevels) {
                             m_ascendState = AscendState.Done;
                         } else {
                             m_level++;
@@ -136,7 +147,13 @@ public class ClimbWhileHeldCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return false;
+        if (!m_runToCompletion) {
+            return false;
+        }
+        if (m_ascend) {
+            return m_ascendState == AscendState.Done;
+        }
+        return m_descendState == DescendState.Done;
     }
 
     @Override

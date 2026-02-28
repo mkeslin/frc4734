@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -313,27 +314,34 @@ public class AutoConfigurator {
         String pathToShot = MoleculeTests.getPathNameForPose(defaultPose, "StartToShot");
         String pathToCenter = MoleculeTests.getPathNameForPose(defaultPose, "StartToCenter");
         String pathBackToShot = MoleculeTests.getPathNameForPose(defaultPose, "CenterToShot");
-        String pathToTower = MoleculeTests.getPathNameForPose(defaultPose, "StartToTower");
-        Pose2d towerAlignPose = startPoses.get(defaultPose); // Placeholder
-        
-        // Climber Auto
+
+        Pose2d shotPose = Landmarks.OurShotPosition();
+
+        // Climber Auto: three start positions (left, middle, right); tower pose = side nearest start, back to circle end
         if (climber != null) {
-            Command climberAuto = AutoRoutines.buildClimberAuto(
-                    defaultPose,
-                    startPoses,
-                    pathToShot,
-                    pathToTower,
-                    towerAlignPose,
-                    AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
-                    3000.0, // Target RPM
-                    100.0, // RPM tolerance
-                    1.0, // Shoot duration
-                    m_drivetrain,
-                    vision,
-                    shooter,
-                    feeder,
-                    climber);
-            m_autoManager.addRoutine(new AutoRoutine("ClimberAuto", climberAuto));
+            for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_2, StartPoseId.POS_3 }) {
+                String label = startId == StartPoseId.POS_1 ? "Left" : (startId == StartPoseId.POS_2 ? "Middle" : "Right");
+                Pose2d towerAlignPose = Landmarks.OurTowerAlign(startId);
+                Command climberAuto = AutoRoutines.buildClimberAuto(
+                        startId,
+                        startPoses,
+                        shotPose,
+                        towerAlignPose,
+                        AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
+                        3000.0, // Target RPM
+                        100.0, // RPM tolerance
+                        1.0, // Shoot duration
+                        m_drivetrain,
+                        vision,
+                        shooter,
+                        feeder,
+                        climber);
+                m_autoManager.addRoutine(new AutoRoutine(
+                        "ClimberAuto (" + label + ")",
+                        climberAuto,
+                        List.of(),
+                        startPoses.get(startId)));
+            }
         }
         
         // Shooter Auto
