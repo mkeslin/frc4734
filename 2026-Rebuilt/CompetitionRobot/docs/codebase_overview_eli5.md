@@ -195,6 +195,8 @@ Commands are step-by-step instructions that tell subsystems what to do. They're 
 3. Robot follows the path automatically
 4. After 15 seconds, drivers take control
 
+For a detailed description of each routine (ClimberAuto, ShooterAuto) and step-by-step behavior, see [Autonomous Routines](autonomous_routines.md).
+
 ---
 
 ## How Code Flows (The Restaurant Analogy)

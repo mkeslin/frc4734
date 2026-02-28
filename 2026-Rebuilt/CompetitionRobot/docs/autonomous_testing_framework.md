@@ -10,6 +10,8 @@ The Autonomous Testing Framework provides a comprehensive, driver-station-friend
 
 The framework includes automatic telemetry logging, deterministic timeout detection, and comprehensive result tracking to help diagnose why tests fail.
 
+For a **step-by-step description of each autonomous routine** (ClimberAuto, ShooterAuto), selection, and key constants, see [Autonomous Routines](autonomous_routines.md).
+
 ## Architecture
 
 ### Core Components
@@ -64,7 +66,7 @@ Once atoms work individually, test short sequences to verify composition.
 
 ### 3. Full Autos (Complete Routines)
 
-Finally, test complete autonomous routines end-to-end.
+Finally, test complete autonomous routines end-to-end. See [Autonomous Routines](autonomous_routines.md) for a full step-by-step description of each.
 
 **Example Autos:**
 - `ClimberAuto`: Complete climber routine with shooting and climbing
