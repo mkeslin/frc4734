@@ -214,24 +214,24 @@ public class ControllerBindingFactory {
                     .onTrue(IndividualMechanismCommands.resetShooter(m_shooter));
         }
         if (m_feeder != null) {
-            m_mechanismController.a()
+            m_mechanismController.a().and(m_mechanismController.start().negate())
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
                     .whileTrue(Commands.defer(
                             () -> IndividualMechanismCommands.feederForward(m_feeder),
                             Set.<Subsystem>of(m_feeder)))
                     .onFalse(IndividualMechanismCommands.resetFeeder(m_feeder));
-            m_mechanismController.x()
+            m_mechanismController.x().and(m_mechanismController.start().negate())
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
                     .whileTrue(Commands.defer(
                             () -> IndividualMechanismCommands.feederReverse(m_feeder),
                             Set.<Subsystem>of(m_feeder)))
                     .onFalse(IndividualMechanismCommands.resetFeeder(m_feeder));
-            m_mechanismController.b()
+            m_mechanismController.b().and(m_mechanismController.start().negate())
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
                     .onTrue(IndividualMechanismCommands.resetFeeder(m_feeder));
         }
         if (m_floor != null) {
-            m_mechanismController.y()
+            m_mechanismController.y().and(m_mechanismController.start().negate())
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
                     .whileTrue(Commands.defer(
                             () -> IndividualMechanismCommands.floorForward(m_floor),

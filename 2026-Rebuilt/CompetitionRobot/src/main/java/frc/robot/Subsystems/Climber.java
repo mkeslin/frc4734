@@ -32,6 +32,7 @@ import frc.robot.TelemetryCalcs;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Constants.ClimberConstants.JawPosition;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Subsystems.Bases.BaseSingleJointedArm;
 
 /**
@@ -97,6 +98,8 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         m_climber.setNeutralMode(NeutralModeValue.Brake);
         m_climber.getConfigurator().apply(talonFxConfigs);
 
+        InvertedValue leftinvert = ClimberConstants.JAW_MOTORS_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        InvertedValue rightinvert = ClimberConstants.JAW_MOTORS_INVERTED ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive;
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
                 .withSupplyCurrentLimit(Amps.of(ClimberConstants.SUPPLY_CURRENT_LIMIT_AMPS))
                 .withSupplyCurrentLimitEnable(ClimberConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
@@ -119,7 +122,6 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         jawConfigs.MotionMagic.MotionMagicCruiseVelocity = ClimberConstants.JAW_MOTION_MAGIC_CRUISE_VELOCITY;
         jawConfigs.MotionMagic.MotionMagicAcceleration = ClimberConstants.JAW_MOTION_MAGIC_ACCELERATION;
         jawConfigs.MotionMagic.MotionMagicJerk = ClimberConstants.JAW_MOTION_MAGIC_JERK;
-        jawConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         CurrentLimitsConfigs jawCurrentLimits = new CurrentLimitsConfigs()
                 .withSupplyCurrentLimit(Amps.of(ClimberConstants.JAW_SUPPLY_CURRENT_LIMIT_AMPS))
@@ -130,6 +132,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         m_jawLeft = new TalonFX(CLIMBER_JAW_LEFT, CAN_BUS);
         m_jawLeft.setNeutralMode(NeutralModeValue.Brake);
         m_jawLeft.getConfigurator().apply(jawConfigs);
+        m_jawLeft.getConfigurator().apply(new MotorOutputConfigs().withInverted(leftinvert));
         m_jawLeft.getConfigurator().apply(jawCurrentLimits);
         m_jawLeft.getConfigurator().apply(closedLoopRamps);
         m_jawLeft.getConfigurator().apply(voltage);
@@ -138,7 +141,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         m_jawRight.setNeutralMode(NeutralModeValue.Brake);
         m_jawRight.getConfigurator().apply(jawConfigs);
         // Right jaw: positive rotation = clamping (mirror of left)
-        m_jawRight.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        m_jawRight.getConfigurator().apply(new MotorOutputConfigs().withInverted(rightinvert));
         m_jawRight.getConfigurator().apply(jawCurrentLimits);
         m_jawRight.getConfigurator().apply(closedLoopRamps);
         m_jawRight.getConfigurator().apply(voltage);

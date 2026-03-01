@@ -13,7 +13,7 @@ public class ClimberConstants {
      */
     public static enum ClimberPosition {
         DOWN(0),
-        ACQUIRE(-50),
+        ACQUIRE(-130),
         CLIMB(-260);
 
         public final double value;
@@ -24,6 +24,8 @@ public class ClimberConstants {
     }
 
     public static final double SCORING_MOVEMENT = -0.8;
+
+    public static final boolean JAW_MOTORS_INVERTED = true;
 
     public static final double MIN_ANGLE_RADIANS = -Math.PI / 2.0;
     public static final double MAX_ANGLE_RADIANS = Math.PI / 2.0;
@@ -68,12 +70,12 @@ public class ClimberConstants {
     /** Left jaw open position (rotations). */
     public static final double LEFT_JAW_OPEN_ROTATIONS = 0.0;
     /** Left jaw closed position (rotations); positive = clamping. */
-    public static final double LEFT_JAW_CLOSED_ROTATIONS = 0.082;
+    public static final double LEFT_JAW_CLOSED_ROTATIONS = 0.5;
 
     /** Right jaw open position (rotations). */
     public static final double RIGHT_JAW_OPEN_ROTATIONS = 0.0;
     /** Right jaw closed position (rotations). */
-    public static final double RIGHT_JAW_CLOSED_ROTATIONS = 0.095;
+    public static final double RIGHT_JAW_CLOSED_ROTATIONS = 0.5;
 
     /** MotionMagic cruise velocity for jaw motors (rot/s). */
     public static final double JAW_MOTION_MAGIC_CRUISE_VELOCITY = 20;
