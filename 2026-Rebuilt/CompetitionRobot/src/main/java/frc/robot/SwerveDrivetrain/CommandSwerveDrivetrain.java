@@ -246,7 +246,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             RobotLogger.log("[PathPlanner] RobotConfig loaded; configuring AutoBuilder...");
             System.out.println("[PathPlanner] RobotConfig loaded; configuring AutoBuilder...");
             AutoBuilder.configure(
-                    () -> getState().Pose, // Supplier of current robot pose
+                    () -> getState().Pose, // Supplier of current robot pose (alliance-relative)
                     this::resetPose, // Consumer for seeding pose against auto
                     () -> getState().Speeds, // Supplier of current robot speeds
                     // Consumer of ChassisSpeeds and feedforwards to drive the robot
@@ -518,8 +518,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /**
      * Returns a command that pathfinds to the given pose in blue coordinates.
-     * Use this when the target is already in PathPlanner's blue-origin frame (e.g. from
-     * Landmarks.midpointShotPoseBlue or BlueLandmarks). PathPlanner will flip the path for red.
+     * Use when the target is in PathPlanner's blue-origin frame. Uses pathfindToPoseFlipped
+     * so on red alliance the target is flipped and pathfinding plans in the same frame as the pose supplier.
      */
     public Command pathfindToPoseBlue(Pose2d poseBlue) {
         var constraints = new PathConstraints(
@@ -528,7 +528,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxAngularRate,
                 frc.robot.SwerveDrivetrain.DrivetrainConstants.kMaxAngularAcceleration
         );
-        return AutoBuilder.pathfindToPose(poseBlue, constraints, 0);
+        return AutoBuilder.pathfindToPoseFlipped(poseBlue, constraints, 0);
     }
 
     /**
