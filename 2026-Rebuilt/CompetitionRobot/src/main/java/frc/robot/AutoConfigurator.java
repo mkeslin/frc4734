@@ -365,6 +365,7 @@ public class AutoConfigurator {
                         vision,
                         shooter,
                         feeder,
+                        intake,
                         climber);
                 m_autoManager.addRoutine(new AutoRoutine(
                         "ClimberAuto (" + label + ")",

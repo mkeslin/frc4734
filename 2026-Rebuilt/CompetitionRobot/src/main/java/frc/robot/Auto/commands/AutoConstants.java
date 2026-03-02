@@ -24,6 +24,8 @@ public final class AutoConstants {
     public static final double DEFAULT_SHOOTER_SPINUP_TIMEOUT = 3.0;
     public static final double DEFAULT_SHOOT_TIMEOUT = 2.0;
     public static final double DEFAULT_INTAKE_TIMEOUT = 5.0;
+    /** Timeout for deploying (lowering) intake so webcam is unblocked before hub aim. */
+    public static final double DEFAULT_INTAKE_DEPLOY_TIMEOUT = 2.0;
     public static final double DEFAULT_CLIMB_TIMEOUT = 15.0;
     public static final double DEFAULT_ODOMETRY_SEED_TIMEOUT = 1.0;
 

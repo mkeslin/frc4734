@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.PositionTracker;
+import frc.robot.Constants.IntakeConstants.DeployPosition;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
@@ -46,6 +47,7 @@ public class AutoRoutines {
      *   <li>Seeds odometry from start pose</li>
      *   <li>Applies tag snap if vision quality is good</li>
      *   <li>Drives to shot position (parallel: spins up shooter)</li>
+     *   <li>Lowers intake if present (deploy so webcam is not blocked)</li>
      *   <li>Acquires hub aim</li>
      *   <li>Waits for shooter at speed</li>
      *   <li>Shoots preload for specified duration</li>
@@ -68,6 +70,7 @@ public class AutoRoutines {
      * @param vision The PhotonVision subsystem
      * @param shooter The shooter subsystem
      * @param feeder The feeder subsystem
+     * @param intake Optional deployable intake; if non-null, intake is lowered before hub aim so webcam is unblocked
      * @param climber The climber subsystem
      * @return A command representing the complete climber auto routine
      * @throws NullPointerException if any required parameter is null
@@ -85,6 +88,7 @@ public class AutoRoutines {
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
+            DeployableIntake intake,
             Climber climber) {
         
         Objects.requireNonNull(id, "id cannot be null");
@@ -121,16 +125,22 @@ public class AutoRoutines {
                                 AutoConstants.DEFAULT_PATH_TIMEOUT),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
 
-                // 4. Acquire hub aim
+                // 4. Lower intake so webcam is not blocked (skip if no intake)
+                intake != null
+                        ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
+                                .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
+                        : Commands.none(),
+
+                // 5. Acquire hub aim
                 CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
 
-                // 5. Wait shooter at speed
+                // 6. Wait shooter at speed
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
 
-                // 6. Shoot for time (preload)
+                // 7. Shoot for time (preload)
                 CmdShootForTime.create(shooter, feeder, shootDuration),
 
-                // 7. Drive to tower align pose (side from Shuffleboard "Climb Side" chooser)
+                // 8. Drive to tower align pose (side from Shuffleboard "Climb Side" chooser)
                 new CmdDriveToPose(
                         drivetrain,
                         towerAlignPose,
@@ -138,7 +148,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 8. Tag snap before final alignment
+                // 9. Tag snap before final alignment
                 new CmdApplyTagSnapIfGood(
                         vision,
                         drivetrain,
@@ -146,7 +156,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // 9. Drive to tower align pose again (fine alignment)
+                // 10. Drive to tower align pose again (fine alignment)
                 new CmdDriveToPose(
                         drivetrain,
                         towerAlignPose,
@@ -154,11 +164,11 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 10. One climb cycle (extend L1 → retract), then end
+                // 11. One climb cycle (extend L1 → retract), then end
                 ClimbWhileHeldCommand.ascentToCompletion(climber)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
-                // 11. Hold climb until end
+                // 12. Hold climb until end
                 new CmdHoldClimbUntilEnd(climber, drivetrain)
         ).withName("ClimberAuto");
     }

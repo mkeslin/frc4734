@@ -38,19 +38,20 @@ Landmarks and paths are **alliance-aware**: `Landmarks` uses `AllianceUtils` so 
 3. **Drive to shot pose (with shooter spin-up)** – In parallel:
    - **CmdDriveToPose** to `Landmarks.OurShotPosition()` (in front of hub, facing hub). XY tolerance 0.1 m, rotation 5°, pose timeout 5 s.
    - **CmdShooterSpinUp** to 3000 RPM.
-4. **Acquire hub aim** – Vision-based heading to hub; fallback heading 180° if no target.
-5. **Wait shooter at speed** – Block until shooter is at 3000 RPM ± 100.
-6. **Shoot preload** – Feed for 1.0 s (`CmdShootForTime`).
-7. **Drive to tower align pose** – `CmdDriveToPose` to the pose from the **"Climb Side"** Shuffleboard chooser (Left or Right only; center is not physically possible):
+4. **Lower intake** – Deploy (lower) the intake so it does not block the webcam; if no intake subsystem is present, this step is skipped. Timeout 2 s.
+5. **Acquire hub aim** – Vision-based heading to hub; fallback heading 180° if no target.
+6. **Wait shooter at speed** – Block until shooter is at 3000 RPM ± 100.
+7. **Shoot preload** – Feed for 1.0 s (`CmdShootForTime`).
+8. **Drive to tower align pose** – `CmdDriveToPose` to the pose from the **"Climb Side"** Shuffleboard chooser (Left or Right only; center is not physically possible):
    - **Climb side: Left** → `Landmarks.OurTowerAlignLeft()` (high Y in blue).
    - **Climb side: Right** → `Landmarks.OurTowerAlignRight()` (low Y in blue).
    Pose is “back into circle end of tower bar” (e.g. 270° in blue).
-8. **Tag snap again** – Same vision snap for better alignment.
-9. **Drive to tower align again** – Same pose as step 7 for fine alignment.
-10. **Climb L1** – `ClimbWhileHeldCommand.ascentToCompletion(climber)` (one full extend L1 → retract cycle), with **15 s** timeout.
-11. **Hold climb until end** – `CmdHoldClimbUntilEnd` keeps climb state until autonomous ends.
+9. **Tag snap again** – Same vision snap for better alignment.
+10. **Drive to tower align again** – Same pose as step 8 for fine alignment.
+11. **Climb L1** – `ClimbWhileHeldCommand.ascentToCompletion(climber)` (one full extend L1 → retract cycle), with **15 s** timeout.
+12. **Hold climb until end** – `CmdHoldClimbUntilEnd` keeps climb state until autonomous ends.
 
-ClimberAuto uses **no PathPlanner paths**; all motion is **drive-to-pose** via `CmdDriveToPose`. Build logic: `AutoRoutines.buildClimberAuto()`; registration: `AutoConfigurator.registerFullAutos()`.
+ClimberAuto uses **no PathPlanner paths**; all motion is **drive-to-pose** via `CmdDriveToPose`. Build logic: `AutoRoutines.buildClimberAuto()`; registration: `AutoConfigurator.registerFullAutos()`. For a detailed walkthrough, see [ClimberAuto walkthrough](climber_auto_walkthrough.md).
 
 ---
 
@@ -92,6 +93,7 @@ Defined in `AutoConstants.java`; used by the commands above.
 | `DEFAULT_PATH_TIMEOUT`           | 10.0 s  | Path following               |
 | `DEFAULT_POSE_TIMEOUT`            | 5.0 s   | Drive-to-pose                |
 | `DEFAULT_HEADING_TIMEOUT`         | 3.0 s   | Snap to heading              |
+| `DEFAULT_INTAKE_DEPLOY_TIMEOUT`   | 2.0 s   | Lower intake before hub aim  |
 | `DEFAULT_CLIMB_TIMEOUT`           | 15.0 s  | L1 climb cycle               |
 | `DEFAULT_XY_TOLERANCE`           | 0.1 m   | Position tolerance           |
 | `DEFAULT_ROTATION_TOLERANCE`      | 5°      | Heading tolerance            |
