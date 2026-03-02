@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Auto.AutoRoutine;
 import frc.robot.Auto.commands.AutoConstants;
@@ -315,11 +316,24 @@ public class AutoConfigurator {
             DeployableIntake intake,
             Climber climber,
             PositionTracker positionTracker) {
-        
+
+        // Minimal test auto: seed at A (POS_1), pathfind to B (shot position). Use to verify PathPlanner/AutoBuilder.
+        Pose2d startA = startPoses.get(StartPoseId.POS_1);
+        Command driveAToBTest = Commands.sequence(
+                CmdSeedOdometryFromStartPose.create(StartPoseId.POS_1, startPoses, m_drivetrain),
+                new CmdDriveToPose(
+                        m_drivetrain,
+                        Landmarks::OurShotPosition,
+                        AutoConstants.DEFAULT_XY_TOLERANCE,
+                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                        AutoConstants.DEFAULT_POSE_TIMEOUT))
+                .withName("PathPlannerTest-AtoB");
+        m_autoManager.addRoutine(new AutoRoutine("PathPlanner Test (A→B)", driveAToBTest, List.of(), startA));
+
         if (vision == null || shooter == null || feeder == null) {
-            return; // Need core subsystems for autos
+            return; // Need core subsystems for remaining autos
         }
-        
+
         StartPoseId defaultPose = StartPoseId.POS_1;
         String pathToShot = MoleculeTests.getPathNameForPose(defaultPose, "StartToShot");
         String pathToCenter = MoleculeTests.getPathNameForPose(defaultPose, "StartToCenter");

@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Auto.AutoManager;
+import frc.robot.Logging.RobotLogger;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA.TunerSwerveDrivetrain;
 
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
@@ -238,7 +239,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private void configureAutoBuilder() {
         try {
+            RobotLogger.log("[PathPlanner] Loading RobotConfig.fromGUISettings()...");
+            System.out.println("[PathPlanner] Loading RobotConfig.fromGUISettings()...");
             var config = RobotConfig.fromGUISettings();
+            RobotLogger.log("[PathPlanner] RobotConfig loaded; configuring AutoBuilder...");
+            System.out.println("[PathPlanner] RobotConfig loaded; configuring AutoBuilder...");
             AutoBuilder.configure(
                     () -> getState().Pose, // Supplier of current robot pose
                     this::resetPose, // Consumer for seeding pose against auto
@@ -259,9 +264,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                     this // Subsystem for requirements
             );
+            RobotLogger.log("[PathPlanner] AutoBuilder configured successfully");
+            System.out.println("[PathPlanner] AutoBuilder configured successfully");
         } catch (Exception ex) {
             String msg = "Failed to load PathPlanner config and configure AutoBuilder: " + ex.getMessage();
+            RobotLogger.logError(msg);
             DriverStation.reportError(msg, true);
+            System.out.println("[PathPlanner] " + msg);
+            System.out.println("[PathPlanner] Stack trace: " + java.util.Arrays.toString(ex.getStackTrace()));
         }
     }
 
@@ -477,6 +487,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void setRelativeSpeed(double x, double y, double rot) {
         var chassisSpeeds = new ChassisSpeeds(x, y, rot);
         this.setControl(m_autoRequest.withSpeeds(chassisSpeeds));
+    }
+
+    /**
+     * Applies robot-relative chassis speeds (for use by auto commands, e.g. simple drive-to-pose fallback).
+     */
+    public void applyChassisSpeeds(ChassisSpeeds robotRelativeSpeeds) {
+        this.setControl(m_autoRequest.withSpeeds(robotRelativeSpeeds));
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

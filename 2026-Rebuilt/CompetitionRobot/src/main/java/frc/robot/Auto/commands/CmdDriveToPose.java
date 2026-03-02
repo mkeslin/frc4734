@@ -76,17 +76,24 @@ public class CmdDriveToPose extends Command {
         Pose2d targetPose = targetPoseSupplier.get();
         if (targetPose == null) {
             RobotLogger.logError("[CmdDriveToPose] targetPose is null; skipping pathfinding");
+            System.out.println("[CmdDriveToPose] targetPose is null; skipping pathfinding");
             return;
         }
+        RobotLogger.log("[CmdDriveToPose] Attempting pathfind to (" + targetPose.getX() + ", " + targetPose.getY() + ")");
+        System.out.println("[CmdDriveToPose] Attempting pathfind to (" + targetPose.getX() + ", " + targetPose.getY() + ")");
         try {
             pathfindingCommand = drivetrain.moveToPose(targetPose)
                     .withTimeout(timeoutSec)
                     .withName("CmdDriveToPose");
             pathfindingCommand.initialize();
+            RobotLogger.log("[CmdDriveToPose] Pathfinding command initialized successfully");
+            System.out.println("[CmdDriveToPose] Pathfinding command initialized successfully");
         } catch (Exception e) {
             String msg = "[CmdDriveToPose] Pathfinding failed (is AutoBuilder configured?): " + e.getMessage();
             RobotLogger.logError(msg);
             DriverStation.reportError(msg, true);
+            System.out.println(msg);
+            System.out.println("[CmdDriveToPose] Stack trace: " + java.util.Arrays.toString(e.getStackTrace()));
         }
     }
 
