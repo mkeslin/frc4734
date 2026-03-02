@@ -1,13 +1,14 @@
 package frc.robot;
 
-import static frc.robot.Constants.DigitalInputIds.CORAL_ARM_SENSOR;
-import static frc.robot.Constants.DigitalInputIds.CORAL_TRAY_SENSOR;
+// DIO not wired yet - uncomment when coral tray/arm sensors are connected
+// import static frc.robot.Constants.DigitalInputIds.CORAL_ARM_SENSOR;
+// import static frc.robot.Constants.DigitalInputIds.CORAL_TRAY_SENSOR;
 import static frc.robot.Constants.VisionConstants.APRILTAG_PIPELINE;
 import static frc.robot.Constants.VisionConstants.CAMERA_NAME;
 
 import java.util.Objects;
 
-import edu.wpi.first.wpilibj.DigitalInput;
+// import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Commands.RobotContext;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
@@ -33,9 +34,10 @@ public class SubsystemFactory {
     private final ShooterHood m_shooterHood;
     // private final Lights m_lights;
     private final PhotonVision m_photonVision;
+    // DIO not wired yet - uncomment when coral tray/arm sensors are connected
     // private final DigitalInput m_coralTraySensor;
     // private final DigitalInput m_coralArmSensor;
-    // private final PositionTracker m_positionTracker;
+    private final PositionTracker m_positionTracker;
     // private final StateMachine m_stateMachine;
     // private final RobotContext m_robotContext;
     private final CommandSwerveDrivetrain m_drivetrain;
@@ -58,34 +60,31 @@ public class SubsystemFactory {
         m_shooterHood = new ShooterHood();
         // m_lights = new Lights();
 
-        // Create sensors
+        // DIO not wired yet - use stub suppliers so getCoralInTray/getCoralInArm return false until sensors are connected
         // m_coralTraySensor = new DigitalInput(CORAL_TRAY_SENSOR);
         // m_coralArmSensor = new DigitalInput(CORAL_ARM_SENSOR);
 
         // Create PhotonVision camera
         m_photonVision = new PhotonVision(CAMERA_NAME, APRILTAG_PIPELINE);
 
-        // Create PositionTracker with all actual suppliers
-        // Method references will work correctly since subsystems are now created
-        // m_positionTracker = new PositionTracker(
-        //         m_climber::getPosition,
-        //         m_coralTraySensor::get,
-        //         m_coralArmSensor::get,
-        //         m_deployableIntake::getDeployPosition,
-        //         m_deployableIntake::getIntakeSpeed,
-        //         m_floor::getSpeed,
-        //         m_feeder::getSpeed,
-        //         m_shooter::getSpeed
-        // );
+        // PositionTracker: real mechanism suppliers; stub sensor suppliers until DIO is wired
+        m_positionTracker = new PositionTracker(
+                m_climber::getPosition,
+                () -> true,  // Stub: sensor "not triggered" -> getCoralInTray() = false
+                () -> true,  // Stub: sensor "not triggered" -> getCoralInArm() = false
+                m_deployableIntake::getDeployPosition,
+                m_deployableIntake::getIntakeSpeed,
+                m_floor::getSpeed,
+                m_feeder::getSpeed,
+                m_shooter::getSpeed
+        );
 
-        // Set PositionTracker on all subsystems
-        // This ensures all subsystems share the same PositionTracker instance with real suppliers,
-        // allowing them to query each other's state correctly
-        // m_climber.setPositionTracker(m_positionTracker);
-        // m_deployableIntake.setPositionTracker(m_positionTracker);
-        // m_floor.setPositionTracker(m_positionTracker);
-        // m_feeder.setPositionTracker(m_positionTracker);
-        // m_shooter.setPositionTracker(m_positionTracker);
+        // Share PositionTracker with subsystems that need it for state/telemetry
+        m_climber.setPositionTracker(m_positionTracker);
+        m_deployableIntake.setPositionTracker(m_positionTracker);
+        m_floor.setPositionTracker(m_positionTracker);
+        m_feeder.setPositionTracker(m_positionTracker);
+        m_shooter.setPositionTracker(m_positionTracker);
 
         // Create state machine (loads states automatically in constructor)
         // m_stateMachine = new StateMachine();
@@ -135,9 +134,9 @@ public class SubsystemFactory {
         return m_photonVision;
     }
 
-    // public PositionTracker getPositionTracker() {
-    //     return m_positionTracker;
-    // }
+    public PositionTracker getPositionTracker() {
+        return m_positionTracker;
+    }
 
     // public StateMachine getStateMachine() {
     //     return m_stateMachine;
@@ -190,12 +189,8 @@ public class SubsystemFactory {
             m_photonVision.cleanup();
         }
 
-        // Close sensors
-        // if (m_coralTraySensor != null) {
-        //     m_coralTraySensor.close();
-        // }
-        // if (m_coralArmSensor != null) {
-        //     m_coralArmSensor.close();
-        // }
+        // DIO not wired yet
+        // if (m_coralTraySensor != null) m_coralTraySensor.close();
+        // if (m_coralArmSensor != null) m_coralArmSensor.close();
     }
 }

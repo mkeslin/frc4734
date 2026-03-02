@@ -100,9 +100,9 @@ public class RobotContainer {
                 m_subsystemFactory.getPhotonVision(),
                 m_subsystemFactory.getShooter(),
                 m_subsystemFactory.getFeeder(),
-                null,  // intake
+                m_subsystemFactory.getDeployableIntake(),
                 m_subsystemFactory.getClimber(),
-                null   // positionTracker
+                m_subsystemFactory.getPositionTracker()
         );
 
         // Seed field-centric pose
