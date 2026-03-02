@@ -5,8 +5,10 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Logging.RobotLogger;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /**
@@ -70,12 +72,21 @@ public class CmdDriveToPose extends Command {
     public void initialize() {
         timer.reset();
         timer.start();
+        pathfindingCommand = null;
         Pose2d targetPose = targetPoseSupplier.get();
-        if (targetPose != null) {
+        if (targetPose == null) {
+            RobotLogger.logError("[CmdDriveToPose] targetPose is null; skipping pathfinding");
+            return;
+        }
+        try {
             pathfindingCommand = drivetrain.moveToPose(targetPose)
                     .withTimeout(timeoutSec)
                     .withName("CmdDriveToPose");
             pathfindingCommand.initialize();
+        } catch (Exception e) {
+            String msg = "[CmdDriveToPose] Pathfinding failed (is AutoBuilder configured?): " + e.getMessage();
+            RobotLogger.logError(msg);
+            DriverStation.reportError(msg, true);
         }
     }
 
@@ -88,11 +99,14 @@ public class CmdDriveToPose extends Command {
 
     @Override
     public boolean isFinished() {
+        if (pathfindingCommand == null) {
+            return true; // Init failed or no target; don't block the sequence
+        }
         if (timer.hasElapsed(timeoutSec)) {
             return true;
         }
 
-        if (pathfindingCommand != null && pathfindingCommand.isFinished()) {
+        if (pathfindingCommand.isFinished()) {
             // Check if we're actually at the pose (pathfinding may finish early)
             Pose2d currentPose = drivetrain.getPose();
             Pose2d targetPose = targetPoseSupplier.get();

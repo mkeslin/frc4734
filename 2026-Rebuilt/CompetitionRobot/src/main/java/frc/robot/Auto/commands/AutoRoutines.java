@@ -111,8 +111,8 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // 3. Drive to shot pose (parallel: spin up shooter)
-                Commands.parallel(
+                // 3. Drive to shot pose (shooter spins up until drive finishes)
+                Commands.deadline(
                         new CmdDriveToPose(
                                 drivetrain,
                                 () -> shotPose,
@@ -245,8 +245,8 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // 3. Follow path to shot (parallel: spin up shooter)
-                Commands.parallel(
+                // 3. Follow path to shot (shooter spins up until path finishes)
+                Commands.deadline(
                         new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
 
@@ -259,16 +259,16 @@ public class AutoRoutines {
                 // 6. Shoot for time
                 CmdShootForTime.create(shooter, feeder, shootDuration),
 
-                // 7. Follow path to center (parallel: intake on)
-                Commands.parallel(
+                // 7. Follow path to center (intake on until path finishes)
+                Commands.deadline(
                         new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
                         CmdIntakeOn.create(intake)),
 
                 // 8. Intake until count (or time-based)
                 CmdIntakeUntilCount.create(intake, positionTracker, targetBallCount),
 
-                // 9. Follow path back to shot (parallel: spin up shooter)
-                Commands.parallel(
+                // 9. Follow path back to shot (shooter spins up until path finishes)
+                Commands.deadline(
                         new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
 
