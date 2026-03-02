@@ -36,6 +36,7 @@ import frc.robot.Auto.commands.CmdWaitShooterAtSpeed;
 import frc.robot.Auto.commands.ShotMode;
 import frc.robot.Auto.commands.StartPoseId;
 import frc.robot.Constants.FeederConstants.FeederSpeed;
+import frc.robot.PathPlanner.BlueLandmarks;
 import frc.robot.PathPlanner.Landmarks;
 import frc.robot.autotest.AutoTestHarness;
 import frc.robot.autotest.AutoTestShuffleboard;
@@ -318,12 +319,14 @@ public class AutoConfigurator {
             PositionTracker positionTracker) {
 
         // Minimal test auto: seed at A (POS_1), pathfind to B (shot position). Use to verify PathPlanner/AutoBuilder.
+        // PathPlanner pathfinding uses the nav grid in blue-origin coordinates; pass blue target so the goal is inside the grid.
+        // AutoBuilder flips the path for red alliance when the flip supplier returns true.
         Pose2d startA = startPoses.get(StartPoseId.POS_1);
         Command driveAToBTest = Commands.sequence(
                 CmdSeedOdometryFromStartPose.create(StartPoseId.POS_1, startPoses, m_drivetrain),
                 new CmdDriveToPose(
                         m_drivetrain,
-                        Landmarks::OurShotPosition,
+                        () -> BlueLandmarks.ShotPosition,
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT))

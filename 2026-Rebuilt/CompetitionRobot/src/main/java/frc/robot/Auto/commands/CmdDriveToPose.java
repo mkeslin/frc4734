@@ -135,6 +135,9 @@ public class CmdDriveToPose extends Command {
     @Override
     public void end(boolean interrupted) {
         timer.stop();
+        double elapsed = timer.get();
+        RobotLogger.log(String.format("[CmdDriveToPose] end interrupted=%b elapsed=%.2fs", interrupted, elapsed));
+        System.out.println(String.format("[CmdDriveToPose] end interrupted=%b elapsed=%.2fs", interrupted, elapsed));
         if (pathfindingCommand != null) {
             pathfindingCommand.end(interrupted);
         }
