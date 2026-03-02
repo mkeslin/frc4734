@@ -26,6 +26,10 @@ public final class AutoConstants {
     public static final double DEFAULT_INTAKE_TIMEOUT = 5.0;
     /** Timeout for deploying (lowering) intake so webcam is unblocked before hub aim. */
     public static final double DEFAULT_INTAKE_DEPLOY_TIMEOUT = 2.0;
+    /** Distance (m) to drive forward after tower align to acquire the bar before climbing. */
+    public static final double DEFAULT_CLIMB_ACQUIRE_DISTANCE_METERS = 0.2;
+    /** Timeout for the drive-forward-to-acquire-bar step. */
+    public static final double DEFAULT_CLIMB_ACQUIRE_TIMEOUT = 3.0;
     public static final double DEFAULT_CLIMB_TIMEOUT = 15.0;
     public static final double DEFAULT_ODOMETRY_SEED_TIMEOUT = 1.0;
 
@@ -41,6 +45,11 @@ public final class AutoConstants {
     // Heading control
     public static final int DEFAULT_STABLE_FRAMES = 10; // frames at target before considered stable
     public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
+
+    /** TEMPORARY: shooter target speed (RPS) for low-ceiling room testing. Revert to 3000 and 100 tolerance for competition. */
+    public static final double TEMPORARY_SHOOTER_TARGET_SPEED = 20.0;
+    /** TEMPORARY: tolerance for at-speed check when using low-ceiling speed. */
+    public static final double TEMPORARY_SHOOTER_TOLERANCE = 5.0;
 
     // Hub position (field-relative, blue alliance origin). From 2026 field diagram: blue diamond plate center 197.61", 158.845" (m)
     public static final Pose2d HUB_POSE = new Pose2d(

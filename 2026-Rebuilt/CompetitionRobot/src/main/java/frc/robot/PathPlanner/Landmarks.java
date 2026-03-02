@@ -1,6 +1,8 @@
 package frc.robot.PathPlanner;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Auto.commands.StartPoseId;
 
 /**
@@ -53,6 +55,22 @@ public class Landmarks {
      */
     public static Pose2d OurShotPosition() {
         return AllianceUtils.getAlliancePose(BlueLandmarks.ShotPosition);
+    }
+
+    /**
+     * Shot pose equidistant between start and tower align: midpoint of the two positions,
+     * with rotation facing the hub so the robot can aim and shoot.
+     * Used by ClimberAuto so shot position depends on start and selected climb side.
+     *
+     * @param startPose Start pose (e.g. OurStart1() for this routine)
+     * @param towerAlignPose Tower align pose for selected climb side (OurTowerAlignLeft() or OurTowerAlignRight())
+     * @return Pose at midpoint, facing the hub
+     */
+    public static Pose2d midpointShotPose(Pose2d startPose, Pose2d towerAlignPose) {
+        Translation2d mid = startPose.getTranslation().plus(towerAlignPose.getTranslation()).div(2);
+        Translation2d hub = OurHub().getTranslation();
+        Rotation2d towardHub = hub.minus(mid).getAngle();
+        return new Pose2d(mid, towardHub);
     }
 
     /**

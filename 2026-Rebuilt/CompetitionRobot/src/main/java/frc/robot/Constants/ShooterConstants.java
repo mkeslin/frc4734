@@ -14,8 +14,8 @@ public class ShooterConstants {
      */
     public static enum ShooterSpeed {
         STOPPED(0),
-        /** RPS for shooting; tune for desired shot distance. */
-        FORWARD(500),//24.0),
+        /** RPS for shooting; tune for desired shot distance. TEMPORARY: 20 for low-ceiling room testing; revert to 500 (or 24.0) for competition. */
+        FORWARD(20),
         /** RPS for reverse (e.g. unjam); tune as needed. */
         REVERSE(-80.0);
 

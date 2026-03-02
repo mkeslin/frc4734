@@ -20,7 +20,7 @@ Shoot the preload, drive to the tower, climb once (L1), then hold until autonomo
 
 3. **Drive to shot pose (with shooter spin-up)**  
    - **Deadline:** The “drive to shot” command is the main one; “shooter spin-up” runs until that drive finishes.  
-   - **Drive:** `CmdDriveToPose` to `Landmarks.OurShotPosition()` (in front of hub, facing hub). Tolerances: 0.1 m XY, 5° rotation; timeout 5 s.  
+   - **Drive:** `CmdDriveToPose` to the **midpoint** between the start pose and the tower align pose for the selected climb side (`Landmarks.midpointShotPose(start, towerAlign)`), so the shot position is equidistant from start and tower; rotation faces the hub. Tolerances: 0.1 m XY, 5° rotation; timeout 5 s.  
    - **Shooter:** Spins to 3000 RPM while driving.  
    When the robot reaches the shot pose (or times out), this step ends.
 
@@ -48,17 +48,20 @@ Shoot the preload, drive to the tower, climb once (L1), then hold until autonomo
 10. **Drive to tower align again**  
     Same tower align pose as step 8, for a second, finer alignment.
 
-11. **Climb L1**  
+11. **Drive forward to acquire bar**  
+    The align pose stops the robot at the bar; the climber must then move forward a short distance to actually acquire (grab) the bar. `CmdDriveForward` drives forward **0.2 m** (configurable) along the current heading. Timeout **3 s**.
+
+12. **Climb L1**  
     `ClimbWhileHeldCommand.ascentToCompletion(climber)`: one full L1 cycle (extend then retract). Timeout **15 s**.
 
-12. **Hold climb until end**  
+13. **Hold climb until end**  
     `CmdHoldClimbUntilEnd`: keeps the climber in its current state until autonomous ends.
 
 ---
 
 ## Summary
 
-**ClimberAuto (Left)** = start at left → (optional tag snap) → drive to shot + spin shooter → **lower intake** → aim at hub → wait for speed → shoot 1 s → drive to tower (side from chooser) → tag snap → drive to tower again → climb L1 (15 s max) → hold until auto end.
+**ClimberAuto (Left)** = start at left → (optional tag snap) → drive to **midpoint shot** + spin shooter → **lower intake** → aim at hub → wait for speed → shoot 1 s → drive to tower (side from chooser) → tag snap → drive to tower again → **drive forward to acquire bar** → climb L1 (15 s max) → hold until auto end.
 
 ---
 
@@ -68,6 +71,7 @@ From `AutoConstants` / config:
 
 - **Pose:** 0.1 m XY tolerance, 5° rotation, 5 s drive timeout.  
 - **Shooter:** 3000 RPM, ±100 tolerance, 1.0 s shoot.  
+- **Climb acquire:** 0.2 m forward, 3 s timeout.  
 - **Climb:** 15 s timeout.  
 - **Tag snap:** max ambiguity 0.2, max distance 5 m, min 2 targets.
 

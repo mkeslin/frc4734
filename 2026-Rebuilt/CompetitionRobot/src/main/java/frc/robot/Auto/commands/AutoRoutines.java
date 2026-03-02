@@ -46,7 +46,7 @@ public class AutoRoutines {
      * <ol>
      *   <li>Seeds odometry from start pose</li>
      *   <li>Applies tag snap if vision quality is good</li>
-     *   <li>Drives to shot position (parallel: spins up shooter)</li>
+     *   <li>Drives to shot position (midpoint between start and tower align; parallel: spins up shooter)</li>
      *   <li>Lowers intake if present (deploy so webcam is not blocked)</li>
      *   <li>Acquires hub aim</li>
      *   <li>Waits for shooter at speed</li>
@@ -54,13 +54,14 @@ public class AutoRoutines {
      *   <li>Drives to tower align pose</li>
      *   <li>Applies tag snap before final alignment</li>
      *   <li>Drives to tower align pose again (fine alignment)</li>
+     *   <li>Drives forward a short distance to acquire the bar</li>
      *   <li>Climbs L1 (with timeout)</li>
      *   <li>Holds climb until auto end</li>
      * </ol>
      * 
      * @param id Start pose identifier
      * @param startPoses Map of start pose IDs to their Pose2d values
-     * @param shotPose Target pose for shooting (e.g. Landmarks.OurShotPosition())
+     * @param shotPoseSupplier Supplier of target pose for shooting (e.g. midpoint of start and tower align)
      * @param towerAlignPose Supplier of target pose for tower/climb (e.g. from Shuffleboard climb-side chooser)
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
      * @param targetRpm Target shooter RPM
@@ -78,7 +79,7 @@ public class AutoRoutines {
     public static Command buildClimberAuto(
             StartPoseId id,
             Map<StartPoseId, Pose2d> startPoses,
-            Pose2d shotPose,
+            Supplier<Pose2d> shotPoseSupplier,
             Supplier<Pose2d> towerAlignPose,
             double fallbackHeadingDeg,
             double targetRpm,
@@ -93,7 +94,7 @@ public class AutoRoutines {
         
         Objects.requireNonNull(id, "id cannot be null");
         Objects.requireNonNull(startPoses, "startPoses cannot be null");
-        Objects.requireNonNull(shotPose, "shotPose cannot be null");
+        Objects.requireNonNull(shotPoseSupplier, "shotPoseSupplier cannot be null");
         Objects.requireNonNull(towerAlignPose, "towerAlignPose cannot be null");
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
         Objects.requireNonNull(vision, "vision cannot be null");
@@ -119,7 +120,7 @@ public class AutoRoutines {
                 Commands.deadline(
                         new CmdDriveToPose(
                                 drivetrain,
-                                () -> shotPose,
+                                shotPoseSupplier,
                                 AutoConstants.DEFAULT_XY_TOLERANCE,
                                 AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                                 AutoConstants.DEFAULT_PATH_TIMEOUT),
@@ -164,11 +165,17 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 11. One climb cycle (extend L1 → retract), then end
+                // 11. Drive forward to acquire the bar (align pose stops at bar; short move to grab)
+                new CmdDriveForward(
+                        drivetrain,
+                        AutoConstants.DEFAULT_CLIMB_ACQUIRE_DISTANCE_METERS,
+                        AutoConstants.DEFAULT_CLIMB_ACQUIRE_TIMEOUT),
+
+                // 12. One climb cycle (extend L1 → retract), then end
                 ClimbWhileHeldCommand.ascentToCompletion(climber)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
-                // 12. Hold climb until end
+                // 13. Hold climb until end
                 new CmdHoldClimbUntilEnd(climber, drivetrain)
         ).withName("ClimberAuto");
     }

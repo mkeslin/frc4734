@@ -36,7 +36,7 @@ Landmarks and paths are **alliance-aware**: `Landmarks` uses `AllianceUtils` so 
 1. **Seed odometry** – Set pose to the chosen start (Left/Middle/Right from `Landmarks.OurStart1()`, `OurStart2()`, or `OurStart3()`).
 2. **Tag snap (if good)** – If vision sees enough AprilTags with low ambiguity and within 5 m, snap pose once. Uses `AutoConstants` (e.g. max ambiguity 0.2, min 2 targets).
 3. **Drive to shot pose (with shooter spin-up)** – In parallel:
-   - **CmdDriveToPose** to `Landmarks.OurShotPosition()` (in front of hub, facing hub). XY tolerance 0.1 m, rotation 5°, pose timeout 5 s.
+   - **CmdDriveToPose** to the **midpoint** between the start pose and the tower align pose for the selected climb side (`Landmarks.midpointShotPose(start, towerAlign)`), so the shot is equidistant from start and tower. XY tolerance 0.1 m, rotation 5°, pose timeout 5 s.
    - **CmdShooterSpinUp** to 3000 RPM.
 4. **Lower intake** – Deploy (lower) the intake so it does not block the webcam; if no intake subsystem is present, this step is skipped. Timeout 2 s.
 5. **Acquire hub aim** – Vision-based heading to hub; fallback heading 180° if no target.
@@ -48,8 +48,9 @@ Landmarks and paths are **alliance-aware**: `Landmarks` uses `AllianceUtils` so 
    Pose is “back into circle end of tower bar” (e.g. 270° in blue).
 9. **Tag snap again** – Same vision snap for better alignment.
 10. **Drive to tower align again** – Same pose as step 8 for fine alignment.
-11. **Climb L1** – `ClimbWhileHeldCommand.ascentToCompletion(climber)` (one full extend L1 → retract cycle), with **15 s** timeout.
-12. **Hold climb until end** – `CmdHoldClimbUntilEnd` keeps climb state until autonomous ends.
+11. **Drive forward to acquire bar** – `CmdDriveForward`: robot drives forward a short distance (default 0.2 m) along its current heading to move into the bar and acquire it; align pose stops at the bar, this step completes the approach. Timeout 3 s.
+12. **Climb L1** – `ClimbWhileHeldCommand.ascentToCompletion(climber)` (one full extend L1 → retract cycle), with **15 s** timeout.
+13. **Hold climb until end** – `CmdHoldClimbUntilEnd` keeps climb state until autonomous ends.
 
 ClimberAuto uses **no PathPlanner paths**; all motion is **drive-to-pose** via `CmdDriveToPose`. Build logic: `AutoRoutines.buildClimberAuto()`; registration: `AutoConfigurator.registerFullAutos()`. For a detailed walkthrough, see [ClimberAuto walkthrough](climber_auto_walkthrough.md).
 
@@ -94,6 +95,8 @@ Defined in `AutoConstants.java`; used by the commands above.
 | `DEFAULT_POSE_TIMEOUT`            | 5.0 s   | Drive-to-pose                |
 | `DEFAULT_HEADING_TIMEOUT`         | 3.0 s   | Snap to heading              |
 | `DEFAULT_INTAKE_DEPLOY_TIMEOUT`   | 2.0 s   | Lower intake before hub aim  |
+| `DEFAULT_CLIMB_ACQUIRE_DISTANCE_METERS` | 0.2 m | Drive forward to acquire bar |
+| `DEFAULT_CLIMB_ACQUIRE_TIMEOUT`   | 3.0 s   | Drive-forward-to-acquire timeout |
 | `DEFAULT_CLIMB_TIMEOUT`           | 15.0 s  | L1 climb cycle               |
 | `DEFAULT_XY_TOLERANCE`           | 0.1 m   | Position tolerance           |
 | `DEFAULT_ROTATION_TOLERANCE`      | 5°      | Heading tolerance            |

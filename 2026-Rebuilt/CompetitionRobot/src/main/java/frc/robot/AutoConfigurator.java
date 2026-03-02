@@ -181,10 +181,10 @@ public class AutoConfigurator {
                         AutoConstants.DEFAULT_POSE_TIMEOUT));
         
         // Shooter commands (on / reverse / off for testing)
-        // Use arbitrary speed in RPS so test is visible; ShooterSpeed.FORWARD (0.5 RPS) is too low to see.
+        // TEMPORARY: use low speed for low-ceiling room; revert to 3000.0 and 30.0 for competition.
         if (shooter != null) {
-            Supplier<Double> testRpm = () -> 3000.0; // Test RPM
-            double testShooterRps = 30.0; // RPS for ShooterOn/Reverse (visible; TalonFX velocity = rotations/sec)
+            Supplier<Double> testRpm = () -> AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED;
+            double testShooterRps = AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED; // RPS (TalonFX velocity = rotations/sec)
             m_testHarness.registerAtom("ShooterOn", () -> 
                     shooter.moveToArbitrarySpeedCommand(() -> testShooterRps));
             m_testHarness.registerAtom("ShooterReverse", () -> 
@@ -194,7 +194,7 @@ public class AutoConfigurator {
             m_testHarness.registerAtom("ShooterSpinUp", () -> 
                     new CmdShooterSpinUp(shooter, testRpm));
             m_testHarness.registerAtom("WaitShooterAtSpeed", () -> 
-                    CmdWaitShooterAtSpeed.create(shooter, testRpm, 100.0));
+                    CmdWaitShooterAtSpeed.create(shooter, testRpm, AutoConstants.TEMPORARY_SHOOTER_TOLERANCE));
             m_testHarness.registerAtom("SetShotMode", () -> 
                     new CmdSetShotMode(shooter, ShotMode.AUTO_SHOT));
             if (feeder != null) {
@@ -286,8 +286,8 @@ public class AutoConfigurator {
             m_testHarness.registerMolecule("Path+SpinUp->Shoot", () -> 
                     MoleculeTests.buildPathSpinupShoot(
                             pathToShot,
-                            3000.0, // Test RPM
-                            100.0, // RPM tolerance
+                            AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
+                            AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
                             1.0, // Shoot duration
                             m_drivetrain,
                             shooter,
@@ -342,9 +342,8 @@ public class AutoConfigurator {
         String pathToCenter = MoleculeTests.getPathNameForPose(defaultPose, "StartToCenter");
         String pathBackToShot = MoleculeTests.getPathNameForPose(defaultPose, "CenterToShot");
 
-        Pose2d shotPose = Landmarks.OurShotPosition();
-
         // Climber Auto: three start positions; tower side is chosen via Shuffleboard "Climb Side" (center not usable)
+        // Shot pose is midpoint between start and tower align so it is equidistant for each routine.
         if (climber != null) {
             Supplier<Pose2d> towerAlignPoseSupplier = () -> {
                 ClimbSide side = m_climbSideChooser.getSelected();
@@ -352,14 +351,15 @@ public class AutoConfigurator {
             };
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_2, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : (startId == StartPoseId.POS_2 ? "Middle" : "Right");
+                Supplier<Pose2d> shotPoseSupplier = () -> Landmarks.midpointShotPose(startPoses.get(startId), towerAlignPoseSupplier.get());
                 Command climberAuto = AutoRoutines.buildClimberAuto(
                         startId,
                         startPoses,
-                        shotPose,
+                        shotPoseSupplier,
                         towerAlignPoseSupplier,
                         AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
-                        3000.0, // Target RPM
-                        100.0, // RPM tolerance
+                        AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
+                        AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
                         1.0, // Shoot duration
                         m_drivetrain,
                         vision,
@@ -384,8 +384,8 @@ public class AutoConfigurator {
                     pathToCenter,
                     pathBackToShot,
                     AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
-                    3000.0, // Target RPM
-                    100.0, // RPM tolerance
+                    AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
+                    AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
                     1.0, // Shoot duration
                     1, // Target ball count
                     m_drivetrain,
