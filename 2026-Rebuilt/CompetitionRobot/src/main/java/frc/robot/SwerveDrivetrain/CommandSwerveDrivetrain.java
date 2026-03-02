@@ -25,6 +25,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.PathPlanner.AllianceUtils;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -515,14 +516,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // return run(() -> setVoltage(voltage)).andThen(this::stop).withTimeout(time);
     // }
 
+    /**
+     * Returns a command that pathfinds to the given pose.
+     * PathPlanner uses blue-origin coordinates; the pose is converted to blue when on red alliance.
+     */
     public Command moveToPose(Pose2d pose) {
+        Pose2d targetBlue = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
+                ? AllianceUtils.redToBlue(pose)
+                : pose;
         var constraints = new PathConstraints(
                 frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxSpeed,
                 frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxAcceleration,
                 frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxAngularRate,
                 frc.robot.SwerveDrivetrain.DrivetrainConstants.kMaxAngularAcceleration
         );
-        return AutoBuilder.pathfindToPose(pose, constraints, 0);
+        return AutoBuilder.pathfindToPose(targetBlue, constraints, 0);
     }
 
     public void moveForwardRobot(double distance) {
