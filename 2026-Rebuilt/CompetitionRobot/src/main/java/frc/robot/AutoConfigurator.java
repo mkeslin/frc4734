@@ -343,15 +343,16 @@ public class AutoConfigurator {
         String pathBackToShot = MoleculeTests.getPathNameForPose(defaultPose, "CenterToShot");
 
         // Climber Auto: three start positions; tower side is chosen via Shuffleboard "Climb Side" (center not usable)
-        // Shot pose is midpoint between start and tower align so it is equidistant for each routine.
+        // Shot and tower poses in blue so pathfinding always gets blue-origin coordinates.
         if (climber != null) {
             Supplier<Pose2d> towerAlignPoseSupplier = () -> {
                 ClimbSide side = m_climbSideChooser.getSelected();
-                return (side == ClimbSide.RIGHT) ? Landmarks.OurTowerAlignRight() : Landmarks.OurTowerAlignLeft();
+                return (side == ClimbSide.RIGHT) ? BlueLandmarks.TowerAlignRight : BlueLandmarks.TowerAlignLeft;
             };
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_2, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : (startId == StartPoseId.POS_2 ? "Middle" : "Right");
-                Supplier<Pose2d> shotPoseSupplier = () -> Landmarks.midpointShotPose(startPoses.get(startId), towerAlignPoseSupplier.get());
+                // Blue coordinates so pathfinding always gets a target inside the nav grid.
+                Supplier<Pose2d> shotPoseSupplier = () -> Landmarks.midpointShotPoseBlue(startId, m_climbSideChooser.getSelected());
                 Command climberAuto = AutoRoutines.buildClimberAuto(
                         startId,
                         startPoses,

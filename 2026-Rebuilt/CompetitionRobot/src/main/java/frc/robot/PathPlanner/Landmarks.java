@@ -3,6 +3,7 @@ package frc.robot.PathPlanner;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.Auto.commands.ClimbSide;
 import frc.robot.Auto.commands.StartPoseId;
 
 /**
@@ -69,6 +70,25 @@ public class Landmarks {
     public static Pose2d midpointShotPose(Pose2d startPose, Pose2d towerAlignPose) {
         Translation2d mid = startPose.getTranslation().plus(towerAlignPose.getTranslation()).div(2);
         Translation2d hub = OurHub().getTranslation();
+        Rotation2d towardHub = hub.minus(mid).getAngle();
+        return new Pose2d(mid, towardHub);
+    }
+
+    /**
+     * Shot pose in blue coordinates only: midpoint between blue start and blue tower align,
+     * rotation toward blue hub. Use this when the target is passed to PathPlanner pathfinding,
+     * which expects blue-origin coordinates regardless of alliance.
+     *
+     * @param startId Start position (POS_1, POS_2, POS_3)
+     * @param climbSide Selected climb side (LEFT or RIGHT)
+     * @return Pose at midpoint in blue coordinates, facing the hub
+     */
+    public static Pose2d midpointShotPoseBlue(StartPoseId startId, ClimbSide climbSide) {
+        Pose2d blueStart = startId == StartPoseId.POS_1 ? BlueLandmarks.Start1
+                : (startId == StartPoseId.POS_2 ? BlueLandmarks.Start2 : BlueLandmarks.Start3);
+        Pose2d blueTower = (climbSide == ClimbSide.RIGHT) ? BlueLandmarks.TowerAlignRight : BlueLandmarks.TowerAlignLeft;
+        Translation2d mid = blueStart.getTranslation().plus(blueTower.getTranslation()).div(2);
+        Translation2d hub = BlueLandmarks.Hub.getTranslation();
         Rotation2d towardHub = hub.minus(mid).getAngle();
         return new Pose2d(mid, towardHub);
     }

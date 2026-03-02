@@ -6,7 +6,9 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.PathPlanner.AllianceUtils;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Logging.RobotLogger;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -82,7 +84,8 @@ public class CmdDriveToPose extends Command {
         RobotLogger.log("[CmdDriveToPose] Attempting pathfind to (" + targetPose.getX() + ", " + targetPose.getY() + ")");
         System.out.println("[CmdDriveToPose] Attempting pathfind to (" + targetPose.getX() + ", " + targetPose.getY() + ")");
         try {
-            pathfindingCommand = drivetrain.moveToPose(targetPose)
+            // Target is always in blue; pathfinding expects blue-origin coordinates.
+            pathfindingCommand = drivetrain.pathfindToPoseBlue(targetPose)
                     .withTimeout(timeoutSec)
                     .withName("CmdDriveToPose");
             pathfindingCommand.initialize();
@@ -114,18 +117,23 @@ public class CmdDriveToPose extends Command {
         }
 
         if (pathfindingCommand.isFinished()) {
-            // Check if we're actually at the pose (pathfinding may finish early)
             Pose2d currentPose = drivetrain.getPose();
-            Pose2d targetPose = targetPoseSupplier.get();
-            if (targetPose != null && atPose(currentPose, targetPose, xyTol, rotTol)) {
+            Pose2d targetBlue = targetPoseSupplier.get();
+            Pose2d targetForCheck = targetBlue != null && DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+                    ? AllianceUtils.blueToRed(targetBlue)
+                    : targetBlue;
+            if (targetForCheck != null && atPose(currentPose, targetForCheck, xyTol, rotTol)) {
                 return true;
             }
         }
 
         // Also check directly if we're at pose (in case pathfinding finished but we're close)
         Pose2d currentPose = drivetrain.getPose();
-        Pose2d targetPose = targetPoseSupplier.get();
-        if (targetPose != null && atPose(currentPose, targetPose, xyTol, rotTol)) {
+        Pose2d targetBlue = targetPoseSupplier.get();
+        Pose2d targetForCheck = targetBlue != null && DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+                ? AllianceUtils.blueToRed(targetBlue)
+                : targetBlue;
+        if (targetForCheck != null && atPose(currentPose, targetForCheck, xyTol, rotTol)) {
             return true;
         }
 

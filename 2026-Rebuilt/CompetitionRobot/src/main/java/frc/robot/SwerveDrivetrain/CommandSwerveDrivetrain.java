@@ -517,20 +517,30 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // }
 
     /**
-     * Returns a command that pathfinds to the given pose.
-     * PathPlanner uses blue-origin coordinates; the pose is converted to blue when on red alliance.
+     * Returns a command that pathfinds to the given pose in blue coordinates.
+     * Use this when the target is already in PathPlanner's blue-origin frame (e.g. from
+     * Landmarks.midpointShotPoseBlue or BlueLandmarks). PathPlanner will flip the path for red.
      */
-    public Command moveToPose(Pose2d pose) {
-        Pose2d targetBlue = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
-                ? AllianceUtils.redToBlue(pose)
-                : pose;
+    public Command pathfindToPoseBlue(Pose2d poseBlue) {
         var constraints = new PathConstraints(
                 frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxSpeed,
                 frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxAcceleration,
                 frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxAngularRate,
                 frc.robot.SwerveDrivetrain.DrivetrainConstants.kMaxAngularAcceleration
         );
-        return AutoBuilder.pathfindToPose(targetBlue, constraints, 0);
+        return AutoBuilder.pathfindToPose(poseBlue, constraints, 0);
+    }
+
+    /**
+     * Returns a command that pathfinds to the given pose (alliance-relative).
+     * Converts to blue when on red so PathPlanner always receives blue-origin coordinates.
+     * Use for targets that are in current alliance frame (e.g. from CmdDriveForward).
+     */
+    public Command moveToPose(Pose2d pose) {
+        Pose2d targetBlue = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red)
+                ? AllianceUtils.redToBlue(pose)
+                : pose;
+        return pathfindToPoseBlue(targetBlue);
     }
 
     public void moveForwardRobot(double distance) {
