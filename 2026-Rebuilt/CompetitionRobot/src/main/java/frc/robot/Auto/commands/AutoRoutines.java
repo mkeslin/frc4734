@@ -65,7 +65,7 @@ public class AutoRoutines {
      * </ol>
      * 
      * @param id Start pose identifier
-     * @param startPoses Map of start pose IDs to their Pose2d values
+     * @param startPoseSuppliers Map of start pose IDs to suppliers (evaluated at runtime for correct alliance)
      * @param shotPoseSupplier Supplier of target pose for shooting (e.g. midpoint of start and tower align)
      * @param towerAlignPose Supplier of target pose for tower/climb (e.g. from Shuffleboard climb-side chooser)
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
@@ -83,7 +83,7 @@ public class AutoRoutines {
      */
     public static Command buildClimberAuto(
             StartPoseId id,
-            Map<StartPoseId, Pose2d> startPoses,
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
             Supplier<Pose2d> shotPoseSupplier,
             Supplier<Pose2d> towerAlignPose,
             double fallbackHeadingDeg,
@@ -98,7 +98,7 @@ public class AutoRoutines {
             Climber climber) {
         
         Objects.requireNonNull(id, "id cannot be null");
-        Objects.requireNonNull(startPoses, "startPoses cannot be null");
+        Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
         Objects.requireNonNull(shotPoseSupplier, "shotPoseSupplier cannot be null");
         Objects.requireNonNull(towerAlignPose, "towerAlignPose cannot be null");
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
@@ -114,7 +114,7 @@ public class AutoRoutines {
 
         return Commands.sequence(
                 // 1. Seed odometry from start pose
-                CmdSeedOdometryFromStartPose.create(id, startPoses, drivetrain),
+                CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
 
                 // 2. Tag snap (if good)
                 new CmdApplyTagSnapIfGood(
@@ -224,7 +224,7 @@ public class AutoRoutines {
      * </ol>
      * 
      * @param id Start pose identifier
-     * @param startPoses Map of start pose IDs to their Pose2d values
+     * @param startPoseSuppliers Map of start pose IDs to suppliers (evaluated at runtime for correct alliance)
      * @param pathToShot Path name to shooting position
      * @param pathToCenter Path name to center/field position
      * @param pathBackToShot Path name back to shooting position
@@ -244,7 +244,7 @@ public class AutoRoutines {
      */
     public static Command buildShooterAuto(
             StartPoseId id,
-            Map<StartPoseId, Pose2d> startPoses,
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
             String pathToShot,
             String pathToCenter,
             String pathBackToShot,
@@ -261,7 +261,7 @@ public class AutoRoutines {
             PositionTracker positionTracker) {
         
         Objects.requireNonNull(id, "id cannot be null");
-        Objects.requireNonNull(startPoses, "startPoses cannot be null");
+        Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
         Objects.requireNonNull(pathToShot, "pathToShot cannot be null");
         Objects.requireNonNull(pathToCenter, "pathToCenter cannot be null");
         Objects.requireNonNull(pathBackToShot, "pathBackToShot cannot be null");
@@ -276,7 +276,7 @@ public class AutoRoutines {
 
         return Commands.sequence(
                 // 1. Seed odometry
-                CmdSeedOdometryFromStartPose.create(id, startPoses, drivetrain),
+                CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
 
                 // 2. Tag snap
                 new CmdApplyTagSnapIfGood(

@@ -43,7 +43,7 @@ public final class MoleculeTests {
      * applying tag snap for pose correction, and acquiring hub aim.
      * 
      * @param startPoseId Selected start pose
-     * @param startPoses Map of start pose IDs to Pose2d values
+     * @param startPoseSuppliers Map of start pose IDs to suppliers (evaluated at runtime for correct alliance)
      * @param pathName Path name (e.g., "L_StartToShot" for POS_1)
      * @param fallbackHeadingDeg Fallback heading for hub aim
      * @param drivetrain Drivetrain subsystem
@@ -52,21 +52,21 @@ public final class MoleculeTests {
      */
     public static Command buildSeedPathTagSnapAim(
             StartPoseId startPoseId,
-            Map<StartPoseId, Pose2d> startPoses,
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
             String pathName,
             double fallbackHeadingDeg,
             CommandSwerveDrivetrain drivetrain,
             PhotonVision vision) {
         
         Objects.requireNonNull(startPoseId, "startPoseId cannot be null");
-        Objects.requireNonNull(startPoses, "startPoses cannot be null");
+        Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
         Objects.requireNonNull(pathName, "pathName cannot be null");
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
         Objects.requireNonNull(vision, "vision cannot be null");
         
         return Commands.sequence(
                 // 1. Seed odometry
-                CmdSeedOdometryFromStartPose.create(startPoseId, startPoses, drivetrain),
+                CmdSeedOdometryFromStartPose.create(startPoseId, startPoseSuppliers, drivetrain),
                 
                 // 2. Follow path to shot
                 new CmdFollowPath(pathName, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
@@ -134,19 +134,19 @@ public final class MoleculeTests {
      * <p>Tests the complete climb sequence: path to tower, align to pose, climb, and hold.
      * 
      * @param pathName Path name to tower stage
-     * @param alignPose Target pose for alignment
+     * @param alignPoseSupplier Supplier of target pose for alignment (evaluated at runtime for correct alliance)
      * @param drivetrain Drivetrain subsystem
      * @param climber Climber subsystem
      * @return Command sequence
      */
     public static Command buildPathAlignClimb(
             String pathName,
-            Pose2d alignPose,
+            Supplier<Pose2d> alignPoseSupplier,
             CommandSwerveDrivetrain drivetrain,
             Climber climber) {
         
         Objects.requireNonNull(pathName, "pathName cannot be null");
-        Objects.requireNonNull(alignPose, "alignPose cannot be null");
+        Objects.requireNonNull(alignPoseSupplier, "alignPoseSupplier cannot be null");
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
         Objects.requireNonNull(climber, "climber cannot be null");
         
@@ -157,7 +157,7 @@ public final class MoleculeTests {
                 // 2. Drive to alignment pose
                 CmdDriveToPose.create(
                         drivetrain,
-                        () -> alignPose,
+                        alignPoseSupplier,
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),

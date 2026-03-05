@@ -86,11 +86,11 @@ public class AutoConfigurator {
             Climber climber,
             PositionTracker positionTracker) {
         
-        // Create start poses map
-        Map<StartPoseId, Pose2d> startPoses = new HashMap<>();
-        startPoses.put(StartPoseId.POS_1, Landmarks.OurStart1());
-        startPoses.put(StartPoseId.POS_2, Landmarks.OurStart2());
-        startPoses.put(StartPoseId.POS_3, Landmarks.OurStart3());
+        // Start poses evaluated at runtime so alliance is correct when auto runs.
+        Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers = new HashMap<>();
+        startPoseSuppliers.put(StartPoseId.POS_1, Landmarks::OurStart1);
+        startPoseSuppliers.put(StartPoseId.POS_2, Landmarks::OurStart2);
+        startPoseSuppliers.put(StartPoseId.POS_3, Landmarks::OurStart3);
         
         // Create test harness
         m_testHarness = new AutoTestHarness(
@@ -103,13 +103,13 @@ public class AutoConfigurator {
                 positionTracker);
         
         // Register atom commands
-        registerAtoms(startPoses, vision, shooter, feeder, intake, climber, positionTracker);
+        registerAtoms(startPoseSuppliers, vision, shooter, feeder, intake, climber, positionTracker);
         
         // Register molecule tests
-        registerMolecules(startPoses, vision, shooter, feeder, intake, climber);
+        registerMolecules(startPoseSuppliers, vision, shooter, feeder, intake, climber);
         
         // Register full autos
-        registerFullAutos(startPoses, vision, shooter, feeder, intake, climber, positionTracker);
+        registerFullAutos(startPoseSuppliers, vision, shooter, feeder, intake, climber, positionTracker);
         
         // Initialize test harness
         m_testHarness.initialize();
@@ -130,7 +130,7 @@ public class AutoConfigurator {
      * Registers all atom (single command) tests.
      */
     private void registerAtoms(
-            Map<StartPoseId, Pose2d> startPoses,
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
@@ -143,7 +143,7 @@ public class AutoConfigurator {
         
         // Seed Odometry
         m_testHarness.registerAtom("SeedOdometry", () -> 
-                CmdSeedOdometryFromStartPose.create(defaultPose, startPoses, m_drivetrain));
+                CmdSeedOdometryFromStartPose.create(defaultPose, startPoseSuppliers, m_drivetrain));
         
         // Tag Snap
         if (vision != null) {
@@ -160,10 +160,9 @@ public class AutoConfigurator {
         m_testHarness.registerAtom("FollowPath", () -> 
                 new CmdFollowPath(defaultPath, AutoConstants.DEFAULT_PATH_TIMEOUT, m_drivetrain));
         
-        // Drive To Pose
-        Pose2d testPose = startPoses.get(defaultPose);
+        // Drive To Pose (target in blue for pathfinding)
         m_testHarness.registerAtom("DriveToPose", () -> 
-                CmdDriveToPose.create(m_drivetrain, () -> testPose));
+                CmdDriveToPose.create(m_drivetrain, () -> BlueLandmarks.Start1));
         
         // Snap To Heading
         m_testHarness.registerAtom("SnapToHeading", () -> 
@@ -256,7 +255,7 @@ public class AutoConfigurator {
      * Registers all molecule (2-3 command sequence) tests.
      */
     private void registerMolecules(
-            Map<StartPoseId, Pose2d> startPoses,
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
@@ -275,7 +274,7 @@ public class AutoConfigurator {
         m_testHarness.registerMolecule("Seed->Path->TagSnap->Aim", () -> 
                 MoleculeTests.buildSeedPathTagSnapAim(
                         defaultPose,
-                        startPoses,
+                        startPoseSuppliers,
                         pathToShot,
                         AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
                         m_drivetrain,
@@ -294,13 +293,13 @@ public class AutoConfigurator {
                             feeder));
         }
         
-        // Molecule 3: Path->Align->Climb->Hold
+        // Molecule 3: Path->Align->Climb->Hold (align pose in blue for pathfinding)
         if (climber != null) {
-            Pose2d alignPose = startPoses.get(defaultPose); // Use start pose as test align pose
+            Supplier<Pose2d> alignPoseSupplier = () -> BlueLandmarks.Start1;
             m_testHarness.registerMolecule("Path->Align->Climb->Hold", () -> 
                     MoleculeTests.buildPathAlignClimb(
                             pathToTower,
-                            alignPose,
+                            alignPoseSupplier,
                             m_drivetrain,
                             climber));
         }
@@ -310,7 +309,7 @@ public class AutoConfigurator {
      * Registers full autonomous routines.
      */
     private void registerFullAutos(
-            Map<StartPoseId, Pose2d> startPoses,
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
@@ -321,9 +320,9 @@ public class AutoConfigurator {
         // Minimal test auto: seed at A (POS_1), pathfind to B (shot position). Use to verify PathPlanner/AutoBuilder.
         // PathPlanner pathfinding uses the nav grid in blue-origin coordinates; pass blue target so the goal is inside the grid.
         // AutoBuilder flips the path for red alliance when the flip supplier returns true.
-        Pose2d startA = startPoses.get(StartPoseId.POS_1);
+        // AutoRoutine.getInitialPose() expects blue; it reflects for Red.
         Command driveAToBTest = Commands.sequence(
-                CmdSeedOdometryFromStartPose.create(StartPoseId.POS_1, startPoses, m_drivetrain),
+                CmdSeedOdometryFromStartPose.create(StartPoseId.POS_1, startPoseSuppliers, m_drivetrain),
                 CmdDriveToPose.create(
                         m_drivetrain,
                         () -> BlueLandmarks.ShotPosition,
@@ -331,7 +330,7 @@ public class AutoConfigurator {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT))
                 .withName("PathPlannerTest-AtoB");
-        m_autoManager.addRoutine(new AutoRoutine("PathPlanner Test (A→B)", driveAToBTest, List.of(), startA));
+        m_autoManager.addRoutine(new AutoRoutine("PathPlanner Test (A→B)", driveAToBTest, List.of(), BlueLandmarks.Start1));
 
         if (vision == null || shooter == null || feeder == null) {
             return; // Need core subsystems for remaining autos
@@ -356,7 +355,7 @@ public class AutoConfigurator {
                 Supplier<Pose2d> shotPoseSupplier = () -> Landmarks.midpointShotPoseBlue(startId, m_climbSideChooser.getSelected());
                 Command climberAuto = AutoRoutines.buildClimberAuto(
                         startId,
-                        startPoses,
+                        startPoseSuppliers,
                         shotPoseSupplier,
                         towerAlignPoseSupplier,
                         AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
@@ -369,11 +368,13 @@ public class AutoConfigurator {
                         feeder,
                         intake,
                         climber);
+                Pose2d initialPoseBlue = startId == StartPoseId.POS_1 ? BlueLandmarks.Start1
+                        : (startId == StartPoseId.POS_2 ? BlueLandmarks.Start2 : BlueLandmarks.Start3);
                 m_autoManager.addRoutine(new AutoRoutine(
                         "ClimberAuto (" + label + ")",
                         climberAuto,
                         List.of(),
-                        startPoses.get(startId)));
+                        initialPoseBlue));
             }
         }
         
@@ -381,7 +382,7 @@ public class AutoConfigurator {
         if (intake != null && positionTracker != null) {
             Command shooterAuto = AutoRoutines.buildShooterAuto(
                     defaultPose,
-                    startPoses,
+                    startPoseSuppliers,
                     pathToShot,
                     pathToCenter,
                     pathBackToShot,
