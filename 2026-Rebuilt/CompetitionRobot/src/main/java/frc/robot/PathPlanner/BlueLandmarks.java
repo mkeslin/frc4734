@@ -47,6 +47,7 @@ public class BlueLandmarks {
 
     /**
      * Test - Climb start pose: 4 ft from tower center toward field center, 4 ft toward closest sideline.
+     * Orientation 270°: back (climber) faces field center vertically, same as tower align pose.
      * Left climb: toward top sideline (+Y). Right climb: toward bottom sideline (-Y).
      */
     public static Pose2d testClimbStartBlue(ClimbSide climbSide) {
@@ -54,7 +55,7 @@ public class BlueLandmarks {
         double towerY = Tower.getTranslation().getY();
         double x = towerX + TEST_CLIMB_OFFSET_4FT_M;
         double y = climbSide == ClimbSide.LEFT ? towerY + TEST_CLIMB_OFFSET_4FT_M : towerY - TEST_CLIMB_OFFSET_4FT_M;
-        return getPose(x, y, 180);
+        return getPose(x, y, 270);
     }
 
     /** Field center. 523.22", 158.845" */
