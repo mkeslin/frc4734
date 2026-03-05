@@ -155,7 +155,7 @@ public final class MoleculeTests {
                 new CmdFollowPath(pathName, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
                 
                 // 2. Drive to alignment pose
-                new CmdDriveToPose(
+                CmdDriveToPose.create(
                         drivetrain,
                         () -> alignPose,
                         AutoConstants.DEFAULT_XY_TOLERANCE,

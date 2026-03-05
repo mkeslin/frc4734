@@ -118,7 +118,7 @@ public class AutoRoutines {
 
                 // 3. Drive to shot pose (shooter spins up until drive finishes)
                 Commands.deadline(
-                        new CmdDriveToPose(
+                        CmdDriveToPose.create(
                                 drivetrain,
                                 shotPoseSupplier,
                                 AutoConstants.DEFAULT_XY_TOLERANCE,
@@ -142,7 +142,7 @@ public class AutoRoutines {
                 CmdShootForTime.create(shooter, feeder, shootDuration),
 
                 // 8. Drive to tower align pose (side from Shuffleboard "Climb Side" chooser)
-                new CmdDriveToPose(
+                CmdDriveToPose.create(
                         drivetrain,
                         towerAlignPose,
                         AutoConstants.DEFAULT_XY_TOLERANCE,
@@ -158,7 +158,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
                 // 10. Drive to tower align pose again (fine alignment)
-                new CmdDriveToPose(
+                CmdDriveToPose.create(
                         drivetrain,
                         towerAlignPose,
                         AutoConstants.DEFAULT_XY_TOLERANCE,

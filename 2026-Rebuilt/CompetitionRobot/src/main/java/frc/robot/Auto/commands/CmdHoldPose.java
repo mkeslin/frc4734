@@ -1,114 +1,57 @@
 package frc.robot.Auto.commands;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.PathPlanner.AllianceUtils;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /**
- * Command to hold the robot at a specified pose.
- * 
- * <p>This command maintains the robot's position and orientation at a target pose.
- * If durationSec is 0, the command runs indefinitely until interrupted. Otherwise,
- * it holds for the specified duration.
- * 
- * <p>Completion conditions:
- * <ul>
- *   <li>Duration expires (if durationSec > 0)</li>
- *   <li>Command is interrupted (if durationSec == 0, runs indefinitely)</li>
- * </ul>
- * 
- * @param drivetrain The drivetrain subsystem
- * @param poseSupplier Supplier of the target pose to hold
- * @param durationSec Duration to hold pose (0 = indefinite until interrupted)
+ * Holds the robot at a pose by pathfinding to it with tight tolerances for a duration.
+ *
+ * <p>Returns a single command (pathfind to pose with timeout) so it runs under the scheduler
+ * and applies drive output. No .until(atPose) so the robot keeps correcting for the full duration.
+ *
+ * @param durationSec Duration to hold (s); 0 = use a long timeout (effectively until interrupted).
  */
-public class CmdHoldPose extends Command {
-    private final CommandSwerveDrivetrain drivetrain;
-    private final Supplier<Pose2d> poseSupplier;
-    private final double durationSec;
-    private final Timer timer = new Timer();
-    private Command holdCommand;
+public final class CmdHoldPose {
+
+    private static final double INDEFINITE_TIMEOUT_SEC = 1000.0;
+
+    private CmdHoldPose() {
+        // Factory only
+    }
 
     /**
-     * Creates a new CmdHoldPose command.
-     * 
-     * @param drivetrain The drivetrain subsystem
-     * @param poseSupplier Supplier of the target pose to hold
-     * @param durationSec Duration to hold pose (0 = indefinite until interrupted)
-     * @throws NullPointerException if drivetrain or poseSupplier is null
+     * Creates a command that pathfinds to the supplied pose (blue coordinates) for the given duration.
      */
-    public CmdHoldPose(
+    public static Command create(
             CommandSwerveDrivetrain drivetrain,
             Supplier<Pose2d> poseSupplier,
             double durationSec) {
-        this.drivetrain = Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
-        this.poseSupplier = Objects.requireNonNull(poseSupplier, "poseSupplier cannot be null");
-        this.durationSec = durationSec;
-
-        addRequirements(drivetrain);
-    }
-
-    @Override
-    public void initialize() {
-        timer.reset();
-        timer.start();
-        
-        // Use pathfinding with tight constraints to hold pose
-        // This will continuously pathfind to the target pose, effectively holding it
-        Pose2d targetPose = poseSupplier.get();
-        if (targetPose != null) {
-            // Use very tight tolerances for holding
-            holdCommand = new CmdDriveToPose(
-                    drivetrain,
-                    poseSupplier,
-                    0.02, // Very tight XY tolerance (2 cm)
-                    0.01, // Very tight rotation tolerance (~0.6 degrees)
-                    durationSec > 0 ? durationSec : 1000.0 // Long timeout if indefinite
-            );
-            holdCommand.initialize();
-        }
-    }
-
-    @Override
-    public void execute() {
-        if (holdCommand != null) {
-            // Reinitialize if pose changes
-            Pose2d currentTarget = poseSupplier.get();
-            if (currentTarget != null) {
-                holdCommand.execute();
-            }
-        }
-    }
-
-    @Override
-    public boolean isFinished() {
-        if (durationSec > 0 && timer.hasElapsed(durationSec)) {
-            return true;
-        }
-        
-        // If duration is 0, run indefinitely until interrupted
-        if (durationSec == 0) {
-            return false;
-        }
-        
-        if (holdCommand != null) {
-            return holdCommand.isFinished();
-        }
-        
-        return false;
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        timer.stop();
-        if (holdCommand != null) {
-            holdCommand.end(interrupted);
-        }
-        if (interrupted) {
-            drivetrain.stop();
-        }
+        Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
+        Objects.requireNonNull(poseSupplier, "poseSupplier cannot be null");
+        double timeoutSec = durationSec > 0 ? durationSec : INDEFINITE_TIMEOUT_SEC;
+        return Commands.defer(
+                () -> {
+                    Pose2d target = poseSupplier.get();
+                    if (target == null) {
+                        return Commands.none();
+                    }
+                    // PathPlanner expects blue; convert if supplier gave alliance-relative (e.g. getPose()).
+                    Pose2d targetBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+                            ? AllianceUtils.redToBlue(target)
+                            : target;
+                    return drivetrain.pathfindToPoseBlue(targetBlue)
+                            .withTimeout(timeoutSec)
+                            .withName("CmdHoldPose");
+                },
+                Set.of(drivetrain));
     }
 }

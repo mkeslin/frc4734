@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -10,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.Logging.RobotLogger;
 import frc.robot.Monitoring.PerformanceMonitor;
+import frc.robot.pathfinding.LocalADStarAK;
 
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -44,6 +46,10 @@ public class Robot extends LoggedRobot {
         
         // Start logging (must be called after adding data receivers)
         Logger.start();
+
+        // PathPlanner pathfinding with AdvantageKit: use AK-compatible pathfinder so pathfinding
+        // works correctly during log replay. Must be set before any pathfinding commands are created.
+        Pathfinding.setPathfinder(new LocalADStarAK());
 
         // Initialize performance monitor
         m_performanceMonitor = PerformanceMonitor.getInstance();

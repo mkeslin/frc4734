@@ -174,8 +174,8 @@ public class AutoConfigurator {
                         AutoConstants.DEFAULT_HEADING_TIMEOUT));
         
         // Hold Pose
-        m_testHarness.registerAtom("HoldPose", () -> 
-                new CmdHoldPose(
+        m_testHarness.registerAtom("HoldPose", () ->
+                CmdHoldPose.create(
                         m_drivetrain,
                         () -> m_drivetrain.getPose(),
                         AutoConstants.DEFAULT_POSE_TIMEOUT));
@@ -324,7 +324,7 @@ public class AutoConfigurator {
         Pose2d startA = startPoses.get(StartPoseId.POS_1);
         Command driveAToBTest = Commands.sequence(
                 CmdSeedOdometryFromStartPose.create(StartPoseId.POS_1, startPoses, m_drivetrain),
-                new CmdDriveToPose(
+                CmdDriveToPose.create(
                         m_drivetrain,
                         () -> BlueLandmarks.ShotPosition,
                         AutoConstants.DEFAULT_XY_TOLERANCE,

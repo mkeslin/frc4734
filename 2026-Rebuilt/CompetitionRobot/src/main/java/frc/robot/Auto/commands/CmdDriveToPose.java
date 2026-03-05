@@ -1,6 +1,7 @@
 package frc.robot.Auto.commands;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -10,177 +11,122 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.PathPlanner.AllianceUtils;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Logging.RobotLogger;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /**
  * Command to drive to a target pose using pathfinding.
- * 
- * <p>This command uses the drivetrain's pathfinding capabilities to navigate
- * to a target pose. It completes when the robot reaches the pose within
- * specified tolerances or when the timeout expires.
- * 
- * <p>Completion conditions:
- * <ul>
- *   <li>Robot is at target pose (within xyTol and rotTol)</li>
- *   <li>Timeout expires</li>
- * </ul>
- * 
- * @param drivetrain The drivetrain subsystem
- * @param targetPoseSupplier Supplier of the target pose
- * @param xyTol XY position tolerance in meters
- * @param rotTol Rotation tolerance in radians
- * @param timeoutSec Maximum time to reach the pose
+ *
+ * <p>Target pose is always in <b>blue alliance</b> coordinates; pathfinding is
+ * run via PathPlanner (pathfindToPoseFlipped) so it works correctly on both red
+ * and blue. The pathfinding command is <b>scheduled</b> by the CommandScheduler
+ * (via {@link Commands#defer}) so it runs normally and can apply drive output.
+ *
+ * <p>Completion: robot at target (within tolerances), or timeout.
  */
-public class CmdDriveToPose extends Command {
-    private final CommandSwerveDrivetrain drivetrain;
-    private final Supplier<Pose2d> targetPoseSupplier;
-    private final double xyTol;
-    private final double rotTol;
-    private final double timeoutSec;
-    private final Timer timer = new Timer();
-    private Command pathfindingCommand;
+public final class CmdDriveToPose {
+
+    private CmdDriveToPose() {
+        // Factory only
+    }
 
     /**
-     * Creates a new CmdDriveToPose command.
-     * 
-     * @param drivetrain The drivetrain subsystem
-     * @param targetPoseSupplier Supplier of the target pose
-     * @param xyTol XY position tolerance in meters
-     * @param rotTol Rotation tolerance in radians
-     * @param timeoutSec Maximum time to reach the pose
-     * @throws NullPointerException if drivetrain or targetPoseSupplier is null
-     * @throws IllegalArgumentException if timeoutSec is less than or equal to 0
+     * Creates a command that pathfinds to the supplied target pose (blue coordinates).
+     * Resolves target at schedule time. Works on both alliances.
+     *
+     * @param drivetrain           drivetrain subsystem
+     * @param targetPoseSupplier   supplier of target pose in blue coordinates
+     * @param xyTol                XY tolerance (m)
+     * @param rotTol               rotation tolerance (rad)
+     * @param timeoutSec           max time to reach pose (s)
+     * @return command that drives to pose or times out
      */
-    public CmdDriveToPose(
+    public static Command create(
             CommandSwerveDrivetrain drivetrain,
             Supplier<Pose2d> targetPoseSupplier,
             double xyTol,
             double rotTol,
             double timeoutSec) {
-        this.drivetrain = Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
-        this.targetPoseSupplier = Objects.requireNonNull(targetPoseSupplier, "targetPoseSupplier cannot be null");
-        this.xyTol = xyTol;
-        this.rotTol = rotTol;
+        Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
+        Objects.requireNonNull(targetPoseSupplier, "targetPoseSupplier cannot be null");
         if (timeoutSec <= 0) {
             throw new IllegalArgumentException("timeoutSec must be greater than 0, got: " + timeoutSec);
         }
-        this.timeoutSec = timeoutSec;
-
-        addRequirements(drivetrain);
-    }
-
-    @Override
-    public void initialize() {
-        timer.reset();
-        timer.start();
-        pathfindingCommand = null;
-        Pose2d targetPose = targetPoseSupplier.get();
-        if (targetPose == null) {
-            RobotLogger.logError("[CmdDriveToPose] targetPose is null; skipping pathfinding");
-            System.out.println("[CmdDriveToPose] targetPose is null; skipping pathfinding");
-            return;
-        }
-        RobotLogger.log("[CmdDriveToPose] Attempting pathfind to (" + targetPose.getX() + ", " + targetPose.getY() + ")");
-        System.out.println("[CmdDriveToPose] Attempting pathfind to (" + targetPose.getX() + ", " + targetPose.getY() + ")");
-        try {
-            // Target is always in blue; pathfinding expects blue-origin coordinates.
-            pathfindingCommand = drivetrain.pathfindToPoseBlue(targetPose)
-                    .withTimeout(timeoutSec)
-                    .withName("CmdDriveToPose");
-            pathfindingCommand.initialize();
-            RobotLogger.log("[CmdDriveToPose] Pathfinding command initialized successfully");
-            System.out.println("[CmdDriveToPose] Pathfinding command initialized successfully");
-        } catch (Exception e) {
-            String msg = "[CmdDriveToPose] Pathfinding failed (is AutoBuilder configured?): " + e.getMessage();
-            RobotLogger.logError(msg);
-            DriverStation.reportError(msg, true);
-            System.out.println(msg);
-            System.out.println("[CmdDriveToPose] Stack trace: " + java.util.Arrays.toString(e.getStackTrace()));
-        }
-    }
-
-    @Override
-    public void execute() {
-        if (pathfindingCommand != null) {
-            pathfindingCommand.execute();
-        }
-    }
-
-    @Override
-    public boolean isFinished() {
-        if (pathfindingCommand == null) {
-            return true; // Init failed or no target; don't block the sequence
-        }
-        if (timer.hasElapsed(timeoutSec)) {
-            return true;
-        }
-
-        if (pathfindingCommand.isFinished()) {
-            Pose2d currentPose = drivetrain.getPose();
-            Pose2d targetBlue = targetPoseSupplier.get();
-            Pose2d targetForCheck = targetBlue != null && DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-                    ? AllianceUtils.blueToRed(targetBlue)
-                    : targetBlue;
-            if (targetForCheck != null && atPose(currentPose, targetForCheck, xyTol, rotTol)) {
-                return true;
-            }
-        }
-
-        // Also check directly if we're at pose (in case pathfinding finished but we're close)
-        Pose2d currentPose = drivetrain.getPose();
-        Pose2d targetBlue = targetPoseSupplier.get();
-        Pose2d targetForCheck = targetBlue != null && DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-                ? AllianceUtils.blueToRed(targetBlue)
-                : targetBlue;
-        if (targetForCheck != null && atPose(currentPose, targetForCheck, xyTol, rotTol)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        timer.stop();
-        double elapsed = timer.get();
-        RobotLogger.log(String.format("[CmdDriveToPose] end interrupted=%b elapsed=%.2fs", interrupted, elapsed));
-        System.out.println(String.format("[CmdDriveToPose] end interrupted=%b elapsed=%.2fs", interrupted, elapsed));
-        if (pathfindingCommand != null) {
-            pathfindingCommand.end(interrupted);
-        }
+        return Commands.defer(
+                () -> {
+                    Pose2d target = targetPoseSupplier.get();
+                    if (target == null) {
+                        RobotLogger.logError("[CmdDriveToPose] targetPose is null; skipping pathfinding");
+                        return Commands.none();
+                    }
+                    final double[] startTime = { 0 };
+                    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+                    Command pathfind = drivetrain.pathfindToPoseBlue(target)
+                            .until(() -> atPose(drivetrain, targetPoseSupplier, xyTol, rotTol))
+                            .withTimeout(timeoutSec)
+                            .withName("CmdDriveToPose");
+                    return pathfind
+                            .beforeStarting(() -> {
+                                try {
+                                    startTime[0] = Timer.getFPGATimestamp();
+                                    Pose2d current = drivetrain.getPose();
+                                    RobotLogger.log(String.format(
+                                            "[CmdDriveToPose] started targetBlue=(%.2f, %.2f) current=(%.2f, %.2f) alliance=%s",
+                                            target.getX(), target.getY(),
+                                            current.getX(), current.getY(),
+                                            alliance.name()));
+                                } catch (Exception e) {
+                                    RobotLogger.logError("[CmdDriveToPose] beforeStarting: " + e.getMessage());
+                                }
+                            })
+                            .finallyDo(interrupted -> {
+                                try {
+                                    double elapsed = Timer.getFPGATimestamp() - startTime[0];
+                                    Pose2d current = drivetrain.getPose();
+                                    boolean atTarget = atPose(drivetrain, targetPoseSupplier, xyTol, rotTol);
+                                    RobotLogger.log(String.format(
+                                            "[CmdDriveToPose] ended interrupted=%b elapsed=%.2fs current=(%.2f, %.2f) atPose=%b",
+                                            interrupted, elapsed, current.getX(), current.getY(), atTarget));
+                                } catch (Exception e) {
+                                    RobotLogger.logError("[CmdDriveToPose] finallyDo: " + e.getMessage());
+                                }
+                            });
+                },
+                Set.of(drivetrain));
     }
 
     /**
-     * Checks if the current pose is within tolerance of the target pose.
-     * 
-     * @param currentPose The current robot pose
-     * @param targetPose The target pose
-     * @param xyTol XY position tolerance in meters
-     * @param rotTol Rotation tolerance in radians
-     * @return true if within tolerance, false otherwise
-     */
-    private boolean atPose(Pose2d currentPose, Pose2d targetPose, double xyTol, double rotTol) {
-        Translation2d translationError = currentPose.getTranslation().minus(targetPose.getTranslation());
-        double xyError = translationError.getNorm();
-        double rotError = Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getRadians());
-        
-        return xyError <= xyTol && rotError <= rotTol;
-    }
-
-    /**
-     * Factory method to create a command with default tolerances and timeout.
-     * 
-     * @param drivetrain The drivetrain subsystem
-     * @param targetPoseSupplier Supplier of the target pose
-     * @return A command that drives to the pose with default settings
+     * Creates a command with default tolerances and timeout.
      */
     public static Command create(CommandSwerveDrivetrain drivetrain, Supplier<Pose2d> targetPoseSupplier) {
-        return new CmdDriveToPose(
+        return create(
                 drivetrain,
                 targetPoseSupplier,
                 AutoConstants.DEFAULT_XY_TOLERANCE,
                 AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                 AutoConstants.DEFAULT_POSE_TIMEOUT);
+    }
+
+    /**
+     * Whether the robot is at the target pose (alliance-relative comparison).
+     */
+    private static boolean atPose(
+            CommandSwerveDrivetrain drivetrain,
+            Supplier<Pose2d> targetBlueSupplier,
+            double xyTol,
+            double rotTol) {
+        Pose2d current = drivetrain.getPose();
+        Pose2d targetBlue = targetBlueSupplier.get();
+        if (targetBlue == null) {
+            return false;
+        }
+        Pose2d target = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+                ? AllianceUtils.blueToRed(targetBlue)
+                : targetBlue;
+        Translation2d transErr = current.getTranslation().minus(target.getTranslation());
+        double xyErr = transErr.getNorm();
+        double rotErr = Math.abs(current.getRotation().minus(target.getRotation()).getRadians());
+        return xyErr <= xyTol && rotErr <= rotTol;
     }
 }

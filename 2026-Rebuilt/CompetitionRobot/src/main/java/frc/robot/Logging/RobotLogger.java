@@ -28,9 +28,10 @@ public class RobotLogger {
 
     /**
      * Logs a string message (replaces DataLogManager.log).
-     * 
+     * Writes to AdvantageKit and to stdout so Driver Station console shows it.
+     *
      * <p>Controlled by {@link LoggingConfig#ENABLE_MESSAGE_LOGGING}.
-     * 
+     *
      * @param message The message to log
      */
     public static void log(String message) {
@@ -38,15 +39,17 @@ public class RobotLogger {
             return;
         }
         Logger.recordOutput("Logs/Message", message);
+        System.out.println(message);
     }
 
     /**
      * Logs an error message.
-     * 
+     * Writes to AdvantageKit and to stderr so Driver Station console shows it.
+     *
      * <p>Controlled by {@link LoggingConfig#ENABLE_ERROR_LOGGING} or
      * {@link LoggingConfig#ALWAYS_LOG_ERRORS}. If ALWAYS_LOG_ERRORS is true,
      * errors are always logged regardless of ENABLE_ERROR_LOGGING.
-     * 
+     *
      * @param message The error message to log
      */
     public static void logError(String message) {
@@ -54,13 +57,15 @@ public class RobotLogger {
             return;
         }
         Logger.recordOutput("Logs/Error", message);
+        System.err.println(message);
     }
 
     /**
      * Logs a warning message.
-     * 
+     * Writes to AdvantageKit and to stdout so Driver Station console shows it.
+     *
      * <p>Controlled by {@link LoggingConfig#ENABLE_MESSAGE_LOGGING}.
-     * 
+     *
      * @param message The warning message to log
      */
     public static void logWarning(String message) {
@@ -68,6 +73,7 @@ public class RobotLogger {
             return;
         }
         Logger.recordOutput("Logs/Warning", message);
+        System.out.println(message);
     }
 
     /**
