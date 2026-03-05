@@ -138,8 +138,8 @@ public class SwerveDrivetrainBindings {
         // Sticks - only active in TELEOP profile
         drivetrain.setDefaultCommand(
                 drivetrain.applyRequest(() -> {
-                    // Only drive if in TELEOP profile
-                    if (currentProfile != InputProfile.TELEOP) {
+                    // Brake in SYSID profile; allow driving in TELEOP and MECHANISM
+                    if (currentProfile == InputProfile.SYSID) {
                         return new SwerveRequest.SwerveDriveBrake();
                     }
                     
