@@ -113,9 +113,6 @@ public class AutoRoutines {
 
         // Captured after extending climber; used by drive-to-bar step (pathfind to pose toward bar).
         final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
-        // Captured after main drive; used by final nudge before retract.
-        final Pose2d[] poseBeforeRetract = new Pose2d[1];
-
         return Commands.sequence(
                 // 1. Seed odometry from start pose
                 CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
@@ -200,22 +197,12 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 12b. Drive 2 in more toward the bar right before retract (tight tolerance so short move actually runs)
-                Commands.runOnce(() -> poseBeforeRetract[0] = drivetrain.getPose()),
-                CmdDriveToPose.create(
+                // 12b. Drive 2 in toward bar (-X) and 2 in +Y using direct velocity (bypasses pathfinding for short move)
+                CmdDriveFieldRelative.forDistance(
                         drivetrain,
-                        () -> {
-                            Pose2d p = poseBeforeRetract[0];
-                            if (p == null) return null;
-                            Pose2d pBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-                                    ? AllianceUtils.redToBlue(p) : p;
-                            return new Pose2d(
-                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_X_METERS, -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_Y_METERS)),
-                                    pBlue.getRotation());
-                        },
-                        0.02,  // Tight XY tolerance (2 cm) so 2 in move is required; default 10 cm would skip it
-                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
-                        AutoConstants.DEFAULT_POSE_TIMEOUT),
+                        -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
+                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
+                        0.25),
 
                 // 13. Retract climber from L1
                 ClimbWhileHeldCommand.retractFromL1(climber, drivetrain)
@@ -438,7 +425,6 @@ public class AutoRoutines {
         Objects.requireNonNull(climber, "climber cannot be null");
 
         final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
-        final Pose2d[] poseBeforeRetract = new Pose2d[1];
 
         return Commands.sequence(
                 CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
@@ -484,21 +470,11 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
-                Commands.runOnce(() -> poseBeforeRetract[0] = drivetrain.getPose()),
-                CmdDriveToPose.create(
+                CmdDriveFieldRelative.forDistance(
                         drivetrain,
-                        () -> {
-                            Pose2d p = poseBeforeRetract[0];
-                            if (p == null) return null;
-                            Pose2d pBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-                                    ? AllianceUtils.redToBlue(p) : p;
-                            return new Pose2d(
-                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_X_METERS, -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_Y_METERS)),
-                                    pBlue.getRotation());
-                        },
-                        0.02,  // Tight XY tolerance (2 cm) so 2 in move is required
-                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
-                        AutoConstants.DEFAULT_POSE_TIMEOUT),
+                        -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
+                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
+                        0.25),
                 ClimbWhileHeldCommand.retractFromL1(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
                 new CmdHoldClimbUntilEnd(climber, drivetrain)
