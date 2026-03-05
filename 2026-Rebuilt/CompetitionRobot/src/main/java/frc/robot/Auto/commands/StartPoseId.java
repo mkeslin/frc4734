@@ -18,5 +18,11 @@ public enum StartPoseId {
     /**
      * Starting position 3 (typically right side of field).
      */
-    POS_3
+    POS_3,
+
+    /**
+     * Test - Climb start: 4 ft from tower center toward field center and 4 ft toward closest sideline.
+     * Used only by Test - Climb routine; pose depends on selected climb side.
+     */
+    POS_TEST_CLIMB
 }

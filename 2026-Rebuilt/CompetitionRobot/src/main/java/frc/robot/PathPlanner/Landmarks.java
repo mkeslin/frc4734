@@ -94,6 +94,14 @@ public class Landmarks {
     }
 
     /**
+     * Test - Climb start pose: 4 ft from tower center toward field center, 4 ft toward closest sideline.
+     * Depends on climb side (left → toward top sideline, right → toward bottom sideline).
+     */
+    public static Pose2d testClimbStart(ClimbSide climbSide) {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.testClimbStartBlue(climbSide));
+    }
+
+    /**
      * Gets the tower (uprights reference) pose for the current alliance.
      */
     public static Pose2d OurTower() {

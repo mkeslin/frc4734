@@ -101,6 +101,7 @@ public final class CmdDriveToPose {
                             })
                             .finallyDo(interrupted -> {
                                 try {
+                                    drivetrain.stop();
                                     double elapsed = Timer.getFPGATimestamp() - startTime[0];
                                     Pose2d current = drivetrain.getPose();
                                     boolean atTarget = atPose(drivetrain, targetPoseSupplier, xyTol, rotTol);

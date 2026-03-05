@@ -93,6 +93,8 @@ public class AutoConfigurator {
         startPoseSuppliers.put(StartPoseId.POS_1, Landmarks::OurStart1);
         startPoseSuppliers.put(StartPoseId.POS_2, Landmarks::OurStart2);
         startPoseSuppliers.put(StartPoseId.POS_3, Landmarks::OurStart3);
+        startPoseSuppliers.put(StartPoseId.POS_TEST_CLIMB,
+                () -> Landmarks.testClimbStart(ClimbSide.RIGHT));
         
         // Create test harness
         m_testHarness = new AutoTestHarness(
@@ -362,20 +364,18 @@ public class AutoConfigurator {
                 intake);
         m_autoManager.addRoutine(new AutoRoutine("Test - Drive and Shoot", testDriveAndShoot, List.of(), BlueLandmarks.Start1));
 
-        // Test - Climb: seed, drive to tower, extend L1, drive to bar, retract
+        // Test - Climb: seed at 4 ft from tower toward center + 4 ft toward sideline, right climb side, drive to tower, extend L1, drive to bar, retract
         if (climber != null) {
-            Supplier<Pose2d> towerAlignPoseSupplier = () -> {
-                ClimbSide side = m_climbSideChooser.getSelected();
-                return (side == ClimbSide.RIGHT) ? BlueLandmarks.TowerAlignRightOffset : BlueLandmarks.TowerAlignLeftOffset;
-            };
+            Supplier<Pose2d> towerAlignPoseSupplier = () -> BlueLandmarks.TowerAlignRightOffset;
             Command testClimb = AutoRoutines.buildTestClimb(
-                    defaultPose,
+                    StartPoseId.POS_TEST_CLIMB,
                     startPoseSuppliers,
                     towerAlignPoseSupplier,
                     m_drivetrain,
                     vision,
                     climber);
-            m_autoManager.addRoutine(new AutoRoutine("Test - Climb", testClimb, List.of(), BlueLandmarks.Start1));
+            m_autoManager.addRoutine(new AutoRoutine("Test - Climb", testClimb, List.of(),
+                    BlueLandmarks.testClimbStartBlue(ClimbSide.RIGHT)));
         }
 
         String pathToCenter = MoleculeTests.getPathNameForPose(defaultPose, "StartToCenter");

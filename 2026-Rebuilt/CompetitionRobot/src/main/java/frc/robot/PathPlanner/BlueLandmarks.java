@@ -2,6 +2,7 @@ package frc.robot.PathPlanner;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Auto.commands.ClimbSide;
 
 /**
  * Blue alliance field landmarks for 2026 Rebuilt (Andymark) field.
@@ -40,6 +41,21 @@ public class BlueLandmarks {
     public static final Pose2d TowerAlignLeftOffset = getPose(7.6 + 0.6096, 4.85, 270);
     /** Tower align right, offset 2 ft toward field center. */
     public static final Pose2d TowerAlignRightOffset = getPose(7.6 + 0.6096, 3.2, 270);
+
+    /** Offset for Test - Climb start: 4 ft from tower center toward center and toward sideline. */
+    private static final double TEST_CLIMB_OFFSET_4FT_M = 4 * 0.3048;
+
+    /**
+     * Test - Climb start pose: 4 ft from tower center toward field center, 4 ft toward closest sideline.
+     * Left climb: toward top sideline (+Y). Right climb: toward bottom sideline (-Y).
+     */
+    public static Pose2d testClimbStartBlue(ClimbSide climbSide) {
+        double towerX = Tower.getTranslation().getX();
+        double towerY = Tower.getTranslation().getY();
+        double x = towerX + TEST_CLIMB_OFFSET_4FT_M;
+        double y = climbSide == ClimbSide.LEFT ? towerY + TEST_CLIMB_OFFSET_4FT_M : towerY - TEST_CLIMB_OFFSET_4FT_M;
+        return getPose(x, y, 180);
+    }
 
     /** Field center. 523.22", 158.845" */
     public static final Pose2d FieldCenter = getPose(13.290, 4.035, 0);
