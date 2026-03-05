@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import com.pathplanner.lib.auto.AutoBuilder;
 import frc.robot.PathPlanner.AllianceUtils;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -60,12 +61,22 @@ public final class CmdDriveToPose {
                         RobotLogger.logError("[CmdDriveToPose] targetPose is null; skipping pathfinding");
                         return Commands.none();
                     }
+                    if (!AutoBuilder.isPathfindingConfigured()) {
+                        RobotLogger.logError("[CmdDriveToPose] AutoBuilder pathfinding not configured; skipping");
+                        return Commands.none();
+                    }
                     final double[] startTime = { 0 };
                     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-                    Command pathfind = drivetrain.pathfindToPoseBlue(target)
-                            .until(() -> atPose(drivetrain, targetPoseSupplier, xyTol, rotTol))
-                            .withTimeout(timeoutSec)
-                            .withName("CmdDriveToPose");
+                    Command pathfind;
+                    try {
+                        pathfind = drivetrain.pathfindToPoseBlue(target)
+                                .until(() -> atPose(drivetrain, targetPoseSupplier, xyTol, rotTol))
+                                .withTimeout(timeoutSec)
+                                .withName("CmdDriveToPose");
+                    } catch (Exception e) {
+                        RobotLogger.logError("[CmdDriveToPose] pathfindToPoseBlue failed: " + e.getMessage());
+                        return Commands.none();
+                    }
                     return pathfind
                             .beforeStarting(() -> {
                                 try {
