@@ -325,7 +325,7 @@ public class AutoRoutines {
     }
 
     /**
-     * Builds a test routine: seed, drive to shot, shoot (no center run).
+     * Builds a test routine: seed, drive to shot, lower intake, aim, shoot (no center run).
      * Subset of ShooterAuto for testing drive + shoot flow.
      *
      * @param id Start pose identifier
@@ -339,6 +339,7 @@ public class AutoRoutines {
      * @param vision Vision subsystem
      * @param shooter Shooter subsystem
      * @param feeder Feeder subsystem
+     * @param intake Optional deployable intake; if non-null, lowered before hub aim so webcam is unblocked
      */
     public static Command buildTestDriveAndShoot(
             StartPoseId id,
@@ -351,7 +352,8 @@ public class AutoRoutines {
             CommandSwerveDrivetrain drivetrain,
             PhotonVision vision,
             Shooter shooter,
-            Feeder feeder) {
+            Feeder feeder,
+            DeployableIntake intake) {
         Objects.requireNonNull(id, "id cannot be null");
         Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
         Objects.requireNonNull(pathToShot, "pathToShot cannot be null");
@@ -373,6 +375,10 @@ public class AutoRoutines {
                 Commands.deadline(
                         new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
+                intake != null
+                        ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
+                                .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
+                        : Commands.none(),
                 CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
                 CmdShootForTime.create(shooter, feeder, shootDuration)

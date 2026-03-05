@@ -339,7 +339,7 @@ public class AutoConfigurator {
         StartPoseId defaultPose = StartPoseId.POS_1;
         String pathToShot = MoleculeTests.getPathNameForPose(defaultPose, "StartToShot");
 
-        // Test - Drive and Shoot: seed, path to shot, aim, shoot (no center run)
+        // Test - Drive and Shoot: seed, path to shot, lower intake, aim, shoot (no center run)
         Command testDriveAndShoot = AutoRoutines.buildTestDriveAndShoot(
                 defaultPose,
                 startPoseSuppliers,
@@ -351,7 +351,8 @@ public class AutoConfigurator {
                 m_drivetrain,
                 vision,
                 shooter,
-                feeder);
+                feeder,
+                intake);
         m_autoManager.addRoutine(new AutoRoutine("Test - Drive and Shoot", testDriveAndShoot, List.of(), BlueLandmarks.Start1));
 
         // Test - Climb: seed, drive to tower, extend L1, drive to bar, retract
