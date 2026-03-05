@@ -25,7 +25,7 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 public class CmdHoldClimbUntilEnd extends Command {
     private final Climber climber;
     private final CommandSwerveDrivetrain drivetrain;
-    private Command holdCommand;
+    private double holdPosition;
 
     /**
      * Creates a new CmdHoldClimbUntilEnd command.
@@ -43,38 +43,18 @@ public class CmdHoldClimbUntilEnd extends Command {
 
     @Override
     public void initialize() {
-        // Stop drivetrain
         drivetrain.stop();
-        
-        // Hold climber at current position
-        // Use moveToArbitraryPositionCommand to hold current position
-        double currentPosition = climber.getPosition();
-        holdCommand = climber.moveToArbitraryPositionCommand(() -> currentPosition)
-                .withName("CmdHoldClimbUntilEnd-hold");
-        holdCommand.initialize();
+        holdPosition = climber.getPosition();
     }
 
     @Override
     public void execute() {
-        // Keep drivetrain stopped
         drivetrain.stop();
-        
-        // Continue holding climber
-        if (holdCommand != null) {
-            holdCommand.execute();
-        }
+        climber.setLiftGoalPosition(holdPosition);
     }
 
     @Override
     public boolean isFinished() {
-        // Runs indefinitely until interrupted
         return false;
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        if (holdCommand != null) {
-            holdCommand.end(interrupted);
-        }
     }
 }
