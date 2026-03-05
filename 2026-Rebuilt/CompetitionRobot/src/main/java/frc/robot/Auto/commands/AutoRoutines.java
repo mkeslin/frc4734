@@ -111,10 +111,10 @@ public class AutoRoutines {
 
         Supplier<Double> rpmSupplier = () -> targetRpm;
 
-        // Captured after extending climber; used by drive-to-bar step (pathfind to pose 2 ft toward bar).
+        // Captured after extending climber; used by drive-to-bar step (pathfind to pose toward bar).
         final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
-        // Captured after drive-to-bar; used by extra drive toward bar before retract.
-        final Pose2d[] poseAfterDriveToBar = new Pose2d[1];
+        // Captured after main drive; used by final nudge before retract.
+        final Pose2d[] poseBeforeRetract = new Pose2d[1];
 
         return Commands.sequence(
                 // 1. Seed odometry from start pose
@@ -181,35 +181,36 @@ public class AutoRoutines {
                 ClimbWhileHeldCommand.extendL1Only(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
-                // 12. Drive 2 ft toward the bar (field -X) to acquire the bar
+                // 12. Drive toward the bar (field -X) to acquire: main distance + extra so robot has enough bar to climb on
                 Commands.runOnce(() -> poseBeforeDriveToBar[0] = drivetrain.getPose()),
                 CmdDriveToPose.create(
                         drivetrain,
                         () -> {
                             Pose2d p = poseBeforeDriveToBar[0];
                             if (p == null) return null;
-                            // Target is 2 ft toward bar (in blue: -X). Convert to blue for pathfinding.
+                            // Target is toward bar (in blue: -X). Total = main drive + extra.
+                            double totalDriveMeters = AutoConstants.CLIMB_DRIVE_TO_BAR_METERS + AutoConstants.CLIMB_EXTRA_DRIVE_TOWARD_BAR_METERS;
                             Pose2d pBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
                                     ? AllianceUtils.redToBlue(p) : p;
                             return new Pose2d(
-                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_TO_BAR_METERS, 0)),
+                                    pBlue.getTranslation().minus(new Translation2d(totalDriveMeters, 0)),
                                     pBlue.getRotation());
                         },
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 12b. Drive a couple inches more toward the bar so robot has enough bar to climb on
-                Commands.runOnce(() -> poseAfterDriveToBar[0] = drivetrain.getPose()),
+                // 12b. Drive 2 in more toward the bar right before retract
+                Commands.runOnce(() -> poseBeforeRetract[0] = drivetrain.getPose()),
                 CmdDriveToPose.create(
                         drivetrain,
                         () -> {
-                            Pose2d p = poseAfterDriveToBar[0];
+                            Pose2d p = poseBeforeRetract[0];
                             if (p == null) return null;
                             Pose2d pBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
                                     ? AllianceUtils.redToBlue(p) : p;
                             return new Pose2d(
-                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_EXTRA_DRIVE_TOWARD_BAR_METERS, 0)),
+                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS, 0)),
                                     pBlue.getRotation());
                         },
                         AutoConstants.DEFAULT_XY_TOLERANCE,
@@ -437,7 +438,7 @@ public class AutoRoutines {
         Objects.requireNonNull(climber, "climber cannot be null");
 
         final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
-        final Pose2d[] poseAfterDriveToBar = new Pose2d[1];
+        final Pose2d[] poseBeforeRetract = new Pose2d[1];
 
         return Commands.sequence(
                 CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
@@ -473,25 +474,26 @@ public class AutoRoutines {
                         () -> {
                             Pose2d p = poseBeforeDriveToBar[0];
                             if (p == null) return null;
+                            double totalDriveMeters = AutoConstants.CLIMB_DRIVE_TO_BAR_METERS + AutoConstants.CLIMB_EXTRA_DRIVE_TOWARD_BAR_METERS;
                             Pose2d pBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
                                     ? AllianceUtils.redToBlue(p) : p;
                             return new Pose2d(
-                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_TO_BAR_METERS, 0)),
+                                    pBlue.getTranslation().minus(new Translation2d(totalDriveMeters, 0)),
                                     pBlue.getRotation());
                         },
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
-                Commands.runOnce(() -> poseAfterDriveToBar[0] = drivetrain.getPose()),
+                Commands.runOnce(() -> poseBeforeRetract[0] = drivetrain.getPose()),
                 CmdDriveToPose.create(
                         drivetrain,
                         () -> {
-                            Pose2d p = poseAfterDriveToBar[0];
+                            Pose2d p = poseBeforeRetract[0];
                             if (p == null) return null;
                             Pose2d pBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
                                     ? AllianceUtils.redToBlue(p) : p;
                             return new Pose2d(
-                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_EXTRA_DRIVE_TOWARD_BAR_METERS, 0)),
+                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS, 0)),
                                     pBlue.getRotation());
                         },
                         AutoConstants.DEFAULT_XY_TOLERANCE,

@@ -55,9 +55,9 @@ public class ClimberConstants {
     /** Voltage for mechanism-mode manual extend/retract (run while held, no position stops). */
     public static final double CLIMB_MANUAL_VOLTAGE = 8.0;
 
-    /** Lift MotionMagic: slow cruise/accel for safe mechanism tuning and ascent. */
-    public static final double LIFT_MOTION_MAGIC_CRUISE_VELOCITY = 15;   // rot/s
-    public static final double LIFT_MOTION_MAGIC_ACCELERATION = 25;     // rot/s²
+    /** Lift MotionMagic: cruise/accel for mechanism tuning and ascent. */
+    public static final double LIFT_MOTION_MAGIC_CRUISE_VELOCITY = 22;   // rot/s
+    public static final double LIFT_MOTION_MAGIC_ACCELERATION = 40;     // rot/s²
     public static final double LIFT_MOTION_MAGIC_JERK = 300;            // rot/s³
 
     // ---- Jaws (left and right, independent open/closed) ----

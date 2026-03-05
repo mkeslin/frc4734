@@ -34,6 +34,8 @@ public final class AutoConstants {
     public static final double CLIMB_DRIVE_TO_BAR_METERS = 0.6096;
     /** Extra drive (m) toward the bar after initial drive, so robot has enough bar to climb on. ~6 in total. */
     public static final double CLIMB_EXTRA_DRIVE_TOWARD_BAR_METERS = 0.1524;
+    /** Final nudge (m) toward the bar right before retract. ~2 in. */
+    public static final double CLIMB_DRIVE_BEFORE_RETRACT_METERS = 0.0508;
     /** Timeout for the drive-forward-to-acquire-bar step. */
     public static final double DEFAULT_CLIMB_ACQUIRE_TIMEOUT = 3.0;
     public static final double DEFAULT_CLIMB_TIMEOUT = 15.0;
@@ -53,9 +55,9 @@ public final class AutoConstants {
     public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
 
     /** TEMPORARY: max speed (m/s) for auto pathfinding. Restore to DrivetrainConstants when done testing. */
-    public static final double TEMPORARY_AUTO_MAX_SPEED_MPS = 0.5;
+    public static final double TEMPORARY_AUTO_MAX_SPEED_MPS = 1.0;
     /** TEMPORARY: max acceleration (m/s²) for auto pathfinding. Restore to DrivetrainConstants when done testing. */
-    public static final double TEMPORARY_AUTO_MAX_ACCELERATION = 0.5;
+    public static final double TEMPORARY_AUTO_MAX_ACCELERATION = 1.0;
 
     /** TEMPORARY: shooter target speed (RPS) for low-ceiling room testing. Revert to 3000 and 100 tolerance for competition. */
     public static final double TEMPORARY_SHOOTER_TARGET_SPEED = 100.0;
