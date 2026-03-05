@@ -210,7 +210,7 @@ public class AutoRoutines {
                             Pose2d pBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
                                     ? AllianceUtils.redToBlue(p) : p;
                             return new Pose2d(
-                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS, 0)),
+                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS, -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS)),
                                     pBlue.getRotation());
                         },
                         0.02,  // Tight XY tolerance (2 cm) so 2 in move is required; default 10 cm would skip it
@@ -493,7 +493,7 @@ public class AutoRoutines {
                             Pose2d pBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
                                     ? AllianceUtils.redToBlue(p) : p;
                             return new Pose2d(
-                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS, 0)),
+                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS, -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS)),
                                     pBlue.getRotation());
                         },
                         0.02,  // Tight XY tolerance (2 cm) so 2 in move is required
