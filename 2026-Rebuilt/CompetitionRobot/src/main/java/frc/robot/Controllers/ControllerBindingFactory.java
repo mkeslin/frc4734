@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Auto.commands.AutoConstants;
-import frc.robot.Auto.commands.ClimbWhileHeldCommand;
 import frc.robot.Auto.commands.CmdFollowPath;
 import frc.robot.Commands.individual.IndividualMechanismCommands;
 import frc.robot.Commands.teleop.TeleopMechanismCommands;
@@ -258,14 +257,18 @@ public class ControllerBindingFactory {
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
                     .onTrue(IndividualMechanismCommands.intakeStow(m_intake));
         }
-        // Climber (lift + jaws): only when mechanism profile is MECHANISM
+        // Climber (lift + jaws): voltage control while held, no position stops
         if (m_climber != null) {
             m_mechanismController.povRight()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
-                    .whileTrue(ClimbWhileHeldCommand.ascent(m_climber));
+                    .whileTrue(Commands.defer(
+                            () -> IndividualMechanismCommands.climbExtend(m_climber),
+                            Set.<Subsystem>of(m_climber)));
             m_mechanismController.povLeft()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
-                    .whileTrue(ClimbWhileHeldCommand.descent(m_climber));
+                    .whileTrue(Commands.defer(
+                            () -> IndividualMechanismCommands.climbRetract(m_climber),
+                            Set.<Subsystem>of(m_climber)));
             m_mechanismController.start().and(m_mechanismController.a())
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.MECHANISM)
                     .onTrue(m_climber.openLeftJawCommand());

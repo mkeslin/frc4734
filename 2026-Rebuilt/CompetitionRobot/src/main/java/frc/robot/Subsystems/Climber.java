@@ -269,10 +269,6 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     // }).withName("climber.moveToCurrentGoal");
     // }
     private Command moveToPositionCommand(double goalPosition) {
-        // var currentPosition = getPosition();
-        // if(Math.abs(getPosition()) > Math.abs(goalPosition)) {
-        //     return Commands.none();
-        // }
         return run(() -> {
             // Safety check: prevent movement until robot is initialized
             if (RobotState.getInstance().isInitialized()) {

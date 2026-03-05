@@ -113,7 +113,6 @@ public class AutoManager {
         RobotLogger.log("[AutoManager] Reset odometry consumer set");
     }
 
-
     /**
      * Updates the NetworkTables field with the new selected auto path. This
      * should be put in {@code disabledPeriodic()}.

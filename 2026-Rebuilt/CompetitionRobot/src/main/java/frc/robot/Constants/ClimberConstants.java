@@ -52,6 +52,9 @@ public class ClimberConstants {
     public static final double PEAK_FORWARD_VOLTAGE = 12.0;
     public static final double PEAK_REVERSE_VOLTAGE = -12.0;
 
+    /** Voltage for mechanism-mode manual extend/retract (run while held, no position stops). */
+    public static final double CLIMB_MANUAL_VOLTAGE = 8.0;
+
     /** Lift MotionMagic: slow cruise/accel for safe mechanism tuning and ascent. */
     public static final double LIFT_MOTION_MAGIC_CRUISE_VELOCITY = 15;   // rot/s
     public static final double LIFT_MOTION_MAGIC_ACCELERATION = 25;     // rot/s²

@@ -1,11 +1,14 @@
 package frc.robot.Commands.individual;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.FloorConstants.ConveyorSpeed;
 import frc.robot.Constants.FeederConstants.FeederSpeed;
 import frc.robot.Constants.IntakeConstants.DeployPosition;
 import frc.robot.Constants.IntakeConstants.IntakeSpeed;
 import frc.robot.Constants.ShooterConstants.ShooterSpeed;
+import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
@@ -69,5 +72,19 @@ public final class IndividualMechanismCommands {
 
     public static Command resetIntake(DeployableIntake intake) {
         return intake.resetIntakeSpeedCommand();
+    }
+
+    /** Climber extend: run at voltage while held, no position stops. Negative voltage = extend. */
+    public static Command climbExtend(Climber climber) {
+        return Commands.run(() -> climber.setVoltage(-ClimberConstants.CLIMB_MANUAL_VOLTAGE))
+                .finallyDo(interrupted -> climber.stopLift())
+                .withName("climber.extend");
+    }
+
+    /** Climber retract: run at voltage while held, no position stops. Positive voltage = retract. */
+    public static Command climbRetract(Climber climber) {
+        return Commands.run(() -> climber.setVoltage(ClimberConstants.CLIMB_MANUAL_VOLTAGE))
+                .finallyDo(interrupted -> climber.stopLift())
+                .withName("climber.retract");
     }
 }
