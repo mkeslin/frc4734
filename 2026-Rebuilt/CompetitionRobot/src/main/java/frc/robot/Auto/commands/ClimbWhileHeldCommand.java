@@ -45,6 +45,7 @@ public class ClimbWhileHeldCommand extends Command {
     private int m_level = 1;
 
     private static final double TOLERANCE = ClimberConstants.CLIMB_POSITION_TOLERANCE_ROTATIONS;
+    private static final double EXTEND_ONLY_TOLERANCE = ClimberConstants.CLIMB_EXTEND_ONLY_TOLERANCE_ROTATIONS;
 
     public ClimbWhileHeldCommand(Climber climber, boolean ascend, boolean runToCompletion, int maxLevels) {
         this(climber, null, ascend, runToCompletion, maxLevels, false, false);
@@ -150,7 +151,8 @@ public class ClimbWhileHeldCommand extends Command {
                 case Extending: {
                     double target = getExtendTarget(m_level);
                     m_climber.setLiftGoalPosition(target);
-                    if (atTarget(position, target)) {
+                    double tol = (m_extendOnly ? EXTEND_ONLY_TOLERANCE : TOLERANCE);
+                    if (Math.abs(position - target) < tol) {
                         m_ascendState = m_extendOnly ? AscendState.Done : AscendState.Retracting;
                     }
                     break;

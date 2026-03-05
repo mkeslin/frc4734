@@ -101,6 +101,8 @@ public class ClimberConstants {
     // ---- Climb cycle (rotation-based, run-while-held) ----
     /** Position tolerance in rotations for "at target" during climb/descend. */
     public static final double CLIMB_POSITION_TOLERANCE_ROTATIONS = 0.5;
+    /** Looser tolerance for extend-only (auto): finish sooner so drive to bar can start without waiting for full settle. */
+    public static final double CLIMB_EXTEND_ONLY_TOLERANCE_ROTATIONS = 2.0;
 
     /** Level 1: extend target (head at bar), start target (retracted). */
     public static final double CLIMB_L1_EXTEND_ROTATIONS = ClimberPosition.ACQUIRE.value;
