@@ -176,7 +176,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
                 // 11. Extend climber to L1 at offset pose (no retract yet)
-                ClimbWhileHeldCommand.extendL1Only(climber)
+                ClimbWhileHeldCommand.extendL1Only(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
                 // 12. Drive 2 ft toward the bar (field -X) to acquire the bar
@@ -198,7 +198,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
                 // 13. Retract climber from L1
-                ClimbWhileHeldCommand.retractFromL1(climber)
+                ClimbWhileHeldCommand.retractFromL1(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
                 // 14. Hold climb until end
@@ -445,7 +445,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
-                ClimbWhileHeldCommand.extendL1Only(climber)
+                ClimbWhileHeldCommand.extendL1Only(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
                 Commands.runOnce(() -> poseBeforeDriveToBar[0] = drivetrain.getPose()),
                 CmdDriveToPose.create(
@@ -462,7 +462,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
-                ClimbWhileHeldCommand.retractFromL1(climber)
+                ClimbWhileHeldCommand.retractFromL1(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
                 new CmdHoldClimbUntilEnd(climber, drivetrain)
         ).withName("TestClimb");

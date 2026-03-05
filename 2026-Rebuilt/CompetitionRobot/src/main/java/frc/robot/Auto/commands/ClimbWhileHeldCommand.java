@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.RobotState;
 import frc.robot.Subsystems.Climber;
+import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /**
  * Run-while-held climb command: runs a rotation-based ascend or descend cycle and only ends when cancelled (e.g. button released).
@@ -19,6 +20,7 @@ import frc.robot.Subsystems.Climber;
 public class ClimbWhileHeldCommand extends Command {
 
     private final Climber m_climber;
+    private final CommandSwerveDrivetrain m_drivetrain;
     private final boolean m_ascend;
     private final boolean m_runToCompletion;
     private final int m_maxLevels;
@@ -45,18 +47,22 @@ public class ClimbWhileHeldCommand extends Command {
     private static final double TOLERANCE = ClimberConstants.CLIMB_POSITION_TOLERANCE_ROTATIONS;
 
     public ClimbWhileHeldCommand(Climber climber, boolean ascend, boolean runToCompletion, int maxLevels) {
-        this(climber, ascend, runToCompletion, maxLevels, false, false);
+        this(climber, null, ascend, runToCompletion, maxLevels, false, false);
     }
 
-    private ClimbWhileHeldCommand(Climber climber, boolean ascend, boolean runToCompletion, int maxLevels,
-            boolean extendOnly, boolean retractOnly) {
+    private ClimbWhileHeldCommand(Climber climber, CommandSwerveDrivetrain drivetrain, boolean ascend,
+            boolean runToCompletion, int maxLevels, boolean extendOnly, boolean retractOnly) {
         this.m_climber = Objects.requireNonNull(climber, "climber cannot be null");
+        this.m_drivetrain = drivetrain;
         this.m_ascend = ascend;
         this.m_runToCompletion = runToCompletion;
         this.m_maxLevels = maxLevels;
         this.m_extendOnly = extendOnly;
         this.m_retractOnly = retractOnly;
         addRequirements(climber);
+        if (drivetrain != null) {
+            addRequirements(drivetrain);
+        }
     }
 
     /** Teleop: ascend while held (up to 3 levels), never finishes. */
@@ -74,14 +80,24 @@ public class ClimbWhileHeldCommand extends Command {
         return new ClimbWhileHeldCommand(climber, true, true, 1);
     }
 
-    /** Auto: extend to L1 only, then end (no retract). Use before driving to bar. */
+    /** Auto: extend to L1 only, then end (no retract). Use before driving to bar. Stops drivetrain during extend when provided. */
     public static ClimbWhileHeldCommand extendL1Only(Climber climber) {
-        return new ClimbWhileHeldCommand(climber, true, true, 1, true, false);
+        return new ClimbWhileHeldCommand(climber, null, true, true, 1, true, false);
     }
 
-    /** Auto: retract from L1 to start position, then end. Use after driving to bar. */
+    /** Auto: extend to L1 only, stopping drivetrain during extend. Use before driving to bar. */
+    public static ClimbWhileHeldCommand extendL1Only(Climber climber, CommandSwerveDrivetrain drivetrain) {
+        return new ClimbWhileHeldCommand(climber, drivetrain, true, true, 1, true, false);
+    }
+
+    /** Auto: retract from L1 to start position, then end. Use after driving to bar. Stops drivetrain during retract when provided. */
     public static ClimbWhileHeldCommand retractFromL1(Climber climber) {
-        return new ClimbWhileHeldCommand(climber, true, true, 1, false, true);
+        return new ClimbWhileHeldCommand(climber, null, true, true, 1, false, true);
+    }
+
+    /** Auto: retract from L1, stopping drivetrain during retract. Use after driving to bar. */
+    public static ClimbWhileHeldCommand retractFromL1(Climber climber, CommandSwerveDrivetrain drivetrain) {
+        return new ClimbWhileHeldCommand(climber, drivetrain, true, true, 1, false, true);
     }
 
     @Override
@@ -118,6 +134,10 @@ public class ClimbWhileHeldCommand extends Command {
         if (!RobotState.getInstance().isInitialized()) {
             m_climber.stopLift();
             return;
+        }
+
+        if (m_drivetrain != null) {
+            m_drivetrain.stop();
         }
 
         double position = m_climber.getPosition();
