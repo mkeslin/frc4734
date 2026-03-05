@@ -105,6 +105,9 @@ public class ClimbWhileHeldCommand extends Command {
         m_ascendState = m_retractOnly ? AscendState.Retracting : AscendState.Extending;
         m_descendState = DescendState.RetractingToStart;
         m_level = 1;
+        if (m_drivetrain != null) {
+            m_drivetrain.stop();
+        }
     }
 
     private static boolean atTarget(double current, double target) {
