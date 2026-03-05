@@ -200,7 +200,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 12b. Drive 2 in more toward the bar right before retract
+                // 12b. Drive 2 in more toward the bar right before retract (tight tolerance so short move actually runs)
                 Commands.runOnce(() -> poseBeforeRetract[0] = drivetrain.getPose()),
                 CmdDriveToPose.create(
                         drivetrain,
@@ -213,7 +213,7 @@ public class AutoRoutines {
                                     pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS, 0)),
                                     pBlue.getRotation());
                         },
-                        AutoConstants.DEFAULT_XY_TOLERANCE,
+                        0.02,  // Tight XY tolerance (2 cm) so 2 in move is required; default 10 cm would skip it
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
@@ -496,7 +496,7 @@ public class AutoRoutines {
                                     pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS, 0)),
                                     pBlue.getRotation());
                         },
-                        AutoConstants.DEFAULT_XY_TOLERANCE,
+                        0.02,  // Tight XY tolerance (2 cm) so 2 in move is required
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
                 ClimbWhileHeldCommand.retractFromL1(climber, drivetrain)

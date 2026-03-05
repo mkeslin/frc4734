@@ -529,10 +529,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     public Command pathfindToPoseBlue(Pose2d poseBlue) {
         var constraints = new PathConstraints(
-                frc.robot.Auto.commands.AutoConstants.TEMPORARY_AUTO_MAX_SPEED_MPS,
-                frc.robot.Auto.commands.AutoConstants.TEMPORARY_AUTO_MAX_ACCELERATION,
-                frc.robot.SwerveDrivetrain.DrivetrainConstants.MaxAngularRate,
-                frc.robot.SwerveDrivetrain.DrivetrainConstants.kMaxAngularAcceleration
+                DrivetrainConstants.MaxSpeed,
+                DrivetrainConstants.MaxAcceleration,
+                DrivetrainConstants.MaxAngularRate,
+                DrivetrainConstants.kMaxAngularAcceleration
         );
         return AutoBuilder.pathfindToPoseFlipped(poseBlue, constraints, 0);
     }
