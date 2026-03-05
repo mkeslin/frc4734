@@ -4,6 +4,7 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +23,9 @@ public class Robot extends LoggedRobot {
     private Command m_autonomousCommand;
 
     private RobotContainer m_robotContainer;
+
+    /** Last mode we were enabled in; used when logging disabled transition (e.g. e-stop from auto). */
+    private String m_lastEnabledMode = "none";
     private PerformanceMonitor m_performanceMonitor;
 
     public Robot() {
@@ -102,7 +106,17 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledInit() {
-        // Cleanup resources when robot is disabled
+        boolean eStopped = DriverStation.isEStopped();
+        String msg = String.format("[Robot] Disabled (from %s)%s",
+                m_lastEnabledMode,
+                eStopped ? " — E-STOP ACTIVE" : "");
+        RobotLogger.log(msg);
+        if (eStopped) {
+            RobotLogger.logError("[Robot] Driver Station reports E-STOP; check DS diagnostics and logs.");
+            System.err.println(msg);
+        } else {
+            System.out.println(msg);
+        }
         m_robotContainer.cleanup();
     }
 
@@ -123,6 +137,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
+        m_lastEnabledMode = "autonomous";
         m_robotContainer.getAutoManager().runSelectedRoutine();
     }
 
@@ -137,6 +152,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
+        m_lastEnabledMode = "teleop";
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
@@ -152,6 +168,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testInit() {
+        m_lastEnabledMode = "test";
         CommandScheduler.getInstance().cancelAll();
         LiveWindow.setEnabled(false);
     }
