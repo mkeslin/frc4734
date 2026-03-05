@@ -56,8 +56,8 @@ public class ClimberConstants {
     public static final double CLIMB_MANUAL_VOLTAGE = 8.0;
 
     /** Lift MotionMagic: cruise/accel for mechanism tuning and ascent. */
-    public static final double LIFT_MOTION_MAGIC_CRUISE_VELOCITY = 22;   // rot/s
-    public static final double LIFT_MOTION_MAGIC_ACCELERATION = 40;     // rot/s²
+    public static final double LIFT_MOTION_MAGIC_CRUISE_VELOCITY = 24;   // rot/s
+    public static final double LIFT_MOTION_MAGIC_ACCELERATION = 44;     // rot/s²
     public static final double LIFT_MOTION_MAGIC_JERK = 300;            // rot/s³
 
     // ---- Jaws (left and right, independent open/closed) ----

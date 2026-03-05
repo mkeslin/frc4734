@@ -55,9 +55,9 @@ public final class AutoConstants {
     public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
 
     /** TEMPORARY: max speed (m/s) for auto pathfinding. Restore to DrivetrainConstants when done testing. */
-    public static final double TEMPORARY_AUTO_MAX_SPEED_MPS = 1.0;
+    public static final double TEMPORARY_AUTO_MAX_SPEED_MPS = 1.1;
     /** TEMPORARY: max acceleration (m/s²) for auto pathfinding. Restore to DrivetrainConstants when done testing. */
-    public static final double TEMPORARY_AUTO_MAX_ACCELERATION = 1.0;
+    public static final double TEMPORARY_AUTO_MAX_ACCELERATION = 1.1;
 
     /** TEMPORARY: shooter target speed (RPS) for low-ceiling room testing. Revert to 3000 and 100 tolerance for competition. */
     public static final double TEMPORARY_SHOOTER_TARGET_SPEED = 100.0;
