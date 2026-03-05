@@ -323,4 +323,135 @@ public class AutoRoutines {
                 CmdShootForTime.create(shooter, feeder, shootDuration)
         ).withName("ShooterAuto");
     }
+
+    /**
+     * Builds a test routine: seed, drive to shot, shoot (no center run).
+     * Subset of ShooterAuto for testing drive + shoot flow.
+     *
+     * @param id Start pose identifier
+     * @param startPoseSuppliers Map of start pose IDs to suppliers
+     * @param pathToShot Path name to shooting position
+     * @param fallbackHeadingDeg Fallback heading for hub aiming
+     * @param targetRpm Target shooter RPM
+     * @param rpmTol RPM tolerance
+     * @param shootDuration Duration to shoot
+     * @param drivetrain Drivetrain subsystem
+     * @param vision Vision subsystem
+     * @param shooter Shooter subsystem
+     * @param feeder Feeder subsystem
+     */
+    public static Command buildTestDriveAndShoot(
+            StartPoseId id,
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
+            String pathToShot,
+            double fallbackHeadingDeg,
+            double targetRpm,
+            double rpmTol,
+            double shootDuration,
+            CommandSwerveDrivetrain drivetrain,
+            PhotonVision vision,
+            Shooter shooter,
+            Feeder feeder) {
+        Objects.requireNonNull(id, "id cannot be null");
+        Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
+        Objects.requireNonNull(pathToShot, "pathToShot cannot be null");
+        Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
+        Objects.requireNonNull(vision, "vision cannot be null");
+        Objects.requireNonNull(shooter, "shooter cannot be null");
+        Objects.requireNonNull(feeder, "feeder cannot be null");
+
+        Supplier<Double> rpmSupplier = () -> targetRpm;
+
+        return Commands.sequence(
+                CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
+                new CmdApplyTagSnapIfGood(
+                        vision,
+                        drivetrain,
+                        AutoConstants.DEFAULT_MAX_AMBIGUITY,
+                        AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
+                        AutoConstants.DEFAULT_MIN_TARGETS),
+                Commands.deadline(
+                        new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                        new CmdShooterSpinUp(shooter, rpmSupplier)),
+                CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
+                CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
+                CmdShootForTime.create(shooter, feeder, shootDuration)
+        ).withName("TestDriveAndShoot");
+    }
+
+    /**
+     * Builds a test routine: seed, drive to tower, extend L1, drive to bar, retract.
+     * Subset of ClimberAuto for testing climb flow.
+     *
+     * @param id Start pose identifier
+     * @param startPoseSuppliers Map of start pose IDs to suppliers
+     * @param towerAlignPose Supplier of tower align pose (from climb-side chooser)
+     * @param drivetrain Drivetrain subsystem
+     * @param vision Vision subsystem
+     * @param climber Climber subsystem
+     */
+    public static Command buildTestClimb(
+            StartPoseId id,
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
+            Supplier<Pose2d> towerAlignPose,
+            CommandSwerveDrivetrain drivetrain,
+            PhotonVision vision,
+            Climber climber) {
+        Objects.requireNonNull(id, "id cannot be null");
+        Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
+        Objects.requireNonNull(towerAlignPose, "towerAlignPose cannot be null");
+        Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
+        Objects.requireNonNull(vision, "vision cannot be null");
+        Objects.requireNonNull(climber, "climber cannot be null");
+
+        final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
+
+        return Commands.sequence(
+                CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
+                new CmdApplyTagSnapIfGood(
+                        vision,
+                        drivetrain,
+                        AutoConstants.DEFAULT_MAX_AMBIGUITY,
+                        AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
+                        AutoConstants.DEFAULT_MIN_TARGETS),
+                CmdDriveToPose.create(
+                        drivetrain,
+                        towerAlignPose,
+                        AutoConstants.DEFAULT_XY_TOLERANCE,
+                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                        AutoConstants.DEFAULT_POSE_TIMEOUT),
+                new CmdApplyTagSnapIfGood(
+                        vision,
+                        drivetrain,
+                        AutoConstants.DEFAULT_MAX_AMBIGUITY,
+                        AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
+                        AutoConstants.DEFAULT_MIN_TARGETS),
+                CmdDriveToPose.create(
+                        drivetrain,
+                        towerAlignPose,
+                        AutoConstants.DEFAULT_XY_TOLERANCE,
+                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                        AutoConstants.DEFAULT_POSE_TIMEOUT),
+                ClimbWhileHeldCommand.extendL1Only(climber)
+                        .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
+                Commands.runOnce(() -> poseBeforeDriveToBar[0] = drivetrain.getPose()),
+                CmdDriveToPose.create(
+                        drivetrain,
+                        () -> {
+                            Pose2d p = poseBeforeDriveToBar[0];
+                            if (p == null) return null;
+                            Pose2d pBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+                                    ? AllianceUtils.redToBlue(p) : p;
+                            return new Pose2d(
+                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_TO_BAR_METERS, 0)),
+                                    pBlue.getRotation());
+                        },
+                        AutoConstants.DEFAULT_XY_TOLERANCE,
+                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                        AutoConstants.DEFAULT_POSE_TIMEOUT),
+                ClimbWhileHeldCommand.retractFromL1(climber)
+                        .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
+                new CmdHoldClimbUntilEnd(climber, drivetrain)
+        ).withName("TestClimb");
+    }
 }

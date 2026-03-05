@@ -330,7 +330,7 @@ public class AutoConfigurator {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT))
                 .withName("PathPlannerTest-AtoB");
-        m_autoManager.addRoutine(new AutoRoutine("PathPlanner Test (A→B)", driveAToBTest, List.of(), BlueLandmarks.Start1));
+        m_autoManager.addRoutine(new AutoRoutine("Test - PathPlanner", driveAToBTest, List.of(), BlueLandmarks.Start1));
 
         if (vision == null || shooter == null || feeder == null) {
             return; // Need core subsystems for remaining autos
@@ -338,6 +338,38 @@ public class AutoConfigurator {
 
         StartPoseId defaultPose = StartPoseId.POS_1;
         String pathToShot = MoleculeTests.getPathNameForPose(defaultPose, "StartToShot");
+
+        // Test - Drive and Shoot: seed, path to shot, aim, shoot (no center run)
+        Command testDriveAndShoot = AutoRoutines.buildTestDriveAndShoot(
+                defaultPose,
+                startPoseSuppliers,
+                pathToShot,
+                AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
+                AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
+                AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
+                1.0,
+                m_drivetrain,
+                vision,
+                shooter,
+                feeder);
+        m_autoManager.addRoutine(new AutoRoutine("Test - Drive and Shoot", testDriveAndShoot, List.of(), BlueLandmarks.Start1));
+
+        // Test - Climb: seed, drive to tower, extend L1, drive to bar, retract
+        if (climber != null) {
+            Supplier<Pose2d> towerAlignPoseSupplier = () -> {
+                ClimbSide side = m_climbSideChooser.getSelected();
+                return (side == ClimbSide.RIGHT) ? BlueLandmarks.TowerAlignRightOffset : BlueLandmarks.TowerAlignLeftOffset;
+            };
+            Command testClimb = AutoRoutines.buildTestClimb(
+                    defaultPose,
+                    startPoseSuppliers,
+                    towerAlignPoseSupplier,
+                    m_drivetrain,
+                    vision,
+                    climber);
+            m_autoManager.addRoutine(new AutoRoutine("Test - Climb", testClimb, List.of(), BlueLandmarks.Start1));
+        }
+
         String pathToCenter = MoleculeTests.getPathNameForPose(defaultPose, "StartToCenter");
         String pathBackToShot = MoleculeTests.getPathNameForPose(defaultPose, "CenterToShot");
 

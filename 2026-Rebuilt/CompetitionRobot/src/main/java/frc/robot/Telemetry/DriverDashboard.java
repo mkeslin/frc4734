@@ -140,11 +140,11 @@ public class DriverDashboard {
 
         String colorPrefix;
         if (phase == MatchPhase.ENDGAME || (phase == MatchPhase.TELEOP && timeRemaining < 30.0)) {
-            colorPrefix = "🔴 ";
+            colorPrefix = "! ";
         } else if (timeRemaining < 60.0 && phase != MatchPhase.AUTO) {
-            colorPrefix = "🟡 ";
+            colorPrefix = "~ ";
         } else {
-            colorPrefix = "🟢 ";
+            colorPrefix = "";
         }
 
         matchTimerEntry.setValue(NetworkTableValue.makeString(colorPrefix + timeString + phaseString));
@@ -172,12 +172,12 @@ public class DriverDashboard {
                 tagCount = latestResult.getTargets().size();
             }
             if (hasTargets && tagCount > 0) {
-                visionStatusEntry.setValue(NetworkTableValue.makeString(String.format("🟢 LOCKED (%d tags)", tagCount)));
+                visionStatusEntry.setValue(NetworkTableValue.makeString(String.format("LOCKED (%d tags)", tagCount)));
             } else {
-                visionStatusEntry.setValue(NetworkTableValue.makeString("🟡 ODOMETRY ONLY"));
+                visionStatusEntry.setValue(NetworkTableValue.makeString("ODOMETRY ONLY"));
             }
         } else {
-            visionStatusEntry.setValue(NetworkTableValue.makeString("🔴 NO CAMERA"));
+            visionStatusEntry.setValue(NetworkTableValue.makeString("NO CAMERA"));
         }
     }
 
@@ -202,7 +202,7 @@ public class DriverDashboard {
 
     private void updateAllianceColor() {
         var alliance = AllianceUtils.getAlliance();
-        String colorString = alliance == DriverStation.Alliance.Red ? "🔴 RED" : "🔵 BLUE";
+        String colorString = alliance == DriverStation.Alliance.Red ? "RED" : "BLUE";
         allianceColorEntry.setValue(NetworkTableValue.makeString(colorString));
     }
 }
