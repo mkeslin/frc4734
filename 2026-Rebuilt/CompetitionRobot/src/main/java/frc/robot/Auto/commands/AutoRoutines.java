@@ -13,6 +13,7 @@ import frc.robot.Constants.IntakeConstants.DeployPosition;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
+import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -94,6 +95,7 @@ public class AutoRoutines {
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
+            Floor floor,
             DeployableIntake intake,
             Climber climber) {
         
@@ -147,7 +149,7 @@ public class AutoRoutines {
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
 
                 // 7. Shoot for time (preload)
-                CmdShootForTime.create(shooter, feeder, shootDuration),
+                CmdShootForTime.create(shooter, feeder, floor, shootDuration),
 
                 // 8. Drive to tower align pose (side from Shuffleboard "Climb Side" chooser)
                 CmdDriveToPose.create(
@@ -237,6 +239,7 @@ public class AutoRoutines {
      * @param vision The PhotonVision subsystem
      * @param shooter The shooter subsystem
      * @param feeder The feeder subsystem
+     * @param floor The floor conveyor subsystem (runs with feeder to feed notes)
      * @param intake The intake subsystem
      * @param positionTracker The position tracker for sensor reading
      * @return A command representing the complete shooter auto routine
@@ -257,6 +260,7 @@ public class AutoRoutines {
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
+            Floor floor,
             DeployableIntake intake,
             PositionTracker positionTracker) {
         
@@ -269,6 +273,7 @@ public class AutoRoutines {
         Objects.requireNonNull(vision, "vision cannot be null");
         Objects.requireNonNull(shooter, "shooter cannot be null");
         Objects.requireNonNull(feeder, "feeder cannot be null");
+        Objects.requireNonNull(floor, "floor cannot be null");
         Objects.requireNonNull(intake, "intake cannot be null");
         Objects.requireNonNull(positionTracker, "positionTracker cannot be null");
 
@@ -298,7 +303,7 @@ public class AutoRoutines {
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
 
                 // 6. Shoot for time
-                CmdShootForTime.create(shooter, feeder, shootDuration),
+                CmdShootForTime.create(shooter, feeder, floor, shootDuration),
 
                 // 7. Follow path to center (intake on until path finishes)
                 Commands.deadline(
@@ -320,7 +325,7 @@ public class AutoRoutines {
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
 
                 // 12. Shoot for time
-                CmdShootForTime.create(shooter, feeder, shootDuration)
+                CmdShootForTime.create(shooter, feeder, floor, shootDuration)
         ).withName("ShooterAuto");
     }
 
@@ -339,6 +344,7 @@ public class AutoRoutines {
      * @param vision Vision subsystem
      * @param shooter Shooter subsystem
      * @param feeder Feeder subsystem
+     * @param floor Optional floor subsystem; if non-null, runs after delay to feed from conveyor
      * @param intake Optional deployable intake; if non-null, lowered before hub aim so webcam is unblocked
      */
     public static Command buildTestDriveAndShoot(
@@ -353,6 +359,7 @@ public class AutoRoutines {
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
+            Floor floor,
             DeployableIntake intake) {
         Objects.requireNonNull(id, "id cannot be null");
         Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
@@ -381,7 +388,7 @@ public class AutoRoutines {
                         : Commands.none(),
                 CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
-                CmdShootForTime.create(shooter, feeder, shootDuration)
+                CmdShootForTime.create(shooter, feeder, floor, shootDuration)
         ).withName("TestDriveAndShoot");
     }
 

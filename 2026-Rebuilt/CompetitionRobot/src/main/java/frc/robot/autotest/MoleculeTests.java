@@ -21,6 +21,7 @@ import frc.robot.Auto.commands.CmdWaitShooterAtSpeed;
 import frc.robot.Auto.commands.StartPoseId;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.Feeder;
+import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -96,6 +97,7 @@ public final class MoleculeTests {
      * @param drivetrain Drivetrain subsystem
      * @param shooter Shooter subsystem
      * @param feeder Feeder subsystem
+     * @param floor Optional floor subsystem; if non-null, runs with feeder to feed notes
      * @return Command sequence
      */
     public static Command buildPathSpinupShoot(
@@ -105,7 +107,8 @@ public final class MoleculeTests {
             double shootDuration,
             CommandSwerveDrivetrain drivetrain,
             Shooter shooter,
-            Feeder feeder) {
+            Feeder feeder,
+            Floor floor) {
         
         Objects.requireNonNull(pathName, "pathName cannot be null");
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
@@ -124,7 +127,7 @@ public final class MoleculeTests {
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
                 
                 // 3. Shoot for duration
-                CmdShootForTime.create(shooter, feeder, shootDuration)
+                CmdShootForTime.create(shooter, feeder, floor, shootDuration)
         ).withName("Mol: Path+SpinUp->Shoot");
     }
 

@@ -182,13 +182,22 @@ public class CmdShootForTime extends Command {
 
     /**
      * Factory method to create a command without requiring shooter at speed.
-     * 
+     * Runs feeder and floor (if non-null) to feed notes into the shooter.
+     *
      * @param shooter The shooter subsystem
      * @param feeder The feeder subsystem
+     * @param floor Optional floor subsystem; if non-null, runs after SHOOT_FLOOR_DELAY to feed from conveyor
      * @param durationSec Duration to feed in seconds
      * @return A command that shoots for the specified duration
      */
+    public static Command create(Shooter shooter, Feeder feeder, Floor floor, double durationSec) {
+        return new CmdShootForTime(shooter, feeder, floor, durationSec, false, false, null, 0.0);
+    }
+
+    /**
+     * Factory method (no floor). Use {@link #create(Shooter, Feeder, Floor, double)} when floor is available.
+     */
     public static Command create(Shooter shooter, Feeder feeder, double durationSec) {
-        return new CmdShootForTime(shooter, feeder, durationSec, false, null, 0.0);
+        return create(shooter, feeder, null, durationSec);
     }
 }

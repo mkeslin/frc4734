@@ -100,6 +100,7 @@ public class RobotContainer {
                 m_subsystemFactory.getPhotonVision(),
                 m_subsystemFactory.getShooter(),
                 m_subsystemFactory.getFeeder(),
+                m_subsystemFactory.getFloor(),
                 m_subsystemFactory.getDeployableIntake(),
                 m_subsystemFactory.getClimber(),
                 m_subsystemFactory.getPositionTracker()

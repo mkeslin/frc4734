@@ -44,6 +44,7 @@ import frc.robot.autotest.MoleculeTests;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
+import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -82,6 +83,7 @@ public class AutoConfigurator {
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
+            Floor floor,
             DeployableIntake intake,
             Climber climber,
             PositionTracker positionTracker) {
@@ -103,13 +105,13 @@ public class AutoConfigurator {
                 positionTracker);
         
         // Register atom commands
-        registerAtoms(startPoseSuppliers, vision, shooter, feeder, intake, climber, positionTracker);
+        registerAtoms(startPoseSuppliers, vision, shooter, feeder, floor, intake, climber, positionTracker);
         
         // Register molecule tests
-        registerMolecules(startPoseSuppliers, vision, shooter, feeder, intake, climber);
+        registerMolecules(startPoseSuppliers, vision, shooter, feeder, floor, intake, climber);
         
         // Register full autos
-        registerFullAutos(startPoseSuppliers, vision, shooter, feeder, intake, climber, positionTracker);
+        registerFullAutos(startPoseSuppliers, vision, shooter, feeder, floor, intake, climber, positionTracker);
         
         // Initialize test harness
         m_testHarness.initialize();
@@ -134,6 +136,7 @@ public class AutoConfigurator {
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
+            Floor floor,
             DeployableIntake intake,
             Climber climber,
             PositionTracker positionTracker) {
@@ -198,10 +201,10 @@ public class AutoConfigurator {
                     new CmdSetShotMode(shooter, ShotMode.AUTO_SHOT));
             if (feeder != null) {
                 m_testHarness.registerAtom("ShootForTime", () -> 
-                        CmdShootForTime.create(shooter, feeder, 1.0));
+                        CmdShootForTime.create(shooter, feeder, floor, 1.0));
                 // Coordinated shoot: wait for shooter at speed, then feed for duration
                 m_testHarness.registerAtom("Shoot", () -> 
-                        new CmdShootForTime(shooter, feeder, 1.5, true, testRpm, 100.0));
+                        new CmdShootForTime(shooter, feeder, floor, 1.5, true, false, testRpm, 100.0));
             }
             m_testHarness.registerAtom("StopShooter", () -> 
                     new CmdStopShooter(shooter));
@@ -259,6 +262,7 @@ public class AutoConfigurator {
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
+            Floor floor,
             DeployableIntake intake,
             Climber climber) {
         
@@ -290,7 +294,8 @@ public class AutoConfigurator {
                             1.0, // Shoot duration
                             m_drivetrain,
                             shooter,
-                            feeder));
+                            feeder,
+                            floor));
         }
         
         // Molecule 3: Path->Align->Climb->Hold (align pose in blue for pathfinding)
@@ -313,6 +318,7 @@ public class AutoConfigurator {
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
+            Floor floor,
             DeployableIntake intake,
             Climber climber,
             PositionTracker positionTracker) {
@@ -352,6 +358,7 @@ public class AutoConfigurator {
                 vision,
                 shooter,
                 feeder,
+                floor,
                 intake);
         m_autoManager.addRoutine(new AutoRoutine("Test - Drive and Shoot", testDriveAndShoot, List.of(), BlueLandmarks.Start1));
 
@@ -399,6 +406,7 @@ public class AutoConfigurator {
                         vision,
                         shooter,
                         feeder,
+                        floor,
                         intake,
                         climber);
                 Pose2d initialPoseBlue = startId == StartPoseId.POS_1 ? BlueLandmarks.Start1
@@ -428,6 +436,7 @@ public class AutoConfigurator {
                     vision,
                     shooter,
                     feeder,
+                    floor,
                     intake,
                     positionTracker);
             m_autoManager.addRoutine(new AutoRoutine("ShooterAuto", shooterAuto));
