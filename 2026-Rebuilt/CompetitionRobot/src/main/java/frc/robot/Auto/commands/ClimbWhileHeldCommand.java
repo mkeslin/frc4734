@@ -22,6 +22,10 @@ public class ClimbWhileHeldCommand extends Command {
     private final boolean m_ascend;
     private final boolean m_runToCompletion;
     private final int m_maxLevels;
+    /** When true, ascend ends when extend target is reached (no retract). */
+    private final boolean m_extendOnly;
+    /** When true, ascend starts in Retracting state (retract to start only). */
+    private final boolean m_retractOnly;
 
     private enum AscendState {
         Extending,
@@ -41,10 +45,17 @@ public class ClimbWhileHeldCommand extends Command {
     private static final double TOLERANCE = ClimberConstants.CLIMB_POSITION_TOLERANCE_ROTATIONS;
 
     public ClimbWhileHeldCommand(Climber climber, boolean ascend, boolean runToCompletion, int maxLevels) {
+        this(climber, ascend, runToCompletion, maxLevels, false, false);
+    }
+
+    private ClimbWhileHeldCommand(Climber climber, boolean ascend, boolean runToCompletion, int maxLevels,
+            boolean extendOnly, boolean retractOnly) {
         this.m_climber = Objects.requireNonNull(climber, "climber cannot be null");
         this.m_ascend = ascend;
         this.m_runToCompletion = runToCompletion;
         this.m_maxLevels = maxLevels;
+        this.m_extendOnly = extendOnly;
+        this.m_retractOnly = retractOnly;
         addRequirements(climber);
     }
 
@@ -63,9 +74,19 @@ public class ClimbWhileHeldCommand extends Command {
         return new ClimbWhileHeldCommand(climber, true, true, 1);
     }
 
+    /** Auto: extend to L1 only, then end (no retract). Use before driving to bar. */
+    public static ClimbWhileHeldCommand extendL1Only(Climber climber) {
+        return new ClimbWhileHeldCommand(climber, true, true, 1, true, false);
+    }
+
+    /** Auto: retract from L1 to start position, then end. Use after driving to bar. */
+    public static ClimbWhileHeldCommand retractFromL1(Climber climber) {
+        return new ClimbWhileHeldCommand(climber, true, true, 1, false, true);
+    }
+
     @Override
     public void initialize() {
-        m_ascendState = AscendState.Extending;
+        m_ascendState = m_retractOnly ? AscendState.Retracting : AscendState.Extending;
         m_descendState = DescendState.RetractingToStart;
         m_level = 1;
     }
@@ -107,7 +128,7 @@ public class ClimbWhileHeldCommand extends Command {
                     double target = getExtendTarget(m_level);
                     m_climber.setLiftGoalPosition(target);
                     if (atTarget(position, target)) {
-                        m_ascendState = AscendState.Retracting;
+                        m_ascendState = m_extendOnly ? AscendState.Done : AscendState.Retracting;
                     }
                     break;
                 }

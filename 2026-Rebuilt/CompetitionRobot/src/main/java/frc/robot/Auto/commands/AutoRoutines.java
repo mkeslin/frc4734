@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.PositionTracker;
@@ -13,6 +14,9 @@ import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Shooter;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.PathPlanner.AllianceUtils;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
@@ -51,11 +55,12 @@ public class AutoRoutines {
      *   <li>Acquires hub aim</li>
      *   <li>Waits for shooter at speed</li>
      *   <li>Shoots preload for specified duration</li>
-     *   <li>Drives to tower align pose</li>
+     *   <li>Drives to tower align pose (offset 2 ft toward field center from bar)</li>
      *   <li>Applies tag snap before final alignment</li>
      *   <li>Drives to tower align pose again (fine alignment)</li>
-     *   <li>Drives forward a short distance to acquire the bar</li>
-     *   <li>Climbs L1 (with timeout)</li>
+     *   <li>Extends climber to L1 at offset pose</li>
+     *   <li>Drives 2 ft toward the bar (field-relative) to acquire the bar</li>
+     *   <li>Retracts climber from L1</li>
      *   <li>Holds climb until auto end</li>
      * </ol>
      * 
@@ -103,6 +108,9 @@ public class AutoRoutines {
         Objects.requireNonNull(climber, "climber cannot be null");
 
         Supplier<Double> rpmSupplier = () -> targetRpm;
+
+        // Captured after extending climber; used by drive-to-bar step (pathfind to pose 2 ft toward bar).
+        final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
 
         return Commands.sequence(
                 // 1. Seed odometry from start pose
@@ -157,7 +165,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // 10. Drive to tower align pose again (fine alignment)
+                // 10. Drive to tower align pose again (fine alignment; pose is 2 ft toward center from bar)
                 CmdDriveToPose.create(
                         drivetrain,
                         towerAlignPose,
@@ -165,17 +173,33 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 11. Drive forward to acquire the bar (align pose stops at bar; short move to grab)
-                new CmdDriveForward(
-                        drivetrain,
-                        AutoConstants.DEFAULT_CLIMB_ACQUIRE_DISTANCE_METERS,
-                        AutoConstants.DEFAULT_CLIMB_ACQUIRE_TIMEOUT),
-
-                // 12. One climb cycle (extend L1 → retract), then end
-                ClimbWhileHeldCommand.ascentToCompletion(climber)
+                // 11. Extend climber to L1 at offset pose (no retract yet)
+                ClimbWhileHeldCommand.extendL1Only(climber)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
-                // 13. Hold climb until end
+                // 12. Drive 2 ft toward the bar (field -X) to acquire the bar
+                Commands.runOnce(() -> poseBeforeDriveToBar[0] = drivetrain.getPose()),
+                CmdDriveToPose.create(
+                        drivetrain,
+                        () -> {
+                            Pose2d p = poseBeforeDriveToBar[0];
+                            if (p == null) return null;
+                            // Target is 2 ft toward bar (in blue: -X). Convert to blue for pathfinding.
+                            Pose2d pBlue = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+                                    ? AllianceUtils.redToBlue(p) : p;
+                            return new Pose2d(
+                                    pBlue.getTranslation().minus(new Translation2d(AutoConstants.CLIMB_DRIVE_TO_BAR_METERS, 0)),
+                                    pBlue.getRotation());
+                        },
+                        AutoConstants.DEFAULT_XY_TOLERANCE,
+                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                        AutoConstants.DEFAULT_POSE_TIMEOUT),
+
+                // 13. Retract climber from L1
+                ClimbWhileHeldCommand.retractFromL1(climber)
+                        .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
+
+                // 14. Hold climb until end
                 new CmdHoldClimbUntilEnd(climber, drivetrain)
         ).withName("ClimberAuto");
     }

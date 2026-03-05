@@ -343,11 +343,12 @@ public class AutoConfigurator {
         String pathBackToShot = MoleculeTests.getPathNameForPose(defaultPose, "CenterToShot");
 
         // Climber Auto: three start positions; tower side is chosen via Shuffleboard "Climb Side" (center not usable)
+        // Tower pose is offset 2 ft toward field center so robot extends climber there, then drives to bar and retracts.
         // Shot and tower poses in blue so pathfinding always gets blue-origin coordinates.
         if (climber != null) {
             Supplier<Pose2d> towerAlignPoseSupplier = () -> {
                 ClimbSide side = m_climbSideChooser.getSelected();
-                return (side == ClimbSide.RIGHT) ? BlueLandmarks.TowerAlignRight : BlueLandmarks.TowerAlignLeft;
+                return (side == ClimbSide.RIGHT) ? BlueLandmarks.TowerAlignRightOffset : BlueLandmarks.TowerAlignLeftOffset;
             };
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_2, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : (startId == StartPoseId.POS_2 ? "Middle" : "Right");
