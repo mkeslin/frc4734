@@ -246,7 +246,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             RobotLogger.log("[PathPlanner] RobotConfig loaded; configuring AutoBuilder...");
             System.out.println("[PathPlanner] RobotConfig loaded; configuring AutoBuilder...");
             AutoBuilder.configure(
-                    () -> getState().Pose, // Supplier of current robot pose (alliance-relative)
+                    // PathPlanner pathfinding uses a blue-origin nav grid; pose supplier must return blue so start is inside the grid.
+                    () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+                            ? AllianceUtils.redToBlue(getState().Pose)
+                            : getState().Pose,
                     this::resetPose, // Consumer for seeding pose against auto
                     () -> getState().Speeds, // Supplier of current robot speeds
                     // Consumer of ChassisSpeeds and feedforwards to drive the robot
