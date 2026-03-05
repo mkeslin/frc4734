@@ -32,6 +32,8 @@ public final class AutoConstants {
     public static final double CLIMB_TOWER_OFFSET_TOWARD_CENTER_METERS = 0.6096;
     /** Distance (m) to drive from offset pose toward the bar after extending climber (same as offset). 2 ft. */
     public static final double CLIMB_DRIVE_TO_BAR_METERS = 0.6096;
+    /** Extra drive (m) toward the bar after initial drive, so robot has enough bar to climb on. ~2 in. */
+    public static final double CLIMB_EXTRA_DRIVE_TOWARD_BAR_METERS = 0.05;
     /** Timeout for the drive-forward-to-acquire-bar step. */
     public static final double DEFAULT_CLIMB_ACQUIRE_TIMEOUT = 3.0;
     public static final double DEFAULT_CLIMB_TIMEOUT = 15.0;
