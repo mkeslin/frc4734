@@ -3,15 +3,15 @@ package frc.robot.Subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.Constants.CANIds.CAN_BUS;
 import static frc.robot.Constants.CANIds.CLIMBER;
-import static frc.robot.Constants.CANIds.CLIMBER_JAW_LEFT;
-import static frc.robot.Constants.CANIds.CLIMBER_JAW_RIGHT;
+// import static frc.robot.Constants.CANIds.CLIMBER_JAW_LEFT;
+// import static frc.robot.Constants.CANIds.CLIMBER_JAW_RIGHT;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
+// import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -98,8 +98,8 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         m_climber.setNeutralMode(NeutralModeValue.Brake);
         m_climber.getConfigurator().apply(talonFxConfigs);
 
-        InvertedValue leftinvert = ClimberConstants.JAW_MOTORS_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-        InvertedValue rightinvert = ClimberConstants.JAW_MOTORS_INVERTED ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive;
+        // InvertedValue leftinvert = ClimberConstants.JAW_MOTORS_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+        // InvertedValue rightinvert = ClimberConstants.JAW_MOTORS_INVERTED ? InvertedValue.CounterClockwise_Positive : InvertedValue.Clockwise_Positive;
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
                 .withSupplyCurrentLimit(Amps.of(ClimberConstants.SUPPLY_CURRENT_LIMIT_AMPS))
                 .withSupplyCurrentLimitEnable(ClimberConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
@@ -114,37 +114,39 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         m_climber.getConfigurator().apply(closedLoopRamps);
         m_climber.getConfigurator().apply(voltage);
 
+        // TEMPORARY: Jaws removed from robot - comment out jaw motor creation
         // Jaws: position control (open/closed) with MotionMagic
-        var jawConfigs = new TalonFXConfiguration();
-        jawConfigs.Slot0.kP = ClimberConstants.JAW_KP;
-        jawConfigs.Slot0.kI = ClimberConstants.JAW_KI;
-        jawConfigs.Slot0.kD = ClimberConstants.JAW_KD;
-        jawConfigs.MotionMagic.MotionMagicCruiseVelocity = ClimberConstants.JAW_MOTION_MAGIC_CRUISE_VELOCITY;
-        jawConfigs.MotionMagic.MotionMagicAcceleration = ClimberConstants.JAW_MOTION_MAGIC_ACCELERATION;
-        jawConfigs.MotionMagic.MotionMagicJerk = ClimberConstants.JAW_MOTION_MAGIC_JERK;
-
-        CurrentLimitsConfigs jawCurrentLimits = new CurrentLimitsConfigs()
-                .withSupplyCurrentLimit(Amps.of(ClimberConstants.JAW_SUPPLY_CURRENT_LIMIT_AMPS))
-                .withSupplyCurrentLimitEnable(ClimberConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
-                .withStatorCurrentLimit(Amps.of(ClimberConstants.JAW_STATOR_CURRENT_LIMIT_AMPS))
-                .withStatorCurrentLimitEnable(ClimberConstants.STATOR_CURRENT_LIMIT_ENABLE);
-
-        m_jawLeft = new TalonFX(CLIMBER_JAW_LEFT, CAN_BUS);
-        m_jawLeft.setNeutralMode(NeutralModeValue.Brake);
-        m_jawLeft.getConfigurator().apply(jawConfigs);
-        m_jawLeft.getConfigurator().apply(new MotorOutputConfigs().withInverted(leftinvert));
-        m_jawLeft.getConfigurator().apply(jawCurrentLimits);
-        m_jawLeft.getConfigurator().apply(closedLoopRamps);
-        m_jawLeft.getConfigurator().apply(voltage);
-
-        m_jawRight = new TalonFX(CLIMBER_JAW_RIGHT, CAN_BUS);
-        m_jawRight.setNeutralMode(NeutralModeValue.Brake);
-        m_jawRight.getConfigurator().apply(jawConfigs);
-        // Right jaw: positive rotation = clamping (mirror of left)
-        m_jawRight.getConfigurator().apply(new MotorOutputConfigs().withInverted(rightinvert));
-        m_jawRight.getConfigurator().apply(jawCurrentLimits);
-        m_jawRight.getConfigurator().apply(closedLoopRamps);
-        m_jawRight.getConfigurator().apply(voltage);
+        // var jawConfigs = new TalonFXConfiguration();
+        // jawConfigs.Slot0.kP = ClimberConstants.JAW_KP;
+        // jawConfigs.Slot0.kI = ClimberConstants.JAW_KI;
+        // jawConfigs.Slot0.kD = ClimberConstants.JAW_KD;
+        // jawConfigs.MotionMagic.MotionMagicCruiseVelocity = ClimberConstants.JAW_MOTION_MAGIC_CRUISE_VELOCITY;
+        // jawConfigs.MotionMagic.MotionMagicAcceleration = ClimberConstants.JAW_MOTION_MAGIC_ACCELERATION;
+        // jawConfigs.MotionMagic.MotionMagicJerk = ClimberConstants.JAW_MOTION_MAGIC_JERK;
+        //
+        // CurrentLimitsConfigs jawCurrentLimits = new CurrentLimitsConfigs()
+        //         .withSupplyCurrentLimit(Amps.of(ClimberConstants.JAW_SUPPLY_CURRENT_LIMIT_AMPS))
+        //         .withSupplyCurrentLimitEnable(ClimberConstants.SUPPLY_CURRENT_LIMIT_ENABLE)
+        //         .withStatorCurrentLimit(Amps.of(ClimberConstants.JAW_STATOR_CURRENT_LIMIT_AMPS))
+        //         .withStatorCurrentLimitEnable(ClimberConstants.STATOR_CURRENT_LIMIT_ENABLE);
+        //
+        // m_jawLeft = new TalonFX(CLIMBER_JAW_LEFT, CAN_BUS);
+        // m_jawLeft.setNeutralMode(NeutralModeValue.Brake);
+        // m_jawLeft.getConfigurator().apply(jawConfigs);
+        // m_jawLeft.getConfigurator().apply(new MotorOutputConfigs().withInverted(leftinvert));
+        // m_jawLeft.getConfigurator().apply(jawCurrentLimits);
+        // m_jawLeft.getConfigurator().apply(closedLoopRamps);
+        // m_jawLeft.getConfigurator().apply(voltage);
+        //
+        // m_jawRight = new TalonFX(CLIMBER_JAW_RIGHT, CAN_BUS);
+        // m_jawRight.setNeutralMode(NeutralModeValue.Brake);
+        // m_jawRight.getConfigurator().apply(jawConfigs);
+        // m_jawRight.getConfigurator().apply(new MotorOutputConfigs().withInverted(rightinvert));
+        // m_jawRight.getConfigurator().apply(jawCurrentLimits);
+        // m_jawRight.getConfigurator().apply(closedLoopRamps);
+        // m_jawRight.getConfigurator().apply(voltage);
+        m_jawLeft = null;
+        m_jawRight = null;
 
         resetPosition();
     }
@@ -200,8 +202,12 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     @Override
     public void resetPosition() {
         m_climber.setPosition(ClimberPosition.DOWN.value);
-        m_jawLeft.setPosition(ClimberConstants.LEFT_JAW_CLOSED_ROTATIONS);
-        m_jawRight.setPosition(ClimberConstants.RIGHT_JAW_CLOSED_ROTATIONS);
+        if (m_jawLeft != null) {
+            m_jawLeft.setPosition(ClimberConstants.LEFT_JAW_CLOSED_ROTATIONS);
+        }
+        if (m_jawRight != null) {
+            m_jawRight.setPosition(ClimberConstants.RIGHT_JAW_CLOSED_ROTATIONS);
+        }
         initialized = true;
     }
 
@@ -323,6 +329,9 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     // ---- Jaw commands (independent left/right, open/closed) ----
 
     private Command moveLeftJawToCommand(JawPosition position) {
+        if (m_jawLeft == null) {
+            return Commands.none().withName("climber.moveLeftJawTo");
+        }
         double goal = position == JawPosition.OPEN
                 ? ClimberConstants.LEFT_JAW_OPEN_ROTATIONS
                 : ClimberConstants.LEFT_JAW_CLOSED_ROTATIONS;
@@ -339,6 +348,9 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     }
 
     private Command moveRightJawToCommand(JawPosition position) {
+        if (m_jawRight == null) {
+            return Commands.none().withName("climber.moveRightJawTo");
+        }
         double goal = position == JawPosition.OPEN
                 ? ClimberConstants.RIGHT_JAW_OPEN_ROTATIONS
                 : ClimberConstants.RIGHT_JAW_CLOSED_ROTATIONS;
@@ -394,13 +406,21 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
     public Command coastMotorsCommand() {
         return runOnce(() -> {
                     m_climber.stopMotor();
-                    m_jawLeft.stopMotor();
-                    m_jawRight.stopMotor();
+                    if (m_jawLeft != null) {
+                        m_jawLeft.stopMotor();
+                    }
+                    if (m_jawRight != null) {
+                        m_jawRight.stopMotor();
+                    }
                 })
                 .andThen(() -> {
                     m_climber.setNeutralMode(NeutralModeValue.Coast);
-                    m_jawLeft.setNeutralMode(NeutralModeValue.Coast);
-                    m_jawRight.setNeutralMode(NeutralModeValue.Coast);
+                    if (m_jawLeft != null) {
+                        m_jawLeft.setNeutralMode(NeutralModeValue.Coast);
+                    }
+                    if (m_jawRight != null) {
+                        m_jawRight.setNeutralMode(NeutralModeValue.Coast);
+                    }
                 })
                 .finallyDo((d) -> {
                     // motor.setIdleMode(IdleMode.kBrake);
