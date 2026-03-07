@@ -378,9 +378,6 @@ public class AutoConfigurator {
                     BlueLandmarks.testClimbStartBlue(ClimbSide.RIGHT)));
         }
 
-        String pathToCenter = MoleculeTests.getPathNameForPose(defaultPose, "StartToCenter");
-        String pathBackToShot = MoleculeTests.getPathNameForPose(defaultPose, "CenterToShot");
-
         // Climber Auto: three start positions; tower side is chosen via Shuffleboard "Climb Side" (center not usable)
         // Tower pose is offset 2 ft toward field center so robot extends climber there, then drives to bar and retracts.
         // Shot and tower poses in blue so pathfinding always gets blue-origin coordinates.
@@ -419,27 +416,34 @@ public class AutoConfigurator {
             }
         }
         
-        // Shooter Auto
+        // Shooter Auto: Left and Right (shoot → center → reload → shoot)
         if (intake != null && positionTracker != null) {
-            Command shooterAuto = AutoRoutines.buildShooterAuto(
-                    defaultPose,
-                    startPoseSuppliers,
-                    pathToShot,
-                    pathToCenter,
-                    pathBackToShot,
-                    AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
-                    AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
-                    AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
-                    1.0, // Shoot duration
-                    1, // Target ball count
-                    m_drivetrain,
-                    vision,
-                    shooter,
-                    feeder,
-                    floor,
-                    intake,
-                    positionTracker);
-            m_autoManager.addRoutine(new AutoRoutine("ShooterAuto", shooterAuto));
+            for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_3 }) {
+                String label = startId == StartPoseId.POS_1 ? "Left" : "Right";
+                String pathToShot = MoleculeTests.getPathNameForPose(startId, "StartToShot");
+                String pathToCenter = MoleculeTests.getPathNameForPose(startId, "StartToCenter");
+                String pathBackToShot = MoleculeTests.getPathNameForPose(startId, "CenterToShot");
+                Command shooterAuto = AutoRoutines.buildShooterAuto(
+                        startId,
+                        startPoseSuppliers,
+                        pathToShot,
+                        pathToCenter,
+                        pathBackToShot,
+                        AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
+                        AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
+                        AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
+                        1.0, // Shoot duration
+                        1, // Target ball count
+                        m_drivetrain,
+                        vision,
+                        shooter,
+                        feeder,
+                        floor,
+                        intake,
+                        positionTracker);
+                Pose2d initialPoseBlue = startId == StartPoseId.POS_1 ? BlueLandmarks.Start1 : BlueLandmarks.Start3;
+                m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (" + label + ")", shooterAuto, List.of(), initialPoseBlue));
+            }
         }
     }
 

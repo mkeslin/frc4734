@@ -23,7 +23,8 @@ Landmarks and paths are **alliance-aware**: `Landmarks` uses `AllianceUtils` so 
 | ClimberAuto (Left)    | POS_1 (left)   | Shoot preload, drive to tower, climb L1, hold. Tower side from **Climb Side** chooser. |
 | ClimberAuto (Middle)  | POS_2 (center) | Same; tower side from **Climb Side** chooser (left or right only).                      |
 | ClimberAuto (Right)   | POS_3 (right)  | Same; tower side from **Climb Side** chooser.                                           |
-| ShooterAuto           | POS_1 (left)   | Shoot preload → center → intake 1 → return → shoot |
+| ShooterAuto (Left)    | POS_1 (left)   | Shoot preload → center → intake 1 → return → shoot |
+| ShooterAuto (Right)   | POS_3 (right)  | Same flow from right start.                         |
 
 ---
 
@@ -56,32 +57,32 @@ ClimberAuto uses **no PathPlanner paths**; all motion is **drive-to-pose** via `
 
 ---
 
-## ShooterAuto
+## ShooterAuto (Left / Right)
 
 **Goal**: Shoot preload, go to center and intake one note, return to shot position and shoot again.
 
 **Steps (in order):**
 
-1. **Seed odometry** – Start at POS_1 (left); pose from `Landmarks.OurStart1()`.
+1. **Seed odometry** – Start at POS_1 (left) or POS_3 (right); pose from `Landmarks.OurStart1()` or `OurStart3()`.
 2. **Tag snap (if good)** – Same as ClimberAuto.
 3. **Path to shot (with shooter spin-up)** – In parallel:
-   - **CmdFollowPath** `L_StartToShot` (PathPlanner), 10 s timeout.
+   - **CmdFollowPath** `L_StartToShot` (Left) or `R_StartToShot` (Right), 10 s timeout.
    - **CmdShooterSpinUp** to 3000 RPM.
 4. **Acquire hub aim** – Same as ClimberAuto.
 5. **Wait shooter at speed** – 3000 RPM ± 100.
 6. **Shoot** – Feed for 1.0 s.
 7. **Path to center (with intake on)** – In parallel:
-   - **CmdFollowPath** `L_StartToCenter`, 10 s timeout.
+   - **CmdFollowPath** `L_StartToCenter` or `R_StartToCenter`, 10 s timeout.
    - **CmdIntakeOn** (intake deployed and running).
 8. **Intake until count** – `CmdIntakeUntilCount` until `PositionTracker` reports **1** extra note (or timeout).
 9. **Path back to shot (with shooter spin-up)** – In parallel:
-   - **CmdFollowPath** `L_CenterToShot`, 10 s timeout.
+   - **CmdFollowPath** `L_CenterToShot` or `R_CenterToShot`, 10 s timeout.
    - **CmdShooterSpinUp** to 3000 RPM.
 10. **Acquire hub aim** – Again.
 11. **Wait shooter at speed** – Again.
 12. **Shoot** – Feed for 1.0 s again.
 
-Summary: **preload shot → center → intake 1 note → return → second shot.** All paths are for the **left** start (L_*). Build logic: `AutoRoutines.buildShooterAuto()`; registration: `AutoConfigurator.registerFullAutos()`.
+Summary: **preload shot → center → intake 1 note → return → second shot.** Left uses `L_*` paths; Right uses `R_*` paths. Build logic: `AutoRoutines.buildShooterAuto()`; registration: `AutoConfigurator.registerFullAutos()`.
 
 ---
 
