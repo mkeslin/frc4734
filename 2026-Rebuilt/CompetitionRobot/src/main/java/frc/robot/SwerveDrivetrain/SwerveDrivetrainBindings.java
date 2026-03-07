@@ -5,11 +5,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.PathPlanner.Landmarks;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.ControllerBindingConstants;
@@ -171,17 +168,18 @@ public class SwerveDrivetrainBindings {
                     rotationalRate = MathUtil.clamp(rotationalRate, -DrivetrainConstants.MaxAngularRate, DrivetrainConstants.MaxAngularRate);
 
                     // Right bumper held: drive normally but override rotation to face hub center
-                    if (driveController.rightBumper().getAsBoolean()) {
-                        Translation2d hub = Landmarks.OurHub().getTranslation();
-                        Translation2d robot = drivetrain.getPose().getTranslation();
-                        Translation2d toHub = hub.minus(robot);
-                        Rotation2d targetDirection = Rotation2d.fromRadians(Math.atan2(toHub.getY(), toHub.getX()));
-                        return m_facingHub
-                                .withVelocityX(velocityX)
-                                .withVelocityY(velocityY)
-                                .withTargetDirection(targetDirection)
-                                .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-                    }
+                    // TEMPORARILY DISABLED - was causing robot to feel stuck in arc during teleop
+                    // if (driveController.rightBumper().getAsBoolean()) {
+                    //     Translation2d hub = Landmarks.OurHub().getTranslation();
+                    //     Translation2d robot = drivetrain.getPose().getTranslation();
+                    //     Translation2d toHub = hub.minus(robot);
+                    //     Rotation2d targetDirection = Rotation2d.fromRadians(Math.atan2(toHub.getY(), toHub.getX()));
+                    //     return m_facingHub
+                    //             .withVelocityX(velocityX)
+                    //             .withVelocityY(velocityY)
+                    //             .withTargetDirection(targetDirection)
+                    //             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+                    // }
 
                     // Normal drive: left stick translation, right stick rotation
                     return m_drive
