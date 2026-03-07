@@ -420,13 +420,13 @@ public class AutoConfigurator {
         if (intake != null && positionTracker != null) {
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : "Right";
-                String pathToShot = MoleculeTests.getPathNameForPose(startId, "StartToShot");
+                String shooterPathToShot = MoleculeTests.getPathNameForPose(startId, "StartToShot");
                 String pathToCenter = MoleculeTests.getPathNameForPose(startId, "StartToCenter");
                 String pathBackToShot = MoleculeTests.getPathNameForPose(startId, "CenterToShot");
                 Command shooterAuto = AutoRoutines.buildShooterAuto(
                         startId,
                         startPoseSuppliers,
-                        pathToShot,
+                        shooterPathToShot,
                         pathToCenter,
                         pathBackToShot,
                         AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
