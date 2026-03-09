@@ -441,6 +441,10 @@ public class AutoRoutines {
                                 new CmdShooterSpinUp(shooter, rpmSupplier)),
                         new CmdWaitShooterAtSpeed(shooter, rpmSupplier, rpmTol, 5.0)),
 
+                // ----- Step 3a: Drive to shoot spot -----
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 3a: Drive to shoot spot")),
+                new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+
                 // ----- Step 4: Lower intake -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 4: Lower intake")),
                 intake != null
@@ -449,8 +453,8 @@ public class AutoRoutines {
                         : Commands.none(),
 
                 // ----- Step 5: Acquire hub aim -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 5: Acquire hub aim")),
-                CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
+                // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 5: Acquire hub aim")),
+                // CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
 
                 // ----- Step 6: Shoot -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Shoot")),
@@ -463,8 +467,9 @@ public class AutoRoutines {
                                 .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
                         : Commands.none(),
 
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Complete")))
-                .withName("TestDriveAndShoot");
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Complete"))
+        )
+        .withName("TestDriveAndShoot");
     }
 
     /**
