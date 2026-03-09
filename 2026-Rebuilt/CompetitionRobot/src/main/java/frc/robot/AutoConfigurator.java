@@ -93,34 +93,42 @@ public class AutoConfigurator {
             Climber climber,
             PositionTracker positionTracker) {
         
-        // Ensure Preferences keys exist (fallback if Auto Tuning tab not used)
+        // Initialize Preferences keys (stored on roboRIO; editable via Preferences widget in Shuffleboard)
         Preferences.initDouble("Auto/ShooterSpeedCenter", AutoConstants.SHOOTER_AUTO_CENTER_SPEED);
         Preferences.initDouble("Auto/ShooterToleranceCenter", AutoConstants.SHOOTER_AUTO_CENTER_TOLERANCE);
         Preferences.initDouble("Auto/ShooterSpeedLeftRight", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_SPEED);
         Preferences.initDouble("Auto/ShooterToleranceLeftRight", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE);
+        Preferences.initDouble("Auto/ShootDuration", AutoConstants.DEFAULT_SHOOT_DURATION);
 
-        // Auto Tuning tab: editable number fields for shooter speed and tuning
-        // Use kTextView for reliable editability (type value directly); kNumberSlider can be read-only in some Shuffleboard versions
+        // Auto Tuning tab: add widgets to a GridLayout so they render as editable sliders
+        // (tab default List layout can show read-only table; GridLayout with kNumberSlider is editable)
         ShuffleboardTab autoTuningTab = Shuffleboard.getTab("Auto Tuning");
-        GenericEntry centerSpeedEntry = autoTuningTab.add("Shooter Speed Center (RPS)", AutoConstants.SHOOTER_AUTO_CENTER_SPEED)
-                .withWidget(BuiltInWidgets.kTextView)
+        var tuningLayout = autoTuningTab.getLayout("Auto Tuning", "Grid Layout")
+                .withPosition(0, 0)
+                .withSize(4, 3);
+        GenericEntry centerSpeedEntry = tuningLayout.add("Shooter Speed Center (RPS)", AutoConstants.SHOOTER_AUTO_CENTER_SPEED)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 500))
                 .withPosition(0, 0)
                 .getEntry();
-        GenericEntry centerTolEntry = autoTuningTab.add("Shooter Tolerance Center", AutoConstants.SHOOTER_AUTO_CENTER_TOLERANCE)
-                .withWidget(BuiltInWidgets.kTextView)
+        GenericEntry centerTolEntry = tuningLayout.add("Shooter Tolerance Center", AutoConstants.SHOOTER_AUTO_CENTER_TOLERANCE)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 50))
                 .withPosition(1, 0)
                 .getEntry();
-        GenericEntry leftRightSpeedEntry = autoTuningTab.add("Shooter Speed Left/Right (RPS)", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_SPEED)
-                .withWidget(BuiltInWidgets.kTextView)
+        GenericEntry leftRightSpeedEntry = tuningLayout.add("Shooter Speed Left/Right (RPS)", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_SPEED)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 500))
                 .withPosition(0, 1)
                 .getEntry();
-        GenericEntry leftRightTolEntry = autoTuningTab.add("Shooter Tolerance Left/Right", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE)
-                .withWidget(BuiltInWidgets.kTextView)
+        GenericEntry leftRightTolEntry = tuningLayout.add("Shooter Tolerance Left/Right", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 50))
                 .withPosition(1, 1)
                 .getEntry();
-
-        GenericEntry shootDurationEntry = autoTuningTab.add("Shoot Duration (sec)", AutoConstants.DEFAULT_SHOOT_DURATION)
-                .withWidget(BuiltInWidgets.kTextView)
+        GenericEntry shootDurationEntry = tuningLayout.add("Shoot Duration (sec)", AutoConstants.DEFAULT_SHOOT_DURATION)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0.5, "max", 10.0))
                 .withPosition(0, 2)
                 .getEntry();
 
