@@ -177,6 +177,16 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
 
         resetDeployPosition();
         resetIntakeSpeed();
+
+        // Hold deploy position when no other command requires intake; prevents slam to stale setpoint on enable
+        setDefaultCommand(
+                run(() -> {
+                    if (RobotState.getInstance().isInitialized()) {
+                        m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+                    }
+                })
+                        .ignoringDisable(true)
+                        .withName("deployableIntake.holdPosition"));
     }
 
     @Override

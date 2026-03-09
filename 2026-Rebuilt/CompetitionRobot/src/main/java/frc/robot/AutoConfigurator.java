@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import java.util.Map;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Preferences;
@@ -124,11 +122,17 @@ public class AutoConfigurator {
                 .withPosition(1, 1)
                 .getEntry();
 
+        GenericEntry shootDurationEntry = autoTuningTab.add("Shoot Duration (sec)", AutoConstants.DEFAULT_SHOOT_DURATION)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0.5, "max", 3.0))
+                .withPosition(0, 2)
+                .getEntry();
+
         // Reset intake position: stow intake manually, then press to sync encoder to "stowed"
         if (intake != null) {
             autoTuningTab.add("Reset Intake Position", intake.resetDeployPositionCommand())
                     .withWidget(BuiltInWidgets.kCommand)
-                    .withPosition(0, 2)
+                    .withPosition(0, 3)
                     .withSize(2, 1);
         }
 
@@ -136,6 +140,7 @@ public class AutoConfigurator {
         Supplier<Double> shooterSpeedLeftRight = () -> leftRightSpeedEntry.getDouble(AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_SPEED);
         Supplier<Double> toleranceCenter = () -> centerTolEntry.getDouble(AutoConstants.SHOOTER_AUTO_CENTER_TOLERANCE);
         Supplier<Double> toleranceLeftRight = () -> leftRightTolEntry.getDouble(AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE);
+        Supplier<Double> shootDuration = () -> shootDurationEntry.getDouble(AutoConstants.DEFAULT_SHOOT_DURATION);
 
         // Start poses evaluated at runtime so alliance is correct when auto runs.
         Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers = new HashMap<>();
@@ -162,7 +167,7 @@ public class AutoConfigurator {
         registerMolecules(startPoseSuppliers, shooterSpeedCenter, toleranceCenter, vision, shooter, feeder, floor, intake, climber);
         
         // Register full autos
-        registerFullAutos(startPoseSuppliers, shooterSpeedCenter, shooterSpeedLeftRight, toleranceCenter, toleranceLeftRight, vision, shooter, feeder, floor, intake, climber, positionTracker);
+        registerFullAutos(startPoseSuppliers, shooterSpeedCenter, shooterSpeedLeftRight, toleranceCenter, toleranceLeftRight, shootDuration, vision, shooter, feeder, floor, intake, climber, positionTracker);
         
         // Initialize test harness
         m_testHarness.initialize();
@@ -369,6 +374,7 @@ public class AutoConfigurator {
             Supplier<Double> shooterSpeedLeftRight,
             Supplier<Double> toleranceCenter,
             Supplier<Double> toleranceLeftRight,
+            Supplier<Double> shootDuration,
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
@@ -408,7 +414,7 @@ public class AutoConfigurator {
                 AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
                 shooterSpeedCenter,
                 toleranceCenter.get(),
-                1.0,
+                shootDuration,
                 m_drivetrain,
                 vision,
                 shooter,
@@ -451,7 +457,7 @@ public class AutoConfigurator {
                         AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
                         shooterSpeedCenter,
                         toleranceCenter.get(),
-                        1.0, // Shoot duration
+                        shootDuration,
                         m_drivetrain,
                         vision,
                         shooter,
@@ -489,7 +495,7 @@ public class AutoConfigurator {
                         AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
                         shooterSpeedLeftRight,
                         toleranceLeftRight.get(),
-                        1.0, // Shoot duration
+                        shootDuration,
                         m_drivetrain,
                         vision,
                         shooter,
@@ -510,7 +516,7 @@ public class AutoConfigurator {
                 AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
                 shooterSpeedCenter,
                 toleranceCenter.get(),
-                1.0,
+                shootDuration,
                 m_drivetrain,
                 vision,
                 shooter,

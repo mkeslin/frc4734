@@ -81,7 +81,7 @@ public class AutoRoutines {
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
      * @param targetRpmSupplier  Supplier of target shooter RPM (e.g. from Preferences for runtime tuning)
      * @param rpmTol             RPM tolerance for shooter at-speed check
-     * @param shootDuration      Duration to shoot preload (seconds)
+     * @param shootDurationSupplier Supplier of shoot duration (seconds); read at runtime for tuning
      * @param drivetrain         The drivetrain subsystem
      * @param vision             The PhotonVision subsystem
      * @param shooter            The shooter subsystem
@@ -100,7 +100,7 @@ public class AutoRoutines {
             double fallbackHeadingDeg,
             Supplier<Double> targetRpmSupplier,
             double rpmTol,
-            double shootDuration,
+            Supplier<Double> shootDurationSupplier,
             CommandSwerveDrivetrain drivetrain,
             PhotonVision vision,
             Shooter shooter,
@@ -119,6 +119,7 @@ public class AutoRoutines {
         Objects.requireNonNull(feeder, "feeder cannot be null");
         Objects.requireNonNull(climber, "climber cannot be null");
         Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null");
+        Objects.requireNonNull(shootDurationSupplier, "shootDurationSupplier cannot be null");
 
         Supplier<Double> rpmSupplier = targetRpmSupplier;
 
@@ -167,7 +168,7 @@ public class AutoRoutines {
 
                 // ----- Step 7: Shoot preload -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 7: Shoot")),
-                CmdShootForTime.create(shooter, feeder, floor, shootDuration),
+                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get())),
 
                 // ----- Step 8: Drive to tower align -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 8: Drive to tower")),
@@ -276,7 +277,7 @@ public class AutoRoutines {
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
      * @param targetRpmSupplier  Supplier of target shooter RPM (e.g. from Preferences for runtime tuning)
      * @param rpmTol             RPM tolerance for shooter at-speed check
-     * @param shootDuration      Duration to shoot (seconds)
+     * @param shootDurationSupplier Supplier of shoot duration (seconds); read at runtime for tuning
      * @param drivetrain         The drivetrain subsystem
      * @param vision             The PhotonVision subsystem
      * @param shooter            The shooter subsystem
@@ -296,7 +297,7 @@ public class AutoRoutines {
             double fallbackHeadingDeg,
             Supplier<Double> targetRpmSupplier,
             double rpmTol,
-            double shootDuration,
+            Supplier<Double> shootDurationSupplier,
             CommandSwerveDrivetrain drivetrain,
             PhotonVision vision,
             Shooter shooter,
@@ -316,6 +317,7 @@ public class AutoRoutines {
         Objects.requireNonNull(floor, "floor cannot be null");
         Objects.requireNonNull(intake, "intake cannot be null");
         Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null");
+        Objects.requireNonNull(shootDurationSupplier, "shootDurationSupplier cannot be null");
 
         Supplier<Double> rpmSupplier = targetRpmSupplier;
 
@@ -350,7 +352,7 @@ public class AutoRoutines {
 
                 // ----- Step 6: Shoot -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Shoot")),
-                CmdShootForTime.create(shooter, feeder, floor, shootDuration),
+                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get())),
 
                 // ----- TEMPORARY: Path to center and second shot commented out -----
                 // Uncomment to restore full routine: path to center, path back, acquire aim,
@@ -387,7 +389,7 @@ public class AutoRoutines {
      * @param fallbackHeadingDeg Fallback heading for hub aiming
      * @param targetRpmSupplier  Supplier of target shooter RPM (e.g. from Preferences for runtime tuning)
      * @param rpmTol             RPM tolerance
-     * @param shootDuration      Duration to shoot
+     * @param shootDurationSupplier Supplier of shoot duration (seconds); read at runtime for tuning
      * @param drivetrain         Drivetrain subsystem
      * @param vision             Vision subsystem
      * @param shooter            Shooter subsystem
@@ -404,7 +406,7 @@ public class AutoRoutines {
             double fallbackHeadingDeg,
             Supplier<Double> targetRpmSupplier,
             double rpmTol,
-            double shootDuration,
+            Supplier<Double> shootDurationSupplier,
             CommandSwerveDrivetrain drivetrain,
             PhotonVision vision,
             Shooter shooter,
@@ -419,6 +421,7 @@ public class AutoRoutines {
         Objects.requireNonNull(shooter, "shooter cannot be null");
         Objects.requireNonNull(feeder, "feeder cannot be null");
         Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null");
+        Objects.requireNonNull(shootDurationSupplier, "shootDurationSupplier cannot be null");
 
         Supplier<Double> rpmSupplier = targetRpmSupplier;
 
@@ -455,7 +458,7 @@ public class AutoRoutines {
 
                 // ----- Step 6: Shoot -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Shoot")),
-                CmdShootForTime.create(shooter, feeder, floor, shootDuration),
+                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get())),
 
                 // ----- Step 7: Raise intake (reset for next run) -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),

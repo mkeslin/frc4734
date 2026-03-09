@@ -67,6 +67,10 @@ public final class AutoConstants {
     public static final double SHOOTER_AUTO_LEFT_RIGHT_SPEED = 130.0;
     /** Default tolerance for ShooterAuto Left/Right at-speed check. Tunable via Preferences "Auto/ShooterToleranceLeftRight". */
     public static final double SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE = 5.0;
+    /** Default shoot duration (seconds) for feeder/floor to launch all balls. Tunable via Auto Tuning tab. */
+    public static final double DEFAULT_SHOOT_DURATION = 2.0;
+    /** Delay (seconds) after shooter at speed before feeder starts, to let shooter stabilize. */
+    public static final double SHOOT_SPINUP_DELAY_BEFORE_FEED = 0.25;
 
     // Hub position (field-relative, blue alliance origin).
     public static final Pose2d HUB_POSE = new Pose2d(

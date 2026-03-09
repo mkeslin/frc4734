@@ -135,6 +135,11 @@ public class CmdShootForTime extends Command {
             feedPhase = Commands.sequence(waitCommand, feedPhase);
         }
 
+        // Extra spin-up time before feeder starts so shooter stabilizes
+        feedPhase = Commands.sequence(
+                Commands.waitSeconds(AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED),
+                feedPhase);
+
         if (useFeederBackoff) {
             Command backoff = feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
                     .withTimeout(SHOOT_FEEDER_BACKOFF)
@@ -156,7 +161,10 @@ public class CmdShootForTime extends Command {
 
     @Override
     public boolean isFinished() {
-        if (timer.hasElapsed(durationSec)) {
+        // Safety timeout: spinup wait (if any) + delay + feed duration
+        double totalDuration = (requireAtSpeed ? AutoConstants.DEFAULT_SHOOTER_SPINUP_TIMEOUT : 0)
+                + AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED + durationSec;
+        if (timer.hasElapsed(totalDuration)) {
             return true;
         }
         
