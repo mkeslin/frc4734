@@ -235,8 +235,8 @@ public class AutoRoutines {
      * @param id Start pose identifier
      * @param startPoseSuppliers Map of start pose IDs to suppliers (evaluated at runtime for correct alliance)
      * @param pathToShot Path name to shooting position
-     * @param pathToCenter Path name to center/field position
-     * @param pathBackToShot Path name back to shooting position
+     * @param pathToCenter Path name to center (or full serpentine shot→center→shot when pathBackToShot is null)
+     * @param pathBackToShot Path name back to shot; null if pathToCenter is a serpentine that ends at shot
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
      * @param targetRpm Target shooter RPM
      * @param rpmTol RPM tolerance for shooter at-speed check
@@ -275,7 +275,6 @@ public class AutoRoutines {
         Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
         Objects.requireNonNull(pathToShot, "pathToShot cannot be null");
         Objects.requireNonNull(pathToCenter, "pathToCenter cannot be null");
-        Objects.requireNonNull(pathBackToShot, "pathBackToShot cannot be null");
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
         Objects.requireNonNull(vision, "vision cannot be null");
         Objects.requireNonNull(shooter, "shooter cannot be null");
@@ -320,10 +319,12 @@ public class AutoRoutines {
                 // 8. Intake until count (or time-based)
                 CmdIntakeUntilCount.create(intake, positionTracker, targetBallCount),
 
-                // 9. Follow path back to shot (shooter spins up until path finishes)
-                Commands.deadline(
-                        new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
-                        new CmdShooterSpinUp(shooter, rpmSupplier)),
+                // 9. Follow path back to shot (skip if pathToCenter is a serpentine that ends at shot)
+                pathBackToShot != null
+                        ? Commands.deadline(
+                                new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                                new CmdShooterSpinUp(shooter, rpmSupplier))
+                        : Commands.none(),
 
                 // 10. Acquire hub aim
                 CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),

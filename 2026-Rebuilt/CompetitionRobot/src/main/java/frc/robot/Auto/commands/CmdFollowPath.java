@@ -1,8 +1,13 @@
 package frc.robot.Auto.commands;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.path.GoalEndState;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,6 +36,7 @@ public class CmdFollowPath extends Command {
     private final String pathName;
     private final double timeoutSec;
     private final CommandSwerveDrivetrain drivetrain;
+    private final boolean reversed;
     private Command pathCommand;
 
     /**
@@ -43,11 +49,24 @@ public class CmdFollowPath extends Command {
      * @throws IllegalArgumentException if timeoutSec is less than or equal to 0
      */
     public CmdFollowPath(String pathName, double timeoutSec, CommandSwerveDrivetrain drivetrain) {
+        this(pathName, timeoutSec, false, drivetrain);
+    }
+
+    /**
+     * Creates a new CmdFollowPath command, optionally reversed.
+     * 
+     * @param pathName The name of the path file (without .path extension)
+     * @param timeoutSec Maximum time to follow the path
+     * @param reversed If true, follow the path backwards (end to start)
+     * @param drivetrain The drivetrain subsystem
+     */
+    public CmdFollowPath(String pathName, double timeoutSec, boolean reversed, CommandSwerveDrivetrain drivetrain) {
         this.pathName = Objects.requireNonNull(pathName, "pathName cannot be null");
         if (timeoutSec <= 0) {
             throw new IllegalArgumentException("timeoutSec must be greater than 0, got: " + timeoutSec);
         }
         this.timeoutSec = timeoutSec;
+        this.reversed = reversed;
         this.drivetrain = Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
 
         addRequirements(drivetrain);
@@ -58,6 +77,9 @@ public class CmdFollowPath extends Command {
         PathPlannerPath path = null;
         try {
             path = PathPlannerPath.fromPathFile(pathName);
+            if (path != null && reversed) {
+                path = createReversedPath(path);
+            }
         } catch (Exception exception) {
             String errorMsg = String.format("[CmdFollowPath] Failed to load path '%s': %s", 
                     pathName, exception.getMessage());
@@ -66,14 +88,32 @@ public class CmdFollowPath extends Command {
         }
 
         if (path != null) {
+            String suffix = reversed ? "-reversed" : "";
             pathCommand = drivetrain.followPathCommand(path)
                     .withTimeout(timeoutSec)
-                    .withName("CmdFollowPath-" + pathName);
+                    .withName("CmdFollowPath-" + pathName + suffix);
             pathCommand.initialize();
         } else {
             // Path failed to load - command will finish immediately
             pathCommand = Commands.none();
         }
+    }
+
+    /**
+     * Creates a reversed copy of the path (traverse from end to start).
+     * Reversed path goal = original path start (ideal starting state).
+     */
+    private static PathPlannerPath createReversedPath(PathPlannerPath original) {
+        List<PathPoint> points = new ArrayList<>(original.getAllPathPoints());
+        Collections.reverse(points);
+        var ideal = original.getIdealStartingState();
+        GoalEndState reversedGoal = ideal != null
+                ? new GoalEndState(ideal.velocityMPS(), ideal.rotation())
+                : original.getGoalEndState();
+        return PathPlannerPath.fromPathPoints(
+                points,
+                original.getGlobalConstraints(),
+                reversedGoal);
     }
 
     @Override

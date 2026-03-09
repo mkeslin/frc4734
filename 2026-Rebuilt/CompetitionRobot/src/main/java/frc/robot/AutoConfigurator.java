@@ -416,19 +416,19 @@ public class AutoConfigurator {
             }
         }
         
-        // Shooter Auto: Left and Right (shoot → center → reload → shoot)
+        // Shooter Auto: Left and Right (shoot → through center → return to shot → shoot)
         if (intake != null && positionTracker != null) {
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : "Right";
                 String shooterPathToShot = MoleculeTests.getPathNameForPose(startId, "StartToShot");
-                String pathToCenter = MoleculeTests.getPathNameForPose(startId, "StartToCenter");
-                String pathBackToShot = MoleculeTests.getPathNameForPose(startId, "CenterToShot");
+                String pathThroughCenter = MoleculeTests.getPathNameForPose(startId, "ThroughCenter");
+                String pathThroughCenterReturn = MoleculeTests.getPathNameForPose(startId, "ThroughCenterReturn");
                 Command shooterAuto = AutoRoutines.buildShooterAuto(
                         startId,
                         startPoseSuppliers,
                         shooterPathToShot,
-                        pathToCenter,
-                        pathBackToShot,
+                        pathThroughCenter,
+                        pathThroughCenterReturn,
                         AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
                         AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
                         AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
