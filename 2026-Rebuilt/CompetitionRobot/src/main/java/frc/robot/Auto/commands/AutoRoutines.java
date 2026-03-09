@@ -79,7 +79,7 @@ public class AutoRoutines {
      * @param towerAlignPose     Supplier of target pose for tower/climb (e.g. from
      *                           Shuffleboard climb-side chooser)
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
-     * @param targetRpm          Target shooter RPM
+     * @param targetRpmSupplier  Supplier of target shooter RPM (e.g. from Preferences for runtime tuning)
      * @param rpmTol             RPM tolerance for shooter at-speed check
      * @param shootDuration      Duration to shoot preload (seconds)
      * @param drivetrain         The drivetrain subsystem
@@ -98,7 +98,7 @@ public class AutoRoutines {
             Supplier<Pose2d> shotPoseSupplier,
             Supplier<Pose2d> towerAlignPose,
             double fallbackHeadingDeg,
-            double targetRpm,
+            Supplier<Double> targetRpmSupplier,
             double rpmTol,
             double shootDuration,
             CommandSwerveDrivetrain drivetrain,
@@ -118,8 +118,9 @@ public class AutoRoutines {
         Objects.requireNonNull(shooter, "shooter cannot be null");
         Objects.requireNonNull(feeder, "feeder cannot be null");
         Objects.requireNonNull(climber, "climber cannot be null");
+        Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null");
 
-        Supplier<Double> rpmSupplier = () -> targetRpm;
+        Supplier<Double> rpmSupplier = targetRpmSupplier;
 
         // Captured after extending climber; used by drive-to-bar step (pathfind to pose
         // toward bar).
@@ -273,7 +274,7 @@ public class AutoRoutines {
      * @param pathToCenter       Path name to center
      * @param pathBackToShot     Path name back to shot
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
-     * @param targetRpm          Target shooter RPM
+     * @param targetRpmSupplier  Supplier of target shooter RPM (e.g. from Preferences for runtime tuning)
      * @param rpmTol             RPM tolerance for shooter at-speed check
      * @param shootDuration      Duration to shoot (seconds)
      * @param drivetrain         The drivetrain subsystem
@@ -293,7 +294,7 @@ public class AutoRoutines {
             String pathToCenter,
             String pathBackToShot,
             double fallbackHeadingDeg,
-            double targetRpm,
+            Supplier<Double> targetRpmSupplier,
             double rpmTol,
             double shootDuration,
             CommandSwerveDrivetrain drivetrain,
@@ -314,8 +315,9 @@ public class AutoRoutines {
         Objects.requireNonNull(feeder, "feeder cannot be null");
         Objects.requireNonNull(floor, "floor cannot be null");
         Objects.requireNonNull(intake, "intake cannot be null");
+        Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null");
 
-        Supplier<Double> rpmSupplier = () -> targetRpm;
+        Supplier<Double> rpmSupplier = targetRpmSupplier;
 
         return Commands.sequence(
                 // ----- Step 1: Seed odometry -----
@@ -383,7 +385,7 @@ public class AutoRoutines {
      * @param startPoseSuppliers Map of start pose IDs to suppliers
      * @param pathToShot         Path name to shooting position
      * @param fallbackHeadingDeg Fallback heading for hub aiming
-     * @param targetRpm          Target shooter RPM
+     * @param targetRpmSupplier  Supplier of target shooter RPM (e.g. from Preferences for runtime tuning)
      * @param rpmTol             RPM tolerance
      * @param shootDuration      Duration to shoot
      * @param drivetrain         Drivetrain subsystem
@@ -400,7 +402,7 @@ public class AutoRoutines {
             Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
             String pathToShot,
             double fallbackHeadingDeg,
-            double targetRpm,
+            Supplier<Double> targetRpmSupplier,
             double rpmTol,
             double shootDuration,
             CommandSwerveDrivetrain drivetrain,
@@ -416,8 +418,9 @@ public class AutoRoutines {
         Objects.requireNonNull(vision, "vision cannot be null");
         Objects.requireNonNull(shooter, "shooter cannot be null");
         Objects.requireNonNull(feeder, "feeder cannot be null");
+        Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null");
 
-        Supplier<Double> rpmSupplier = () -> targetRpm;
+        Supplier<Double> rpmSupplier = targetRpmSupplier;
 
         return Commands.sequence(
                 // ----- Step 1: Seed odometry -----
