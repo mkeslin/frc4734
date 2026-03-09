@@ -42,6 +42,7 @@ public class CmdShootForTime extends Command {
     private final Feeder feeder;
     private final Floor floor;
     private final double durationSec;
+    private final double spinupDelaySec;
     private final boolean requireAtSpeed;
     private final boolean useFeederBackoff;
     private final Supplier<Double> targetRpmSupplier;
@@ -56,6 +57,7 @@ public class CmdShootForTime extends Command {
      * @param feeder The feeder subsystem
      * @param floor Optional floor subsystem; if non-null, floor runs in parallel with feeder and is stopped in end()
      * @param durationSec Duration to feed in seconds
+     * @param spinupDelaySec Delay (seconds) before feeder/floor start, to let shooter stabilize
      * @param requireAtSpeed If true, wait for shooter at speed before feeding
      * @param useFeederBackoff If true, run feeder reverse for {@code SHOOT_FEEDER_BACKOFF} first to clear ball from wheels
      * @param targetRpmSupplier Supplier of target RPM (required if requireAtSpeed is true)
@@ -66,6 +68,7 @@ public class CmdShootForTime extends Command {
             Feeder feeder,
             Floor floor,
             double durationSec,
+            double spinupDelaySec,
             boolean requireAtSpeed,
             boolean useFeederBackoff,
             Supplier<Double> targetRpmSupplier,
@@ -77,6 +80,7 @@ public class CmdShootForTime extends Command {
             throw new IllegalArgumentException("durationSec must be greater than 0, got: " + durationSec);
         }
         this.durationSec = durationSec;
+        this.spinupDelaySec = spinupDelaySec;
         this.requireAtSpeed = requireAtSpeed;
         this.useFeederBackoff = useFeederBackoff;
         this.targetRpmSupplier = requireAtSpeed
@@ -107,7 +111,7 @@ public class CmdShootForTime extends Command {
             boolean requireAtSpeed,
             Supplier<Double> targetRpmSupplier,
             double rpmTol) {
-        this(shooter, feeder, null, durationSec, requireAtSpeed, false, targetRpmSupplier, rpmTol);
+        this(shooter, feeder, null, durationSec, AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED, requireAtSpeed, false, targetRpmSupplier, rpmTol);
     }
 
     @Override
@@ -137,7 +141,7 @@ public class CmdShootForTime extends Command {
 
         // Extra spin-up time before feeder starts so shooter stabilizes
         feedPhase = Commands.sequence(
-                Commands.waitSeconds(AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED),
+                Commands.waitSeconds(spinupDelaySec),
                 feedPhase);
 
         if (useFeederBackoff) {
@@ -163,7 +167,7 @@ public class CmdShootForTime extends Command {
     public boolean isFinished() {
         // Safety timeout: spinup wait (if any) + delay + feed duration
         double totalDuration = (requireAtSpeed ? AutoConstants.DEFAULT_SHOOTER_SPINUP_TIMEOUT : 0)
-                + AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED + durationSec;
+                + spinupDelaySec + durationSec;
         if (timer.hasElapsed(totalDuration)) {
             return true;
         }
@@ -192,6 +196,7 @@ public class CmdShootForTime extends Command {
     /**
      * Factory method to create a command without requiring shooter at speed.
      * Runs feeder and floor (if non-null) to feed notes into the shooter.
+     * Uses default spin-up delay ({@link AutoConstants#SHOOT_SPINUP_DELAY_BEFORE_FEED}).
      *
      * @param shooter The shooter subsystem
      * @param feeder The feeder subsystem
@@ -200,7 +205,46 @@ public class CmdShootForTime extends Command {
      * @return A command that shoots for the specified duration
      */
     public static Command create(Shooter shooter, Feeder feeder, Floor floor, double durationSec) {
-        return new CmdShootForTime(shooter, feeder, floor, durationSec, false, false, null, 0.0);
+        return create(shooter, feeder, floor, durationSec, AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED);
+    }
+
+    /**
+     * Factory method with configurable spin-up delay. Use for routines that need longer shooter
+     * stabilization (e.g. ShooterAuto Left/Right at angle).
+     *
+     * @param shooter The shooter subsystem
+     * @param feeder The feeder subsystem
+     * @param floor Optional floor subsystem; if non-null, runs in parallel with feeder to feed from conveyor
+     * @param durationSec Duration to feed in seconds
+     * @param spinupDelaySec Delay (seconds) before feeder/floor start
+     * @return A command that shoots for the specified duration
+     */
+    public static Command create(Shooter shooter, Feeder feeder, Floor floor, double durationSec, double spinupDelaySec) {
+        return create(shooter, feeder, floor, durationSec, spinupDelaySec, null);
+    }
+
+    /**
+     * Factory method with spin-up delay and optional shooter RPM. When shooterRpmSupplier is
+     * non-null, runs the shooter at that speed for the full duration (delay + feed). Use when
+     * the shoot step is not preceded by a spin-up command (e.g. ShooterAuto Left/Right).
+     *
+     * @param shooter The shooter subsystem
+     * @param feeder The feeder subsystem
+     * @param floor Optional floor subsystem; if non-null, runs in parallel with feeder
+     * @param durationSec Duration to feed in seconds
+     * @param spinupDelaySec Delay (seconds) before feeder/floor start
+     * @param shooterRpmSupplier Optional; when non-null, runs shooter at this speed for full duration
+     * @return A command that shoots for the specified duration
+     */
+    public static Command create(Shooter shooter, Feeder feeder, Floor floor, double durationSec, double spinupDelaySec, Supplier<Double> shooterRpmSupplier) {
+        Command base = new CmdShootForTime(shooter, feeder, floor, durationSec, spinupDelaySec, false, false, null, 0.0);
+        if (shooterRpmSupplier != null) {
+            Command shooterRun = shooter.moveToArbitrarySpeedCommand(shooterRpmSupplier)
+                    .withTimeout(spinupDelaySec + durationSec)
+                    .withName("CmdShootForTime-shooter");
+            base = Commands.parallel(shooterRun, base);
+        }
+        return base;
     }
 
     /**

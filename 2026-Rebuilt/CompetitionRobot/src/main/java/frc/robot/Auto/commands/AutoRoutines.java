@@ -340,11 +340,11 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // ----- Step 4: Spin up shooter (completes when at speed or 5s timeout) -----
+                // ----- Step 4: Spin up shooter (1.5s spin, then wait for at speed or 5s timeout) -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 4: Spin up shooter")),
                 Commands.sequence(
                         Commands.deadline(
-                                Commands.waitSeconds(0.1),
+                                Commands.waitSeconds(AutoConstants.SHOOTER_SPINUP_DURATION_LEFT_RIGHT),
                                 new CmdShooterSpinUp(shooter, rpmSupplier)),
                         new CmdWaitShooterAtSpeed(shooter, rpmSupplier, rpmTol, 5.0)),
 
@@ -352,7 +352,7 @@ public class AutoRoutines {
 
                 // ----- Step 6: Shoot -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Shoot")),
-                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get())),
+                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), AutoConstants.SHOOT_SPINUP_DELAY_LEFT_RIGHT, rpmSupplier)),
 
                 // ----- TEMPORARY: Path to center and second shot commented out -----
                 // Uncomment to restore full routine: path to center, path back, acquire aim,
@@ -370,9 +370,9 @@ public class AutoRoutines {
                 // CmdShootForTime.create(shooter, feeder, floor, shootDuration),
 
                 // ----- Step 7: Raise intake (reset for next run) -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),
-                intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
-                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
+                // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),
+                // intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
+                //         .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
 
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Complete")))
                 .withName("ShooterAuto");
@@ -461,11 +461,11 @@ public class AutoRoutines {
                 Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get())),
 
                 // ----- Step 7: Raise intake (reset for next run) -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),
-                intake != null
-                        ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
-                                .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
-                        : Commands.none(),
+                // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),
+                // intake != null
+                //         ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
+                //                 .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
+                //         : Commands.none(),
 
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Complete"))
         )
