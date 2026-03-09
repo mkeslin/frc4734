@@ -60,7 +60,7 @@ public final class AutoConstants {
     public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
 
     /** Default shooter speed (RPS) for ShooterAuto Center. Tunable via Preferences "Auto/ShooterSpeedCenter". */
-    public static final double SHOOTER_AUTO_CENTER_SPEED = 130.0;
+    public static final double SHOOTER_AUTO_CENTER_SPEED = 120.0;
     /** Default tolerance for ShooterAuto Center at-speed check. Tunable via Preferences "Auto/ShooterToleranceCenter". */
     public static final double SHOOTER_AUTO_CENTER_TOLERANCE = 5.0;
     /** Default shooter speed (RPS) for ShooterAuto Left/Right. Tunable via Preferences "Auto/ShooterSpeedLeftRight". */
@@ -70,7 +70,7 @@ public final class AutoConstants {
     /** Default shoot duration (seconds) for feeder/floor to launch all balls. Tunable via Auto Tuning tab. */
     public static final double DEFAULT_SHOOT_DURATION = 2.0;
     /** Delay (seconds) after shooter at speed before feeder starts, to let shooter stabilize. */
-    public static final double SHOOT_SPINUP_DELAY_BEFORE_FEED = 0.25;
+    public static final double SHOOT_SPINUP_DELAY_BEFORE_FEED = 0.75;
 
     // Hub position (field-relative, blue alliance origin).
     public static final Pose2d HUB_POSE = new Pose2d(

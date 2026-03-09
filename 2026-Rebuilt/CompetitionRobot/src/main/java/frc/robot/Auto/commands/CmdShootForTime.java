@@ -1,7 +1,6 @@
 package frc.robot.Auto.commands;
 
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_BACKOFF;
-import static frc.robot.Constants.CommandConstants.SHOOT_FLOOR_DELAY;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -55,7 +54,7 @@ public class CmdShootForTime extends Command {
      *
      * @param shooter The shooter subsystem
      * @param feeder The feeder subsystem
-     * @param floor Optional floor subsystem; if non-null, floor runs after {@code SHOOT_FLOOR_DELAY} and is stopped in end()
+     * @param floor Optional floor subsystem; if non-null, floor runs in parallel with feeder and is stopped in end()
      * @param durationSec Duration to feed in seconds
      * @param requireAtSpeed If true, wait for shooter at speed before feeding
      * @param useFeederBackoff If true, run feeder reverse for {@code SHOOT_FEEDER_BACKOFF} first to clear ball from wheels
@@ -121,8 +120,9 @@ public class CmdShootForTime extends Command {
                 .withName("CmdShootForTime-feeder");
 
         if (floor != null) {
-            Command floorPhase = Commands.waitSeconds(SHOOT_FLOOR_DELAY)
-                    .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value).withTimeout(Math.max(0, durationSec - SHOOT_FLOOR_DELAY)));
+            Command floorPhase = floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)
+                    .withTimeout(durationSec)
+                    .withName("CmdShootForTime-floor");
             feedPhase = new ParallelCommandGroup(feedPhase, floorPhase);
         }
 
@@ -194,7 +194,7 @@ public class CmdShootForTime extends Command {
      *
      * @param shooter The shooter subsystem
      * @param feeder The feeder subsystem
-     * @param floor Optional floor subsystem; if non-null, runs after SHOOT_FLOOR_DELAY to feed from conveyor
+     * @param floor Optional floor subsystem; if non-null, runs in parallel with feeder to feed from conveyor
      * @param durationSec Duration to feed in seconds
      * @return A command that shoots for the specified duration
      */

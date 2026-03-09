@@ -124,7 +124,7 @@ public class AutoConfigurator {
 
         GenericEntry shootDurationEntry = autoTuningTab.add("Shoot Duration (sec)", AutoConstants.DEFAULT_SHOOT_DURATION)
                 .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", 0.5, "max", 3.0))
+                .withProperties(Map.of("min", 0.5, "max", 10.0))
                 .withPosition(0, 2)
                 .getEntry();
 
