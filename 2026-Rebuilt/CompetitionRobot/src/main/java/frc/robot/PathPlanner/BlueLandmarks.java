@@ -19,8 +19,8 @@ public class BlueLandmarks {
     public static final Pose2d Start3 = getPose(3.4682438016528927, 0.5982713498622594, 76.945);
 
     // ----- Scoring & stage (from diagram, inches → m) -----
-    /** Blue diamond plate (scoring target) center. 197.61", 158.845" */
-    public static final Pose2d Hub = getPose(5.019, 4.035, 0);
+    /** Blue diamond plate (scoring target) center. */
+    public static final Pose2d Hub = getPose(4.620, 4.035, 0);
     /** Pose in front of hub for shooting (robot faces hub). Used by drive-to auto. */
     public static final Pose2d ShotPosition = getPose(6.2, 4.035, 180);
     /** Tower / uprights reference: midpoint between uprights near blue diamond. 312.66", 158.845" */

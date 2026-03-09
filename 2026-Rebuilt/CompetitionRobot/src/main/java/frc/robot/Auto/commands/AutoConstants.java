@@ -59,9 +59,9 @@ public final class AutoConstants {
     /** TEMPORARY: tolerance for at-speed check when using low-ceiling speed. */
     public static final double TEMPORARY_SHOOTER_TOLERANCE = 5.0;
 
-    // Hub position (field-relative, blue alliance origin). From 2026 field diagram: blue diamond plate center 197.61", 158.845" (m)
+    // Hub position (field-relative, blue alliance origin).
     public static final Pose2d HUB_POSE = new Pose2d(
-            new Translation2d(5.019, 4.035),
+            new Translation2d(4.620, 4.035),
             Rotation2d.fromDegrees(0)
     );
 }

@@ -303,35 +303,39 @@ public class AutoRoutines {
                         new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
 
-                // 4. Acquire hub aim
+                // 4. Lower intake so webcam is unblocked for hub aim
+                intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
+                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
+
+                // 5. Acquire hub aim
                 CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
 
-                // 5. Wait shooter at speed
+                // 6. Wait shooter at speed
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
 
-                // 6. Shoot for time
+                // 7. Shoot for time
                 CmdShootForTime.create(shooter, feeder, floor, shootDuration),
 
-                // 7. Follow path to center (intake on until path finishes)
+                // 8. Follow path to center (intake on until path finishes)
                 Commands.deadline(
                         new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
                         CmdIntakeOn.create(intake)),
 
-                // 8. Intake until count (or time-based)
+                // 9. Intake until count (or time-based)
                 CmdIntakeUntilCount.create(intake, positionTracker, targetBallCount),
 
-                // 9. Follow path back to shot (shooter spins up until path finishes)
+                // 10. Follow path back to shot (shooter spins up until path finishes)
                 Commands.deadline(
                         new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
 
-                // 10. Acquire hub aim
+                // 11. Acquire hub aim
                 CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
 
-                // 11. Wait shooter at speed
+                // 12. Wait shooter at speed
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
 
-                // 12. Shoot for time
+                // 13. Shoot for time
                 CmdShootForTime.create(shooter, feeder, floor, shootDuration)
         ).withName("ShooterAuto");
     }
