@@ -213,6 +213,8 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
     @Override
     public void resetDeployPosition() {
         m_deployMotor.setPosition(DeployPosition.STOWED.value);
+        // Update closed-loop setpoint so motor doesn't drive toward stale DEPLOYED target on enable
+        m_deployMotor.setControl(m_deployRequest.withPosition(DeployPosition.STOWED.value));
         initialized = true;
     }
 
