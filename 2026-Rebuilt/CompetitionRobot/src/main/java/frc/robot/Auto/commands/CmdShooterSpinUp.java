@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Logging.RobotLogger;
 import frc.robot.Subsystems.Shooter;
 
 /**
@@ -43,6 +44,8 @@ public class CmdShooterSpinUp extends Command {
     @Override
     public void initialize() {
         double targetRpm = rpmSupplier.get();
+        RobotLogger.log(String.format("[CmdShooterSpinUp] Target shooter speed: %.1f RPS", targetRpm));
+        RobotLogger.recordDouble("Auto/ShooterTargetRPS", targetRpm);
         spinUpCommand = shooter.moveToArbitrarySpeedCommand(() -> targetRpm);
         spinUpCommand.initialize();
     }

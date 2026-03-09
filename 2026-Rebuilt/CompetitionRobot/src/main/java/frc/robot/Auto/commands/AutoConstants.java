@@ -60,11 +60,11 @@ public final class AutoConstants {
     public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
 
     /** Default shooter speed (RPS) for ShooterAuto Center. Tunable via Preferences "Auto/ShooterSpeedCenter". */
-    public static final double SHOOTER_AUTO_CENTER_SPEED = 140.0;
+    public static final double SHOOTER_AUTO_CENTER_SPEED = 110.0;
     /** Default tolerance for ShooterAuto Center at-speed check. Tunable via Preferences "Auto/ShooterToleranceCenter". */
     public static final double SHOOTER_AUTO_CENTER_TOLERANCE = 5.0;
     /** Default shooter speed (RPS) for ShooterAuto Left/Right. Tunable via Preferences "Auto/ShooterSpeedLeftRight". */
-    public static final double SHOOTER_AUTO_LEFT_RIGHT_SPEED = 160.0;
+    public static final double SHOOTER_AUTO_LEFT_RIGHT_SPEED = 130.0;
     /** Default tolerance for ShooterAuto Left/Right at-speed check. Tunable via Preferences "Auto/ShooterToleranceLeftRight". */
     public static final double SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE = 5.0;
     /** Default shoot duration (seconds) for feeder/floor to launch all balls. Tunable via Auto Tuning tab. */
