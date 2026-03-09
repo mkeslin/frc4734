@@ -433,15 +433,11 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // ----- Step 3: Drive to shoot spot + spin up shooter (in parallel) -----
+                // ----- Step 3: Drive to shoot spot + spin up shooter (drive is deadline; spin-up runs during drive) -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 3: Drive to shot + spin up shooter")),
-                Commands.parallel(
+                Commands.deadline(
                         new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
-                        Commands.sequence(
-                                Commands.deadline(
-                                        Commands.waitSeconds(0.1),
-                                        new CmdShooterSpinUp(shooter, rpmSupplier)),
-                                new CmdWaitShooterAtSpeed(shooter, rpmSupplier, rpmTol, 5.0))),
+                        new CmdShooterSpinUp(shooter, rpmSupplier)),
 
                 // ----- Step 4: Lower intake -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 4: Lower intake")),
