@@ -99,32 +99,28 @@ public class AutoConfigurator {
         Preferences.initDouble("Auto/ShooterSpeedLeftRight", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_SPEED);
         Preferences.initDouble("Auto/ShooterToleranceLeftRight", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE);
 
-        // Auto Tuning tab: editable sliders for shooter speed (no need to add Preferences widget manually)
+        // Auto Tuning tab: editable number fields for shooter speed and tuning
+        // Use kTextView for reliable editability (type value directly); kNumberSlider can be read-only in some Shuffleboard versions
         ShuffleboardTab autoTuningTab = Shuffleboard.getTab("Auto Tuning");
         GenericEntry centerSpeedEntry = autoTuningTab.add("Shooter Speed Center (RPS)", AutoConstants.SHOOTER_AUTO_CENTER_SPEED)
-                .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", 0, "max", 500))
+                .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(0, 0)
                 .getEntry();
         GenericEntry centerTolEntry = autoTuningTab.add("Shooter Tolerance Center", AutoConstants.SHOOTER_AUTO_CENTER_TOLERANCE)
-                .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", 0, "max", 50))
+                .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(1, 0)
                 .getEntry();
         GenericEntry leftRightSpeedEntry = autoTuningTab.add("Shooter Speed Left/Right (RPS)", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_SPEED)
-                .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", 0, "max", 500))
+                .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(0, 1)
                 .getEntry();
         GenericEntry leftRightTolEntry = autoTuningTab.add("Shooter Tolerance Left/Right", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE)
-                .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", 0, "max", 50))
+                .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(1, 1)
                 .getEntry();
 
         GenericEntry shootDurationEntry = autoTuningTab.add("Shoot Duration (sec)", AutoConstants.DEFAULT_SHOOT_DURATION)
-                .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", 0.5, "max", 10.0))
+                .withWidget(BuiltInWidgets.kTextView)
                 .withPosition(0, 2)
                 .getEntry();
 
