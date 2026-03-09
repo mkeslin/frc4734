@@ -23,7 +23,8 @@ Landmarks and paths are **alliance-aware**: `Landmarks` uses `AllianceUtils` so 
 | ClimberAuto (Left)    | POS_1 (left)   | Shoot preload, drive to tower, climb L1, hold. Tower side from **Climb Side** chooser. |
 | ClimberAuto (Middle)  | POS_2 (center) | Same; tower side from **Climb Side** chooser (left or right only).                      |
 | ClimberAuto (Right)   | POS_3 (right)  | Same; tower side from **Climb Side** chooser.                                           |
-| ShooterAuto (Left)    | POS_1 (left)   | Shoot preload → serpentine through center (intake) → shoot |
+| ShooterAuto (Left)    | POS_1 (left)   | Shoot preload → through center (intake) → return → shoot |
+| ShooterAuto (Center)  | POS_2 (center) | C_StartToShot → shoot preload → stop.               |
 | ShooterAuto (Right)   | POS_3 (right)  | Same flow from right start.                         |
 
 ---
@@ -84,13 +85,34 @@ ClimberAuto uses **no PathPlanner paths**; all motion is **drive-to-pose** via `
 
 Summary: **preload shot → serpentine through center (intake) → second shot.** Left uses `L_*` paths; Right uses `R_*` paths. Build logic: `AutoRoutines.buildShooterAuto()`; registration: `AutoConfigurator.registerFullAutos()`.
 
+---
+
+## ShooterAuto (Center)
+
+**Goal**: Follow C_StartToShot, shoot preload, then stop.
+
+**Steps (in order):**
+
+1. **Seed odometry** – Start at POS_2 (center).
+2. **Tag snap (if good)** – Same as ClimberAuto.
+3. **Path to shot (with shooter spin-up)** – **CmdFollowPath** `C_StartToShot`, 10 s timeout.
+4. **Lower intake** – Deploy intake so webcam is unblocked (if present).
+5. **Acquire hub aim** – Vision-based heading to hub.
+6. **Wait shooter at speed** – 3000 RPM ± 100.
+7. **Shoot** – Feed for 1.0 s.
+8. **Stop** – Routine ends.
+
+Build logic: `AutoRoutines.buildTestDriveAndShoot()`; registration: `AutoConfigurator.registerFullAutos()`.
+
+---
+
 **PathPlanner paths (ShooterAuto):**
 
-| Path file | Left (L_) | Right (R_) | Use |
-|-----------|-----------|------------|-----|
-| `*_StartToShot.path` | ✓ | ✓ | Start → shot (preload) |
-| `*_ThroughCenter.path` | ✓ | ✓ | Shot → through center |
-| `*_ThroughCenterReturn.path` | ✓ | ✓ | Center → back to shot |
+| Path file | Left (L_) | Center (C_) | Right (R_) | Use |
+|-----------|-----------|-------------|------------|-----|
+| `*_StartToShot.path` | ✓ | ✓ | ✓ | Start → shot (preload) |
+| `*_ThroughCenter.path` | ✓ | — | ✓ | Shot → through center |
+| `*_ThroughCenterReturn.path` | ✓ | — | ✓ | Center → back to shot |
 
 ---
 

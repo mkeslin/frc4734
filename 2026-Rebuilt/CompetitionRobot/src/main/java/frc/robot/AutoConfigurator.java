@@ -445,6 +445,23 @@ public class AutoConfigurator {
                 m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (" + label + ")", shooterAuto, List.of(), initialPoseBlue));
             }
         }
+
+        // Shooter Auto (Center): C_StartToShot → shoot preload → stop (no center run)
+        Command shooterAutoCenter = AutoRoutines.buildTestDriveAndShoot(
+                StartPoseId.POS_2,
+                startPoseSuppliers,
+                "C_StartToShot",
+                AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
+                AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
+                AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
+                1.0,
+                m_drivetrain,
+                vision,
+                shooter,
+                feeder,
+                floor,
+                intake);
+        m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (Center)", shooterAutoCenter, List.of(), BlueLandmarks.Start2));
     }
 
     /**
