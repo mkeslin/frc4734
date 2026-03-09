@@ -29,10 +29,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  */
 public final class AllianceUtils {
     /** Field width in meters (used for rotation calculations). Verified for 2026 Rebuilt field. */
-    private static final double FIELD_WIDTH = 16.54; // meters
+    private static final double FIELD_WIDTH = 16.540988; // meters
     
     /** Field length in meters (used for rotation calculations). Verified for 2026 Rebuilt field. */
-    private static final double FIELD_LENGTH = 8.07; // meters
+    private static final double FIELD_LENGTH = 8.069326; // meters
     
     /** Field center X coordinate in meters */
     private static final double FIELD_CENTER_X = FIELD_LENGTH / 2.0;
