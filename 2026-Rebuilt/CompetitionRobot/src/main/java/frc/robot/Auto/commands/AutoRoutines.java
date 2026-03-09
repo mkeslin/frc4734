@@ -16,6 +16,7 @@ import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.Logging.RobotLogger;
 import frc.robot.PathPlanner.AllianceUtils;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -282,9 +283,16 @@ public class AutoRoutines {
 
         return Commands.sequence(
                 // 1. Seed odometry
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 1: Seed odometry")),
                 CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
 
-                // 2. Tag snap
+                // 2. Lower intake so webcam is unblocked for hub aim
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 2: Lower intake")),
+                intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
+                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
+
+                // 3. Tag snap
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 3: Tag snap")),
                 new CmdApplyTagSnapIfGood(
                         vision,
                         drivetrain,
@@ -292,26 +300,22 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // 3. TEMPORARY: Drive to shot commented out; robot starts at shot position.
-                // Commands.deadline(
-                //         new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
-                //         new CmdShooterSpinUp(shooter, rpmSupplier)),
-                // Spin up shooter while stationary (replaces path-to-shot)
+                // 4. Spin up shooter while stationary
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 4: Spin up shooter")),
                 Commands.deadline(
-                        Commands.waitSeconds(2.0),
+                        Commands.waitSeconds(1.0),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
 
-                // 4. Lower intake so webcam is unblocked for hub aim
-                intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
-                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
-
-                // 5. Acquire hub aim
-                CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
+                // 5. Acquire hub aim (commented out in some configs)
+                // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 5: Acquire hub aim")),
+                // CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
 
                 // 6. Wait shooter at speed
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Wait shooter at speed")),
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
 
                 // 7. Shoot for time
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Shoot")),
                 CmdShootForTime.create(shooter, feeder, floor, shootDuration),
 
                 // TEMPORARY: No moving yet - test preload shot only.
@@ -331,8 +335,11 @@ public class AutoRoutines {
                 // CmdShootForTime.create(shooter, feeder, floor, shootDuration),
 
                 // 8. Raise intake for next run reset
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 8: Raise intake")),
                 intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
-                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
+                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
+
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Complete"))
         ).withName("ShooterAuto");
     }
 
@@ -379,32 +386,36 @@ public class AutoRoutines {
         Supplier<Double> rpmSupplier = () -> targetRpm;
 
         return Commands.sequence(
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto Center] Step 1: Seed odometry")),
                 CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto Center] Step 2: Tag snap")),
                 new CmdApplyTagSnapIfGood(
                         vision,
                         drivetrain,
                         AutoConstants.DEFAULT_MAX_AMBIGUITY,
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
-                // TEMPORARY: Drive to shot commented out; robot starts at shot position.
-                // Commands.deadline(
-                //         new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
-                //         new CmdShooterSpinUp(shooter, rpmSupplier)),
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto Center] Step 3: Spin up shooter")),
                 Commands.deadline(
                         Commands.waitSeconds(2.0),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto Center] Step 4: Lower intake")),
                 intake != null
                         ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
                                 .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
                         : Commands.none(),
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto Center] Step 5: Acquire hub aim")),
                 CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto Center] Step 6: Wait shooter at speed")),
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto Center] Step 7: Shoot")),
                 CmdShootForTime.create(shooter, feeder, floor, shootDuration),
-                // Raise intake for next run reset
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto Center] Step 8: Raise intake")),
                 intake != null
                         ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
                                 .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
-                        : Commands.none()
+                        : Commands.none(),
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto Center] Complete"))
         ).withName("TestDriveAndShoot");
     }
 
