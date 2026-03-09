@@ -417,7 +417,7 @@ public class AutoConfigurator {
         }
         
         // Shooter Auto: Left and Right (shoot → through center → return to shot → shoot)
-        if (intake != null && positionTracker != null) {
+        if (intake != null) {
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : "Right";
                 String shooterPathToShot = MoleculeTests.getPathNameForPose(startId, "StartToShot");
@@ -433,14 +433,12 @@ public class AutoConfigurator {
                         AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
                         AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
                         1.0, // Shoot duration
-                        1, // Target ball count
                         m_drivetrain,
                         vision,
                         shooter,
                         feeder,
                         floor,
-                        intake,
-                        positionTracker);
+                        intake);
                 Pose2d initialPoseBlue = startId == StartPoseId.POS_1 ? BlueLandmarks.Start1 : BlueLandmarks.Start3;
                 m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (" + label + ")", shooterAuto, List.of(), initialPoseBlue));
             }

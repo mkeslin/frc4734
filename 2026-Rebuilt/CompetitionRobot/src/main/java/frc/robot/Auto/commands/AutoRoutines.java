@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.PositionTracker;
 import frc.robot.Constants.IntakeConstants.DeployPosition;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
@@ -221,11 +220,11 @@ public class AutoRoutines {
      *   <li>Seeds odometry from start pose</li>
      *   <li>Applies tag snap if vision quality is good</li>
      *   <li>Follows path to shot position (parallel: spins up shooter)</li>
+     *   <li>Lowers intake</li>
      *   <li>Acquires hub aim</li>
      *   <li>Waits for shooter at speed</li>
      *   <li>Shoots for specified duration</li>
-     *   <li>Follows path to center (parallel: intake on)</li>
-     *   <li>Intakes until ball count reached (or timeout)</li>
+     *   <li>Follows path to center (parallel: intake on until path endpoint)</li>
      *   <li>Follows path back to shot (parallel: spin up shooter)</li>
      *   <li>Acquires hub aim</li>
      *   <li>Waits for shooter at speed</li>
@@ -241,14 +240,12 @@ public class AutoRoutines {
      * @param targetRpm Target shooter RPM
      * @param rpmTol RPM tolerance for shooter at-speed check
      * @param shootDuration Duration to shoot (seconds)
-     * @param targetBallCount Target ball count for intake
      * @param drivetrain The drivetrain subsystem
      * @param vision The PhotonVision subsystem
      * @param shooter The shooter subsystem
      * @param feeder The feeder subsystem
      * @param floor The floor conveyor subsystem (runs with feeder to feed notes)
      * @param intake The intake subsystem
-     * @param positionTracker The position tracker for sensor reading
      * @return A command representing the complete shooter auto routine
      * @throws NullPointerException if any required parameter is null
      */
@@ -262,14 +259,12 @@ public class AutoRoutines {
             double targetRpm,
             double rpmTol,
             double shootDuration,
-            int targetBallCount,
             CommandSwerveDrivetrain drivetrain,
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
             Floor floor,
-            DeployableIntake intake,
-            PositionTracker positionTracker) {
+            DeployableIntake intake) {
         
         Objects.requireNonNull(id, "id cannot be null");
         Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
@@ -282,7 +277,6 @@ public class AutoRoutines {
         Objects.requireNonNull(feeder, "feeder cannot be null");
         Objects.requireNonNull(floor, "floor cannot be null");
         Objects.requireNonNull(intake, "intake cannot be null");
-        Objects.requireNonNull(positionTracker, "positionTracker cannot be null");
 
         Supplier<Double> rpmSupplier = () -> targetRpm;
 
@@ -316,26 +310,23 @@ public class AutoRoutines {
                 // 7. Shoot for time
                 CmdShootForTime.create(shooter, feeder, floor, shootDuration),
 
-                // 8. Follow path to center (intake on until path finishes)
+                // 8. Follow path to center (intake on until path endpoint)
                 Commands.deadline(
                         new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
                         CmdIntakeOn.create(intake)),
 
-                // 9. Intake until count (or time-based)
-                CmdIntakeUntilCount.create(intake, positionTracker, targetBallCount),
-
-                // 10. Follow path back to shot (shooter spins up until path finishes)
+                // 9. Follow path back to shot (shooter spins up until path finishes)
                 Commands.deadline(
                         new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
 
-                // 11. Acquire hub aim
+                // 10. Acquire hub aim
                 CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
 
-                // 12. Wait shooter at speed
+                // 11. Wait shooter at speed
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
 
-                // 13. Shoot for time
+                // 12. Shoot for time
                 CmdShootForTime.create(shooter, feeder, floor, shootDuration)
         ).withName("ShooterAuto");
     }

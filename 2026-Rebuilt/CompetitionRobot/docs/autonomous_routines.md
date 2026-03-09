@@ -69,13 +69,13 @@ ClimberAuto uses **no PathPlanner paths**; all motion is **drive-to-pose** via `
 3. **Path to shot (with shooter spin-up)** – In parallel:
    - **CmdFollowPath** `L_StartToShot` (Left) or `R_StartToShot` (Right), 10 s timeout.
    - **CmdShooterSpinUp** to 3000 RPM.
-4. **Acquire hub aim** – Same as ClimberAuto.
-5. **Wait shooter at speed** – 3000 RPM ± 100.
-6. **Shoot** – Feed for 1.0 s.
-7. **Path through center (with intake on)** – In parallel:
+4. **Lower intake** – Deploy intake so webcam is unblocked for hub aim.
+5. **Acquire hub aim** – Same as ClimberAuto.
+6. **Wait shooter at speed** – 3000 RPM ± 100.
+7. **Shoot** – Feed for 1.0 s.
+8. **Path through center (with intake on until endpoint)** – In parallel:
    - **CmdFollowPath** `L_ThroughCenter` (Left) or `R_ThroughCenter` (Right), 10 s timeout.
-   - **CmdIntakeOn** (intake deployed and running).
-8. **Intake until count** – `CmdIntakeUntilCount` until `PositionTracker` reports **1** extra note (or timeout).
+   - **CmdIntakeOn** (intake deployed and running). Intake stops when path finishes.
 9. **Path back to shot (with shooter spin-up)** – In parallel:
    - **CmdFollowPath** `L_ThroughCenterReturn` (Left) or `R_ThroughCenterReturn` (Right), 10 s timeout.
    - **CmdShooterSpinUp** to 3000 RPM.
