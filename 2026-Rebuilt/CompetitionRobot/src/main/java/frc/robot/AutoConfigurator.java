@@ -120,9 +120,6 @@ public class AutoConfigurator {
         
         // Setup Shuffleboard tab
         AutoTestShuffleboard.setupTab(m_testHarness);
-        
-        // Publish AutoManager chooser
-        SmartDashboard.putData("Auto Mode (manager)", m_autoManager.chooser);
 
         // Climber auto: choose which side of tower to climb (center not physically possible)
         m_climbSideChooser.setDefaultOption("Climb side: Left", ClimbSide.LEFT);
@@ -417,6 +414,11 @@ public class AutoConfigurator {
         }
         
         // Shooter Auto: Left and Right (shoot → through center → return to shot → shoot)
+        // TEMPORARY: Start at shot position (path-to-shot step commented out).
+        Map<StartPoseId, Supplier<Pose2d>> shotPoseSuppliers = new HashMap<>();
+        shotPoseSuppliers.put(StartPoseId.POS_1, Landmarks::OurShotPositionLeft);
+        shotPoseSuppliers.put(StartPoseId.POS_2, Landmarks::OurShotPositionCenter);
+        shotPoseSuppliers.put(StartPoseId.POS_3, Landmarks::OurShotPositionRight);
         if (intake != null) {
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : "Right";
@@ -425,7 +427,7 @@ public class AutoConfigurator {
                 String pathThroughCenterReturn = MoleculeTests.getPathNameForPose(startId, "ThroughCenterReturn");
                 Command shooterAuto = AutoRoutines.buildShooterAuto(
                         startId,
-                        startPoseSuppliers,
+                        shotPoseSuppliers,
                         shooterPathToShot,
                         pathThroughCenter,
                         pathThroughCenterReturn,
@@ -439,15 +441,16 @@ public class AutoConfigurator {
                         feeder,
                         floor,
                         intake);
-                Pose2d initialPoseBlue = startId == StartPoseId.POS_1 ? BlueLandmarks.Start1 : BlueLandmarks.Start3;
+                Pose2d initialPoseBlue = startId == StartPoseId.POS_1 ? BlueLandmarks.ShotPositionLeft : BlueLandmarks.ShotPositionRight;
                 m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (" + label + ")", shooterAuto, List.of(), initialPoseBlue));
             }
         }
 
         // Shooter Auto (Center): C_StartToShot → shoot preload → stop (no center run)
+        // TEMPORARY: Start at shot position (path-to-shot step commented out).
         Command shooterAutoCenter = AutoRoutines.buildTestDriveAndShoot(
                 StartPoseId.POS_2,
-                startPoseSuppliers,
+                shotPoseSuppliers,
                 "C_StartToShot",
                 AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
                 AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
@@ -459,7 +462,7 @@ public class AutoConfigurator {
                 feeder,
                 floor,
                 intake);
-        m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (Center)", shooterAutoCenter, List.of(), BlueLandmarks.Start2));
+        m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (Center)", shooterAutoCenter, List.of(), BlueLandmarks.ShotPositionCenter));
     }
 
     /**

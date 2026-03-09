@@ -23,6 +23,12 @@ public class BlueLandmarks {
     public static final Pose2d Hub = getPose(4.620, 4.035, 0);
     /** Pose in front of hub for shooting (robot faces hub). Used by drive-to auto. */
     public static final Pose2d ShotPosition = getPose(6.2, 4.035, 180);
+    /** Left shooter auto shot position (end of L_StartToShot path). */
+    public static final Pose2d ShotPositionLeft = getPose(3.468, 7.472, -76.945);
+    /** Center shooter auto shot position (end of C_StartToShot path). */
+    public static final Pose2d ShotPositionCenter = getPose(2.6, 4.035, 0);
+    /** Right shooter auto shot position (end of R_StartToShot path). */
+    public static final Pose2d ShotPositionRight = getPose(3.468, 0.598, 76.945);
     /** Tower / uprights reference: midpoint between uprights near blue diamond. 312.66", 158.845" */
     public static final Pose2d Tower = getPose(7.942, 4.035, 0);
     /**

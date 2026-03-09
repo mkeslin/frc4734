@@ -292,9 +292,13 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // 3. Follow path to shot (shooter spins up until path finishes)
+                // 3. TEMPORARY: Drive to shot commented out; robot starts at shot position.
+                // Commands.deadline(
+                //         new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                //         new CmdShooterSpinUp(shooter, rpmSupplier)),
+                // Spin up shooter while stationary (replaces path-to-shot)
                 Commands.deadline(
-                        new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                        Commands.waitSeconds(2.0),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
 
                 // 4. Lower intake so webcam is unblocked for hub aim
@@ -310,24 +314,25 @@ public class AutoRoutines {
                 // 7. Shoot for time
                 CmdShootForTime.create(shooter, feeder, floor, shootDuration),
 
-                // 8. Follow path to center (intake on until path endpoint)
-                Commands.deadline(
-                        new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
-                        CmdIntakeOn.create(intake)),
+                // TEMPORARY: No moving yet - test preload shot only.
+                // // 8. Follow path to center (intake on until path endpoint)
+                // Commands.deadline(
+                //         new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                //         CmdIntakeOn.create(intake)),
+                // // 9. Follow path back to shot (shooter spins up until path finishes)
+                // Commands.deadline(
+                //         new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                //         new CmdShooterSpinUp(shooter, rpmSupplier)),
+                // // 10. Acquire hub aim
+                // CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
+                // // 11. Wait shooter at speed
+                // CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
+                // // 12. Shoot for time
+                // CmdShootForTime.create(shooter, feeder, floor, shootDuration),
 
-                // 9. Follow path back to shot (shooter spins up until path finishes)
-                Commands.deadline(
-                        new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
-                        new CmdShooterSpinUp(shooter, rpmSupplier)),
-
-                // 10. Acquire hub aim
-                CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
-
-                // 11. Wait shooter at speed
-                CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
-
-                // 12. Shoot for time
-                CmdShootForTime.create(shooter, feeder, floor, shootDuration)
+                // 8. Raise intake for next run reset
+                intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
+                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
         ).withName("ShooterAuto");
     }
 
@@ -381,8 +386,12 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_AMBIGUITY,
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
+                // TEMPORARY: Drive to shot commented out; robot starts at shot position.
+                // Commands.deadline(
+                //         new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                //         new CmdShooterSpinUp(shooter, rpmSupplier)),
                 Commands.deadline(
-                        new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                        Commands.waitSeconds(2.0),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
                 intake != null
                         ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
@@ -390,7 +399,12 @@ public class AutoRoutines {
                         : Commands.none(),
                 CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
-                CmdShootForTime.create(shooter, feeder, floor, shootDuration)
+                CmdShootForTime.create(shooter, feeder, floor, shootDuration),
+                // Raise intake for next run reset
+                intake != null
+                        ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
+                                .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
+                        : Commands.none()
         ).withName("TestDriveAndShoot");
     }
 
