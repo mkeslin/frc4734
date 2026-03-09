@@ -261,7 +261,7 @@ public class AutoConfigurator {
                         CmdShootForTime.create(shooter, feeder, floor, 1.0));
                 // Coordinated shoot: wait for shooter at speed, then feed for duration
                 m_testHarness.registerAtom("Shoot", () -> 
-                        new CmdShootForTime(shooter, feeder, floor, 1.5, AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED, true, false, testRpm, 100.0));
+                        new CmdShootForTime(shooter, feeder, floor, 1.5, AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED, null, true, false, testRpm, 100.0));
             }
             m_testHarness.registerAtom("StopShooter", () -> 
                     new CmdStopShooter(shooter));

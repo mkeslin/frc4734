@@ -46,6 +46,7 @@ public class CmdShootForTime extends Command {
     private final boolean requireAtSpeed;
     private final boolean useFeederBackoff;
     private final Supplier<Double> targetRpmSupplier;
+    private final Supplier<Double> shooterRpmSupplierForRun;
     private final double rpmTol;
     private final Timer timer = new Timer();
     private Command feederCommand;
@@ -58,6 +59,7 @@ public class CmdShootForTime extends Command {
      * @param floor Optional floor subsystem; if non-null, floor runs in parallel with feeder and is stopped in end()
      * @param durationSec Duration to feed in seconds
      * @param spinupDelaySec Delay (seconds) before feeder/floor start, to let shooter stabilize
+     * @param shooterRpmSupplierForRun Optional; when non-null, runs shooter at this speed for full duration (avoids parallel subsystem conflict)
      * @param requireAtSpeed If true, wait for shooter at speed before feeding
      * @param useFeederBackoff If true, run feeder reverse for {@code SHOOT_FEEDER_BACKOFF} first to clear ball from wheels
      * @param targetRpmSupplier Supplier of target RPM (required if requireAtSpeed is true)
@@ -69,6 +71,7 @@ public class CmdShootForTime extends Command {
             Floor floor,
             double durationSec,
             double spinupDelaySec,
+            Supplier<Double> shooterRpmSupplierForRun,
             boolean requireAtSpeed,
             boolean useFeederBackoff,
             Supplier<Double> targetRpmSupplier,
@@ -81,6 +84,7 @@ public class CmdShootForTime extends Command {
         }
         this.durationSec = durationSec;
         this.spinupDelaySec = spinupDelaySec;
+        this.shooterRpmSupplierForRun = shooterRpmSupplierForRun;
         this.requireAtSpeed = requireAtSpeed;
         this.useFeederBackoff = useFeederBackoff;
         this.targetRpmSupplier = requireAtSpeed
@@ -111,7 +115,7 @@ public class CmdShootForTime extends Command {
             boolean requireAtSpeed,
             Supplier<Double> targetRpmSupplier,
             double rpmTol) {
-        this(shooter, feeder, null, durationSec, AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED, requireAtSpeed, false, targetRpmSupplier, rpmTol);
+        this(shooter, feeder, null, durationSec, AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED, null, requireAtSpeed, false, targetRpmSupplier, rpmTol);
     }
 
     @Override
@@ -143,6 +147,15 @@ public class CmdShootForTime extends Command {
         feedPhase = Commands.sequence(
                 Commands.waitSeconds(spinupDelaySec),
                 feedPhase);
+
+        // When shooterRpmSupplierForRun is set, run shooter in parallel with feed phase (inside this
+        // command to avoid ParallelCommandGroup subsystem conflict: shooter vs feeder+floor only)
+        if (shooterRpmSupplierForRun != null) {
+            Command shooterRun = shooter.moveToArbitrarySpeedCommand(shooterRpmSupplierForRun)
+                    .withTimeout(spinupDelaySec + durationSec)
+                    .withName("CmdShootForTime-shooter");
+            feedPhase = new ParallelCommandGroup(shooterRun, feedPhase);
+        }
 
         if (useFeederBackoff) {
             Command backoff = feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
@@ -237,14 +250,7 @@ public class CmdShootForTime extends Command {
      * @return A command that shoots for the specified duration
      */
     public static Command create(Shooter shooter, Feeder feeder, Floor floor, double durationSec, double spinupDelaySec, Supplier<Double> shooterRpmSupplier) {
-        Command base = new CmdShootForTime(shooter, feeder, floor, durationSec, spinupDelaySec, false, false, null, 0.0);
-        if (shooterRpmSupplier != null) {
-            Command shooterRun = shooter.moveToArbitrarySpeedCommand(shooterRpmSupplier)
-                    .withTimeout(spinupDelaySec + durationSec)
-                    .withName("CmdShootForTime-shooter");
-            base = Commands.parallel(shooterRun, base);
-        }
-        return base;
+        return new CmdShootForTime(shooter, feeder, floor, durationSec, spinupDelaySec, shooterRpmSupplier, false, false, null, 0.0);
     }
 
     /**
