@@ -114,10 +114,12 @@ public class AutoRoutines {
         // Captured after extending climber; used by drive-to-bar step (pathfind to pose toward bar).
         final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
         return Commands.sequence(
-                // 1. Seed odometry from start pose
+                // ----- Step 1: Seed odometry -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 1: Seed odometry")),
                 CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
 
-                // 2. Tag snap (if good)
+                // ----- Step 2: Tag snap -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 2: Tag snap")),
                 new CmdApplyTagSnapIfGood(
                         vision,
                         drivetrain,
@@ -125,7 +127,8 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // 3. Drive to shot pose (shooter spins up until drive finishes)
+                // ----- Step 3: Drive to shot pose -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 3: Drive to shot")),
                 Commands.deadline(
                         CmdDriveToPose.create(
                                 drivetrain,
@@ -135,22 +138,27 @@ public class AutoRoutines {
                                 AutoConstants.DEFAULT_PATH_TIMEOUT),
                         new CmdShooterSpinUp(shooter, rpmSupplier)),
 
-                // 4. Lower intake so webcam is not blocked (skip if no intake)
+                // ----- Step 4: Lower intake -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 4: Lower intake")),
                 intake != null
                         ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
                                 .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
                         : Commands.none(),
 
-                // 5. Acquire hub aim
+                // ----- Step 5: Acquire hub aim -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 5: Acquire hub aim")),
                 CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
 
-                // 6. Wait shooter at speed
+                // ----- Step 6: Wait shooter at speed -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 6: Wait shooter at speed")),
                 CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
 
-                // 7. Shoot for time (preload)
+                // ----- Step 7: Shoot preload -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 7: Shoot")),
                 CmdShootForTime.create(shooter, feeder, floor, shootDuration),
 
-                // 8. Drive to tower align pose (side from Shuffleboard "Climb Side" chooser)
+                // ----- Step 8: Drive to tower align -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 8: Drive to tower")),
                 CmdDriveToPose.create(
                         drivetrain,
                         towerAlignPose,
@@ -158,7 +166,8 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 9. Tag snap before final alignment
+                // ----- Step 9: Tag snap before final alignment -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 9: Tag snap")),
                 new CmdApplyTagSnapIfGood(
                         vision,
                         drivetrain,
@@ -166,7 +175,8 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // 10. Drive to tower align pose again (fine alignment; pose is 2 ft toward center from bar)
+                // ----- Step 10: Fine alignment to tower -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 10: Fine alignment")),
                 CmdDriveToPose.create(
                         drivetrain,
                         towerAlignPose,
@@ -178,7 +188,8 @@ public class AutoRoutines {
                 ClimbWhileHeldCommand.extendL1Only(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
-                // 12. Drive toward the bar (field -X) to acquire: main distance + extra so robot has enough bar to climb on
+                // ----- Step 12: Drive toward bar to acquire -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 12: Drive toward bar")),
                 Commands.runOnce(() -> poseBeforeDriveToBar[0] = drivetrain.getPose()),
                 CmdDriveToPose.create(
                         drivetrain,
@@ -197,19 +208,24 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // 12b. Drive 2 in toward bar (-X) and 2 in +Y using direct velocity (bypasses pathfinding for short move)
+                // ----- Step 13: Nudge toward bar -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 13: Nudge toward bar")),
                 CmdDriveFieldRelative.forDistance(
                         drivetrain,
                         -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         0.25),
 
-                // 13. Retract climber from L1
+                // ----- Step 14: Retract climber from L1 -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 14: Retract climber")),
                 ClimbWhileHeldCommand.retractFromL1(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
-                // 14. Hold climb until end
-                new CmdHoldClimbUntilEnd(climber, drivetrain)
+                // ----- Step 15: Hold climb until end -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 15: Hold climb")),
+                new CmdHoldClimbUntilEnd(climber, drivetrain),
+
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Complete"))
         ).withName("ClimberAuto");
     }
 
@@ -457,33 +473,53 @@ public class AutoRoutines {
         final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
 
         return Commands.sequence(
+                // ----- Step 1: Seed odometry -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 1: Seed odometry")),
                 CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
+
+                // ----- Step 2: Tag snap -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 2: Tag snap")),
                 new CmdApplyTagSnapIfGood(
                         vision,
                         drivetrain,
                         AutoConstants.DEFAULT_MAX_AMBIGUITY,
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
+
+                // ----- Step 3: Drive to tower align -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 3: Drive to tower")),
                 CmdDriveToPose.create(
                         drivetrain,
                         towerAlignPose,
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
+
+                // ----- Step 4: Tag snap again -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 4: Tag snap")),
                 new CmdApplyTagSnapIfGood(
                         vision,
                         drivetrain,
                         AutoConstants.DEFAULT_MAX_AMBIGUITY,
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
+
+                // ----- Step 5: Fine alignment to tower -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 5: Fine alignment")),
                 CmdDriveToPose.create(
                         drivetrain,
                         towerAlignPose,
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
+
+                // ----- Step 6: Extend climber to L1 -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 6: Extend climber L1")),
                 ClimbWhileHeldCommand.extendL1Only(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
+
+                // ----- Step 7: Drive toward bar to acquire -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 7: Drive toward bar")),
                 Commands.runOnce(() -> poseBeforeDriveToBar[0] = drivetrain.getPose()),
                 CmdDriveToPose.create(
                         drivetrain,
@@ -500,14 +536,25 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
+
+                // ----- Step 8: Nudge toward bar -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 8: Nudge toward bar")),
                 CmdDriveFieldRelative.forDistance(
                         drivetrain,
                         -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         0.25),
+
+                // ----- Step 9: Retract climber from L1 -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 9: Retract climber")),
                 ClimbWhileHeldCommand.retractFromL1(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
-                new CmdHoldClimbUntilEnd(climber, drivetrain)
+
+                // ----- Step 10: Hold climb until end -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 10: Hold climb")),
+                new CmdHoldClimbUntilEnd(climber, drivetrain),
+
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Complete"))
         ).withName("TestClimb");
     }
 }
