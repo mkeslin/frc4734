@@ -186,6 +186,7 @@ public class CmdShootForTime extends Command {
         if (floor != null) {
             scheduler.schedule(floor.resetSpeedCommand());
         }
+        scheduler.schedule(new CmdStopShooter(shooter));
     }
 
     /**
