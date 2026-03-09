@@ -60,7 +60,7 @@ public final class AutoConstants {
     public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
 
     /** TEMPORARY: shooter target speed (RPS) for low-ceiling room testing. Revert to 3000 and 100 tolerance for competition. */
-    public static final double TEMPORARY_SHOOTER_TARGET_SPEED = 180.0;
+    public static final double TEMPORARY_SHOOTER_TARGET_SPEED = 120.0;
     /** TEMPORARY: tolerance for at-speed check when using low-ceiling speed. */
     public static final double TEMPORARY_SHOOTER_TOLERANCE = 5.0;
 
