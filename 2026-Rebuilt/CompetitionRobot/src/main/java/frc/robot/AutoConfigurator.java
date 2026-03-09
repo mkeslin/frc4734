@@ -342,11 +342,13 @@ public class AutoConfigurator {
         }
 
         StartPoseId defaultPose = StartPoseId.POS_1;
-        String pathToShot = MoleculeTests.getPathNameForPose(defaultPose, "StartToShot");
+        // Use center path for Test - Drive and Shoot: L_StartToShot has zero length (same start/end).
+        StartPoseId testDrivePose = StartPoseId.POS_2;
+        String pathToShot = MoleculeTests.getPathNameForPose(testDrivePose, "StartToShot");
 
         // Test - Drive and Shoot: seed, path to shot, lower intake, aim, shoot (no center run)
         Command testDriveAndShoot = AutoRoutines.buildTestDriveAndShoot(
-                defaultPose,
+                testDrivePose,
                 startPoseSuppliers,
                 pathToShot,
                 AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
@@ -359,7 +361,7 @@ public class AutoConfigurator {
                 feeder,
                 floor,
                 intake);
-        m_autoManager.addRoutine(new AutoRoutine("Test - Drive and Shoot", testDriveAndShoot, List.of(), BlueLandmarks.Start1));
+        m_autoManager.addRoutine(new AutoRoutine("Test - Drive and Shoot", testDriveAndShoot, List.of(), BlueLandmarks.Start2));
 
         // Test - Climb: seed at 4 ft from tower toward center + 4 ft toward sideline, right climb side, drive to tower, extend L1, drive to bar, retract
         if (climber != null) {
@@ -447,10 +449,10 @@ public class AutoConfigurator {
         }
 
         // Shooter Auto (Center): C_StartToShot → shoot preload → stop (no center run)
-        // TEMPORARY: Start at shot position (path-to-shot step commented out).
+        // Seed at start so the robot actually drives from start to shot.
         Command shooterAutoCenter = AutoRoutines.buildTestDriveAndShoot(
                 StartPoseId.POS_2,
-                shotPoseSuppliers,
+                startPoseSuppliers,
                 "C_StartToShot",
                 AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
                 AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
@@ -462,7 +464,7 @@ public class AutoConfigurator {
                 feeder,
                 floor,
                 intake);
-        m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (Center)", shooterAutoCenter, List.of(), BlueLandmarks.ShotPositionCenter));
+        m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (Center)", shooterAutoCenter, List.of(), BlueLandmarks.Start2));
     }
 
     /**

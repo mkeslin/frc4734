@@ -18,9 +18,9 @@ public final class AutoConstants {
     public static final String TUNING_PATH_NAME = "zzTuning-1";
 
     /** TEMPORARY: max velocity (m/s) for auto path following. Use lower value for testing; revert to 5.0 for competition. */
-    public static final double AUTO_PATH_MAX_VELOCITY_MPS = 1.5;
+    public static final double AUTO_PATH_MAX_VELOCITY_MPS = 3.0;
     /** TEMPORARY: max acceleration (m/s²) for auto path following. Use lower value for testing; revert to 3.0 for competition. */
-    public static final double AUTO_PATH_MAX_ACCELERATION_MPS2 = 1.0;
+    public static final double AUTO_PATH_MAX_ACCELERATION_MPS2 = 2.0;
 
     // Default timeouts (seconds)
     public static final double DEFAULT_PATH_TIMEOUT = 10.0;
