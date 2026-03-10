@@ -148,13 +148,17 @@ public class AutoConfigurator {
         Supplier<Double> toleranceLeftRight = () -> leftRightTolEntry.getDouble(AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE);
         Supplier<Double> shootDuration = () -> shootDurationEntry.getDouble(AutoConstants.DEFAULT_SHOOT_DURATION);
 
-        // Dynamic shooter speed from distance to hub (RPS = 4 * distanceFt + 80.67); fixed uses Shuffleboard sliders
-        Supplier<Double> shooterSpeedForAutos = CommandConstants.USE_DYNAMIC_SHOOTER_SPEED
-                ? () -> ShotModel.rpsFromRobotToHub(m_drivetrain.getPose().getTranslation())
-                : shooterSpeedCenter;
-        Supplier<Double> shooterSpeedLeftRightForAutos = CommandConstants.USE_DYNAMIC_SHOOTER_SPEED
-                ? () -> ShotModel.rpsFromRobotToHub(m_drivetrain.getPose().getTranslation())
-                : shooterSpeedLeftRight;
+        // Shooter speed: TEMPORARY 6 ft override, or dynamic from distance, or fixed from Shuffleboard
+        Supplier<Double> shooterSpeedForAutos = CommandConstants.USE_TEMPORARY_6FT_SHOOTER_SPEED
+                ? () -> CommandConstants.TEMPORARY_SHOOTER_SPEED_6FT_RPS
+                : (CommandConstants.USE_DYNAMIC_SHOOTER_SPEED
+                        ? () -> ShotModel.rpsFromRobotToHub(m_drivetrain.getPose().getTranslation())
+                        : shooterSpeedCenter);
+        Supplier<Double> shooterSpeedLeftRightForAutos = CommandConstants.USE_TEMPORARY_6FT_SHOOTER_SPEED
+                ? () -> CommandConstants.TEMPORARY_SHOOTER_SPEED_6FT_RPS
+                : (CommandConstants.USE_DYNAMIC_SHOOTER_SPEED
+                        ? () -> ShotModel.rpsFromRobotToHub(m_drivetrain.getPose().getTranslation())
+                        : shooterSpeedLeftRight);
 
         // Start poses evaluated at runtime so alliance is correct when auto runs.
         Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers = new HashMap<>();
