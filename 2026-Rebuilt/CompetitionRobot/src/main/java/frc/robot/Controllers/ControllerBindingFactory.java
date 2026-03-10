@@ -109,7 +109,7 @@ public class ControllerBindingFactory {
             m_mechanismController.rightTrigger()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
                     .whileTrue(Commands.defer(
-                            () -> TeleopMechanismCommands.shoot(m_shooter, m_feeder, m_floor),
+                            () -> TeleopMechanismCommands.shoot(m_shooter, m_feeder, m_floor, m_drivetrain),
                             Set.<Subsystem>of(m_shooter, m_feeder, m_floor)));
             m_mechanismController.rightBumper()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
