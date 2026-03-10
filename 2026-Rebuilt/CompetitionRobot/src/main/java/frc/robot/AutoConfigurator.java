@@ -6,6 +6,11 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -88,6 +93,59 @@ public class AutoConfigurator {
             Climber climber,
             PositionTracker positionTracker) {
         
+        // Initialize Preferences keys (stored on roboRIO; editable via Preferences widget in Shuffleboard)
+        Preferences.initDouble("Auto/ShooterSpeedCenter", AutoConstants.SHOOTER_AUTO_CENTER_SPEED);
+        Preferences.initDouble("Auto/ShooterToleranceCenter", AutoConstants.SHOOTER_AUTO_CENTER_TOLERANCE);
+        Preferences.initDouble("Auto/ShooterSpeedLeftRight", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_SPEED);
+        Preferences.initDouble("Auto/ShooterToleranceLeftRight", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE);
+        Preferences.initDouble("Auto/ShootDuration", AutoConstants.DEFAULT_SHOOT_DURATION);
+
+        // Auto Tuning tab: add widgets to a GridLayout so they render as editable sliders
+        // (tab default List layout can show read-only table; GridLayout with kNumberSlider is editable)
+        ShuffleboardTab autoTuningTab = Shuffleboard.getTab("Auto Tuning");
+        var tuningLayout = autoTuningTab.getLayout("Auto Tuning", "Grid Layout")
+                .withPosition(0, 0)
+                .withSize(4, 3);
+        GenericEntry centerSpeedEntry = tuningLayout.add("Shooter Speed Center (RPS)", AutoConstants.SHOOTER_AUTO_CENTER_SPEED)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 500))
+                .withPosition(0, 0)
+                .getEntry();
+        GenericEntry centerTolEntry = tuningLayout.add("Shooter Tolerance Center", AutoConstants.SHOOTER_AUTO_CENTER_TOLERANCE)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 50))
+                .withPosition(1, 0)
+                .getEntry();
+        GenericEntry leftRightSpeedEntry = tuningLayout.add("Shooter Speed Left/Right (RPS)", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_SPEED)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 500))
+                .withPosition(0, 1)
+                .getEntry();
+        GenericEntry leftRightTolEntry = tuningLayout.add("Shooter Tolerance Left/Right", AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0, "max", 50))
+                .withPosition(1, 1)
+                .getEntry();
+        GenericEntry shootDurationEntry = tuningLayout.add("Shoot Duration (sec)", AutoConstants.DEFAULT_SHOOT_DURATION)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0.5, "max", 10.0))
+                .withPosition(0, 2)
+                .getEntry();
+
+        // Reset intake position: stow intake manually, then press to sync encoder to "stowed"
+        if (intake != null) {
+            autoTuningTab.add("Reset Intake Position", intake.resetDeployPositionCommand())
+                    .withWidget(BuiltInWidgets.kCommand)
+                    .withPosition(0, 3)
+                    .withSize(2, 1);
+        }
+
+        Supplier<Double> shooterSpeedCenter = () -> centerSpeedEntry.getDouble(AutoConstants.SHOOTER_AUTO_CENTER_SPEED);
+        Supplier<Double> shooterSpeedLeftRight = () -> leftRightSpeedEntry.getDouble(AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_SPEED);
+        Supplier<Double> toleranceCenter = () -> centerTolEntry.getDouble(AutoConstants.SHOOTER_AUTO_CENTER_TOLERANCE);
+        Supplier<Double> toleranceLeftRight = () -> leftRightTolEntry.getDouble(AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE);
+        Supplier<Double> shootDuration = () -> shootDurationEntry.getDouble(AutoConstants.DEFAULT_SHOOT_DURATION);
+
         // Start poses evaluated at runtime so alliance is correct when auto runs.
         Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers = new HashMap<>();
         startPoseSuppliers.put(StartPoseId.POS_1, Landmarks::OurStart1);
@@ -106,23 +164,20 @@ public class AutoConfigurator {
                 climber,
                 positionTracker);
         
-        // Register atom commands
-        registerAtoms(startPoseSuppliers, vision, shooter, feeder, floor, intake, climber, positionTracker);
+        // Register atom commands (use center speed for test harness)
+        registerAtoms(startPoseSuppliers, shooterSpeedCenter, toleranceCenter, vision, shooter, feeder, floor, intake, climber, positionTracker);
         
         // Register molecule tests
-        registerMolecules(startPoseSuppliers, vision, shooter, feeder, floor, intake, climber);
+        registerMolecules(startPoseSuppliers, shooterSpeedCenter, toleranceCenter, vision, shooter, feeder, floor, intake, climber);
         
         // Register full autos
-        registerFullAutos(startPoseSuppliers, vision, shooter, feeder, floor, intake, climber, positionTracker);
+        registerFullAutos(startPoseSuppliers, shooterSpeedCenter, shooterSpeedLeftRight, toleranceCenter, toleranceLeftRight, shootDuration, vision, shooter, feeder, floor, intake, climber, positionTracker);
         
         // Initialize test harness
         m_testHarness.initialize();
         
         // Setup Shuffleboard tab
         AutoTestShuffleboard.setupTab(m_testHarness);
-        
-        // Publish AutoManager chooser
-        SmartDashboard.putData("Auto Mode (manager)", m_autoManager.chooser);
 
         // Climber auto: choose which side of tower to climb (center not physically possible)
         m_climbSideChooser.setDefaultOption("Climb side: Left", ClimbSide.LEFT);
@@ -135,6 +190,8 @@ public class AutoConfigurator {
      */
     private void registerAtoms(
             Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
+            Supplier<Double> shooterSpeedSupplier,
+            Supplier<Double> toleranceCenter,
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
@@ -184,21 +241,19 @@ public class AutoConfigurator {
                         () -> m_drivetrain.getPose(),
                         AutoConstants.DEFAULT_POSE_TIMEOUT));
         
-        // Shooter commands (on / reverse / off for testing)
-        // TEMPORARY: use low speed for low-ceiling room; revert to 3000.0 and 30.0 for competition.
+        // Shooter commands (on / reverse / off for testing); speed from Preferences for runtime tuning
         if (shooter != null) {
-            Supplier<Double> testRpm = () -> AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED;
-            double testShooterRps = AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED; // RPS (TalonFX velocity = rotations/sec)
+            Supplier<Double> testRpm = shooterSpeedSupplier;
             m_testHarness.registerAtom("ShooterOn", () -> 
-                    shooter.moveToArbitrarySpeedCommand(() -> testShooterRps));
+                    shooter.moveToArbitrarySpeedCommand(testRpm));
             m_testHarness.registerAtom("ShooterReverse", () -> 
-                    shooter.moveToArbitrarySpeedCommand(() -> -testShooterRps));
+                    shooter.moveToArbitrarySpeedCommand(() -> -testRpm.get()));
             m_testHarness.registerAtom("ShooterOff", () -> 
                     new CmdStopShooter(shooter));
             m_testHarness.registerAtom("ShooterSpinUp", () -> 
                     new CmdShooterSpinUp(shooter, testRpm));
             m_testHarness.registerAtom("WaitShooterAtSpeed", () -> 
-                    CmdWaitShooterAtSpeed.create(shooter, testRpm, AutoConstants.TEMPORARY_SHOOTER_TOLERANCE));
+                    CmdWaitShooterAtSpeed.create(shooter, testRpm, toleranceCenter.get()));
             m_testHarness.registerAtom("SetShotMode", () -> 
                     new CmdSetShotMode(shooter, ShotMode.AUTO_SHOT));
             if (feeder != null) {
@@ -206,7 +261,7 @@ public class AutoConfigurator {
                         CmdShootForTime.create(shooter, feeder, floor, 1.0));
                 // Coordinated shoot: wait for shooter at speed, then feed for duration
                 m_testHarness.registerAtom("Shoot", () -> 
-                        new CmdShootForTime(shooter, feeder, floor, 1.5, true, false, testRpm, 100.0));
+                        new CmdShootForTime(shooter, feeder, floor, 1.5, AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED, null, true, false, testRpm, 100.0));
             }
             m_testHarness.registerAtom("StopShooter", () -> 
                     new CmdStopShooter(shooter));
@@ -261,6 +316,8 @@ public class AutoConfigurator {
      */
     private void registerMolecules(
             Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
+            Supplier<Double> shooterSpeedSupplier,
+            Supplier<Double> toleranceCenter,
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
@@ -291,8 +348,8 @@ public class AutoConfigurator {
             m_testHarness.registerMolecule("Path+SpinUp->Shoot", () -> 
                     MoleculeTests.buildPathSpinupShoot(
                             pathToShot,
-                            AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
-                            AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
+                            shooterSpeedSupplier.get(),
+                            toleranceCenter.get(),
                             1.0, // Shoot duration
                             m_drivetrain,
                             shooter,
@@ -317,6 +374,11 @@ public class AutoConfigurator {
      */
     private void registerFullAutos(
             Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
+            Supplier<Double> shooterSpeedCenter,
+            Supplier<Double> shooterSpeedLeftRight,
+            Supplier<Double> toleranceCenter,
+            Supplier<Double> toleranceLeftRight,
+            Supplier<Double> shootDuration,
             PhotonVision vision,
             Shooter shooter,
             Feeder feeder,
@@ -344,25 +406,26 @@ public class AutoConfigurator {
             return; // Need core subsystems for remaining autos
         }
 
-        StartPoseId defaultPose = StartPoseId.POS_1;
-        String pathToShot = MoleculeTests.getPathNameForPose(defaultPose, "StartToShot");
+        // Use center path for Test - Drive and Shoot: L_StartToShot has zero length (same start/end).
+        StartPoseId testDrivePose = StartPoseId.POS_2;
+        String pathToShot = MoleculeTests.getPathNameForPose(testDrivePose, "StartToShot");
 
         // Test - Drive and Shoot: seed, path to shot, lower intake, aim, shoot (no center run)
         Command testDriveAndShoot = AutoRoutines.buildTestDriveAndShoot(
-                defaultPose,
+                testDrivePose,
                 startPoseSuppliers,
                 pathToShot,
                 AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
-                AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
-                AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
-                1.0,
+                shooterSpeedCenter,
+                toleranceCenter.get(),
+                shootDuration,
                 m_drivetrain,
                 vision,
                 shooter,
                 feeder,
                 floor,
                 intake);
-        m_autoManager.addRoutine(new AutoRoutine("Test - Drive and Shoot", testDriveAndShoot, List.of(), BlueLandmarks.Start1));
+        m_autoManager.addRoutine(new AutoRoutine("Test - Drive and Shoot", testDriveAndShoot, List.of(), BlueLandmarks.Start2));
 
         // Test - Climb: seed at 4 ft from tower toward center + 4 ft toward sideline, right climb side, drive to tower, extend L1, drive to bar, retract
         if (climber != null) {
@@ -396,9 +459,9 @@ public class AutoConfigurator {
                         shotPoseSupplier,
                         towerAlignPoseSupplier,
                         AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
-                        AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
-                        AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
-                        1.0, // Shoot duration
+                        shooterSpeedCenter,
+                        toleranceCenter.get(),
+                        shootDuration,
                         m_drivetrain,
                         vision,
                         shooter,
@@ -416,35 +479,55 @@ public class AutoConfigurator {
             }
         }
         
-        // Shooter Auto: Left and Right (shoot → center → reload → shoot)
-        if (intake != null && positionTracker != null) {
+        // Shooter Auto: Left and Right (shoot → through center → return to shot → shoot)
+        Map<StartPoseId, Supplier<Pose2d>> shotPoseSuppliers = new HashMap<>();
+        shotPoseSuppliers.put(StartPoseId.POS_1, Landmarks::OurShotPositionLeft);
+        shotPoseSuppliers.put(StartPoseId.POS_2, Landmarks::OurShotPositionCenter);
+        shotPoseSuppliers.put(StartPoseId.POS_3, Landmarks::OurShotPositionRight);
+        if (intake != null) {
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : "Right";
                 String shooterPathToShot = MoleculeTests.getPathNameForPose(startId, "StartToShot");
-                String pathToCenter = MoleculeTests.getPathNameForPose(startId, "StartToCenter");
-                String pathBackToShot = MoleculeTests.getPathNameForPose(startId, "CenterToShot");
+                String pathThroughCenter = MoleculeTests.getPathNameForPose(startId, "ThroughCenter");
+                String pathThroughCenterReturn = MoleculeTests.getPathNameForPose(startId, "ThroughCenterReturn");
                 Command shooterAuto = AutoRoutines.buildShooterAuto(
                         startId,
-                        startPoseSuppliers,
+                        shotPoseSuppliers,
                         shooterPathToShot,
-                        pathToCenter,
-                        pathBackToShot,
+                        pathThroughCenter,
+                        pathThroughCenterReturn,
                         AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
-                        AutoConstants.TEMPORARY_SHOOTER_TARGET_SPEED,
-                        AutoConstants.TEMPORARY_SHOOTER_TOLERANCE,
-                        1.0, // Shoot duration
-                        1, // Target ball count
+                        shooterSpeedLeftRight,
+                        toleranceLeftRight.get(),
+                        shootDuration,
                         m_drivetrain,
                         vision,
                         shooter,
                         feeder,
                         floor,
-                        intake,
-                        positionTracker);
-                Pose2d initialPoseBlue = startId == StartPoseId.POS_1 ? BlueLandmarks.Start1 : BlueLandmarks.Start3;
+                        intake);
+                Pose2d initialPoseBlue = startId == StartPoseId.POS_1 ? BlueLandmarks.ShotPositionLeft : BlueLandmarks.ShotPositionRight;
                 m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (" + label + ")", shooterAuto, List.of(), initialPoseBlue));
             }
         }
+
+        // Shooter Auto (Center): C_StartToShot → shoot preload → stop (no center run)
+        // Seed at start so the robot actually drives from start to shot.
+        Command shooterAutoCenter = AutoRoutines.buildTestDriveAndShoot(
+                StartPoseId.POS_2,
+                startPoseSuppliers,
+                "C_StartToShot",
+                AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
+                shooterSpeedCenter,
+                toleranceCenter.get(),
+                shootDuration,
+                m_drivetrain,
+                vision,
+                shooter,
+                feeder,
+                floor,
+                intake);
+        m_autoManager.addRoutine(new AutoRoutine("ShooterAuto (Center)", shooterAutoCenter, List.of(), BlueLandmarks.Start2));
     }
 
     /**

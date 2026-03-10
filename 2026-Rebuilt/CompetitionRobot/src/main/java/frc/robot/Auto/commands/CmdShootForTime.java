@@ -1,7 +1,6 @@
 package frc.robot.Auto.commands;
 
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_BACKOFF;
-import static frc.robot.Constants.CommandConstants.SHOOT_FLOOR_DELAY;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -43,9 +42,11 @@ public class CmdShootForTime extends Command {
     private final Feeder feeder;
     private final Floor floor;
     private final double durationSec;
+    private final double spinupDelaySec;
     private final boolean requireAtSpeed;
     private final boolean useFeederBackoff;
     private final Supplier<Double> targetRpmSupplier;
+    private final Supplier<Double> shooterRpmSupplierForRun;
     private final double rpmTol;
     private final Timer timer = new Timer();
     private Command feederCommand;
@@ -55,8 +56,10 @@ public class CmdShootForTime extends Command {
      *
      * @param shooter The shooter subsystem
      * @param feeder The feeder subsystem
-     * @param floor Optional floor subsystem; if non-null, floor runs after {@code SHOOT_FLOOR_DELAY} and is stopped in end()
+     * @param floor Optional floor subsystem; if non-null, floor runs in parallel with feeder and is stopped in end()
      * @param durationSec Duration to feed in seconds
+     * @param spinupDelaySec Delay (seconds) before feeder/floor start, to let shooter stabilize
+     * @param shooterRpmSupplierForRun Optional; when non-null, runs shooter at this speed for full duration (avoids parallel subsystem conflict)
      * @param requireAtSpeed If true, wait for shooter at speed before feeding
      * @param useFeederBackoff If true, run feeder reverse for {@code SHOOT_FEEDER_BACKOFF} first to clear ball from wheels
      * @param targetRpmSupplier Supplier of target RPM (required if requireAtSpeed is true)
@@ -67,6 +70,8 @@ public class CmdShootForTime extends Command {
             Feeder feeder,
             Floor floor,
             double durationSec,
+            double spinupDelaySec,
+            Supplier<Double> shooterRpmSupplierForRun,
             boolean requireAtSpeed,
             boolean useFeederBackoff,
             Supplier<Double> targetRpmSupplier,
@@ -78,6 +83,8 @@ public class CmdShootForTime extends Command {
             throw new IllegalArgumentException("durationSec must be greater than 0, got: " + durationSec);
         }
         this.durationSec = durationSec;
+        this.spinupDelaySec = spinupDelaySec;
+        this.shooterRpmSupplierForRun = shooterRpmSupplierForRun;
         this.requireAtSpeed = requireAtSpeed;
         this.useFeederBackoff = useFeederBackoff;
         this.targetRpmSupplier = requireAtSpeed
@@ -108,7 +115,7 @@ public class CmdShootForTime extends Command {
             boolean requireAtSpeed,
             Supplier<Double> targetRpmSupplier,
             double rpmTol) {
-        this(shooter, feeder, null, durationSec, requireAtSpeed, false, targetRpmSupplier, rpmTol);
+        this(shooter, feeder, null, durationSec, AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED, null, requireAtSpeed, false, targetRpmSupplier, rpmTol);
     }
 
     @Override
@@ -121,8 +128,9 @@ public class CmdShootForTime extends Command {
                 .withName("CmdShootForTime-feeder");
 
         if (floor != null) {
-            Command floorPhase = Commands.waitSeconds(SHOOT_FLOOR_DELAY)
-                    .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value).withTimeout(Math.max(0, durationSec - SHOOT_FLOOR_DELAY)));
+            Command floorPhase = floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)
+                    .withTimeout(durationSec)
+                    .withName("CmdShootForTime-floor");
             feedPhase = new ParallelCommandGroup(feedPhase, floorPhase);
         }
 
@@ -133,6 +141,20 @@ public class CmdShootForTime extends Command {
                     rpmTol,
                     AutoConstants.DEFAULT_SHOOTER_SPINUP_TIMEOUT);
             feedPhase = Commands.sequence(waitCommand, feedPhase);
+        }
+
+        // Extra spin-up time before feeder starts so shooter stabilizes
+        feedPhase = Commands.sequence(
+                Commands.waitSeconds(spinupDelaySec),
+                feedPhase);
+
+        // When shooterRpmSupplierForRun is set, run shooter in parallel with feed phase (inside this
+        // command to avoid ParallelCommandGroup subsystem conflict: shooter vs feeder+floor only)
+        if (shooterRpmSupplierForRun != null) {
+            Command shooterRun = shooter.moveToArbitrarySpeedCommand(shooterRpmSupplierForRun)
+                    .withTimeout(spinupDelaySec + durationSec)
+                    .withName("CmdShootForTime-shooter");
+            feedPhase = new ParallelCommandGroup(shooterRun, feedPhase);
         }
 
         if (useFeederBackoff) {
@@ -156,7 +178,10 @@ public class CmdShootForTime extends Command {
 
     @Override
     public boolean isFinished() {
-        if (timer.hasElapsed(durationSec)) {
+        // Safety timeout: spinup wait (if any) + delay + feed duration
+        double totalDuration = (requireAtSpeed ? AutoConstants.DEFAULT_SHOOTER_SPINUP_TIMEOUT : 0)
+                + spinupDelaySec + durationSec;
+        if (timer.hasElapsed(totalDuration)) {
             return true;
         }
         
@@ -178,20 +203,54 @@ public class CmdShootForTime extends Command {
         if (floor != null) {
             scheduler.schedule(floor.resetSpeedCommand());
         }
+        scheduler.schedule(new CmdStopShooter(shooter));
     }
 
     /**
      * Factory method to create a command without requiring shooter at speed.
      * Runs feeder and floor (if non-null) to feed notes into the shooter.
+     * Uses default spin-up delay ({@link AutoConstants#SHOOT_SPINUP_DELAY_BEFORE_FEED}).
      *
      * @param shooter The shooter subsystem
      * @param feeder The feeder subsystem
-     * @param floor Optional floor subsystem; if non-null, runs after SHOOT_FLOOR_DELAY to feed from conveyor
+     * @param floor Optional floor subsystem; if non-null, runs in parallel with feeder to feed from conveyor
      * @param durationSec Duration to feed in seconds
      * @return A command that shoots for the specified duration
      */
     public static Command create(Shooter shooter, Feeder feeder, Floor floor, double durationSec) {
-        return new CmdShootForTime(shooter, feeder, floor, durationSec, false, false, null, 0.0);
+        return create(shooter, feeder, floor, durationSec, AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED);
+    }
+
+    /**
+     * Factory method with configurable spin-up delay. Use for routines that need longer shooter
+     * stabilization (e.g. ShooterAuto Left/Right at angle).
+     *
+     * @param shooter The shooter subsystem
+     * @param feeder The feeder subsystem
+     * @param floor Optional floor subsystem; if non-null, runs in parallel with feeder to feed from conveyor
+     * @param durationSec Duration to feed in seconds
+     * @param spinupDelaySec Delay (seconds) before feeder/floor start
+     * @return A command that shoots for the specified duration
+     */
+    public static Command create(Shooter shooter, Feeder feeder, Floor floor, double durationSec, double spinupDelaySec) {
+        return create(shooter, feeder, floor, durationSec, spinupDelaySec, null);
+    }
+
+    /**
+     * Factory method with spin-up delay and optional shooter RPM. When shooterRpmSupplier is
+     * non-null, runs the shooter at that speed for the full duration (delay + feed). Use when
+     * the shoot step is not preceded by a spin-up command (e.g. ShooterAuto Left/Right).
+     *
+     * @param shooter The shooter subsystem
+     * @param feeder The feeder subsystem
+     * @param floor Optional floor subsystem; if non-null, runs in parallel with feeder
+     * @param durationSec Duration to feed in seconds
+     * @param spinupDelaySec Delay (seconds) before feeder/floor start
+     * @param shooterRpmSupplier Optional; when non-null, runs shooter at this speed for full duration
+     * @return A command that shoots for the specified duration
+     */
+    public static Command create(Shooter shooter, Feeder feeder, Floor floor, double durationSec, double spinupDelaySec, Supplier<Double> shooterRpmSupplier) {
+        return new CmdShootForTime(shooter, feeder, floor, durationSec, spinupDelaySec, shooterRpmSupplier, false, false, null, 0.0);
     }
 
     /**

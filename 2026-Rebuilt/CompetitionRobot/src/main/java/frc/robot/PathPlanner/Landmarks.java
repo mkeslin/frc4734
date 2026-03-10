@@ -58,6 +58,21 @@ public class Landmarks {
         return AllianceUtils.getAlliancePose(BlueLandmarks.ShotPosition);
     }
 
+    /** Gets the left shooter auto shot position for the current alliance. */
+    public static Pose2d OurShotPositionLeft() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.ShotPositionLeft);
+    }
+
+    /** Gets the center shooter auto shot position for the current alliance. */
+    public static Pose2d OurShotPositionCenter() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.ShotPositionCenter);
+    }
+
+    /** Gets the right shooter auto shot position for the current alliance. */
+    public static Pose2d OurShotPositionRight() {
+        return AllianceUtils.getAlliancePose(BlueLandmarks.ShotPositionRight);
+    }
+
     /**
      * Shot pose equidistant between start and tower align: midpoint of the two positions,
      * with rotation facing the hub so the robot can aim and shoot.

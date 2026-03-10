@@ -77,6 +77,12 @@ public class DriverDashboard {
 
         tab = Shuffleboard.getTab(TAB_NAME);
 
+        // Auto routine selector (top right)
+        tab.add("Auto Routine", m_autoManager.chooser)
+                .withWidget(BuiltInWidgets.kComboBoxChooser)
+                .withPosition(4, 0)
+                .withSize(2, 1);
+
         // Bindings profile: dropdown to switch mode; default is Teleop
         m_profileChooser = new SendableChooser<>();
         m_profileChooser.setDefaultOption(PROFILE_TELEOP_LABEL, PROFILE_TELEOP_LABEL);
@@ -84,12 +90,12 @@ public class DriverDashboard {
         m_profileChooser.addOption(PROFILE_MECHANISM_LABEL, PROFILE_MECHANISM_LABEL);
         tab.add("Bindings Profile", m_profileChooser)
                 .withWidget(BuiltInWidgets.kComboBoxChooser)
-                .withPosition(4, 2)
+                .withPosition(4, 1)
                 .withSize(2, 1);
 
         m_currentProfileEntry = tab.add("Current Profile", PROFILE_TELEOP_LABEL)
                 .withWidget(BuiltInWidgets.kTextView)
-                .withPosition(4, 3)
+                .withPosition(4, 2)
                 .withSize(2, 1)
                 .getEntry();
 

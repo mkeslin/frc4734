@@ -17,6 +17,11 @@ public final class AutoConstants {
     /** Path name (without .path) for drivetrain path-following PID tuning. File: zzTuning-1.path. */
     public static final String TUNING_PATH_NAME = "zzTuning-1";
 
+    /** TEMPORARY: max velocity (m/s) for auto path following. Use lower value for testing; revert to 5.0 for competition. */
+    public static final double AUTO_PATH_MAX_VELOCITY_MPS = 3.0;
+    /** TEMPORARY: max acceleration (m/s²) for auto path following. Use lower value for testing; revert to 3.0 for competition. */
+    public static final double AUTO_PATH_MAX_ACCELERATION_MPS2 = 2.0;
+
     // Default timeouts (seconds)
     public static final double DEFAULT_PATH_TIMEOUT = 10.0;
     public static final double DEFAULT_POSE_TIMEOUT = 5.0;
@@ -54,14 +59,26 @@ public final class AutoConstants {
     public static final int DEFAULT_STABLE_FRAMES = 10; // frames at target before considered stable
     public static final double DEFAULT_FALLBACK_HEADING_DEG = 180.0; // degrees
 
-    /** TEMPORARY: shooter target speed (RPS) for low-ceiling room testing. Revert to 3000 and 100 tolerance for competition. */
-    public static final double TEMPORARY_SHOOTER_TARGET_SPEED = 100.0;
-    /** TEMPORARY: tolerance for at-speed check when using low-ceiling speed. */
-    public static final double TEMPORARY_SHOOTER_TOLERANCE = 5.0;
+    /** Default shooter speed (RPS) for ShooterAuto Center. Tunable via Preferences "Auto/ShooterSpeedCenter". */
+    public static final double SHOOTER_AUTO_CENTER_SPEED = 110.0;
+    /** Default tolerance for ShooterAuto Center at-speed check. Tunable via Preferences "Auto/ShooterToleranceCenter". */
+    public static final double SHOOTER_AUTO_CENTER_TOLERANCE = 5.0;
+    /** Default shooter speed (RPS) for ShooterAuto Left/Right. Tunable via Preferences "Auto/ShooterSpeedLeftRight". */
+    public static final double SHOOTER_AUTO_LEFT_RIGHT_SPEED = 110.0;
+    /** Default tolerance for ShooterAuto Left/Right at-speed check. Tunable via Preferences "Auto/ShooterToleranceLeftRight". */
+    public static final double SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE = 5.0;
+    /** Default shoot duration (seconds) for feeder/floor to launch all balls. Tunable via Auto Tuning tab. */
+    public static final double DEFAULT_SHOOT_DURATION = 2.0;
+    /** Delay (seconds) after shooter at speed before feeder starts, to let shooter stabilize. */
+    public static final double SHOOT_SPINUP_DELAY_BEFORE_FEED = 0.75;
+    /** ShooterAuto Left/Right: spin-up delay (seconds) before feeder/floor turn on. Longer than center due to angle. */
+    public static final double SHOOT_SPINUP_DELAY_LEFT_RIGHT = 1.5;
+    /** ShooterAuto Left/Right: duration (seconds) shooter spins before at-speed check. */
+    public static final double SHOOTER_SPINUP_DURATION_LEFT_RIGHT = 1.5;
 
-    // Hub position (field-relative, blue alliance origin). From 2026 field diagram: blue diamond plate center 197.61", 158.845" (m)
+    // Hub position (field-relative, blue alliance origin).
     public static final Pose2d HUB_POSE = new Pose2d(
-            new Translation2d(5.019, 4.035),
+            new Translation2d(4.620, 4.035),
             Rotation2d.fromDegrees(0)
     );
 }

@@ -87,9 +87,9 @@ public final class CmdDriveToPose {
                                             target.getX(), target.getY(),
                                             current.getX(), current.getY(),
                                             alliance.name()));
-                                    // PathPlanner uses blue nav grid (typically 0–16.54 x 0–8.07); check pose in blue frame.
+                                    // PathPlanner uses blue nav grid (typically 0–16.540988 x 0–8.069326); check pose in blue frame.
                                     Pose2d currentBlue = alliance == Alliance.Red ? AllianceUtils.redToBlue(current) : current;
-                                    final double maxX = 16.6, maxY = 8.2;
+                                    final double maxX = 16.540988, maxY = 8.069326;
                                     if (currentBlue.getX() < -0.5 || currentBlue.getX() > maxX || currentBlue.getY() < -0.5 || currentBlue.getY() > maxY) {
                                         RobotLogger.logError(String.format(
                                                 "[CmdDriveToPose] pose in blue frame (%.2f, %.2f) is outside typical nav grid (0–%.1f, 0–%.1f); pathfinding may not move robot.",

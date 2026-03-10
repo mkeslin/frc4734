@@ -2,6 +2,7 @@ package frc.robot.Auto.commands;
 
 import java.util.Objects;
 
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -66,7 +67,18 @@ public class CmdFollowPath extends Command {
         }
 
         if (path != null) {
-            pathCommand = drivetrain.followPathCommand(path)
+            var orig = path.getGlobalConstraints();
+            PathConstraints constraints = new PathConstraints(
+                    AutoConstants.AUTO_PATH_MAX_VELOCITY_MPS,
+                    AutoConstants.AUTO_PATH_MAX_ACCELERATION_MPS2,
+                    orig.maxAngularVelocityRadPerSec(),
+                    orig.maxAngularAccelerationRadPerSecSq(),
+                    orig.nominalVoltageVolts());
+            PathPlannerPath pathToFollow = PathPlannerPath.fromPathPoints(
+                    path.getAllPathPoints(),
+                    constraints,
+                    path.getGoalEndState());
+            pathCommand = drivetrain.followPathCommand(pathToFollow)
                     .withTimeout(timeoutSec)
                     .withName("CmdFollowPath-" + pathName);
             pathCommand.initialize();

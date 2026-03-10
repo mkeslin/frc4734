@@ -30,10 +30,10 @@ public class CommandConstants {
 
     /** Teleop shoot: feeder runs reverse this long first to back ball off shooter wheels (seconds). */
     public static final double SHOOT_FEEDER_BACKOFF = 0.5;
-    /** Teleop shoot: time after shooter start before feeder runs (seconds). Gives shooter time to reach full speed. */
-    public static final double SHOOT_FEEDER_DELAY = 0.5;
-    /** Teleop shoot: time after shooter start before floor runs (seconds). */
-    public static final double SHOOT_FLOOR_DELAY = 0.5;
+    /** Teleop shoot: time after shooter start before feeder runs (seconds). Matches auto SHOOT_SPINUP_DELAY_BEFORE_FEED. */
+    public static final double SHOOT_FEEDER_DELAY = 0.75;
+    /** Teleop shoot: time after shooter start before floor runs (seconds). Matches auto for consistent spin-up. */
+    public static final double SHOOT_FLOOR_DELAY = 0.75;
 
     // Drivetrain speed constants (normalized -1.0 to 1.0)
     /** Speed for approaching scoring position */
