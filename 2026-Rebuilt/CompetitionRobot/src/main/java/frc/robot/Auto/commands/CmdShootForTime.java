@@ -1,6 +1,8 @@
 package frc.robot.Auto.commands;
 
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_BACKOFF;
+import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_PULSE_DELAY_SEC;
+import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_PULSE_ON_SEC;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -123,16 +125,23 @@ public class CmdShootForTime extends Command {
         timer.reset();
         timer.start();
 
-        Command feedPhase = feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
-                .withTimeout(durationSec)
+        Command pulseCycle = Commands.sequence(
+                feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
+                        .withTimeout(SHOOT_FEEDER_PULSE_ON_SEC)
+                        .finallyDo(interrupted -> feeder.resetSpeed()),
+                Commands.waitSeconds(SHOOT_FEEDER_PULSE_DELAY_SEC));
+        Command feederPulsed = Commands.deadline(
+                Commands.waitSeconds(durationSec),
+                pulseCycle.repeatedly())
                 .withName("CmdShootForTime-feeder");
 
         if (floor != null) {
             Command floorPhase = floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)
                     .withTimeout(durationSec)
                     .withName("CmdShootForTime-floor");
-            feedPhase = new ParallelCommandGroup(feedPhase, floorPhase);
+            feederPulsed = new ParallelCommandGroup(feederPulsed, floorPhase);
         }
+        Command feedPhase = feederPulsed;
 
         if (requireAtSpeed) {
             Command waitCommand = new CmdWaitShooterAtSpeed(

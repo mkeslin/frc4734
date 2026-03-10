@@ -2,6 +2,8 @@ package frc.robot.Commands.teleop;
 
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_BACKOFF;
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_DELAY;
+import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_PULSE_DELAY_SEC;
+import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_PULSE_ON_SEC;
 import static frc.robot.Constants.CommandConstants.SHOOT_FLOOR_DELAY;
 import static frc.robot.Constants.CommandConstants.USE_DYNAMIC_SHOOTER_SPEED;
 import static frc.robot.Constants.FeederConstants.FeederSpeed;
@@ -70,10 +72,15 @@ public final class TeleopMechanismCommands {
         Supplier<Double> shooterSpeedSupplier = USE_DYNAMIC_SHOOTER_SPEED
                 ? () -> ShotModel.rpsFromRobotToHub(drivetrain.getPose().getTranslation())
                 : () -> ShooterSpeed.FORWARD.value;
+        Command pulseCycle = Commands.sequence(
+                feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
+                        .withTimeout(SHOOT_FEEDER_PULSE_ON_SEC)
+                        .finallyDo(interrupted -> feeder.resetSpeed()),
+                Commands.waitSeconds(SHOOT_FEEDER_PULSE_DELAY_SEC));
+        Command feederPulsed = pulseCycle.repeatedly();
         Command shootPhase = new ParallelCommandGroup(
                 shooter.moveToArbitrarySpeedCommand(shooterSpeedSupplier),
-                Commands.waitSeconds(SHOOT_FEEDER_DELAY)
-                        .andThen(feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)),
+                Commands.waitSeconds(SHOOT_FEEDER_DELAY).andThen(feederPulsed),
                 Commands.waitSeconds(SHOOT_FLOOR_DELAY)
                         .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)));
         return Commands.sequence(backoff, shootPhase)

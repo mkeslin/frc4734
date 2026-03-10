@@ -37,6 +37,10 @@ public class CommandConstants {
     public static final double SHOOT_FEEDER_DELAY = 0.75;
     /** Teleop shoot: time after shooter start before floor runs (seconds). Matches auto for consistent spin-up. */
     public static final double SHOOT_FLOOR_DELAY = 0.75;
+    /** Pulsed feed: how long feeder runs per pulse (seconds). Long enough to push one ball. */
+    public static final double SHOOT_FEEDER_PULSE_ON_SEC = 0.25;
+    /** Pulsed feed: delay between pulses (seconds). Time for flywheel shaft to recover. Tunable. */
+    public static final double SHOOT_FEEDER_PULSE_DELAY_SEC = 0.35;
 
     // Drivetrain speed constants (normalized -1.0 to 1.0)
     /** Speed for approaching scoring position */
