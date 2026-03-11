@@ -29,12 +29,12 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 /**
  * Teleop mechanism combo commands (Teleop mode). Run while held; reset on release.
  *
- * <p>Driver D-pad (drive controller) controls shooter speed mode at runtime:
+ * <p>Mechanism controller A/B/X/Y (TELEOP mode) controls shooter speed at runtime:
  * <ul>
- *   <li>Up: Toggle dynamic (distance-based) vs fixed speed</li>
- *   <li>Left: Fixed 110 RPS</li>
- *   <li>Down: Fixed 125 RPS</li>
- *   <li>Right: Fixed 140 RPS</li>
+ *   <li>Y: Toggle dynamic (distance-based) vs fixed speed</li>
+ *   <li>X: Fixed 110 RPS</li>
+ *   <li>A: Fixed 125 RPS</li>
+ *   <li>B: Fixed 140 RPS</li>
  * </ul>
  */
 public final class TeleopMechanismCommands {
