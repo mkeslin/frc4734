@@ -92,16 +92,16 @@ public class ControllerBindingFactory {
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
                     .onTrue(m_intake.moveToArbitraryDeployPositionCommand(() -> DeployPosition.STOWED.value));
         }
-        // Mechanism controller A/B/X/Y (TELEOP): shooter speed mode. Y=toggle dynamic, X=110, A=125, B=140 RPS.
+        // Mechanism controller A/B/X/Y (TELEOP): shooter speed mode. Y=toggle dynamic, X=115, A=127, B=140 RPS.
         m_mechanismController.y()
                 .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
                 .onTrue(Commands.runOnce(TeleopMechanismCommands::toggleDynamicShooterSpeed));
         m_mechanismController.x()
                 .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
-                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(110)));
+                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(115)));
         m_mechanismController.a()
                 .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
-                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(125)));
+                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(127)));
         m_mechanismController.b()
                 .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
                 .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(140)));

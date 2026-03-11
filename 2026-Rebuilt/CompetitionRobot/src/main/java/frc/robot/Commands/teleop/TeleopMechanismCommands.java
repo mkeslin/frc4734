@@ -30,8 +30,8 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * <p>Mechanism controller A/B/X/Y (TELEOP mode) controls shooter speed at runtime:
  * <ul>
  *   <li>Y: Toggle dynamic (distance-based) vs fixed speed</li>
- *   <li>X: Fixed 110 RPS</li>
- *   <li>A: Fixed 125 RPS</li>
+ *   <li>X: Fixed 115 RPS</li>
+ *   <li>A: Fixed 127 RPS</li>
  *   <li>B: Fixed 140 RPS</li>
  * </ul>
  */
@@ -40,8 +40,8 @@ public final class TeleopMechanismCommands {
 
     /** Runtime toggle: dynamic (distance-based) vs fixed shooter speed. */
     private static volatile boolean s_isDynamicShooterSpeed = USE_DYNAMIC_SHOOTER_SPEED;
-    /** Fixed RPS when not using dynamic. X=110, A=125, B=140. */
-    private static volatile double s_fixedShooterSpeedRps = 110.0;
+    /** Fixed RPS when not using dynamic. X=115, A=127, B=140. */
+    private static volatile double s_fixedShooterSpeedRps = 115.0;
 
     /** Toggles between dynamic and fixed shooter speed. */
     public static void toggleDynamicShooterSpeed() {
@@ -88,7 +88,7 @@ public final class TeleopMechanismCommands {
 
     /**
      * Shoot command. Shooter speed comes from runtime driver D-pad selection:
-     * dynamic (distance-based) or fixed (110/125/140 RPS).
+     * dynamic (distance-based) or fixed (115/127/140 RPS).
      *
      * @param shooter    Shooter subsystem
      * @param feeder     Feeder subsystem
