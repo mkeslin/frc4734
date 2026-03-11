@@ -105,9 +105,11 @@ public final class TeleopMechanismCommands {
                 .moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
                 .withTimeout(SHOOT_FEEDER_BACKOFF)
                 .finallyDo(interrupted -> feeder.resetSpeed());
-        Supplier<Double> shooterSpeedSupplier = () -> s_isDynamicShooterSpeed
-                ? ShotModel.rpsFromRobotToHub(drivetrain.getPose().getTranslation())
-                : s_fixedShooterSpeedRps;
+        Supplier<Double> shooterSpeedSupplier = USE_TEMPORARY_6FT_SHOOTER_SPEED
+                ? () -> TEMPORARY_SHOOTER_SPEED_6FT_RPS
+                : () -> s_isDynamicShooterSpeed
+                        ? ShotModel.rpsFromRobotToHub(drivetrain.getPose().getTranslation())
+                        : s_fixedShooterSpeedRps;
         Command pulseCycle = Commands.sequence(
                 feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
                         .withTimeout(SHOOT_FEEDER_PULSE_ON_SEC)
