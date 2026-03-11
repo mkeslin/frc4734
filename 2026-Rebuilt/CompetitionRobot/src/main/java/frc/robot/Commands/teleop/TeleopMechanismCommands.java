@@ -6,8 +6,6 @@ import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_PULSE_DELAY_SEC;
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_PULSE_ON_SEC;
 import static frc.robot.Constants.CommandConstants.SHOOT_FLOOR_DELAY;
 import static frc.robot.Constants.CommandConstants.USE_DYNAMIC_SHOOTER_SPEED;
-import static frc.robot.Constants.CommandConstants.USE_TEMPORARY_6FT_SHOOTER_SPEED;
-import static frc.robot.Constants.CommandConstants.TEMPORARY_SHOOTER_SPEED_6FT_RPS;
 import static frc.robot.Constants.FeederConstants.FeederSpeed;
 import static frc.robot.Constants.FloorConstants.ConveyorSpeed;
 import static frc.robot.Constants.IntakeConstants.IntakeSpeed;
@@ -23,7 +21,6 @@ import frc.robot.ShotModel;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
-import frc.robot.dashboard.DriverDashboard;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
@@ -43,10 +40,8 @@ public final class TeleopMechanismCommands {
 
     /** Runtime toggle: dynamic (distance-based) vs fixed shooter speed. */
     private static volatile boolean s_isDynamicShooterSpeed = USE_DYNAMIC_SHOOTER_SPEED;
-    /** Fixed RPS when not using dynamic. Left=110, Down=125, Right=140. */
-    private static volatile double s_fixedShooterSpeedRps = USE_TEMPORARY_6FT_SHOOTER_SPEED
-            ? TEMPORARY_SHOOTER_SPEED_6FT_RPS
-            : 110.0;
+    /** Fixed RPS when not using dynamic. X=110, A=125, B=140. */
+    private static volatile double s_fixedShooterSpeedRps = 110.0;
 
     /** Toggles between dynamic and fixed shooter speed. */
     public static void toggleDynamicShooterSpeed() {
@@ -106,11 +101,9 @@ public final class TeleopMechanismCommands {
                 .moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
                 .withTimeout(SHOOT_FEEDER_BACKOFF)
                 .finallyDo(interrupted -> feeder.resetSpeed());
-        Supplier<Double> shooterSpeedSupplier = USE_TEMPORARY_6FT_SHOOTER_SPEED
-                ? () -> DriverDashboard.getTempShooterSpeedRps()
-                : () -> s_isDynamicShooterSpeed
-                        ? ShotModel.rpsFromRobotToHub(drivetrain.getPose().getTranslation())
-                        : s_fixedShooterSpeedRps;
+        Supplier<Double> shooterSpeedSupplier = () -> s_isDynamicShooterSpeed
+                ? ShotModel.rpsFromRobotToHub(drivetrain.getPose().getTranslation())
+                : s_fixedShooterSpeedRps;
         Command pulseCycle = Commands.sequence(
                 feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
                         .withTimeout(SHOOT_FEEDER_PULSE_ON_SEC)

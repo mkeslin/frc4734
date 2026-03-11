@@ -32,10 +32,10 @@ public final class CANIds {
     // Feeder
     public static final int FEEDER = 28;
 
-    // Shooter
-    public static final int SHOOTER_1 = 29;
-    public static final int SHOOTER_2 = 30;
-    public static final int SHOOTER_3 = 32;
+    // Shooter (left=32, center=30, right=29)
+    public static final int SHOOTER_LEFT = 32;
+    public static final int SHOOTER_CENTER = 30;
+    public static final int SHOOTER_RIGHT = 29;
 
     // Lights (moved from 40 to avoid conflict with climber)
     public static final int LIGHTS = 50;

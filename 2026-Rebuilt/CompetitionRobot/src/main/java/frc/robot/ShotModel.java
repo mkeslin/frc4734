@@ -5,15 +5,15 @@ import frc.robot.PathPlanner.Landmarks;
 
 /**
  * Shot model that computes shooter speed (RPS) from distance to the hub.
- * Uses linear regression from empirical testing: RPS = 4 * distanceFt + 80.67.
+ * Empirical fit: RPS = 3.5 * distanceFt + 85 (8'→113, 10'→120, 14'→134, 18'→148).
  */
 public final class ShotModel {
     private ShotModel() {}
 
     /** Slope: RPS per foot of distance. */
-    private static final double SLOPE = 4.0;
+    private static final double SLOPE = 3.5;
     /** Intercept: base RPS at zero distance. */
-    private static final double INTERCEPT = 80.67;
+    private static final double INTERCEPT = 85.0;
 
     /** Min distance (ft) for formula; below this, use min RPS. */
     private static final double MIN_DISTANCE_FT = 3.0;

@@ -59,10 +59,10 @@ public class ShooterConstants {
     // ---- Closed-loop ramp ----
     /** Time (seconds) for closed-loop voltage output to ramp 0→12V. 0 = no ramp (instant). Smooths spin-up and can reduce current spikes. */
     public static final double CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC = 0.2;
-    /** Per-axle ramp period (seconds). Staggered to spread current draw and reduce brownout risk. */
-    public static final double AXLE_1_RAMP_PERIOD_SEC = 0.15;
-    public static final double AXLE_2_RAMP_PERIOD_SEC = 0.20;
-    public static final double AXLE_3_RAMP_PERIOD_SEC = 0.25;
+    /** Per-motor ramp period (seconds). Staggered to spread current draw and reduce brownout risk. */
+    public static final double SHOOTER_LEFT_RAMP_PERIOD_SEC = 0.25;
+    public static final double SHOOTER_CENTER_RAMP_PERIOD_SEC = 0.20;
+    public static final double SHOOTER_RIGHT_RAMP_PERIOD_SEC = 0.15;
 
     // ---- Peak output voltage ----
     /** Peak forward voltage (volts). Slightly below 12 to leave bus headroom and reduce brownout risk. */
@@ -70,9 +70,9 @@ public class ShooterConstants {
     /** Peak reverse voltage (volts), typically negative. */
     public static final double PEAK_REVERSE_VOLTAGE = -12.0;
 
-    // ---- Per-axle speed multipliers ----
-    /** Per-axle speed multiplier. Tune to compensate for mechanical variation. 1.0 = nominal. */
-    public static final double AXLE_1_SPEED_MULTIPLIER = 1.0;
-    public static final double AXLE_2_SPEED_MULTIPLIER = 1.0;
-    public static final double AXLE_3_SPEED_MULTIPLIER = 1.0;
+    // ---- Per-motor speed multipliers ----
+    /** Per-motor speed multiplier. Tune to compensate for mechanical variation. 1.0 = nominal. */
+    public static final double SHOOTER_LEFT_SPEED_MULTIPLIER = 1.0;   // Motor 32
+    public static final double SHOOTER_CENTER_SPEED_MULTIPLIER = 1.0;   // Motor 30
+    public static final double SHOOTER_RIGHT_SPEED_MULTIPLIER = 1.0;  // Motor 29
 }

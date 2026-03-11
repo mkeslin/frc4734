@@ -33,7 +33,7 @@ public class CommandConstants {
     /** TEMPORARY: When true, override shooter speed to 12 ft value (128.67 RPS). Set false to restore dynamic/fixed logic. */
     public static final boolean USE_TEMPORARY_6FT_SHOOTER_SPEED = true;
     /** TEMPORARY: Shooter RPS (60% of 115 for low-ceiling testing). */
-    public static final double TEMPORARY_SHOOTER_SPEED_6FT_RPS = 110.0;
+    public static final double TEMPORARY_SHOOTER_SPEED_6FT_RPS = 185.0;
 
     /** Teleop shoot: feeder runs reverse this long first to back ball off shooter wheels (seconds). */
     public static final double SHOOT_FEEDER_BACKOFF = 0.5;
@@ -43,8 +43,8 @@ public class CommandConstants {
     public static final double SHOOT_FLOOR_DELAY = 0.75;
     /** Pulsed feed: how long feeder runs per pulse (seconds). Long enough to push one ball. Set high for continuous. */
     public static final double SHOOT_FEEDER_PULSE_ON_SEC = 0.25;
-    /** Pulsed feed: delay between pulses (seconds). 0 = effectively continuous (no gap). */
-    public static final double SHOOT_FEEDER_PULSE_DELAY_SEC = 0.0;
+    /** Pulsed feed: delay between pulses (seconds). Pause between shots for flywheel recovery. */
+    public static final double SHOOT_FEEDER_PULSE_DELAY_SEC = 0.2;
 
     // Drivetrain speed constants (normalized -1.0 to 1.0)
     /** Speed for approaching scoring position */
