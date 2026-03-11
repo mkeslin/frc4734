@@ -33,7 +33,9 @@ public class CmdStopShooter extends Command {
 
     @Override
     public void initialize() {
-        edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance().schedule(shooter.resetSpeedCommand());
+        // Call directly; do not schedule resetSpeedCommand() - that also requires Shooter
+        // and would cancel this command, interrupting the parent sequence.
+        shooter.resetSpeed();
     }
 
     @Override
