@@ -83,6 +83,8 @@ public final class AutoConstants {
     public static final double SHOOT_SPINUP_DELAY_LEFT_RIGHT = 1.5;
     /** ShooterAuto Left/Right: duration (seconds) shooter spins before at-speed check. */
     public static final double SHOOTER_SPINUP_DURATION_LEFT_RIGHT = 1.5;
+    /** Delay (seconds) into shoot before drive-through-center starts; overlap ensures drive begins before shoot ends. */
+    public static final double SHOOT_DRIVE_OVERLAP_DELAY_SEC = 1.5;
 
     // Hub position (field-relative, blue alliance origin).
     public static final Pose2d HUB_POSE = new Pose2d(
