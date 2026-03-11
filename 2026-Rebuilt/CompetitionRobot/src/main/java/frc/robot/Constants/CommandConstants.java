@@ -37,14 +37,14 @@ public class CommandConstants {
 
     /** Teleop shoot: feeder runs reverse this long first to back ball off shooter wheels (seconds). */
     public static final double SHOOT_FEEDER_BACKOFF = 0.5;
-    /** Teleop shoot: time after shooter start before feeder runs (seconds). Longer delay improves first-shot accuracy. */
-    public static final double SHOOT_FEEDER_DELAY = 1.4;
+    /** Teleop shoot: time after shooter start before feeder runs (seconds). Longer delay improves first-shot accuracy for heavier flywheel. */
+    public static final double SHOOT_FEEDER_DELAY = 1.7;
     /** Teleop shoot: time after shooter start before floor runs (seconds). Matches auto for consistent spin-up. */
     public static final double SHOOT_FLOOR_DELAY = 0.75;
-    /** Pulsed feed: how long feeder runs per pulse (seconds). Long enough to push one ball. */
+    /** Pulsed feed: how long feeder runs per pulse (seconds). Long enough to push one ball. Set high for continuous. */
     public static final double SHOOT_FEEDER_PULSE_ON_SEC = 0.25;
-    /** Pulsed feed: delay between pulses (seconds). Time for flywheel shaft to recover. Tunable. */
-    public static final double SHOOT_FEEDER_PULSE_DELAY_SEC = 0.45;
+    /** Pulsed feed: delay between pulses (seconds). 0 = effectively continuous (no gap). */
+    public static final double SHOOT_FEEDER_PULSE_DELAY_SEC = 0.0;
 
     // Drivetrain speed constants (normalized -1.0 to 1.0)
     /** Speed for approaching scoring position */

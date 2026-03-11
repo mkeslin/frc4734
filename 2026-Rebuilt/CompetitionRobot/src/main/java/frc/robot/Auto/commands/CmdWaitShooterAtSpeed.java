@@ -74,12 +74,8 @@ public class CmdWaitShooterAtSpeed extends Command {
         if (timer.hasElapsed(timeoutSec)) {
             return true;
         }
-
-        double currentSpeed = shooter.getSpeed();
-        double targetSpeed = targetRpmSupplier.get();
-        double speedError = Math.abs(currentSpeed - targetSpeed);
-        
-        return speedError <= rpmTol;
+        double targetRps = targetRpmSupplier.get();
+        return shooter.isAtSpeed(targetRps, rpmTol);
     }
 
     @Override

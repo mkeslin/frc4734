@@ -17,21 +17,17 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.VoltageConfigs;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.ShooterConstants;
 
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
@@ -42,7 +38,7 @@ import frc.robot.Subsystems.Bases.BaseIntake;
 
 /**
  * Shooter subsystem that controls the robot's shooter mechanism.
- * Uses three TalonFX motors (leader and two followers) with velocity control to shoot balls.
+ * Uses three independently controlled TalonFX motors (one per axle) with velocity control.
  * 
  * <p>Safety features:
  * <ul>
@@ -61,14 +57,12 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
 
     private final DoublePublisher shooterSpeedPub = TelemetryCalcs.createMechanismsPublisher("Shooter Speed");
 
-    private TalonFX m_shooterLeftLeaderMotor;
-    private TalonFX m_shooterRightFollowerMotor;
-    private TalonFX m_shooterCenterFollowerMotor;
-    private final int m_leaderDeviceId;
+    private TalonFX m_axle1;
+    private TalonFX m_axle2;
+    private TalonFX m_axle3;
     private final VoltageOut m_voltReq = new VoltageOut(0.0);
 
     private final SysIdRoutine m_sysIdRoutine;
-    private final Timer m_sysIdTimer = new Timer();
 
     private PositionTracker m_positionTracker;
 
@@ -84,17 +78,16 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
                 new SysIdRoutine.Mechanism(
                         (volts) -> {
                             double v = volts.in(Volts);
-                            m_shooterLeftLeaderMotor.setControl(m_voltReq.withOutput(v));
-                            // Followers mounted opposite to leader; negate so all spin same direction for SysId
-                            m_shooterRightFollowerMotor.setControl(m_voltReq.withOutput(-v));
-                            m_shooterCenterFollowerMotor.setControl(m_voltReq.withOutput(-v));
+                            m_axle1.setControl(m_voltReq.withOutput(v));
+                            m_axle2.setControl(m_voltReq.withOutput(-v));
+                            m_axle3.setControl(m_voltReq.withOutput(-v));
                         },
                         null,
                         this,
                         "Shooter"));
 
-        m_shooterLeftLeaderMotor = new TalonFX(SHOOTER_1, CAN_BUS);
-        m_shooterLeftLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
+        m_axle1 = new TalonFX(SHOOTER_1, CAN_BUS);
+        m_axle1.setNeutralMode(NeutralModeValue.Brake);
 
         // Velocity closed-loop Slot0 and current limits in one config
         Slot0Configs slot0 = new Slot0Configs();
@@ -121,19 +114,15 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
                 .withPeakForwardVoltage(ShooterConstants.PEAK_FORWARD_VOLTAGE)
                 .withPeakReverseVoltage(ShooterConstants.PEAK_REVERSE_VOLTAGE);
 
-        applyShooterMotorConfig(m_shooterLeftLeaderMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
+        applyShooterMotorConfig(m_axle1, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
 
-        // Shooter 2 and 3: same config as leader, then run as followers (mounted opposite to leader)
-        m_leaderDeviceId = m_shooterLeftLeaderMotor.getDeviceID();
-        m_shooterRightFollowerMotor = new TalonFX(SHOOTER_2, CAN_BUS);
-        m_shooterRightFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
-        applyShooterMotorConfig(m_shooterRightFollowerMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
-        m_shooterRightFollowerMotor.setControl(new Follower(m_leaderDeviceId, MotorAlignmentValue.Opposed));
+        m_axle2 = new TalonFX(SHOOTER_2, CAN_BUS);
+        m_axle2.setNeutralMode(NeutralModeValue.Brake);
+        applyShooterMotorConfig(m_axle2, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
 
-        m_shooterCenterFollowerMotor = new TalonFX(SHOOTER_3, CAN_BUS);
-        m_shooterCenterFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
-        applyShooterMotorConfig(m_shooterCenterFollowerMotor, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
-        m_shooterCenterFollowerMotor.setControl(new Follower(m_leaderDeviceId, MotorAlignmentValue.Opposed));
+        m_axle3 = new TalonFX(SHOOTER_3, CAN_BUS);
+        m_axle3.setNeutralMode(NeutralModeValue.Brake);
+        applyShooterMotorConfig(m_axle3, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
 
         resetSpeed();
     }
@@ -190,32 +179,54 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
 
     @Override
     public double getSpeed() {
-        return m_shooterLeftLeaderMotor.getVelocity().getValueAsDouble();
+        double v1 = m_axle1.getVelocity().getValueAsDouble();
+        double v2 = Math.abs(m_axle2.getVelocity().getValueAsDouble());
+        double v3 = Math.abs(m_axle3.getVelocity().getValueAsDouble());
+        return Math.min(v1, Math.min(v2, v3));
+    }
+
+    /**
+     * Returns true if all three axles are within tolerance of their per-axle target speeds.
+     *
+     * @param baseRps Base RPS (before per-axle multipliers)
+     * @param tol     Tolerance in RPS
+     */
+    public boolean isAtSpeed(double baseRps, double tol) {
+        double t1 = baseRps * ShooterConstants.AXLE_1_SPEED_MULTIPLIER;
+        double t2 = -baseRps * ShooterConstants.AXLE_2_SPEED_MULTIPLIER;
+        double t3 = -baseRps * ShooterConstants.AXLE_3_SPEED_MULTIPLIER;
+        double v1 = m_axle1.getVelocity().getValueAsDouble();
+        double v2 = m_axle2.getVelocity().getValueAsDouble();
+        double v3 = m_axle3.getVelocity().getValueAsDouble();
+        return Math.abs(v1 - t1) <= tol && Math.abs(v2 - t2) <= tol && Math.abs(v3 - t3) <= tol;
     }
 
     @Override
     public void resetSpeed() {
-        m_shooterLeftLeaderMotor.stopMotor();
-        m_shooterRightFollowerMotor.stopMotor();
-        m_shooterCenterFollowerMotor.stopMotor();
+        m_axle1.stopMotor();
+        m_axle2.stopMotor();
+        m_axle3.stopMotor();
         initialized = true;
     }
 
-    private Command moveToSpeedCommand(double goalVelocity) {
+    private Command moveToSpeedCommand(Supplier<Double> baseRpsSupplier) {
         return run(() -> {
             boolean skipInitCheck = BYPASS_ROBOT_STATE_FOR_BENCH;
             boolean allowRun = canRun() && (skipInitCheck || RobotState.getInstance().isInitialized());
             if (allowRun) {
+                double base = baseRpsSupplier.get();
+                double v1 = base * ShooterConstants.AXLE_1_SPEED_MULTIPLIER;
+                double v2 = -base * ShooterConstants.AXLE_2_SPEED_MULTIPLIER;
+                double v3 = -base * ShooterConstants.AXLE_3_SPEED_MULTIPLIER;
                 VelocityVoltage velocityOut = new VelocityVoltage(0);
                 velocityOut.Slot = 0;
-                m_shooterLeftLeaderMotor.setControl(velocityOut.withVelocity(goalVelocity));
-                // Re-apply Follower each cycle; stopMotor() clears it so followers would otherwise stay stopped
-                m_shooterRightFollowerMotor.setControl(new Follower(m_leaderDeviceId, MotorAlignmentValue.Opposed));
-                m_shooterCenterFollowerMotor.setControl(new Follower(m_leaderDeviceId, MotorAlignmentValue.Opposed));
+                m_axle1.setControl(velocityOut.withVelocity(v1));
+                m_axle2.setControl(velocityOut.withVelocity(v2));
+                m_axle3.setControl(velocityOut.withVelocity(v3));
             } else {
-                m_shooterLeftLeaderMotor.stopMotor();
-                m_shooterRightFollowerMotor.stopMotor();
-                m_shooterCenterFollowerMotor.stopMotor();
+                m_axle1.stopMotor();
+                m_axle2.stopMotor();
+                m_axle3.stopMotor();
             }
             if (m_positionTracker != null) {
                 shooterSpeedPub.set(m_positionTracker.getShooterSpeed());
@@ -227,8 +238,7 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
     @Override
     public Command moveToSetSpeedCommand(Supplier<ShooterSpeed> goalSpeedSupplier) {
         Objects.requireNonNull(goalSpeedSupplier, "goalSpeedSupplier cannot be null");
-        return Commands.sequence(
-                moveToSpeedCommand(goalSpeedSupplier.get().value))
+        return moveToSpeedCommand(() -> goalSpeedSupplier.get().value)
                 .withTimeout(3)
                 .withName("shooter.moveToSetSpeed");
     }
@@ -236,16 +246,14 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
     @Override
     public Command moveToArbitrarySpeedCommand(Supplier<Double> goalSpeedSupplier) {
         Objects.requireNonNull(goalSpeedSupplier, "goalSpeedSupplier cannot be null");
-        return Commands.sequence(
-                moveToSpeedCommand(goalSpeedSupplier.get()))
+        return moveToSpeedCommand(goalSpeedSupplier)
                 .withName("shooter.moveToArbitrarySpeed");
     }
 
     @Override
     public Command moveSpeedDeltaCommand(Supplier<Double> delta) {
         Objects.requireNonNull(delta, "delta supplier cannot be null");
-        return Commands.sequence(
-                moveToSpeedCommand(getSpeed() + delta.get()))
+        return moveToSpeedCommand(() -> getSpeed() + delta.get())
                 .withName("shooter.moveSpeedDelta");
     }
 
@@ -257,14 +265,14 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
     @Override
     public Command coastMotorsCommand() {
         return runOnce(() -> {
-            m_shooterLeftLeaderMotor.stopMotor();
-            m_shooterRightFollowerMotor.stopMotor();
-            m_shooterCenterFollowerMotor.stopMotor();
+            m_axle1.stopMotor();
+            m_axle2.stopMotor();
+            m_axle3.stopMotor();
         })
                 .andThen(() -> {
-                    m_shooterLeftLeaderMotor.setNeutralMode(NeutralModeValue.Coast);
-                    m_shooterRightFollowerMotor.setNeutralMode(NeutralModeValue.Coast);
-                    m_shooterCenterFollowerMotor.setNeutralMode(NeutralModeValue.Coast);
+                    m_axle1.setNeutralMode(NeutralModeValue.Coast);
+                    m_axle2.setNeutralMode(NeutralModeValue.Coast);
+                    m_axle3.setNeutralMode(NeutralModeValue.Coast);
                 })
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                 .withName("shooter.coastMotorsCommand");
@@ -283,14 +291,14 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
      * Stops all motors and closes NetworkTables publishers.
      */
     public void cleanup() {
-if (m_shooterLeftLeaderMotor != null) {
-            m_shooterLeftLeaderMotor.stopMotor();
+        if (m_axle1 != null) {
+            m_axle1.stopMotor();
         }
-        if (m_shooterRightFollowerMotor != null) {
-            m_shooterRightFollowerMotor.stopMotor();
+        if (m_axle2 != null) {
+            m_axle2.stopMotor();
         }
-        if (m_shooterCenterFollowerMotor != null) {
-            m_shooterCenterFollowerMotor.stopMotor();
+        if (m_axle3 != null) {
+            m_axle3.stopMotor();
         }
         if (shooterSpeedPub != null) {
             shooterSpeedPub.close();

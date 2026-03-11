@@ -65,4 +65,10 @@ public class ShooterConstants {
     public static final double PEAK_FORWARD_VOLTAGE = 12.0;
     /** Peak reverse voltage (volts), typically negative. */
     public static final double PEAK_REVERSE_VOLTAGE = -12.0;
+
+    // ---- Per-axle speed multipliers ----
+    /** Per-axle speed multiplier. Tune to compensate for mechanical variation. 1.0 = nominal. */
+    public static final double AXLE_1_SPEED_MULTIPLIER = 1.0;
+    public static final double AXLE_2_SPEED_MULTIPLIER = 1.0;
+    public static final double AXLE_3_SPEED_MULTIPLIER = 1.0;
 }
