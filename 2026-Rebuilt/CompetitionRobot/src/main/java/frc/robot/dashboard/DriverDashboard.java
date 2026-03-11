@@ -14,8 +14,11 @@ import frc.robot.PathPlanner.AllianceUtils;
 import frc.robot.RobotState;
 import frc.robot.SubsystemFactory;
 import frc.robot.Subsystems.Cameras.PhotonVision;
+import frc.robot.Constants.CommandConstants;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
+
+import java.util.Map;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainBindings.InputProfile;
 import frc.robot.dashboard.MatchTimer.MatchPhase;
@@ -66,6 +69,9 @@ public class DriverDashboard {
     private final GenericEntry visionPoseXEntry;
     private final GenericEntry visionPoseYEntry;
     private final GenericEntry visionPoseRotationEntry;
+
+    /** Editable at runtime when USE_TEMPORARY_6FT_SHOOTER_SPEED is true. */
+    private static GenericEntry s_tempShooterSpeedEntry;
 
     public DriverDashboard(
             SubsystemFactory subsystemFactory,
@@ -174,6 +180,21 @@ public class DriverDashboard {
                 .withPosition(2, 6)
                 .withSize(1, 1)
                 .getEntry();
+
+        // Teleop temp shooter speed (RPS). Editable without redeploy when USE_TEMPORARY_6FT_SHOOTER_SPEED is true.
+        s_tempShooterSpeedEntry = tab.add("Temp Shooter Speed (RPS)", CommandConstants.TEMPORARY_SHOOTER_SPEED_6FT_RPS)
+                .withWidget(BuiltInWidgets.kNumberSlider)
+                .withProperties(Map.of("min", 0.0, "max", 200.0))
+                .withPosition(4, 3)
+                .withSize(2, 1)
+                .getEntry();
+    }
+
+    /** Returns temp shooter speed from Shuffleboard when USE_TEMPORARY_6FT_SHOOTER_SPEED is true. */
+    public static double getTempShooterSpeedRps() {
+        return s_tempShooterSpeedEntry != null
+                ? s_tempShooterSpeedEntry.getDouble(CommandConstants.TEMPORARY_SHOOTER_SPEED_6FT_RPS)
+                : CommandConstants.TEMPORARY_SHOOTER_SPEED_6FT_RPS;
     }
 
     /** Updates all dashboard values. Call from robotPeriodic(). */

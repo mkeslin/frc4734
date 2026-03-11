@@ -23,6 +23,7 @@ import frc.robot.ShotModel;
 import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
+import frc.robot.dashboard.DriverDashboard;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
@@ -106,7 +107,7 @@ public final class TeleopMechanismCommands {
                 .withTimeout(SHOOT_FEEDER_BACKOFF)
                 .finallyDo(interrupted -> feeder.resetSpeed());
         Supplier<Double> shooterSpeedSupplier = USE_TEMPORARY_6FT_SHOOTER_SPEED
-                ? () -> TEMPORARY_SHOOTER_SPEED_6FT_RPS
+                ? () -> DriverDashboard.getTempShooterSpeedRps()
                 : () -> s_isDynamicShooterSpeed
                         ? ShotModel.rpsFromRobotToHub(drivetrain.getPose().getTranslation())
                         : s_fixedShooterSpeedRps;
