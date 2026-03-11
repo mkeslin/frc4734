@@ -14,6 +14,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.FlippingUtil;
+import com.pathplanner.lib.util.FlippingUtil.FieldSymmetry;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
@@ -240,18 +242,31 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private void configureAutoBuilder() {
         try {
+            // 2026 Rebuilt field is rotationally symmetrical; FlippingUtil must use kRotational
+            // so path.flipPath() mirrors correctly for red alliance.
+            FlippingUtil.fieldSizeX = 16.540988;
+            FlippingUtil.fieldSizeY = 8.069326;
+            FlippingUtil.symmetryType = FieldSymmetry.kRotational;
+
             RobotLogger.log("[PathPlanner] Loading RobotConfig.fromGUISettings()...");
             System.out.println("[PathPlanner] Loading RobotConfig.fromGUISettings()...");
             var config = RobotConfig.fromGUISettings();
             RobotLogger.log("[PathPlanner] RobotConfig loaded; configuring AutoBuilder...");
             System.out.println("[PathPlanner] RobotConfig loaded; configuring AutoBuilder...");
             AutoBuilder.configure(
-                    // PathPlanner pathfinding uses a blue-origin nav grid; pose supplier must return blue so start is inside the grid.
-                    // Query alliance: when Red, convert red pose to blue; when Blue, use pose as-is (already blue).
+                    // PathPlanner uses blue-origin nav grid; pose supplier must return blue-frame coordinates.
+                    // Odometry is seeded alliance-relative (red frame when on red). When Red: redToBlue gives
+                    // blue-side equivalent; flipPositionForPathPlanner then gives red-side position in blue frame.
                     () -> {
                         Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
                         Pose2d current = getState().Pose;
-                        return alliance == Alliance.Red ? AllianceUtils.redToBlue(current) : current;
+                        if (alliance == Alliance.Red) {
+                            Pose2d blueEquivalent = AllianceUtils.redToBlue(current);
+                            return new Pose2d(
+                                    AllianceUtils.flipPositionForPathPlanner(blueEquivalent.getTranslation()),
+                                    AllianceUtils.flipRotationForPathPlanner(blueEquivalent.getRotation()));
+                        }
+                        return current;
                     },
                     this::resetPose, // Consumer for seeding pose against auto
                     () -> getState().Speeds, // Supplier of current robot speeds

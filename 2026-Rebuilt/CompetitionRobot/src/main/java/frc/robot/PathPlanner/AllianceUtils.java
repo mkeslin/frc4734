@@ -169,4 +169,36 @@ public final class AllianceUtils {
     public static String getFieldLayoutName() {
         return "k2026RebuiltAndymark";
     }
+
+    /**
+     * PathPlanner field dimensions (from navgrid.json). PathPlanner uses X as the long
+     * dimension (16.54m toward red), Y as the short (8.07m). Distinct from AllianceUtils
+     * FIELD_LENGTH/FIELD_WIDTH which use different axis conventions for Landmarks.
+     */
+    private static final double PATHPLANNER_FIELD_X = 16.540988;
+    private static final double PATHPLANNER_FIELD_Y = 8.069326;
+
+    /**
+     * Flips a position from blue side to red side in PathPlanner's blue-origin frame.
+     * Uses 180° rotation around field center for the 2026 rotationally symmetrical field.
+     * Use when flipping path points for red alliance.
+     *
+     * @param position Position in blue frame (PathPlanner convention: X toward red, Y width)
+     * @return The red-side equivalent position in blue frame
+     */
+    public static Translation2d flipPositionForPathPlanner(Translation2d position) {
+        return new Translation2d(
+                PATHPLANNER_FIELD_X - position.getX(),
+                PATHPLANNER_FIELD_Y - position.getY());
+    }
+
+    /**
+     * Flips a rotation for the red side (add 180°).
+     *
+     * @param rotation Rotation in blue frame
+     * @return The flipped rotation for red side
+     */
+    public static Rotation2d flipRotationForPathPlanner(Rotation2d rotation) {
+        return rotation.plus(Rotation2d.fromDegrees(180));
+    }
 }
