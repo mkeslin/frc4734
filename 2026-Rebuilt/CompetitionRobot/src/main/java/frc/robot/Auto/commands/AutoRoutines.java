@@ -447,17 +447,9 @@ public class AutoRoutines {
                                 .beforeStarting(Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 4: Intake deploy starting", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))))
                                 .finallyDo(interrupted -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 4: Intake deploy finished (interrupted=%b)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), interrupted)))
                         : Commands.none(),
-                // ----- Step 5: Spin up shooter and wait at speed -----
-                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 5: Spin up + wait at speed", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
-                new CmdShooterSpinUpAndWait(shooter, targetSpeedsSupplier, rpmTol, 5.0),
-
-                // ----- Step 6: Acquire hub aim -----
-                // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Acquire hub aim")),
-                // CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
-
-                // ----- Step 7: Shoot -----
-                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 7: Shoot", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
-                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED, targetSpeedsSupplier)),
+                // ----- Step 5: Shoot (immediately after intake; no spin-up wait) -----
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 5: Shoot", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
+                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
 
                 // ----- Step 7: Raise intake (reset for next run) -----
                 // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),
