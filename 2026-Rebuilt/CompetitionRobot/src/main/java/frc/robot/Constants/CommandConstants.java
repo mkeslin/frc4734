@@ -28,12 +28,19 @@ public class CommandConstants {
     /** Delay before moving arm to top position after intake */
     public static final double POST_INTAKE_ARM_DELAY = 0.40;
 
+    /** When true, shooter speed is computed from distance to hub (ShotModel). When false, uses fixed ShooterSpeed.FORWARD. */
+    public static final boolean USE_DYNAMIC_SHOOTER_SPEED = true;
+
     /** Teleop shoot: feeder runs reverse this long first to back ball off shooter wheels (seconds). */
     public static final double SHOOT_FEEDER_BACKOFF = 0.5;
     /** Teleop shoot: time after shooter start before feeder runs (seconds). Matches auto SHOOT_SPINUP_DELAY_BEFORE_FEED. */
     public static final double SHOOT_FEEDER_DELAY = 0.75;
     /** Teleop shoot: time after shooter start before floor runs (seconds). Matches auto for consistent spin-up. */
     public static final double SHOOT_FLOOR_DELAY = 0.75;
+    /** Pulsed feed: how long feeder runs per pulse (seconds). Long enough to push one ball. */
+    public static final double SHOOT_FEEDER_PULSE_ON_SEC = 0.25;
+    /** Pulsed feed: delay between pulses (seconds). Time for flywheel shaft to recover. Tunable. */
+    public static final double SHOOT_FEEDER_PULSE_DELAY_SEC = 0.35;
 
     // Drivetrain speed constants (normalized -1.0 to 1.0)
     /** Speed for approaching scoring position */

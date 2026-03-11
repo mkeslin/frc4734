@@ -41,8 +41,10 @@ import frc.robot.Auto.commands.CmdWaitShooterAtSpeed;
 import frc.robot.Auto.commands.ShotMode;
 import frc.robot.Auto.commands.StartPoseId;
 import frc.robot.Constants.FeederConstants.FeederSpeed;
+import frc.robot.Constants.CommandConstants;
 import frc.robot.PathPlanner.BlueLandmarks;
 import frc.robot.PathPlanner.Landmarks;
+import frc.robot.ShotModel;
 import frc.robot.autotest.AutoTestHarness;
 import frc.robot.autotest.AutoTestShuffleboard;
 import frc.robot.autotest.MoleculeTests;
@@ -146,6 +148,14 @@ public class AutoConfigurator {
         Supplier<Double> toleranceLeftRight = () -> leftRightTolEntry.getDouble(AutoConstants.SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE);
         Supplier<Double> shootDuration = () -> shootDurationEntry.getDouble(AutoConstants.DEFAULT_SHOOT_DURATION);
 
+        // Dynamic shooter speed from distance to hub (RPS = 4 * distanceFt + 80.67); fixed uses Shuffleboard sliders
+        Supplier<Double> shooterSpeedForAutos = CommandConstants.USE_DYNAMIC_SHOOTER_SPEED
+                ? () -> ShotModel.rpsFromRobotToHub(m_drivetrain.getPose().getTranslation())
+                : shooterSpeedCenter;
+        Supplier<Double> shooterSpeedLeftRightForAutos = CommandConstants.USE_DYNAMIC_SHOOTER_SPEED
+                ? () -> ShotModel.rpsFromRobotToHub(m_drivetrain.getPose().getTranslation())
+                : shooterSpeedLeftRight;
+
         // Start poses evaluated at runtime so alliance is correct when auto runs.
         Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers = new HashMap<>();
         startPoseSuppliers.put(StartPoseId.POS_1, Landmarks::OurStart1);
@@ -170,8 +180,8 @@ public class AutoConfigurator {
         // Register molecule tests
         registerMolecules(startPoseSuppliers, shooterSpeedCenter, toleranceCenter, vision, shooter, feeder, floor, intake, climber);
         
-        // Register full autos
-        registerFullAutos(startPoseSuppliers, shooterSpeedCenter, shooterSpeedLeftRight, toleranceCenter, toleranceLeftRight, shootDuration, vision, shooter, feeder, floor, intake, climber, positionTracker);
+        // Register full autos (shooter speed: dynamic from distance or fixed from Shuffleboard, per USE_DYNAMIC_SHOOTER_SPEED)
+        registerFullAutos(startPoseSuppliers, shooterSpeedForAutos, shooterSpeedLeftRightForAutos, toleranceCenter, toleranceLeftRight, shootDuration, vision, shooter, feeder, floor, intake, climber, positionTracker);
         
         // Initialize test harness
         m_testHarness.initialize();
