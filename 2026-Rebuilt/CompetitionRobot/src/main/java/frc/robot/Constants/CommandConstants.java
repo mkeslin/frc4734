@@ -28,10 +28,10 @@ public class CommandConstants {
     /** Delay before moving arm to top position after intake */
     public static final double POST_INTAKE_ARM_DELAY = 0.40;
 
-    /** When true, shooter speed is computed from distance to hub (ShotModel). When false, uses fixed ShooterSpeed.FORWARD. */
+    /** When true, teleop shooter speed is computed from distance to hub (ShotModel). When false, uses fixed ShooterSpeed.FORWARD. Auto always uses per-motor values from Shuffleboard. */
     public static final boolean USE_DYNAMIC_SHOOTER_SPEED = true;
     /** TEMPORARY: When true, override shooter speed to 12 ft value (128.67 RPS). Set false to restore dynamic/fixed logic. */
-    public static final boolean USE_TEMPORARY_6FT_SHOOTER_SPEED = true;
+    public static final boolean USE_TEMPORARY_6FT_SHOOTER_SPEED = false;
     /** TEMPORARY: Shooter RPS (60% of 115 for low-ceiling testing). */
     public static final double TEMPORARY_SHOOTER_SPEED_6FT_RPS = 185.0;
 

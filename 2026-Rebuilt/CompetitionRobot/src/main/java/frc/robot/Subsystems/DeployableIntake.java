@@ -234,7 +234,7 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
     }
 
     private Command moveToDeployPositionCommand(double goalPosition) {
-        return run(() -> {
+        return Commands.run(() -> {
             // Safety check: prevent movement until robot is initialized
             if (RobotState.getInstance().isInitialized()) {
                 m_deployMotor.setControl(m_deployRequest.withPosition(goalPosition));
@@ -244,7 +244,7 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
             if (m_positionTracker != null) {
                 deployPositionPub.set(m_positionTracker.getIntakeDeployPosition());
             }
-        })
+        }, this)
                 .until(() -> Math.abs(getDeployPosition() - goalPosition) < DEPLOY_TOLERANCE)
                 .withName("deployableIntake.moveToDeployPosition");
     }

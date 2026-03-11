@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.ShooterSpeeds;
 
 /**
  * Command to wait until the shooter reaches target speed.
@@ -21,41 +22,42 @@ import frc.robot.Subsystems.Shooter;
  * </ul>
  * 
  * @param shooter The shooter subsystem
- * @param targetRpmSupplier Supplier of the target RPM
+ * @param targetRpmSupplier Supplier of the target RPM (single value)
  * @param rpmTol RPM tolerance
  * @param timeoutSec Maximum time to wait
  */
 public class CmdWaitShooterAtSpeed extends Command {
     private final Shooter shooter;
-    private final Supplier<Double> targetRpmSupplier;
+    private final Supplier<ShooterSpeeds> targetSpeedsSupplier;
     private final double rpmTol;
     private final double timeoutSec;
     private final Timer timer = new Timer();
 
     /**
-     * Creates a new CmdWaitShooterAtSpeed command.
-     * 
+     * Creates a new CmdWaitShooterAtSpeed command with per-motor speeds.
+     * For a single base RPM in auto, use {@code () -> ShooterSpeeds.uniform(rpm)}.
+     *
      * @param shooter The shooter subsystem
-     * @param targetRpmSupplier Supplier of the target RPM
+     * @param targetSpeedsSupplier Supplier of per-motor speeds (left, center, right RPS)
      * @param rpmTol RPM tolerance
      * @param timeoutSec Maximum time to wait
-     * @throws NullPointerException if shooter or targetRpmSupplier is null
+     * @throws NullPointerException if shooter or targetSpeedsSupplier is null
      * @throws IllegalArgumentException if timeoutSec is less than or equal to 0
      */
     public CmdWaitShooterAtSpeed(
             Shooter shooter,
-            Supplier<Double> targetRpmSupplier,
+            Supplier<ShooterSpeeds> targetSpeedsSupplier,
             double rpmTol,
             double timeoutSec) {
         this.shooter = Objects.requireNonNull(shooter, "shooter cannot be null");
-        this.targetRpmSupplier = Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null");
+        this.targetSpeedsSupplier = Objects.requireNonNull(targetSpeedsSupplier, "targetSpeedsSupplier cannot be null");
         this.rpmTol = rpmTol;
         if (timeoutSec <= 0) {
             throw new IllegalArgumentException("timeoutSec must be greater than 0, got: " + timeoutSec);
         }
         this.timeoutSec = timeoutSec;
-
-        addRequirements(shooter);
+        // No subsystem requirement: only reads shooter state; does not control it.
+        // Allows running in parallel with CmdShooterSpinUp (which does require Shooter).
     }
 
     @Override
@@ -74,8 +76,7 @@ public class CmdWaitShooterAtSpeed extends Command {
         if (timer.hasElapsed(timeoutSec)) {
             return true;
         }
-        double targetRps = targetRpmSupplier.get();
-        return shooter.isAtSpeed(targetRps, rpmTol);
+        return shooter.isAtSpeed(targetSpeedsSupplier.get(), rpmTol);
     }
 
     @Override
@@ -85,16 +86,12 @@ public class CmdWaitShooterAtSpeed extends Command {
 
     /**
      * Factory method to create a command with default timeout.
-     * 
-     * @param shooter The shooter subsystem
-     * @param targetRpmSupplier Supplier of the target RPM
-     * @param rpmTol RPM tolerance
-     * @return A command that waits for shooter at speed with default timeout
+     * For a single base RPM in auto, use {@code () -> ShooterSpeeds.uniform(rpm)}.
      */
-    public static Command create(Shooter shooter, Supplier<Double> targetRpmSupplier, double rpmTol) {
+    public static Command create(Shooter shooter, Supplier<ShooterSpeeds> targetSpeedsSupplier, double rpmTol) {
         return new CmdWaitShooterAtSpeed(
                 shooter,
-                targetRpmSupplier,
+                targetSpeedsSupplier,
                 rpmTol,
                 AutoConstants.DEFAULT_SHOOTER_SPINUP_TIMEOUT);
     }

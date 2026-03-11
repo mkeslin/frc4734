@@ -14,6 +14,7 @@ import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.ShooterSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Logging.RobotLogger;
@@ -79,7 +80,7 @@ public class AutoRoutines {
      * @param towerAlignPose     Supplier of target pose for tower/climb (e.g. from
      *                           Shuffleboard climb-side chooser)
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
-     * @param targetRpmSupplier  Supplier of target shooter RPM (e.g. from Preferences for runtime tuning)
+     * @param targetSpeedsSupplier Supplier of per-motor shooter speeds (left, center, right RPS)
      * @param rpmTol             RPM tolerance for shooter at-speed check
      * @param shootDurationSupplier Supplier of shoot duration (seconds); read at runtime for tuning
      * @param drivetrain         The drivetrain subsystem
@@ -98,7 +99,7 @@ public class AutoRoutines {
             Supplier<Pose2d> shotPoseSupplier,
             Supplier<Pose2d> towerAlignPose,
             double fallbackHeadingDeg,
-            Supplier<Double> targetRpmSupplier,
+            Supplier<ShooterSpeeds> targetSpeedsSupplier,
             double rpmTol,
             Supplier<Double> shootDurationSupplier,
             CommandSwerveDrivetrain drivetrain,
@@ -118,10 +119,8 @@ public class AutoRoutines {
         Objects.requireNonNull(shooter, "shooter cannot be null");
         Objects.requireNonNull(feeder, "feeder cannot be null");
         Objects.requireNonNull(climber, "climber cannot be null");
-        Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null");
+        Objects.requireNonNull(targetSpeedsSupplier, "targetSpeedsSupplier cannot be null");
         Objects.requireNonNull(shootDurationSupplier, "shootDurationSupplier cannot be null");
-
-        Supplier<Double> rpmSupplier = targetRpmSupplier;
 
         // Captured after extending climber; used by drive-to-bar step (pathfind to pose
         // toward bar).
@@ -149,7 +148,7 @@ public class AutoRoutines {
                                 AutoConstants.DEFAULT_XY_TOLERANCE,
                                 AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                                 AutoConstants.DEFAULT_PATH_TIMEOUT),
-                        new CmdShooterSpinUp(shooter, rpmSupplier)),
+                        new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
 
                 // ----- Step 4: Lower intake -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 4: Lower intake")),
@@ -164,7 +163,7 @@ public class AutoRoutines {
 
                 // ----- Step 6: Wait shooter at speed -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 6: Wait shooter at speed")),
-                CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
+                CmdWaitShooterAtSpeed.create(shooter, targetSpeedsSupplier, rpmTol),
 
                 // ----- Step 7: Shoot preload -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 7: Shoot")),
@@ -275,7 +274,7 @@ public class AutoRoutines {
      * @param pathToCenter       Path name to center
      * @param pathBackToShot     Path name back to shot
      * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
-     * @param targetRpmSupplier  Supplier of target shooter RPM (e.g. from Preferences for runtime tuning)
+     * @param targetSpeedsSupplier Supplier of per-motor shooter speeds (left, center, right RPS)
      * @param rpmTol             RPM tolerance for shooter at-speed check
      * @param shootDurationSupplier Supplier of shoot duration (seconds); read at runtime for tuning
      * @param drivetrain         The drivetrain subsystem
@@ -295,7 +294,7 @@ public class AutoRoutines {
             String pathToCenter,
             String pathBackToShot,
             double fallbackHeadingDeg,
-            Supplier<Double> targetRpmSupplier,
+            Supplier<ShooterSpeeds> targetSpeedsSupplier,
             double rpmTol,
             Supplier<Double> shootDurationSupplier,
             CommandSwerveDrivetrain drivetrain,
@@ -316,10 +315,8 @@ public class AutoRoutines {
         Objects.requireNonNull(feeder, "feeder cannot be null");
         Objects.requireNonNull(floor, "floor cannot be null");
         Objects.requireNonNull(intake, "intake cannot be null");
-        Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null");
+        Objects.requireNonNull(targetSpeedsSupplier, "targetSpeedsSupplier cannot be null");
         Objects.requireNonNull(shootDurationSupplier, "shootDurationSupplier cannot be null");
-
-        Supplier<Double> rpmSupplier = targetRpmSupplier;
 
         return Commands.sequence(
                 // ----- Step 1: Seed odometry -----
@@ -345,14 +342,14 @@ public class AutoRoutines {
                 Commands.sequence(
                         Commands.deadline(
                                 Commands.waitSeconds(AutoConstants.SHOOTER_SPINUP_DURATION_LEFT_RIGHT),
-                                new CmdShooterSpinUp(shooter, rpmSupplier)),
-                        new CmdWaitShooterAtSpeed(shooter, rpmSupplier, rpmTol, 5.0)),
+                                new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
+                        new CmdWaitShooterAtSpeed(shooter, targetSpeedsSupplier, rpmTol, 5.0)),
 
                 // Step 5 (Acquire hub aim) commented out in current config.
 
                 // ----- Step 6: Shoot -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Shoot")),
-                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), AutoConstants.SHOOT_SPINUP_DELAY_LEFT_RIGHT, rpmSupplier)),
+                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), AutoConstants.SHOOT_SPINUP_DELAY_LEFT_RIGHT, targetSpeedsSupplier)),
 
                 // ----- TEMPORARY: Path to center and second shot commented out -----
                 // Uncomment to restore full routine: path to center, path back, acquire aim,
@@ -404,7 +401,7 @@ public class AutoRoutines {
             Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
             String pathToShot,
             double fallbackHeadingDeg,
-            Supplier<Double> targetRpmSupplier,
+            Supplier<ShooterSpeeds> targetSpeedsSupplier,
             double rpmTol,
             Supplier<Double> shootDurationSupplier,
             CommandSwerveDrivetrain drivetrain,
@@ -420,10 +417,8 @@ public class AutoRoutines {
         Objects.requireNonNull(vision, "vision cannot be null");
         Objects.requireNonNull(shooter, "shooter cannot be null");
         Objects.requireNonNull(feeder, "feeder cannot be null");
-        Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null");
+        Objects.requireNonNull(targetSpeedsSupplier, "targetSpeedsSupplier cannot be null");
         Objects.requireNonNull(shootDurationSupplier, "shootDurationSupplier cannot be null");
-
-        Supplier<Double> rpmSupplier = targetRpmSupplier;
 
         return Commands.sequence(
                 // ----- Step 1: Seed odometry -----
@@ -439,18 +434,22 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // ----- Step 3: Drive to shoot spot + spin up shooter (drive is deadline; spin-up runs during drive) -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 3: Drive to shot + spin up shooter")),
+                // ----- Step 3: Drive to shot pose (parallel: spin up shooter) -----
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 3: Drive to shot + spin up")),
                 Commands.deadline(
                         new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
-                        new CmdShooterSpinUp(shooter, rpmSupplier)),
-
-                // ----- Step 4: Lower intake -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 4: Lower intake")),
-                intake != null
-                        ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
-                                .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
-                        : Commands.none(),
+                        new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
+                // Stop shooter when pose is reached; spin-up command is cancelled by deadline
+                new CmdStopShooter(shooter),
+                // ----- Step 4: Spin up + wait at speed + deploy intake (parallel to reduce delay) -----
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 4: Spin up + wait shooter + deploy intake")),
+                Commands.parallel(
+                        new CmdShooterSpinUp(shooter, targetSpeedsSupplier),
+                        new CmdWaitShooterAtSpeed(shooter, targetSpeedsSupplier, rpmTol, 5.0),
+                        intake != null
+                                ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
+                                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
+                                : Commands.none()),
 
                 // ----- Step 5: Acquire hub aim -----
                 // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 5: Acquire hub aim")),
@@ -458,7 +457,7 @@ public class AutoRoutines {
 
                 // ----- Step 6: Shoot -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Shoot")),
-                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get())),
+                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), AutoConstants.SHOOT_SPINUP_DELAY_BEFORE_FEED, targetSpeedsSupplier)),
 
                 // ----- Step 7: Raise intake (reset for next run) -----
                 // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),

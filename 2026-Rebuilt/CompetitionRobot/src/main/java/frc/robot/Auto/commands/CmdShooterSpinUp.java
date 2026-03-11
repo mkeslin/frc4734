@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Logging.RobotLogger;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.ShooterSpeeds;
 
 /**
  * Command to spin up the shooter to a target RPM (non-blocking).
@@ -20,33 +21,32 @@ import frc.robot.Subsystems.Shooter;
  * </ul>
  * 
  * @param shooter The shooter subsystem
- * @param rpmSupplier Supplier of the target RPM
+ * @param rpmSupplier Supplier of the target RPM (single value) or per-motor speeds
  */
 public class CmdShooterSpinUp extends Command {
     private final Shooter shooter;
-    private final Supplier<Double> rpmSupplier;
+    private final Supplier<ShooterSpeeds> speedsSupplier;
     private Command spinUpCommand;
 
     /**
-     * Creates a new CmdShooterSpinUp command.
-     * 
+     * Creates a new CmdShooterSpinUp command with per-motor speeds.
+     * For a single base RPM in auto, use {@code () -> ShooterSpeeds.uniform(rpm)}.
+     *
      * @param shooter The shooter subsystem
-     * @param rpmSupplier Supplier of the target RPM
-     * @throws NullPointerException if shooter or rpmSupplier is null
+     * @param speedsSupplier Supplier of per-motor speeds (left, center, right RPS)
+     * @throws NullPointerException if shooter or speedsSupplier is null
      */
-    public CmdShooterSpinUp(Shooter shooter, Supplier<Double> rpmSupplier) {
+    public CmdShooterSpinUp(Shooter shooter, Supplier<ShooterSpeeds> speedsSupplier) {
         this.shooter = Objects.requireNonNull(shooter, "shooter cannot be null");
-        this.rpmSupplier = Objects.requireNonNull(rpmSupplier, "rpmSupplier cannot be null");
-
+        this.speedsSupplier = Objects.requireNonNull(speedsSupplier, "speedsSupplier cannot be null");
         addRequirements(shooter);
     }
 
     @Override
     public void initialize() {
-        double targetRpm = rpmSupplier.get();
-        RobotLogger.log(String.format("[CmdShooterSpinUp] Target shooter speed: %.1f RPS", targetRpm));
-        RobotLogger.recordDouble("Auto/ShooterTargetRPS", targetRpm);
-        spinUpCommand = shooter.moveToArbitrarySpeedCommand(() -> targetRpm);
+        ShooterSpeeds s = speedsSupplier.get();
+        RobotLogger.log(String.format("[CmdShooterSpinUp] Target shooter speeds: L=%.1f C=%.1f R=%.1f RPS", s.leftRps(), s.centerRps(), s.rightRps()));
+        spinUpCommand = shooter.moveToTripleSpeedCommand(speedsSupplier);
         spinUpCommand.initialize();
     }
 

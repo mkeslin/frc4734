@@ -87,11 +87,9 @@ public final class MoleculeTests {
 
     /**
      * Builds molecule: PathToShot + SpinUp (parallel) -> ShootPreload
-     * 
-     * <p>Tests parallel execution of path following and shooter spin-up, then shooting.
-     * 
+     *
      * @param pathName Path name to shooting position
-     * @param targetRpm Target shooter RPM
+     * @param shooterSpeedsSupplier Supplier of per-motor shooter speeds
      * @param rpmTol RPM tolerance
      * @param shootDuration Duration to shoot
      * @param drivetrain Drivetrain subsystem
@@ -102,7 +100,7 @@ public final class MoleculeTests {
      */
     public static Command buildPathSpinupShoot(
             String pathName,
-            double targetRpm,
+            java.util.function.Supplier<frc.robot.ShooterSpeeds> shooterSpeedsSupplier,
             double rpmTol,
             double shootDuration,
             CommandSwerveDrivetrain drivetrain,
@@ -111,20 +109,19 @@ public final class MoleculeTests {
             Floor floor) {
         
         Objects.requireNonNull(pathName, "pathName cannot be null");
+        Objects.requireNonNull(shooterSpeedsSupplier, "shooterSpeedsSupplier cannot be null");
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
         Objects.requireNonNull(shooter, "shooter cannot be null");
         Objects.requireNonNull(feeder, "feeder cannot be null");
-        
-        Supplier<Double> rpmSupplier = () -> targetRpm;
         
         return Commands.sequence(
                 // 1. Follow path to shot (parallel: spin up shooter)
                 Commands.parallel(
                         new CmdFollowPath(pathName, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
-                        new CmdShooterSpinUp(shooter, rpmSupplier)),
+                        new CmdShooterSpinUp(shooter, shooterSpeedsSupplier)),
                 
                 // 2. Wait for shooter at speed
-                CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
+                CmdWaitShooterAtSpeed.create(shooter, shooterSpeedsSupplier, rpmTol),
                 
                 // 3. Shoot for duration
                 CmdShootForTime.create(shooter, feeder, floor, shootDuration)

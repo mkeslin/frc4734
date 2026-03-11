@@ -24,10 +24,12 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.ShooterSpeeds;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.PositionTracker;
@@ -193,9 +195,19 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
      * @param tol     Tolerance in RPS
      */
     public boolean isAtSpeed(double baseRps, double tol) {
-        double tLeft = -baseRps * ShooterConstants.SHOOTER_LEFT_SPEED_MULTIPLIER;
-        double tCenter = -baseRps * ShooterConstants.SHOOTER_CENTER_SPEED_MULTIPLIER;
-        double tRight = baseRps * ShooterConstants.SHOOTER_RIGHT_SPEED_MULTIPLIER;
+        return isAtSpeed(ShooterSpeeds.fromBase(baseRps), tol);
+    }
+
+    /**
+     * Returns true if all three motors are within tolerance of their per-motor target speeds.
+     *
+     * @param speeds Per-motor target speeds (magnitudes)
+     * @param tol    Tolerance in RPS
+     */
+    public boolean isAtSpeed(ShooterSpeeds speeds, double tol) {
+        double tLeft = -speeds.leftRps();
+        double tCenter = -speeds.centerRps();
+        double tRight = speeds.rightRps();
         double vLeft = m_left.getVelocity().getValueAsDouble();
         double vCenter = m_center.getVelocity().getValueAsDouble();
         double vRight = m_right.getVelocity().getValueAsDouble();
@@ -210,15 +222,25 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
         initialized = true;
     }
 
+    /** Teleop only: applies per-motor multipliers to base RPS. Auto uses moveToTripleSpeedCommand with explicit speeds. */
     private Command moveToSpeedCommand(Supplier<Double> baseRpsSupplier) {
-        return run(() -> {
+        return moveToTripleSpeedCommand(() -> ShooterSpeeds.fromBase(baseRpsSupplier.get()));
+    }
+
+    /**
+     * Command to run shooter at per-motor speeds. Left and center use negative velocity,
+     * right uses positive (shoot direction).
+     */
+    public Command moveToTripleSpeedCommand(Supplier<ShooterSpeeds> speedsSupplier) {
+        Objects.requireNonNull(speedsSupplier, "speedsSupplier cannot be null");
+        return Commands.run(() -> {
             boolean skipInitCheck = BYPASS_ROBOT_STATE_FOR_BENCH;
             boolean allowRun = canRun() && (skipInitCheck || RobotState.getInstance().isInitialized());
             if (allowRun) {
-                double base = baseRpsSupplier.get();
-                double vLeft = -base * ShooterConstants.SHOOTER_LEFT_SPEED_MULTIPLIER;
-                double vCenter = -base * ShooterConstants.SHOOTER_CENTER_SPEED_MULTIPLIER;
-                double vRight = base * ShooterConstants.SHOOTER_RIGHT_SPEED_MULTIPLIER;
+                ShooterSpeeds s = speedsSupplier.get();
+                double vLeft = -s.leftRps();
+                double vCenter = -s.centerRps();
+                double vRight = s.rightRps();
                 VelocityVoltage velocityOut = new VelocityVoltage(0);
                 velocityOut.Slot = 0;
                 m_left.setControl(velocityOut.withVelocity(vLeft));
@@ -232,8 +254,8 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
             if (m_positionTracker != null) {
                 shooterSpeedPub.set(m_positionTracker.getShooterSpeed());
             }
-        })
-                .withName("shooter.moveToSpeed");
+        }, this)
+                .withName("shooter.moveToTripleSpeed");
     }
 
     @Override

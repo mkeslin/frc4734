@@ -16,6 +16,7 @@ import frc.robot.Constants.FloorConstants.ConveyorSpeed;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
 import frc.robot.Subsystems.Shooter;
+import frc.robot.ShooterSpeeds;
 
 /**
  * Command to feed and shoot for a specified duration.
@@ -48,7 +49,9 @@ public class CmdShootForTime extends Command {
     private final boolean requireAtSpeed;
     private final boolean useFeederBackoff;
     private final Supplier<Double> targetRpmSupplier;
+    private final Supplier<ShooterSpeeds> targetSpeedsSupplier;
     private final Supplier<Double> shooterRpmSupplierForRun;
+    private final Supplier<ShooterSpeeds> shooterSpeedsSupplierForRun;
     private final double rpmTol;
     private final Timer timer = new Timer();
     private Command feederCommand;
@@ -74,9 +77,11 @@ public class CmdShootForTime extends Command {
             double durationSec,
             double spinupDelaySec,
             Supplier<Double> shooterRpmSupplierForRun,
+            Supplier<ShooterSpeeds> shooterSpeedsSupplierForRun,
             boolean requireAtSpeed,
             boolean useFeederBackoff,
             Supplier<Double> targetRpmSupplier,
+            Supplier<ShooterSpeeds> targetSpeedsSupplier,
             double rpmTol) {
         this.shooter = Objects.requireNonNull(shooter, "shooter cannot be null");
         this.feeder = Objects.requireNonNull(feeder, "feeder cannot be null");
@@ -87,17 +92,37 @@ public class CmdShootForTime extends Command {
         this.durationSec = durationSec;
         this.spinupDelaySec = spinupDelaySec;
         this.shooterRpmSupplierForRun = shooterRpmSupplierForRun;
+        this.shooterSpeedsSupplierForRun = shooterSpeedsSupplierForRun;
         this.requireAtSpeed = requireAtSpeed;
         this.useFeederBackoff = useFeederBackoff;
-        this.targetRpmSupplier = requireAtSpeed
-                ? Objects.requireNonNull(targetRpmSupplier, "targetRpmSupplier cannot be null if requireAtSpeed is true")
-                : targetRpmSupplier;
+        this.targetRpmSupplier = targetRpmSupplier;
+        this.targetSpeedsSupplier = targetSpeedsSupplier;
+        if (requireAtSpeed && targetRpmSupplier == null && targetSpeedsSupplier == null) {
+            throw new NullPointerException("targetRpmSupplier or targetSpeedsSupplier required when requireAtSpeed is true");
+        }
         this.rpmTol = rpmTol;
 
         addRequirements(shooter, feeder);
         if (floor != null) {
             addRequirements(floor);
         }
+    }
+
+    /** Legacy constructor (single RPM for shooter run and wait). */
+    public CmdShootForTime(
+            Shooter shooter,
+            Feeder feeder,
+            Floor floor,
+            double durationSec,
+            double spinupDelaySec,
+            Supplier<Double> shooterRpmSupplierForRun,
+            boolean requireAtSpeed,
+            boolean useFeederBackoff,
+            Supplier<Double> targetRpmSupplier,
+            double rpmTol) {
+        this(shooter, feeder, floor, durationSec, spinupDelaySec,
+                shooterRpmSupplierForRun, null, requireAtSpeed, useFeederBackoff,
+                targetRpmSupplier, null, rpmTol);
     }
 
     /**
@@ -144,11 +169,10 @@ public class CmdShootForTime extends Command {
         Command feedPhase = feederPulsed;
 
         if (requireAtSpeed) {
-            Command waitCommand = new CmdWaitShooterAtSpeed(
-                    shooter,
-                    targetRpmSupplier,
-                    rpmTol,
-                    AutoConstants.DEFAULT_SHOOTER_SPINUP_TIMEOUT);
+            Supplier<ShooterSpeeds> speedsForWait = targetSpeedsSupplier != null
+                    ? targetSpeedsSupplier
+                    : () -> ShooterSpeeds.uniform(targetRpmSupplier.get());
+            Command waitCommand = new CmdWaitShooterAtSpeed(shooter, speedsForWait, rpmTol, AutoConstants.DEFAULT_SHOOTER_SPINUP_TIMEOUT);
             feedPhase = Commands.sequence(waitCommand, feedPhase);
         }
 
@@ -157,9 +181,13 @@ public class CmdShootForTime extends Command {
                 Commands.waitSeconds(spinupDelaySec),
                 feedPhase);
 
-        // When shooterRpmSupplierForRun is set, run shooter in parallel with feed phase (inside this
-        // command to avoid ParallelCommandGroup subsystem conflict: shooter vs feeder+floor only)
-        if (shooterRpmSupplierForRun != null) {
+        // When shooter speed supplier is set, run shooter in parallel with feed phase
+        if (shooterSpeedsSupplierForRun != null) {
+            Command shooterRun = shooter.moveToTripleSpeedCommand(shooterSpeedsSupplierForRun)
+                    .withTimeout(spinupDelaySec + durationSec)
+                    .withName("CmdShootForTime-shooter");
+            feedPhase = new ParallelCommandGroup(shooterRun, feedPhase);
+        } else if (shooterRpmSupplierForRun != null) {
             Command shooterRun = shooter.moveToArbitrarySpeedCommand(shooterRpmSupplierForRun)
                     .withTimeout(spinupDelaySec + durationSec)
                     .withName("CmdShootForTime-shooter");
@@ -246,20 +274,12 @@ public class CmdShootForTime extends Command {
     }
 
     /**
-     * Factory method with spin-up delay and optional shooter RPM. When shooterRpmSupplier is
-     * non-null, runs the shooter at that speed for the full duration (delay + feed). Use when
-     * the shoot step is not preceded by a spin-up command (e.g. ShooterAuto Left/Right).
-     *
-     * @param shooter The shooter subsystem
-     * @param feeder The feeder subsystem
-     * @param floor Optional floor subsystem; if non-null, runs in parallel with feeder
-     * @param durationSec Duration to feed in seconds
-     * @param spinupDelaySec Delay (seconds) before feeder/floor start
-     * @param shooterRpmSupplier Optional; when non-null, runs shooter at this speed for full duration
-     * @return A command that shoots for the specified duration
+     * Factory method with spin-up delay and optional per-motor shooter speeds. When shooterSpeedsSupplier is
+     * non-null, runs the shooter at those speeds for the full duration (delay + feed). For a single
+     * base RPM in auto use {@code () -> ShooterSpeeds.uniform(rpm)}.
      */
-    public static Command create(Shooter shooter, Feeder feeder, Floor floor, double durationSec, double spinupDelaySec, Supplier<Double> shooterRpmSupplier) {
-        return new CmdShootForTime(shooter, feeder, floor, durationSec, spinupDelaySec, shooterRpmSupplier, false, false, null, 0.0);
+    public static Command create(Shooter shooter, Feeder feeder, Floor floor, double durationSec, double spinupDelaySec, Supplier<ShooterSpeeds> shooterSpeedsSupplier) {
+        return new CmdShootForTime(shooter, feeder, floor, durationSec, spinupDelaySec, null, shooterSpeedsSupplier, false, false, null, null, 0.0);
     }
 
     /**
