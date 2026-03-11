@@ -21,10 +21,10 @@ public final class AutoConstants {
     public static final double AUTO_PATH_MAX_VELOCITY_MPS = 3.0;
     /** TEMPORARY: max acceleration (m/s²) for auto path following. Use lower value for testing; revert to 3.0 for competition. */
     public static final double AUTO_PATH_MAX_ACCELERATION_MPS2 = 2.0;
-    /** TEMPORARY: max velocity (m/s) for drive-through-center paths. Slow for testing; revert to AUTO_PATH_MAX_VELOCITY_MPS for competition. */
-    public static final double AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS = 1.0;
-    /** TEMPORARY: max acceleration (m/s²) for drive-through-center paths. Slow for testing; revert to AUTO_PATH_MAX_ACCELERATION_MPS2 for competition. */
-    public static final double AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2 = 1.0;
+    /** TEMPORARY: max velocity (m/s) for drive-through-center paths. Use same as main paths for reliability. */
+    public static final double AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS = AUTO_PATH_MAX_VELOCITY_MPS;
+    /** TEMPORARY: max acceleration (m/s²) for drive-through-center paths. Use same as main paths for reliability. */
+    public static final double AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2 = AUTO_PATH_MAX_ACCELERATION_MPS2;
 
     // Default timeouts (seconds)
     public static final double DEFAULT_PATH_TIMEOUT = 10.0;
@@ -76,7 +76,7 @@ public final class AutoConstants {
     /** Default tolerance for ShooterAuto Left/Right at-speed check. Tunable via Preferences "Auto/ShooterToleranceLeftRight". */
     public static final double SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE = 5.0;
     /** Default shoot duration (seconds) for feeder/floor to launch all balls. Tunable via Auto Tuning tab. */
-    public static final double DEFAULT_SHOOT_DURATION = 5.0;
+    public static final double DEFAULT_SHOOT_DURATION = 4.0;
     /** Delay (seconds) after shooter at speed before feeder starts, to let shooter stabilize. */
     public static final double SHOOT_SPINUP_DELAY_BEFORE_FEED = 0.75;
     /** ShooterAuto Left/Right: spin-up delay (seconds) before feeder/floor turn on. Longer than center due to angle. */

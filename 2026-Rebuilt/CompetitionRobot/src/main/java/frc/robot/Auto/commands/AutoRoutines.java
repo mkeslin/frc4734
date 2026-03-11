@@ -345,7 +345,7 @@ public class AutoRoutines {
 
                 // Step 5 (Acquire hub aim) commented out in current config.
 
-                // ----- Step 6: Shoot (duration from Shuffleboard "Shoot Duration (sec)", default 5.0) -----
+                // ----- Step 6: Shoot (duration from Shuffleboard "Shoot Duration (sec)", default 4.0) -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 6: Shoot (duration=%.1fs)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), shootDurationSupplier.get()))),
                 Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
 
