@@ -15,6 +15,7 @@ import frc.robot.Constants.FeederConstants.FeederSpeed;
 import frc.robot.Constants.FloorConstants.ConveyorSpeed;
 import frc.robot.Subsystems.Feeder;
 import frc.robot.Subsystems.Floor;
+import frc.robot.Logging.RobotLogger;
 import frc.robot.Subsystems.Shooter;
 import frc.robot.ShooterSpeeds;
 
@@ -149,6 +150,8 @@ public class CmdShootForTime extends Command {
     public void initialize() {
         timer.reset();
         timer.start();
+        RobotLogger.log(String.format("[CmdShootForTime] t=%.2f Started: duration=%.1fs spinupDelay=%.1fs",
+                Timer.getFPGATimestamp(), durationSec, spinupDelaySec));
 
         Command pulseCycle = Commands.sequence(
                 feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
@@ -232,6 +235,8 @@ public class CmdShootForTime extends Command {
     @Override
     public void end(boolean interrupted) {
         timer.stop();
+        RobotLogger.log(String.format("[CmdShootForTime] t=%.2f Finished: interrupted=%b elapsed=%.2fs",
+                Timer.getFPGATimestamp(), interrupted, timer.get()));
         if (feederCommand != null) {
             feederCommand.end(interrupted);
         }

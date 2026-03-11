@@ -320,16 +320,16 @@ public class AutoRoutines {
 
         return Commands.sequence(
                 // ----- Step 1: Seed odometry -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 1: Seed odometry")),
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 1: Seed odometry", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
 
                 // ----- Step 2: Lower intake (webcam unblocked for hub aim) -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 2: Lower intake")),
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 2: Lower intake", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
                         .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
 
                 // ----- Step 3: Tag snap -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 3: Tag snap")),
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 3: Tag snap", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 new CmdApplyTagSnapIfGood(
                         vision,
                         drivetrain,
@@ -338,27 +338,28 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
                 // ----- Step 4: Spin up shooter (1.5s spin, then shoot immediately; no at-speed wait) -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 4: Spin up shooter")),
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 4: Spin up shooter", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 Commands.deadline(
                         Commands.waitSeconds(AutoConstants.SHOOTER_SPINUP_DURATION_LEFT_RIGHT),
                         new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
 
                 // Step 5 (Acquire hub aim) commented out in current config.
 
-                // ----- Step 6: Shoot (immediately after spin-up; no extra delay) -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Shoot")),
+                // ----- Step 6: Shoot (duration from Shuffleboard "Shoot Duration (sec)", default 5.0) -----
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 6: Shoot (duration=%.1fs)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), shootDurationSupplier.get()))),
                 Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
 
                 // ----- Step 7: Drive through center (intake on; slow for testing) -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Drive through center (intake on)")),
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 7: Drive through center (intake on)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 Commands.deadline(
                         new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain,
                                 AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS,
                                 AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2),
-                        CmdIntakeOn.create(intake)),
+                        CmdIntakeOn.create(intake))
+                        .andThen(intake.resetIntakeSpeedCommand()),
 
                 // ----- Step 8: Drive back to shot (spin up shooter; slow for testing) -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 8: Drive back to shot (spin up)")),
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 8: Drive back to shot (spin up)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 Commands.deadline(
                         new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain,
                                 AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS,
@@ -366,15 +367,15 @@ public class AutoRoutines {
                         new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
 
                 // ----- Step 9: Shoot second load -----
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 9: Shoot second load")),
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 9: Shoot second load (duration=%.1fs)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), shootDurationSupplier.get()))),
                 Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
 
                 // ----- Step 10: Raise intake (reset for next run) -----
-                // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),
+                // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 10: Raise intake")),
                 // intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
                 //         .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
 
-                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Complete")))
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Complete", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))))
                 .withName("ShooterAuto");
     }
 
