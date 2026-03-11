@@ -337,19 +337,17 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
 
-                // ----- Step 4: Spin up shooter (1.5s spin, then wait for at speed or 5s timeout) -----
+                // ----- Step 4: Spin up shooter (1.5s spin, then shoot immediately; no at-speed wait) -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 4: Spin up shooter")),
-                Commands.sequence(
-                        Commands.deadline(
-                                Commands.waitSeconds(AutoConstants.SHOOTER_SPINUP_DURATION_LEFT_RIGHT),
-                                new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
-                        new CmdWaitShooterAtSpeed(shooter, targetSpeedsSupplier, rpmTol, 5.0)),
+                Commands.deadline(
+                        Commands.waitSeconds(AutoConstants.SHOOTER_SPINUP_DURATION_LEFT_RIGHT),
+                        new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
 
                 // Step 5 (Acquire hub aim) commented out in current config.
 
-                // ----- Step 6: Shoot -----
+                // ----- Step 6: Shoot (immediately after spin-up; no extra delay) -----
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Shoot")),
-                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), AutoConstants.SHOOT_SPINUP_DELAY_LEFT_RIGHT, targetSpeedsSupplier)),
+                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
 
                 // ----- TEMPORARY: Path to center and second shot commented out -----
                 // Uncomment to restore full routine: path to center, path back, acquire aim,
