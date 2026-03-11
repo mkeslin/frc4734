@@ -214,10 +214,13 @@ public class AutoManager {
     }
 
     /**
-     * Ends the selected routine. This should be run in {@code teleopInit()}.
+     * Ends the selected routine. Called from autonomousExit when autonomous period ends.
      */
     public void endRoutine() {
         timer.stop();
+        double matchTime = DriverStation.getMatchTime();
+        RobotLogger.log(String.format("[AutoManager] endRoutine: matchTime=%.2f cancelling=%b",
+                matchTime, currentCommand != null));
         if (currentCommand != null) {
             currentCommand.cancel();
         }

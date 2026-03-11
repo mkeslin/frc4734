@@ -350,7 +350,8 @@ public class AutoRoutines {
                 Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
 
                 // ----- Step 7: Drive through center (intake on; slow for testing) -----
-                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 7: Drive through center (intake on)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 7: Drive through center (intake on) matchTime=%.2f",
+                        edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), edu.wpi.first.wpilibj.DriverStation.getMatchTime()))),
                 Commands.deadline(
                         new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain,
                                 AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS,

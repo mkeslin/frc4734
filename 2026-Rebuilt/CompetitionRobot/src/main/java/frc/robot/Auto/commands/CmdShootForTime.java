@@ -7,6 +7,7 @@ import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_PULSE_ON_SEC;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -235,17 +236,19 @@ public class CmdShootForTime extends Command {
     @Override
     public void end(boolean interrupted) {
         timer.stop();
-        RobotLogger.log(String.format("[CmdShootForTime] t=%.2f Finished: interrupted=%b elapsed=%.2fs",
-                Timer.getFPGATimestamp(), interrupted, timer.get()));
+        double matchTime = DriverStation.getMatchTime();
+        RobotLogger.log(String.format("[CmdShootForTime] t=%.2f Finished: interrupted=%b elapsed=%.2fs matchTime=%.2f",
+                Timer.getFPGATimestamp(), interrupted, timer.get(), matchTime));
         if (feederCommand != null) {
             feederCommand.end(interrupted);
         }
-        var scheduler = edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance();
-        scheduler.schedule(feeder.resetSpeedCommand());
+        // Call reset directly; do not schedule - scheduling commands that require these
+        // subsystems would cancel this command's parent sequence before it can proceed.
+        feeder.resetSpeed();
         if (floor != null) {
-            scheduler.schedule(floor.resetSpeedCommand());
+            floor.resetSpeed();
         }
-        scheduler.schedule(new CmdStopShooter(shooter));
+        shooter.resetSpeed();
     }
 
     /**
