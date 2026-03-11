@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Logging.RobotLogger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
@@ -279,11 +278,6 @@ public abstract class BaseCenterToCommand extends Command {
         SmartDashboard.putNumber("omegaSpeed", omegaSpeed);
 
         m_drivetrain.setRelativeSpeed(xSpeed, ySpeed, omegaSpeed);
-        if (m_driveController != null) {
-            m_driveController.povUp().onTrue(Commands.runOnce(() -> {
-                driverInterrupted = true;
-            }));
-        }
         onExecute();
     }
 

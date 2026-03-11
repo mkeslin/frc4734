@@ -28,9 +28,43 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /**
  * Teleop mechanism combo commands (Teleop mode). Run while held; reset on release.
+ *
+ * <p>Driver D-pad (drive controller) controls shooter speed mode at runtime:
+ * <ul>
+ *   <li>Up: Toggle dynamic (distance-based) vs fixed speed</li>
+ *   <li>Left: Fixed 110 RPS</li>
+ *   <li>Down: Fixed 125 RPS</li>
+ *   <li>Right: Fixed 140 RPS</li>
+ * </ul>
  */
 public final class TeleopMechanismCommands {
     private TeleopMechanismCommands() {}
+
+    /** Runtime toggle: dynamic (distance-based) vs fixed shooter speed. */
+    private static volatile boolean s_isDynamicShooterSpeed = USE_DYNAMIC_SHOOTER_SPEED;
+    /** Fixed RPS when not using dynamic. Left=110, Down=125, Right=140. */
+    private static volatile double s_fixedShooterSpeedRps = USE_TEMPORARY_6FT_SHOOTER_SPEED
+            ? TEMPORARY_SHOOTER_SPEED_6FT_RPS
+            : 110.0;
+
+    /** Toggles between dynamic and fixed shooter speed. */
+    public static void toggleDynamicShooterSpeed() {
+        s_isDynamicShooterSpeed = !s_isDynamicShooterSpeed;
+    }
+
+    /** Sets fixed shooter speed (RPS) and switches to fixed mode. */
+    public static void setFixedShooterSpeed(double rps) {
+        s_fixedShooterSpeedRps = rps;
+        s_isDynamicShooterSpeed = false;
+    }
+
+    public static boolean isDynamicShooterSpeed() {
+        return s_isDynamicShooterSpeed;
+    }
+
+    public static double getFixedShooterSpeedRps() {
+        return s_fixedShooterSpeedRps;
+    }
 
     public static Command intake(DeployableIntake intake, Floor floor, Feeder feeder) {
         return new ParallelCommandGroup(
@@ -57,13 +91,13 @@ public final class TeleopMechanismCommands {
     }
 
     /**
-     * Shoot command. Shooter speed is dynamic (from distance to hub) or fixed (ShooterSpeed.FORWARD)
-     * depending on {@link frc.robot.Constants.CommandConstants#USE_DYNAMIC_SHOOTER_SPEED}.
+     * Shoot command. Shooter speed comes from runtime driver D-pad selection:
+     * dynamic (distance-based) or fixed (110/125/140 RPS).
      *
      * @param shooter    Shooter subsystem
      * @param feeder     Feeder subsystem
      * @param floor      Floor conveyor subsystem
-     * @param drivetrain Drivetrain for pose-based distance (required when USE_DYNAMIC_SHOOTER_SPEED is true)
+     * @param drivetrain Drivetrain for pose-based distance (required when dynamic)
      */
     public static Command shoot(Shooter shooter, Feeder feeder, Floor floor, CommandSwerveDrivetrain drivetrain) {
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
@@ -71,11 +105,9 @@ public final class TeleopMechanismCommands {
                 .moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
                 .withTimeout(SHOOT_FEEDER_BACKOFF)
                 .finallyDo(interrupted -> feeder.resetSpeed());
-        Supplier<Double> shooterSpeedSupplier = USE_TEMPORARY_6FT_SHOOTER_SPEED
-                ? () -> TEMPORARY_SHOOTER_SPEED_6FT_RPS
-                : (USE_DYNAMIC_SHOOTER_SPEED
-                        ? () -> ShotModel.rpsFromRobotToHub(drivetrain.getPose().getTranslation())
-                        : () -> ShooterSpeed.FORWARD.value);
+        Supplier<Double> shooterSpeedSupplier = () -> s_isDynamicShooterSpeed
+                ? ShotModel.rpsFromRobotToHub(drivetrain.getPose().getTranslation())
+                : s_fixedShooterSpeedRps;
         Command pulseCycle = Commands.sequence(
                 feeder.moveToArbitrarySpeedCommand(() -> FeederSpeed.FORWARD.value)
                         .withTimeout(SHOOT_FEEDER_PULSE_ON_SEC)

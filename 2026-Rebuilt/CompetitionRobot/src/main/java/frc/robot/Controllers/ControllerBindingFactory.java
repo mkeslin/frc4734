@@ -67,9 +67,26 @@ public class ControllerBindingFactory {
      */
     public void configureBindings() {
         configureDriveTuningBindings();
+        configureDriverShooterSpeedDpadBindings();
         configureMechanismModeBindings();
         configureMechanismSysIdBindings();
         configureMechanismIndividualBindings();
+    }
+
+    /** Drive controller D-pad: shooter speed mode (TELEOP only). Up=toggle dynamic, Left=110, Down=125, Right=140 RPS. */
+    private void configureDriverShooterSpeedDpadBindings() {
+        m_driveController.povUp()
+                .and(() -> SwerveDrivetrainBindings.getCurrentProfile() == InputProfile.TELEOP)
+                .onTrue(Commands.runOnce(TeleopMechanismCommands::toggleDynamicShooterSpeed));
+        m_driveController.povLeft()
+                .and(() -> SwerveDrivetrainBindings.getCurrentProfile() == InputProfile.TELEOP)
+                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(110)));
+        m_driveController.povDown()
+                .and(() -> SwerveDrivetrainBindings.getCurrentProfile() == InputProfile.TELEOP)
+                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(125)));
+        m_driveController.povRight()
+                .and(() -> SwerveDrivetrainBindings.getCurrentProfile() == InputProfile.TELEOP)
+                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(140)));
     }
 
     /** Drive controller: A = run tuning path when profile is MECHANISM. */
