@@ -42,11 +42,13 @@ public class CmdFollowPath extends Command {
     private final String pathName;
     private final double timeoutSec;
     private final CommandSwerveDrivetrain drivetrain;
+    private final double maxVelocityMps;
+    private final double maxAccelMps2;
     private Command pathCommand;
 
     /**
-     * Creates a new CmdFollowPath command.
-     * 
+     * Creates a new CmdFollowPath command with default velocity constraints.
+     *
      * @param pathName The name of the path file (without .path extension)
      * @param timeoutSec Maximum time to follow the path
      * @param drivetrain The drivetrain subsystem
@@ -54,12 +56,29 @@ public class CmdFollowPath extends Command {
      * @throws IllegalArgumentException if timeoutSec is less than or equal to 0
      */
     public CmdFollowPath(String pathName, double timeoutSec, CommandSwerveDrivetrain drivetrain) {
+        this(pathName, timeoutSec, drivetrain, AutoConstants.AUTO_PATH_MAX_VELOCITY_MPS, AutoConstants.AUTO_PATH_MAX_ACCELERATION_MPS2);
+    }
+
+    /**
+     * Creates a new CmdFollowPath command with custom velocity constraints.
+     *
+     * @param pathName The name of the path file (without .path extension)
+     * @param timeoutSec Maximum time to follow the path
+     * @param drivetrain The drivetrain subsystem
+     * @param maxVelocityMps Maximum velocity (m/s) for path following
+     * @param maxAccelMps2 Maximum acceleration (m/s²) for path following
+     * @throws NullPointerException if pathName or drivetrain is null
+     * @throws IllegalArgumentException if timeoutSec is less than or equal to 0
+     */
+    public CmdFollowPath(String pathName, double timeoutSec, CommandSwerveDrivetrain drivetrain, double maxVelocityMps, double maxAccelMps2) {
         this.pathName = Objects.requireNonNull(pathName, "pathName cannot be null");
         if (timeoutSec <= 0) {
             throw new IllegalArgumentException("timeoutSec must be greater than 0, got: " + timeoutSec);
         }
         this.timeoutSec = timeoutSec;
         this.drivetrain = Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
+        this.maxVelocityMps = maxVelocityMps;
+        this.maxAccelMps2 = maxAccelMps2;
 
         addRequirements(drivetrain);
     }
@@ -113,8 +132,8 @@ public class CmdFollowPath extends Command {
 
             var orig = path.getGlobalConstraints();
             PathConstraints constraints = new PathConstraints(
-                    AutoConstants.AUTO_PATH_MAX_VELOCITY_MPS,
-                    AutoConstants.AUTO_PATH_MAX_ACCELERATION_MPS2,
+                    maxVelocityMps,
+                    maxAccelMps2,
                     orig.maxAngularVelocityRadPerSec(),
                     orig.maxAngularAccelerationRadPerSecSq(),
                     orig.nominalVoltageVolts());

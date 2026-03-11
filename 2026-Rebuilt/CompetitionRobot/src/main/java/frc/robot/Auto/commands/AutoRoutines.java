@@ -349,22 +349,27 @@ public class AutoRoutines {
                 Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 6: Shoot")),
                 Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
 
-                // ----- TEMPORARY: Path to center and second shot commented out -----
-                // Uncomment to restore full routine: path to center, path back, acquire aim,
-                // shoot again.
-                // Commands.deadline(
-                // new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT,
-                // drivetrain),
-                // CmdIntakeOn.create(intake)),
-                // Commands.deadline(
-                // new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT,
-                // drivetrain),
-                // new CmdShooterSpinUp(shooter, rpmSupplier)),
-                // CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
-                // CmdWaitShooterAtSpeed.create(shooter, rpmSupplier, rpmTol),
-                // CmdShootForTime.create(shooter, feeder, floor, shootDuration),
+                // ----- Step 7: Drive through center (intake on; slow for testing) -----
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Drive through center (intake on)")),
+                Commands.deadline(
+                        new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain,
+                                AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS,
+                                AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2),
+                        CmdIntakeOn.create(intake)),
 
-                // ----- Step 7: Raise intake (reset for next run) -----
+                // ----- Step 8: Drive back to shot (spin up shooter; slow for testing) -----
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 8: Drive back to shot (spin up)")),
+                Commands.deadline(
+                        new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain,
+                                AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS,
+                                AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2),
+                        new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
+
+                // ----- Step 9: Shoot second load -----
+                Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 9: Shoot second load")),
+                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
+
+                // ----- Step 10: Raise intake (reset for next run) -----
                 // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),
                 // intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
                 //         .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
