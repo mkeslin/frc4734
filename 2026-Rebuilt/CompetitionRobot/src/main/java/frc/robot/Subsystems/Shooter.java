@@ -107,22 +107,24 @@ public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
         InvertedValue invert = ShooterConstants.MOTOR_INVERTED ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
         MotorOutputConfigs motorOutput = new MotorOutputConfigs().withInverted(invert);
 
-        ClosedLoopRampsConfigs closedLoopRamps = new ClosedLoopRampsConfigs()
-                .withVoltageClosedLoopRampPeriod(ShooterConstants.CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC);
-
         VoltageConfigs voltage = new VoltageConfigs()
                 .withPeakForwardVoltage(ShooterConstants.PEAK_FORWARD_VOLTAGE)
                 .withPeakReverseVoltage(ShooterConstants.PEAK_REVERSE_VOLTAGE);
 
-        applyShooterMotorConfig(m_axle1, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
+        ClosedLoopRampsConfigs ramp1 = new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(ShooterConstants.AXLE_1_RAMP_PERIOD_SEC);
+        ClosedLoopRampsConfigs ramp2 = new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(ShooterConstants.AXLE_2_RAMP_PERIOD_SEC);
+        ClosedLoopRampsConfigs ramp3 = new ClosedLoopRampsConfigs()
+                .withVoltageClosedLoopRampPeriod(ShooterConstants.AXLE_3_RAMP_PERIOD_SEC);
 
+        applyShooterMotorConfig(m_axle1, slot0, currentLimits, motorOutput, ramp1, voltage);
         m_axle2 = new TalonFX(SHOOTER_2, CAN_BUS);
         m_axle2.setNeutralMode(NeutralModeValue.Brake);
-        applyShooterMotorConfig(m_axle2, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
-
+        applyShooterMotorConfig(m_axle2, slot0, currentLimits, motorOutput, ramp2, voltage);
         m_axle3 = new TalonFX(SHOOTER_3, CAN_BUS);
         m_axle3.setNeutralMode(NeutralModeValue.Brake);
-        applyShooterMotorConfig(m_axle3, slot0, currentLimits, motorOutput, closedLoopRamps, voltage);
+        applyShooterMotorConfig(m_axle3, slot0, currentLimits, motorOutput, ramp3, voltage);
 
         resetSpeed();
     }

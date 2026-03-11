@@ -59,6 +59,10 @@ public class ShooterConstants {
     // ---- Closed-loop ramp ----
     /** Time (seconds) for closed-loop voltage output to ramp 0→12V. 0 = no ramp (instant). Smooths spin-up and can reduce current spikes. */
     public static final double CLOSED_LOOP_VOLTAGE_RAMP_PERIOD_SEC = 0.2;
+    /** Per-axle ramp period (seconds). Staggered to spread current draw and reduce brownout risk. */
+    public static final double AXLE_1_RAMP_PERIOD_SEC = 0.15;
+    public static final double AXLE_2_RAMP_PERIOD_SEC = 0.20;
+    public static final double AXLE_3_RAMP_PERIOD_SEC = 0.25;
 
     // ---- Peak output voltage ----
     /** Peak forward voltage (volts). Slightly below 12 to leave bus headroom and reduce brownout risk. */
