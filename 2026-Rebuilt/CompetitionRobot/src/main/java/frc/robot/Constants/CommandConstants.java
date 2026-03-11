@@ -33,7 +33,7 @@ public class CommandConstants {
     /** TEMPORARY: When true, override shooter speed to 12 ft value (128.67 RPS). Set false to restore dynamic/fixed logic. */
     public static final boolean USE_TEMPORARY_6FT_SHOOTER_SPEED = true;
     /** TEMPORARY: Shooter RPS for 12 ft distance (4 * 12 + 80.67). */
-    public static final double TEMPORARY_SHOOTER_SPEED_6FT_RPS = 128.67;
+    public static final double TEMPORARY_SHOOTER_SPEED_6FT_RPS = 115.00;
 
     /** Teleop shoot: feeder runs reverse this long first to back ball off shooter wheels (seconds). */
     public static final double SHOOT_FEEDER_BACKOFF = 0.5;
