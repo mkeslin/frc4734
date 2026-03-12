@@ -2,12 +2,14 @@ package frc.robot.Auto.commands;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import frc.robot.Constants.IntakeConstants.DeployPosition;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
@@ -167,7 +169,9 @@ public class AutoRoutines {
 
                 // ----- Step 7: Shoot preload -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 7: Shoot")),
-                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get())),
+                new DeferredCommand(
+                        () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
+                        floor != null ? Set.of(shooter, feeder, floor) : Set.of(shooter, feeder)),
 
                 // ----- Step 8: Drive to tower align -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 8: Drive to tower")),
@@ -345,23 +349,22 @@ public class AutoRoutines {
 
                 // Step 5 (Acquire hub aim) commented out in current config.
 
-                // ----- Step 6: Shoot + drive through center (overlap so drive starts during shoot) -----
-                // Drive starts partway through shoot so we're moving before shoot ends; avoids race with
-                // manual disable or mode transition cancelling the sequence before Step 7 runs.
-                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 6: Shoot (duration=%.1fs) + drive overlap",
+                // ----- Step 6: Shoot (duration from Shuffleboard) -----
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 6: Shoot (duration=%.1fs)",
                         edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), shootDurationSupplier.get()))),
-                Commands.parallel(
-                        Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
-                        Commands.sequence(
-                                Commands.waitSeconds(AutoConstants.SHOOT_DRIVE_OVERLAP_DELAY_SEC),
-                                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 7: Drive through center (intake on)",
-                                        edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
-                                Commands.deadline(
-                                        new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain,
-                                                AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS,
-                                                AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2),
-                                        CmdIntakeOn.create(intake))
-                                        .andThen(intake.resetIntakeSpeedCommand()))),
+                new DeferredCommand(
+                        () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
+                        Set.of(shooter, feeder, floor)),
+
+                // ----- Step 7: Drive through center (intake on) -----
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 7: Drive through center (intake on)",
+                        edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
+                Commands.deadline(
+                        new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain,
+                                AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS,
+                                AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2),
+                        CmdIntakeOn.create(intake))
+                        .andThen(intake.resetIntakeSpeedCommand()),
 
                 // ----- Step 8: Drive back to shot (spin up shooter; slow for testing) -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 8: Drive back to shot (spin up)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
@@ -373,7 +376,9 @@ public class AutoRoutines {
 
                 // ----- Step 9: Shoot second load -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 9: Shoot second load (duration=%.1fs)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), shootDurationSupplier.get()))),
-                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
+                new DeferredCommand(
+                        () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
+                        Set.of(shooter, feeder, floor)),
 
                 // ----- Step 10: Raise intake (reset for next run) -----
                 // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 10: Raise intake")),
@@ -458,7 +463,9 @@ public class AutoRoutines {
                         : Commands.none(),
                 // ----- Step 5: Shoot (immediately after intake; no spin-up wait) -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 5: Shoot", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
-                Commands.deferredProxy(() -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier)),
+                new DeferredCommand(
+                        () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
+                        floor != null ? Set.of(shooter, feeder, floor) : Set.of(shooter, feeder)),
 
                 // ----- Step 7: Raise intake (reset for next run) -----
                 // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),
