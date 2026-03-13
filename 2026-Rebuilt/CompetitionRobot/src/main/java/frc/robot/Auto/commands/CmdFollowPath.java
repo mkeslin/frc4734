@@ -1,17 +1,11 @@
 package frc.robot.Auto.commands;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPoint;
-import com.pathplanner.lib.path.RotationTarget;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -88,26 +82,18 @@ public class CmdFollowPath extends Command {
         Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
         System.out.println(String.format("[CmdFollowPath] initialize: pathName='%s' alliance=%s", pathName, alliance));
 
-        // Try alliance-specific path first (e.g. C_StartToShot_Red.path); if present, use without flipping.
+        // Load alliance-specific path (_Blue or _Red); both must exist.
         String alliancePathName = pathName + "_" + (alliance == Alliance.Red ? "Red" : "Blue");
         PathPlannerPath path = null;
-        String loadedFrom = null;
         try {
             path = PathPlannerPath.fromPathFile(alliancePathName);
-            loadedFrom = alliancePathName;
-            System.out.println(String.format("[CmdFollowPath] Loaded alliance-specific path '%s'", alliancePathName));
+            System.out.println(String.format("[CmdFollowPath] Loaded path '%s'", alliancePathName));
         } catch (Exception e) {
-            try {
-                path = PathPlannerPath.fromPathFile(pathName);
-                loadedFrom = pathName;
-                System.out.println(String.format("[CmdFollowPath] Loaded base path '%s' (alliance-specific '%s' not found)", pathName, alliancePathName));
-            } catch (Exception exception) {
-                String errorMsg = String.format("[CmdFollowPath] Failed to load path '%s': %s",
-                        pathName, exception.getMessage());
-                RobotLogger.logError(errorMsg);
-                DriverStation.reportError(errorMsg, false);
-                System.out.println(errorMsg);
-            }
+            String errorMsg = String.format("[CmdFollowPath] Failed to load path '%s': %s",
+                    alliancePathName, e.getMessage());
+            RobotLogger.logError(errorMsg);
+            DriverStation.reportError(errorMsg, false);
+            System.out.println(errorMsg);
         }
 
         if (path != null) {
@@ -116,7 +102,7 @@ public class CmdFollowPath extends Command {
                 Translation2d first = points.get(0).position;
                 Translation2d last = points.get(points.size() - 1).position;
                 System.out.println(String.format("[CmdFollowPath] Path '%s' points: first=(%.2f, %.2f) last=(%.2f, %.2f)",
-                        loadedFrom, first.getX(), first.getY(), last.getX(), last.getY()));
+                        alliancePathName, first.getX(), first.getY(), last.getX(), last.getY()));
             }
             var robotPose = drivetrain.getState().Pose;
             System.out.println(String.format("[CmdFollowPath] Robot odometry pose: (%.2f, %.2f) rot=%.1f deg",
@@ -137,46 +123,18 @@ public class CmdFollowPath extends Command {
                     orig.maxAngularVelocityRadPerSec(),
                     orig.maxAngularAccelerationRadPerSecSq(),
                     orig.nominalVoltageVolts());
-            PathPlannerPath pathToFollow;
-            if (alliance == Alliance.Red && loadedFrom.equals(pathName)) {
-                // No alliance-specific path; manually flip base path for red.
-                List<PathPoint> flippedPoints = new ArrayList<>();
-                for (PathPoint pt : path.getAllPathPoints()) {
-                    Translation2d flippedPos = AllianceUtils.flipPositionForPathPlanner(pt.position);
-                    PathPoint flipped = pt.rotationTarget != null
-                            ? new PathPoint(flippedPos,
-                                    new RotationTarget(pt.rotationTarget.position(),
-                                            AllianceUtils.flipRotationForPathPlanner(pt.rotationTarget.rotation())),
-                                    pt.constraints)
-                            : new PathPoint(flippedPos);
-                    flippedPoints.add(flipped);
-                }
-                GoalEndState origGoal = path.getGoalEndState();
-                GoalEndState flippedGoal = new GoalEndState(
-                        origGoal.velocityMPS(),
-                        AllianceUtils.flipRotationForPathPlanner(origGoal.rotation()));
-                pathToFollow = PathPlannerPath.fromPathPoints(flippedPoints, constraints, flippedGoal);
-                pathToFollow.preventFlipping = true;
-                var fp = flippedPoints.get(0).position;
-                var lp = flippedPoints.get(flippedPoints.size() - 1).position;
-                System.out.println(String.format("[CmdFollowPath] Flipped for red: first=(%.2f, %.2f) last=(%.2f, %.2f)",
-                        fp.getX(), fp.getY(), lp.getX(), lp.getY()));
-                RobotLogger.log(String.format("[CmdFollowPath] Flipped path '%s' for red alliance", pathName));
-            } else {
-                pathToFollow = PathPlannerPath.fromPathPoints(
-                        path.getAllPathPoints(),
-                        constraints,
-                        path.getGoalEndState());
-                if (alliance == Alliance.Red) {
-                    pathToFollow.preventFlipping = true; // Alliance-specific path already in red coords
-                }
+            PathPlannerPath pathToFollow = PathPlannerPath.fromPathPoints(
+                    path.getAllPathPoints(),
+                    constraints,
+                    path.getGoalEndState());
+            if (alliance == Alliance.Red) {
+                pathToFollow.preventFlipping = true; // Alliance-specific path already in red coords
             }
             pathCommand = drivetrain.followPathCommand(pathToFollow)
                     .withTimeout(timeoutSec)
                     .withName("CmdFollowPath-" + pathName);
             pathCommand.initialize();
         } else {
-            // Path failed to load - command will finish immediately
             pathCommand = Commands.none();
         }
     }
