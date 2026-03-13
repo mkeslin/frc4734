@@ -72,7 +72,7 @@ public class ShooterConstants {
 
     // ---- Per-motor speed multipliers ----
     /** Per-motor speed multiplier. Tune to compensate for mechanical variation. 1.0 = nominal. */
-    public static final double SHOOTER_LEFT_SPEED_MULTIPLIER = 1.0;   // Motor 32
+    public static final double SHOOTER_LEFT_SPEED_MULTIPLIER = 1.05;   // Motor 32
     public static final double SHOOTER_CENTER_SPEED_MULTIPLIER = 1.0;   // Motor 30
-    public static final double SHOOTER_RIGHT_SPEED_MULTIPLIER = 1.0;  // Motor 29
+    public static final double SHOOTER_RIGHT_SPEED_MULTIPLIER = 1.05;  // Motor 29
 }

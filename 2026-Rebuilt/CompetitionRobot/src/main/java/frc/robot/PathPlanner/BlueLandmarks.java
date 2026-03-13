@@ -12,11 +12,11 @@ import frc.robot.Auto.commands.ClimbSide;
 public class BlueLandmarks {
 
     /** Left start: matches L_StartToShot path first waypoint. */
-    public static final Pose2d Start1 = getPose(3.4682438016528927, 7.471728650137741, -76.945);
+    public static final Pose2d Start1 = getPose(4.1, 7.4, -81.2);
     /** Center start: matches C_StartToShot path first waypoint. */
     public static final Pose2d Start2 = getPose(3.6, 4.035, 0);
-    /** Right start: matches R_StartToShot path first waypoint. */
-    public static final Pose2d Start3 = getPose(3.4682438016528927, 0.5982713498622594, 76.945);
+    /** Right start: matches R_StartToShot path first waypoint (flipped from left). */
+    public static final Pose2d Start3 = getPose(4.1, 0.669326, 81.2);
 
     // ----- Scoring & stage (from diagram, inches → m) -----
     /** Blue diamond plate (scoring target) center. */
@@ -24,11 +24,11 @@ public class BlueLandmarks {
     /** Pose in front of hub for shooting (robot faces hub). Used by drive-to auto. */
     public static final Pose2d ShotPosition = getPose(6.2, 4.035, 180);
     /** Left shooter auto shot position (end of L_StartToShot path). */
-    public static final Pose2d ShotPositionLeft = getPose(3.468, 7.472, -76.945);
+    public static final Pose2d ShotPositionLeft = getPose(4.1, 7.4, -81.2);
     /** Center shooter auto shot position (end of C_StartToShot path). */
     public static final Pose2d ShotPositionCenter = getPose(2.6, 4.035, 0);
     /** Right shooter auto shot position (end of R_StartToShot path). */
-    public static final Pose2d ShotPositionRight = getPose(3.468, 0.598, 76.945);
+    public static final Pose2d ShotPositionRight = getPose(4.1, 0.669326, 81.2);
     /** Tower / uprights reference: midpoint between uprights near blue diamond. 312.66", 158.845" */
     public static final Pose2d Tower = getPose(7.942, 4.035, 0);
     /**
