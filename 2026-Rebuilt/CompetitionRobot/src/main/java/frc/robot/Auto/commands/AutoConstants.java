@@ -34,7 +34,7 @@ public final class AutoConstants {
     public static final double DEFAULT_SHOOT_TIMEOUT = 2.0;
     public static final double DEFAULT_INTAKE_TIMEOUT = 5.0;
     /** Timeout for deploying (lowering) intake so webcam is unblocked before hub aim. */
-    public static final double DEFAULT_INTAKE_DEPLOY_TIMEOUT = 2.0;
+    public static final double DEFAULT_INTAKE_DEPLOY_TIMEOUT = 1.5;
     /** Distance (m) to drive forward after tower align to acquire the bar before climbing. */
     public static final double DEFAULT_CLIMB_ACQUIRE_DISTANCE_METERS = 0.2;
     /** Offset (m): tower align pose is this far toward field center from the bar so robot extends climber there, then drives to bar. 2 ft. */

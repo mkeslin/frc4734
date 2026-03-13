@@ -327,12 +327,17 @@ public class AutoRoutines {
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 1: Seed odometry", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
 
-                // ----- Step 2: Lower intake (webcam unblocked for hub aim) -----
-                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 2: Lower intake", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
-                intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
-                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
+                // ----- Step 2: Lower intake + spin up shooter (parallel) -----
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 2: Lower intake + spin up shooter (parallel)",
+                        edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
+                Commands.parallel(
+                        intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
+                                .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
+                        Commands.deadline(
+                                Commands.waitSeconds(AutoConstants.SHOOTER_SPINUP_DURATION_LEFT_RIGHT),
+                                new CmdShooterSpinUp(shooter, targetSpeedsSupplier))),
 
-                // ----- Step 3: Tag snap -----
+                // ----- Step 3: Tag snap (webcam unblocked after intake deploy) -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 3: Tag snap", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 new CmdApplyTagSnapIfGood(
                         vision,
@@ -340,12 +345,6 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_MAX_AMBIGUITY,
                         AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
                         AutoConstants.DEFAULT_MIN_TARGETS),
-
-                // ----- Step 4: Spin up shooter (1.5s spin, then shoot immediately; no at-speed wait) -----
-                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 4: Spin up shooter", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
-                Commands.deadline(
-                        Commands.waitSeconds(AutoConstants.SHOOTER_SPINUP_DURATION_LEFT_RIGHT),
-                        new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
 
                 // Step 5 (Acquire hub aim) commented out in current config.
 
