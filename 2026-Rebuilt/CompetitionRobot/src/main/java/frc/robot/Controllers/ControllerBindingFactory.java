@@ -140,6 +140,18 @@ public class ControllerBindingFactory {
                         if (m_intake != null) m_intake.resetIntakeSpeed();
                     }));
         }
+        if (m_climber != null) {
+            m_mechanismController.povRight()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
+                    .whileTrue(Commands.defer(
+                            () -> IndividualMechanismCommands.climbExtend(m_climber),
+                            Set.<Subsystem>of(m_climber)));
+            m_mechanismController.povLeft()
+                    .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
+                    .whileTrue(Commands.defer(
+                            () -> IndividualMechanismCommands.climbRetract(m_climber),
+                            Set.<Subsystem>of(m_climber)));
+        }
     }
 
     /** Mechanism controller: SysId bindings (PID tuning). Active when mechanism mode is SYSID. */
