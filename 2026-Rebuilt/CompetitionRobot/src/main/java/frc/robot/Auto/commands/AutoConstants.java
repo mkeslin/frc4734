@@ -22,7 +22,7 @@ public final class AutoConstants {
     /** TEMPORARY: max acceleration (m/s²) for auto path following. Use lower value for testing; revert to 3.0 for competition. */
     public static final double AUTO_PATH_MAX_ACCELERATION_MPS2 = 2.0;
     /** TEMPORARY: max velocity (m/s) for drive-through-center paths. Use same as main paths for reliability. */
-    public static final double AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS = AUTO_PATH_MAX_VELOCITY_MPS / 2;
+    public static final double AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS = AUTO_PATH_MAX_VELOCITY_MPS / 4;
     /** TEMPORARY: max acceleration (m/s²) for drive-through-center paths. Use same as main paths for reliability. */
     public static final double AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2 = AUTO_PATH_MAX_ACCELERATION_MPS2 / 2;
 

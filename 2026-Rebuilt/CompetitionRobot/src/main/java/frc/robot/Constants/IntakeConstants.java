@@ -11,7 +11,7 @@ public class IntakeConstants {
      */
     public static enum DeployPosition {
         STOWED(0),
-        DEPLOYED(12);
+        DEPLOYED(16.3);
 
         public final double value;
 
