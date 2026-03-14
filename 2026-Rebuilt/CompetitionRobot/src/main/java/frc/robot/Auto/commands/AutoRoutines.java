@@ -454,6 +454,7 @@ public class AutoRoutines {
                                 AutoConstants.AUTO_PATH_CENTER_TO_SHOT_MAX_VELOCITY_MPS,
                                 AutoConstants.AUTO_PATH_CENTER_TO_SHOT_MAX_ACCELERATION_MPS2),
                         new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
+
                 // ----- Step 4: Deploy intake -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 4: Deploy intake (intake=%s)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), intake != null ? "present" : "null"))),
                 intake != null
@@ -462,11 +463,15 @@ public class AutoRoutines {
                                 .beforeStarting(Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 4: Intake deploy starting", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))))
                                 .finallyDo(interrupted -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 4: Intake deploy finished (interrupted=%b)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), interrupted)))
                         : Commands.none(),
-                // ----- Step 5: Shoot (immediately after intake; no spin-up wait) -----
+
+                // ----- Step 5: Shoot (intake runs during shoot; stops when shoot completes) -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 5: Shoot", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
-                new DeferredCommand(
-                        () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
-                        floor != null ? Set.of(shooter, feeder, floor) : Set.of(shooter, feeder)),
+                Commands.deadline(
+                        new DeferredCommand(
+                                () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
+                                floor != null ? Set.of(shooter, feeder, floor) : Set.of(shooter, feeder)),
+                        intake != null ? CmdIntakeOn.create(intake) : Commands.none())
+                        .andThen(intake != null ? intake.resetIntakeSpeedCommand() : Commands.none()),
 
                 // ----- Step 7: Raise intake (reset for next run) -----
                 // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),

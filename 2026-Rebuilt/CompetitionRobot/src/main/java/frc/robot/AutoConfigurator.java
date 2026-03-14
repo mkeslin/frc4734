@@ -555,7 +555,7 @@ public class AutoConfigurator {
 
         // Shooter Auto (Center): C_StartToShot → shoot preload → stop (no center run)
         // Seed at start so the robot drives from start to shot.
-        Supplier<Double> shootDurationCenter = () -> AutoConstants.DEFAULT_SHOOT_DURATION;
+        Supplier<Double> shootDurationCenter = () -> AutoConstants.SHOOTER_AUTO_CENTER_SHOOT_DURATION;
         Command shooterAutoCenter = AutoRoutines.buildTestDriveAndShoot(
                 StartPoseId.POS_2,
                 startPoseSuppliers,

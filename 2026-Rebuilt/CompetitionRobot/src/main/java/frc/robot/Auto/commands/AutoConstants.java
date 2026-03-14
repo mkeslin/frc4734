@@ -81,6 +81,8 @@ public final class AutoConstants {
     public static final double SHOOTER_AUTO_LEFT_RIGHT_TOLERANCE = 5.0;
     /** Default shoot duration (seconds) for feeder/floor to launch all balls. Tunable via Auto Tuning tab. */
     public static final double DEFAULT_SHOOT_DURATION = 3.0;
+    /** Shoot duration (seconds) for ShooterAuto Center. */
+    public static final double SHOOTER_AUTO_CENTER_SHOOT_DURATION = 5.0;
     /** Delay (seconds) after shooter at speed before feeder starts, to let shooter stabilize. */
     public static final double SHOOT_SPINUP_DELAY_BEFORE_FEED = 0.75;
     /** ShooterAuto Left/Right: spin-up delay (seconds) before feeder/floor turn on. Longer than center due to angle. */
