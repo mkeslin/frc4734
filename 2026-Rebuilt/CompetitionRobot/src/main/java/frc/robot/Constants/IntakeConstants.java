@@ -11,7 +11,7 @@ public class IntakeConstants {
      */
     public static enum DeployPosition {
         STOWED(0),
-        DEPLOYED(16.3);
+        DEPLOYED(16.5);
 
         public final double value;
 
@@ -26,7 +26,7 @@ public class IntakeConstants {
      */
     public static enum IntakeSpeed {
         STOPPED(0),
-        IN(125.0),    // Intake; tune as needed
+        IN(200.0),    // Intake; tune as needed
         OUT(-60.0);  // Outtake / reverse
 
         public final double value;
@@ -63,8 +63,8 @@ public class IntakeConstants {
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
     /** Intake roller: supply and stator limits (amps). */
-    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 15;
-    public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 40;
+    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 25;
+    public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 60;
     /** Intake deploy: supply and stator limits (amps). */
     public static final double INTAKE_DEPLOY_SUPPLY_CURRENT_LIMIT_AMPS = 15;
     public static final double INTAKE_DEPLOY_STATOR_CURRENT_LIMIT_AMPS = 30;

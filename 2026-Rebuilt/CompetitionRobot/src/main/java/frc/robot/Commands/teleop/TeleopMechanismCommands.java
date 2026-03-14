@@ -97,10 +97,10 @@ public final class TeleopMechanismCommands {
      */
     public static Command shoot(Shooter shooter, Feeder feeder, Floor floor, CommandSwerveDrivetrain drivetrain) {
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
-        Command backoff = feeder
-                .moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
-                .withTimeout(SHOOT_FEEDER_BACKOFF)
-                .finallyDo(interrupted -> feeder.resetSpeed());
+        // Command backoff = feeder
+        //         .moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
+        //         .withTimeout(SHOOT_FEEDER_BACKOFF)
+        //         .finallyDo(interrupted -> feeder.resetSpeed());
         Supplier<Double> shooterSpeedSupplier = () -> s_isDynamicShooterSpeed
                 ? ShotModel.rpsFromRobotToHub(drivetrain.getPose().getTranslation())
                 : s_fixedShooterSpeedRps;
@@ -115,7 +115,7 @@ public final class TeleopMechanismCommands {
                 Commands.waitSeconds(SHOOT_FEEDER_DELAY).andThen(feederPulsed),
                 Commands.waitSeconds(SHOOT_FLOOR_DELAY)
                         .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)));
-        return Commands.sequence(backoff, shootPhase)
+        return Commands.sequence(/*backoff,*/ shootPhase)
                 .finallyDo(interrupted -> {
                     shooter.resetSpeed();
                     feeder.resetSpeed();

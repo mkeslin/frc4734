@@ -11,7 +11,7 @@ public final class ShotModel {
     private ShotModel() {}
 
     /** Slope: RPS per foot of distance. */
-    private static final double SLOPE = 3.5;
+    private static final double SLOPE = 3;
     /** Intercept: base RPS at zero distance. */
     private static final double INTERCEPT = 85.0;
 
