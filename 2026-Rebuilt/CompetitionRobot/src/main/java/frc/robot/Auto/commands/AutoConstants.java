@@ -25,6 +25,10 @@ public final class AutoConstants {
     public static final double AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS = AUTO_PATH_MAX_VELOCITY_MPS / 4;
     /** TEMPORARY: max acceleration (m/s²) for drive-through-center paths. Use same as main paths for reliability. */
     public static final double AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2 = AUTO_PATH_MAX_ACCELERATION_MPS2 / 2;
+    /** Max velocity (m/s) for ShooterAuto Center path to shot. Slower than main paths for precision. */
+    public static final double AUTO_PATH_CENTER_TO_SHOT_MAX_VELOCITY_MPS = 1.0;
+    /** Max acceleration (m/s²) for ShooterAuto Center path to shot. Scaled with velocity (ratio ~1.5:1). */
+    public static final double AUTO_PATH_CENTER_TO_SHOT_MAX_ACCELERATION_MPS2 = 0.67;
 
     // Default timeouts (seconds)
     public static final double DEFAULT_PATH_TIMEOUT = 10.0;

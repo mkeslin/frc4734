@@ -450,7 +450,9 @@ public class AutoRoutines {
                 // ----- Step 3: Drive to shot pose (parallel: spin up shooter) -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 3: Drive to shot + spin up", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 Commands.deadline(
-                        new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain),
+                        new CmdFollowPath(pathToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain,
+                                AutoConstants.AUTO_PATH_CENTER_TO_SHOT_MAX_VELOCITY_MPS,
+                                AutoConstants.AUTO_PATH_CENTER_TO_SHOT_MAX_ACCELERATION_MPS2),
                         new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
                 // ----- Step 4: Deploy intake -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 4: Deploy intake (intake=%s)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), intake != null ? "present" : "null"))),
