@@ -104,7 +104,7 @@ public class ControllerBindingFactory {
                 .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(127)));
         m_mechanismController.b()
                 .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
-                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(140)));
+                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(135)));
         // Defer so each button press gets a fresh command instance; reusing a cancelled command can cause scheduler errors / e-stop
         if (m_intake != null && m_floor != null && m_feeder != null) {
             m_mechanismController.leftTrigger()
