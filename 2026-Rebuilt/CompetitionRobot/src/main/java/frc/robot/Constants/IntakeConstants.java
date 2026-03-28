@@ -26,7 +26,7 @@ public class IntakeConstants {
      */
     public static enum IntakeSpeed {
         STOPPED(0),
-        IN(300.0),    // Intake; tune on robot with drive throttle + current limits
+        IN(350.0),    // Intake; tune on robot with drive throttle + current limits
         OUT(-80.0);  // Outtake / reverse
 
         public final double value;
@@ -63,15 +63,21 @@ public class IntakeConstants {
     public static final double MIN_DEPLOY_POSITION_FOR_INTAKE = 0.5;
 
     /**
-     * Lower deploy setpoint during shoot jiggle (rotations). Between stow and {@link DeployPosition#DEPLOYED};
-     * tune on robot for agitation without losing alignment.
+     * Lower deploy setpoint during shoot agitation (rotations). Between stow and {@link DeployPosition#DEPLOYED};
+     * tune on robot for feed assist without losing alignment.
      */
-    public static final double SHOOT_JIGGLE_DEPLOY_ROTATIONS = 15.0;
+    public static final double SHOOT_AGITATE_DEPLOY_ROTATIONS = 12.0;
 
     /**
-     * Minimum deploy position before shoot jiggle is allowed; avoids commanding deploy away from stow while shooting.
+     * Minimum deploy position before shoot agitation is allowed; avoids commanding deploy away from stow while shooting.
      */
-    public static final double SHOOT_JIGGLE_MIN_DEPLOY_ROTATIONS = MIN_DEPLOY_POSITION_FOR_INTAKE;
+    public static final double SHOOT_AGITATE_MIN_DEPLOY_ROTATIONS = MIN_DEPLOY_POSITION_FOR_INTAKE;
+
+    /**
+     * Time each agitation segment holds one Motion Magic setpoint before switching (seconds). Too short and the
+     * mechanism will not visibly move; tune with {@link #SHOOT_AGITATE_DEPLOY_ROTATIONS}.
+     */
+    public static final double SHOOT_AGITATE_HALF_PERIOD_SEC = 0.45;
 
     /** When intake roller is running, deploy motor gets this forward voltage to keep pressure and hold intake in place (volts). */
     public static final double INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE = 0.5;
@@ -80,7 +86,7 @@ public class IntakeConstants {
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
     /** Intake roller: supply and stator limits (amps). */
-    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 30;
+    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 40;
     public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 80;
     /** Intake deploy: supply and stator limits (amps). */
     public static final double INTAKE_DEPLOY_SUPPLY_CURRENT_LIMIT_AMPS = 15;

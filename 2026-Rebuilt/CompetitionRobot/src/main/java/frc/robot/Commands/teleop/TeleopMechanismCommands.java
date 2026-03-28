@@ -93,7 +93,7 @@ public final class TeleopMechanismCommands {
      * @param feeder     Feeder subsystem
      * @param floor      Floor conveyor subsystem
      * @param drivetrain Drivetrain for pose-based distance (required when dynamic)
-     * @param intake     Optional; when non-null, deploy jiggles during shoot to help feed
+     * @param intake     Optional; when non-null, deploy agitates during shoot to help feed
      */
     public static Command shoot(Shooter shooter, Feeder feeder, Floor floor, CommandSwerveDrivetrain drivetrain,
             DeployableIntake intake) {
@@ -116,7 +116,7 @@ public final class TeleopMechanismCommands {
                 Commands.waitSeconds(SHOOT_FEEDER_DELAY).andThen(feederPulsed),
                 Commands.waitSeconds(SHOOT_FLOOR_DELAY)
                         .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)),
-                intake != null ? intake.shootDeployJiggleCommand() : Commands.none());
+                intake != null ? intake.shootDeployAgitateCommand() : Commands.none());
         return Commands.sequence(/*backoff,*/ shootPhase)
                 .finallyDo(interrupted -> {
                     shooter.resetSpeed();

@@ -13,8 +13,9 @@ import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_CRUISE_VELOCITY;
 import static frc.robot.Constants.IntakeConstants.INTAKE_ROLLER_RUNNING_SPEED_THRESHOLD_RPS;
 import static frc.robot.Constants.IntakeConstants.INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_JERK;
-import static frc.robot.Constants.IntakeConstants.SHOOT_JIGGLE_DEPLOY_ROTATIONS;
-import static frc.robot.Constants.IntakeConstants.SHOOT_JIGGLE_MIN_DEPLOY_ROTATIONS;
+import static frc.robot.Constants.IntakeConstants.SHOOT_AGITATE_DEPLOY_ROTATIONS;
+import static frc.robot.Constants.IntakeConstants.SHOOT_AGITATE_HALF_PERIOD_SEC;
+import static frc.robot.Constants.IntakeConstants.SHOOT_AGITATE_MIN_DEPLOY_ROTATIONS;
 import static frc.robot.Constants.IntakeConstants.kA;
 import static frc.robot.Constants.IntakeConstants.kD;
 import static frc.robot.Constants.IntakeConstants.kG;
@@ -24,7 +25,7 @@ import static frc.robot.Constants.IntakeConstants.kS;
 import static frc.robot.Constants.IntakeConstants.kV;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -43,6 +44,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.IntakeConstants;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -400,40 +402,38 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
     }
 
     /**
-     * Oscillates deploy between full deployed and {@link IntakeConstants#SHOOT_JIGGLE_DEPLOY_ROTATIONS} while
-     * scheduled. When below {@link IntakeConstants#SHOOT_JIGGLE_MIN_DEPLOY_ROTATIONS}, holds position (no motion
-     * toward deployed from stow).
+     * Alternates deploy between full deployed and {@link IntakeConstants#SHOOT_AGITATE_DEPLOY_ROTATIONS} on a timer so
+     * Motion Magic has time to move (tolerance-based flipping was too fast to produce visible motion). When below
+     * {@link IntakeConstants#SHOOT_AGITATE_MIN_DEPLOY_ROTATIONS}, holds position (no motion toward deployed from stow).
      */
-    public Command shootDeployJiggleCommand() {
-        AtomicBoolean towardHigh = new AtomicBoolean(true);
-        return Commands.run(() -> {
+    public Command shootDeployAgitateCommand() {
+        AtomicReference<Double> phaseAnchor = new AtomicReference<>();
+        return run(() -> {
             if (!RobotState.getInstance().isInitialized()) {
                 m_deployMotor.stopMotor();
                 return;
             }
-            if (getDeployPosition() < SHOOT_JIGGLE_MIN_DEPLOY_ROTATIONS) {
+            if (getDeployPosition() < SHOOT_AGITATE_MIN_DEPLOY_ROTATIONS) {
                 m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
                 return;
             }
-            double goal = towardHigh.get() ? DeployPosition.DEPLOYED.value : SHOOT_JIGGLE_DEPLOY_ROTATIONS;
+            double goal = shootAgitateGoalFromElapsed(phaseAnchor);
             m_deployMotor.setControl(m_deployRequest.withPosition(goal));
-            if (Math.abs(getDeployPosition() - goal) < DEPLOY_TOLERANCE) {
-                towardHigh.set(!towardHigh.get());
-            }
             if (m_positionTracker != null) {
                 deployPositionPub.set(m_positionTracker.getIntakeDeployPosition());
             }
-        }, this)
-                .beforeStarting(() -> towardHigh.set(true))
-                .withName("deployableIntake.shootDeployJiggle");
+        })
+                .beforeStarting(() -> phaseAnchor.set(null))
+                .withName("deployableIntake.shootDeployAgitate");
     }
 
     /**
-     * Intake roller forward plus deploy jiggle (replaces voltage hold on deploy). Use when {@link #shootDeployJiggleCommand}
-     * cannot run in parallel with roller (same subsystem), e.g. auto shoot with intake feeding.
+     * Intake roller forward plus deploy agitation (replaces voltage hold on deploy). Use when
+     * {@link #shootDeployAgitateCommand} cannot run in parallel with roller (same subsystem), e.g. auto shoot with
+     * intake feeding.
      */
-    public Command shootDeployJiggleWithIntakeRollCommand() {
-        AtomicBoolean towardHigh = new AtomicBoolean(true);
+    public Command shootDeployAgitateWithIntakeRollCommand() {
+        AtomicReference<Double> phaseAnchor = new AtomicReference<>();
         final double goalVelocity = IntakeSpeed.IN.value;
         return run(() -> {
             m_rollerVelocityCommanded = Math.abs(goalVelocity) >= 0.01;
@@ -447,14 +447,11 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
                 velocityOut.Slot = 0;
                 m_intakeMotor.setControl(velocityOut.withVelocity(goalVelocity));
                 if (Math.abs(goalVelocity) >= 0.01 && isDeployed()) {
-                    if (getDeployPosition() < SHOOT_JIGGLE_MIN_DEPLOY_ROTATIONS) {
+                    if (getDeployPosition() < SHOOT_AGITATE_MIN_DEPLOY_ROTATIONS) {
                         m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
                     } else {
-                        double goal = towardHigh.get() ? DeployPosition.DEPLOYED.value : SHOOT_JIGGLE_DEPLOY_ROTATIONS;
+                        double goal = shootAgitateGoalFromElapsed(phaseAnchor);
                         m_deployMotor.setControl(m_deployRequest.withPosition(goal));
-                        if (Math.abs(getDeployPosition() - goal) < DEPLOY_TOLERANCE) {
-                            towardHigh.set(!towardHigh.get());
-                        }
                     }
                 } else {
                     m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
@@ -468,12 +465,24 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
                 deployPositionPub.set(m_positionTracker.getIntakeDeployPosition());
             }
         })
-                .beforeStarting(() -> towardHigh.set(true))
+                .beforeStarting(() -> phaseAnchor.set(null))
                 .finallyDo(interrupted -> {
                     m_rollerVelocityCommanded = false;
                     m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
                 })
-                .withName("deployableIntake.shootDeployJiggleWithIntakeRoll");
+                .withName("deployableIntake.shootDeployAgitateWithIntakeRoll");
+    }
+
+    /** Picks deployed vs intermediate setpoint from elapsed time; holds each for {@link IntakeConstants#SHOOT_AGITATE_HALF_PERIOD_SEC}. */
+    private double shootAgitateGoalFromElapsed(AtomicReference<Double> phaseAnchor) {
+        double now = Timer.getFPGATimestamp();
+        if (phaseAnchor.get() == null) {
+            phaseAnchor.set(now);
+        }
+        double elapsed = now - phaseAnchor.get();
+        int segment = (int) (elapsed / SHOOT_AGITATE_HALF_PERIOD_SEC);
+        boolean towardDeployed = (segment % 2) == 0;
+        return towardDeployed ? DeployPosition.DEPLOYED.value : SHOOT_AGITATE_DEPLOY_ROTATIONS;
     }
 
     // SysId commands

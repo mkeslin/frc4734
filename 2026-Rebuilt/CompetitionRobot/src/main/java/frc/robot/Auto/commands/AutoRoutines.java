@@ -189,7 +189,7 @@ public class AutoRoutines {
                         () -> intake != null
                                 ? new ParallelCommandGroup(
                                         CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
-                                        intake.shootDeployJiggleCommand())
+                                        intake.shootDeployAgitateCommand())
                                 : CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
                         shootSubsystemSet(shooter, feeder, floor, intake)),
 
@@ -398,7 +398,7 @@ public class AutoRoutines {
                 new DeferredCommand(
                         () -> new ParallelCommandGroup(
                                 CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
-                                intake.shootDeployJiggleCommand()),
+                                intake.shootDeployAgitateCommand()),
                         shootSubsystemSet(shooter, feeder, floor, intake)),
 
                 // ----- Step 10: Raise intake (reset for next run) -----
@@ -486,13 +486,13 @@ public class AutoRoutines {
                                 .finallyDo(interrupted -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 4: Intake deploy finished (interrupted=%b)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), interrupted)))
                         : Commands.none(),
 
-                // ----- Step 5: Shoot (intake rolls + deploy jiggle during shoot; single command avoids intake conflict) -----
+                // ----- Step 5: Shoot (intake rolls + deploy agitate during shoot; single command avoids intake conflict) -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 5: Shoot", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 Commands.deadline(
                         new DeferredCommand(
                                 () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
                                 floor != null ? Set.of(shooter, feeder, floor) : Set.of(shooter, feeder)),
-                        intake != null ? intake.shootDeployJiggleWithIntakeRollCommand() : Commands.none())
+                        intake != null ? intake.shootDeployAgitateWithIntakeRollCommand() : Commands.none())
                         .andThen(intake != null ? intake.resetIntakeSpeedCommand() : Commands.none()),
 
                 // ----- Step 7: Raise intake (reset for next run) -----
