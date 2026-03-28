@@ -66,7 +66,7 @@ public class IntakeConstants {
      * Lower deploy setpoint during shoot agitation (rotations). Between stow and {@link DeployPosition#DEPLOYED};
      * tune on robot for feed assist without losing alignment.
      */
-    public static final double SHOOT_AGITATE_DEPLOY_ROTATIONS = 12.0;
+    public static final double SHOOT_AGITATE_DEPLOY_ROTATIONS = 8.5;
 
     /**
      * Minimum deploy position before shoot agitation is allowed; avoids commanding deploy away from stow while shooting.
