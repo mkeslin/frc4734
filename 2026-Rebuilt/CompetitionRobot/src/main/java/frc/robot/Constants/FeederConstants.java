@@ -13,7 +13,7 @@ public class FeederConstants {
      */
     public static enum FeederSpeed {
         STOPPED(0),
-        FORWARD(150.0),   // Toward shooter; tune for indexing
+        FORWARD(180.0),   // Toward shooter; tune for indexing
         REVERSE(-60.0);  // Unjam / reverse
 
         public final double value;
