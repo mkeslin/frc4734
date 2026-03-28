@@ -1,6 +1,5 @@
 package frc.robot.Commands.teleop;
 
-import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_BACKOFF;
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_DELAY;
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_PULSE_DELAY_SEC;
 import static frc.robot.Constants.CommandConstants.SHOOT_FEEDER_PULSE_ON_SEC;
@@ -94,8 +93,10 @@ public final class TeleopMechanismCommands {
      * @param feeder     Feeder subsystem
      * @param floor      Floor conveyor subsystem
      * @param drivetrain Drivetrain for pose-based distance (required when dynamic)
+     * @param intake     Optional; when non-null, deploy jiggles during shoot to help feed
      */
-    public static Command shoot(Shooter shooter, Feeder feeder, Floor floor, CommandSwerveDrivetrain drivetrain) {
+    public static Command shoot(Shooter shooter, Feeder feeder, Floor floor, CommandSwerveDrivetrain drivetrain,
+            DeployableIntake intake) {
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
         // Command backoff = feeder
         //         .moveToArbitrarySpeedCommand(() -> FeederSpeed.REVERSE.value)
@@ -114,7 +115,8 @@ public final class TeleopMechanismCommands {
                 shooter.moveToArbitrarySpeedCommand(shooterSpeedSupplier),
                 Commands.waitSeconds(SHOOT_FEEDER_DELAY).andThen(feederPulsed),
                 Commands.waitSeconds(SHOOT_FLOOR_DELAY)
-                        .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)));
+                        .andThen(floor.moveToArbitrarySpeedCommand(() -> ConveyorSpeed.FORWARD.value)),
+                intake != null ? intake.shootDeployJiggleCommand() : Commands.none());
         return Commands.sequence(/*backoff,*/ shootPhase)
                 .finallyDo(interrupted -> {
                     shooter.resetSpeed();

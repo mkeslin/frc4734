@@ -62,6 +62,17 @@ public class IntakeConstants {
     // Safety: minimum deploy position to allow intake operation (rotations)
     public static final double MIN_DEPLOY_POSITION_FOR_INTAKE = 0.5;
 
+    /**
+     * Lower deploy setpoint during shoot jiggle (rotations). Between stow and {@link DeployPosition#DEPLOYED};
+     * tune on robot for agitation without losing alignment.
+     */
+    public static final double SHOOT_JIGGLE_DEPLOY_ROTATIONS = 15.0;
+
+    /**
+     * Minimum deploy position before shoot jiggle is allowed; avoids commanding deploy away from stow while shooting.
+     */
+    public static final double SHOOT_JIGGLE_MIN_DEPLOY_ROTATIONS = MIN_DEPLOY_POSITION_FOR_INTAKE;
+
     /** When intake roller is running, deploy motor gets this forward voltage to keep pressure and hold intake in place (volts). */
     public static final double INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE = 0.5;
 

@@ -1,5 +1,6 @@
 package frc.robot.Controllers;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -125,11 +126,18 @@ public class ControllerBindingFactory {
                             Set.<Subsystem>of(m_intake, m_floor, m_feeder)));
         }
         if (m_shooter != null && m_feeder != null && m_floor != null) {
+            HashSet<Subsystem> shootSubsystems = new HashSet<>();
+            shootSubsystems.add(m_shooter);
+            shootSubsystems.add(m_feeder);
+            shootSubsystems.add(m_floor);
+            if (m_intake != null) {
+                shootSubsystems.add(m_intake);
+            }
             c.rightTrigger()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
                     .whileTrue(Commands.defer(
-                            () -> TeleopMechanismCommands.shoot(m_shooter, m_feeder, m_floor, m_drivetrain),
-                            Set.<Subsystem>of(m_shooter, m_feeder, m_floor)));
+                            () -> TeleopMechanismCommands.shoot(m_shooter, m_feeder, m_floor, m_drivetrain, m_intake),
+                            shootSubsystems));
             c.rightBumper()
                     .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
                     .whileTrue(Commands.defer(

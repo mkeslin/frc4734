@@ -1,5 +1,6 @@
 package frc.robot.Auto.commands;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -10,6 +11,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.IntakeConstants.DeployPosition;
 import frc.robot.Subsystems.Climber;
 import frc.robot.Subsystems.DeployableIntake;
@@ -47,6 +50,19 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 public class AutoRoutines {
     private AutoRoutines() {
         // Utility class - prevent instantiation
+    }
+
+    private static Set<Subsystem> shootSubsystemSet(Shooter shooter, Feeder feeder, Floor floor, DeployableIntake intake) {
+        HashSet<Subsystem> set = new HashSet<>();
+        set.add(shooter);
+        set.add(feeder);
+        if (floor != null) {
+            set.add(floor);
+        }
+        if (intake != null) {
+            set.add(intake);
+        }
+        return set;
     }
 
     /**
@@ -170,8 +186,12 @@ public class AutoRoutines {
                 // ----- Step 7: Shoot preload -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 7: Shoot")),
                 new DeferredCommand(
-                        () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
-                        floor != null ? Set.of(shooter, feeder, floor) : Set.of(shooter, feeder)),
+                        () -> intake != null
+                                ? new ParallelCommandGroup(
+                                        CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
+                                        intake.shootDeployJiggleCommand())
+                                : CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
+                        shootSubsystemSet(shooter, feeder, floor, intake)),
 
                 // ----- Step 8: Drive to tower align -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 8: Drive to tower")),
@@ -376,8 +396,10 @@ public class AutoRoutines {
                 // ----- Step 9: Shoot second load -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 9: Shoot second load (duration=%.1fs)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), shootDurationSupplier.get()))),
                 new DeferredCommand(
-                        () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
-                        Set.of(shooter, feeder, floor)),
+                        () -> new ParallelCommandGroup(
+                                CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
+                                intake.shootDeployJiggleCommand()),
+                        shootSubsystemSet(shooter, feeder, floor, intake)),
 
                 // ----- Step 10: Raise intake (reset for next run) -----
                 // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 10: Raise intake")),
@@ -464,13 +486,13 @@ public class AutoRoutines {
                                 .finallyDo(interrupted -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 4: Intake deploy finished (interrupted=%b)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), interrupted)))
                         : Commands.none(),
 
-                // ----- Step 5: Shoot (intake runs during shoot; stops when shoot completes) -----
+                // ----- Step 5: Shoot (intake rolls + deploy jiggle during shoot; single command avoids intake conflict) -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 5: Shoot", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 Commands.deadline(
                         new DeferredCommand(
                                 () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
                                 floor != null ? Set.of(shooter, feeder, floor) : Set.of(shooter, feeder)),
-                        intake != null ? CmdIntakeOn.create(intake) : Commands.none())
+                        intake != null ? intake.shootDeployJiggleWithIntakeRollCommand() : Commands.none())
                         .andThen(intake != null ? intake.resetIntakeSpeedCommand() : Commands.none()),
 
                 // ----- Step 7: Raise intake (reset for next run) -----

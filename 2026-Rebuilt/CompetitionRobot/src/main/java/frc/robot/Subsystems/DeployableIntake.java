@@ -13,6 +13,8 @@ import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_CRUISE_VELOCITY;
 import static frc.robot.Constants.IntakeConstants.INTAKE_ROLLER_RUNNING_SPEED_THRESHOLD_RPS;
 import static frc.robot.Constants.IntakeConstants.INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_JERK;
+import static frc.robot.Constants.IntakeConstants.SHOOT_JIGGLE_DEPLOY_ROTATIONS;
+import static frc.robot.Constants.IntakeConstants.SHOOT_JIGGLE_MIN_DEPLOY_ROTATIONS;
 import static frc.robot.Constants.IntakeConstants.kA;
 import static frc.robot.Constants.IntakeConstants.kD;
 import static frc.robot.Constants.IntakeConstants.kG;
@@ -22,6 +24,7 @@ import static frc.robot.Constants.IntakeConstants.kS;
 import static frc.robot.Constants.IntakeConstants.kV;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -394,6 +397,83 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
                 })
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                 .withName("deployableIntake.coastMotorsCommand");
+    }
+
+    /**
+     * Oscillates deploy between full deployed and {@link IntakeConstants#SHOOT_JIGGLE_DEPLOY_ROTATIONS} while
+     * scheduled. When below {@link IntakeConstants#SHOOT_JIGGLE_MIN_DEPLOY_ROTATIONS}, holds position (no motion
+     * toward deployed from stow).
+     */
+    public Command shootDeployJiggleCommand() {
+        AtomicBoolean towardHigh = new AtomicBoolean(true);
+        return Commands.run(() -> {
+            if (!RobotState.getInstance().isInitialized()) {
+                m_deployMotor.stopMotor();
+                return;
+            }
+            if (getDeployPosition() < SHOOT_JIGGLE_MIN_DEPLOY_ROTATIONS) {
+                m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+                return;
+            }
+            double goal = towardHigh.get() ? DeployPosition.DEPLOYED.value : SHOOT_JIGGLE_DEPLOY_ROTATIONS;
+            m_deployMotor.setControl(m_deployRequest.withPosition(goal));
+            if (Math.abs(getDeployPosition() - goal) < DEPLOY_TOLERANCE) {
+                towardHigh.set(!towardHigh.get());
+            }
+            if (m_positionTracker != null) {
+                deployPositionPub.set(m_positionTracker.getIntakeDeployPosition());
+            }
+        }, this)
+                .beforeStarting(() -> towardHigh.set(true))
+                .withName("deployableIntake.shootDeployJiggle");
+    }
+
+    /**
+     * Intake roller forward plus deploy jiggle (replaces voltage hold on deploy). Use when {@link #shootDeployJiggleCommand}
+     * cannot run in parallel with roller (same subsystem), e.g. auto shoot with intake feeding.
+     */
+    public Command shootDeployJiggleWithIntakeRollCommand() {
+        AtomicBoolean towardHigh = new AtomicBoolean(true);
+        final double goalVelocity = IntakeSpeed.IN.value;
+        return run(() -> {
+            m_rollerVelocityCommanded = Math.abs(goalVelocity) >= 0.01;
+            if (!RobotState.getInstance().isInitialized()) {
+                m_intakeMotor.stopMotor();
+                m_deployMotor.stopMotor();
+                return;
+            }
+            if (isDeployed() || Math.abs(goalVelocity) < 0.01) {
+                VelocityVoltage velocityOut = new VelocityVoltage(0);
+                velocityOut.Slot = 0;
+                m_intakeMotor.setControl(velocityOut.withVelocity(goalVelocity));
+                if (Math.abs(goalVelocity) >= 0.01 && isDeployed()) {
+                    if (getDeployPosition() < SHOOT_JIGGLE_MIN_DEPLOY_ROTATIONS) {
+                        m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+                    } else {
+                        double goal = towardHigh.get() ? DeployPosition.DEPLOYED.value : SHOOT_JIGGLE_DEPLOY_ROTATIONS;
+                        m_deployMotor.setControl(m_deployRequest.withPosition(goal));
+                        if (Math.abs(getDeployPosition() - goal) < DEPLOY_TOLERANCE) {
+                            towardHigh.set(!towardHigh.get());
+                        }
+                    }
+                } else {
+                    m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+                }
+            } else {
+                m_intakeMotor.stopMotor();
+                m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+            }
+            if (m_positionTracker != null) {
+                intakeSpeedPub.set(m_positionTracker.getIntakeSpeed());
+                deployPositionPub.set(m_positionTracker.getIntakeDeployPosition());
+            }
+        })
+                .beforeStarting(() -> towardHigh.set(true))
+                .finallyDo(interrupted -> {
+                    m_rollerVelocityCommanded = false;
+                    m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+                })
+                .withName("deployableIntake.shootDeployJiggleWithIntakeRoll");
     }
 
     // SysId commands
