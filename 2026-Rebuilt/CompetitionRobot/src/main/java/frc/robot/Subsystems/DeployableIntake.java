@@ -10,6 +10,7 @@ import static frc.robot.Constants.IntakeConstants.DEPLOY_TOLERANCE;
 import static frc.robot.Constants.IntakeConstants.MIN_DEPLOY_POSITION_FOR_INTAKE;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_ACCELERATION;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_CRUISE_VELOCITY;
+import static frc.robot.Constants.IntakeConstants.INTAKE_DEPLOY_IDLE_HOLD_VOLTAGE;
 import static frc.robot.Constants.IntakeConstants.INTAKE_ROLLER_RUNNING_SPEED_THRESHOLD_RPS;
 import static frc.robot.Constants.IntakeConstants.INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_JERK;
@@ -187,11 +188,15 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
         resetDeployPosition();
         resetIntakeSpeed();
 
-        // Hold deploy position when no other command requires intake; prevents slam to stale setpoint on enable
+        // When stowed: Motion Magic hold at current position. When deployed + idle: constant deploy voltage (no position loop) to avoid bounce.
         setDefaultCommand(
                 run(() -> {
                     if (RobotState.getInstance().isInitialized()) {
-                        m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+                        if (isDeployed()) {
+                            m_deployMotor.setControl(m_deployVoltReq.withOutput(INTAKE_DEPLOY_IDLE_HOLD_VOLTAGE));
+                        } else {
+                            m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+                        }
                     }
                 })
                         .ignoringDisable(true)
