@@ -98,10 +98,10 @@ public class ControllerBindingFactory {
                 .onTrue(Commands.runOnce(TeleopMechanismCommands::setDynamicShooterSpeed));
         m_mechanismController.x()
                 .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
-                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(115)));
+                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(127)));
         m_mechanismController.a()
                 .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
-                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(127)));
+                .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(131)));
         m_mechanismController.b()
                 .and(() -> SwerveDrivetrainBindings.getMechanismMode() == MechanismMode.TELEOP)
                 .onTrue(Commands.runOnce(() -> TeleopMechanismCommands.setFixedShooterSpeed(135)));
