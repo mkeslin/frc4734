@@ -74,6 +74,7 @@ public class RobotContainer {
         new ControllerBindingFactory(
                 m_driveController,
                 m_mechanismController,
+                m_arcadeController,
                 m_drivetrain,
                 m_subsystemFactory.getShooter(),
                 m_subsystemFactory.getFeeder(),
