@@ -26,8 +26,8 @@ public class IntakeConstants {
      */
     public static enum IntakeSpeed {
         STOPPED(0),
-        IN(200.0),    // Intake; tune as needed
-        OUT(-60.0);  // Outtake / reverse
+        IN(300.0),    // Intake; tune on robot with drive throttle + current limits
+        OUT(-80.0);  // Outtake / reverse
 
         public final double value;
 
@@ -35,6 +35,12 @@ public class IntakeConstants {
             this.value = value;
         }
     }
+
+    /**
+     * Minimum |roller speed| (rotations per second) to count as running for drive throttle when the
+     * closed-loop command is not active (coast-down, or voltage modes). Tune above sensor noise.
+     */
+    public static final double INTAKE_ROLLER_RUNNING_SPEED_THRESHOLD_RPS = 20.0;
 
     // Deploy motor constants (similar to ArmConstants)
     public static final double DEPLOY_TOLERANCE = 0.1; // Tolerance for checking if deployed (rotations)
@@ -63,8 +69,8 @@ public class IntakeConstants {
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
     /** Intake roller: supply and stator limits (amps). */
-    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 25;
-    public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 60;
+    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 30;
+    public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 80;
     /** Intake deploy: supply and stator limits (amps). */
     public static final double INTAKE_DEPLOY_SUPPLY_CURRENT_LIMIT_AMPS = 15;
     public static final double INTAKE_DEPLOY_STATOR_CURRENT_LIMIT_AMPS = 30;

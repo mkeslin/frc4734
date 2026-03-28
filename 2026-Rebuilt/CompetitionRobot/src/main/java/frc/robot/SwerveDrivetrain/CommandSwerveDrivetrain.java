@@ -35,9 +35,12 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Logging.RobotLogger;
+import frc.robot.Subsystems.DeployableIntake;
 import frc.robot.SwerveDrivetrain.SwerveDrivetrainA.TunerSwerveDrivetrain;
 
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+
+    private DeployableIntake m_intakeForThrottle;
 
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
@@ -240,6 +243,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
+    /**
+     * Enables PathPlanner / chassis-speed translation throttle while the intake roller is commanded.
+     * Call from RobotContainer after subsystems exist.
+     */
+    public void registerIntakeDriveThrottle(DeployableIntake intake) {
+        m_intakeForThrottle = intake;
+    }
+
+    private ChassisSpeeds applyIntakeTranslationThrottleToChassisSpeeds(ChassisSpeeds speeds) {
+        if (m_intakeForThrottle == null) {
+            return speeds;
+        }
+        if (!IntakeDriveThrottle.shouldThrottleDriveTranslation(m_intakeForThrottle)) {
+            return speeds;
+        }
+        double m = DrivetrainConstants.kIntakeDriveTranslationMultiplier;
+        return new ChassisSpeeds(
+                speeds.vxMetersPerSecond * m,
+                speeds.vyMetersPerSecond * m,
+                speeds.omegaRadiansPerSecond);
+    }
+
     private void configureAutoBuilder() {
         try {
             // 2026 Rebuilt field is rotationally symmetrical; FlippingUtil must use kRotational
@@ -272,7 +297,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     () -> getState().Speeds, // Supplier of current robot speeds
                     // Consumer of ChassisSpeeds and feedforwards to drive the robot
                     (speeds, feedforwards) -> setControl(
-                            m_pathApplyRobotSpeeds.withSpeeds(speeds)
+                            m_pathApplyRobotSpeeds.withSpeeds(applyIntakeTranslationThrottleToChassisSpeeds(speeds))
                                     .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                                     .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
                     new PPHolonomicDriveController(
@@ -508,14 +533,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public void setRelativeSpeed(double x, double y, double rot) {
         var chassisSpeeds = new ChassisSpeeds(x, y, rot);
-        this.setControl(m_autoRequest.withSpeeds(chassisSpeeds));
+        this.setControl(m_autoRequest.withSpeeds(applyIntakeTranslationThrottleToChassisSpeeds(chassisSpeeds)));
     }
 
     /**
      * Applies robot-relative chassis speeds (for use by auto commands, e.g. simple drive-to-pose fallback).
      */
     public void applyChassisSpeeds(ChassisSpeeds robotRelativeSpeeds) {
-        this.setControl(m_autoRequest.withSpeeds(robotRelativeSpeeds));
+        this.setControl(m_autoRequest.withSpeeds(applyIntakeTranslationThrottleToChassisSpeeds(robotRelativeSpeeds)));
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

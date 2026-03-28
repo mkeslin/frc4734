@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.ControllerBindingConstants;
+import frc.robot.Subsystems.DeployableIntake;
 
 /**
  * Configures controller bindings for the swerve drivetrain.
@@ -46,9 +47,6 @@ public class SwerveDrivetrainBindings {
 
     private static InputProfile currentProfile = InputProfile.TELEOP;
     private static MechanismMode currentMechanismMode = MechanismMode.TELEOP;
-
-    private static double CurrentSpeed = DrivetrainConstants.MaxSpeed;
-    private static double CurrentAngularRate = DrivetrainConstants.MaxAngularRate; // This will be updated when turtle and reset to MaxAngularRate
 
     // Rate limiters applied to normalized joystick inputs (-1..1) before scaling to physical units
     // These values are in 1/s (per second) and are applied to the joystick command inputs
@@ -127,7 +125,10 @@ public class SwerveDrivetrainBindings {
      * Configures normal driving bindings.
      * This is the default profile for teleop operation.
      */
-    private static void configureNormalBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
+    private static void configureNormalBindings(
+            CommandXboxController driveController,
+            DeployableIntake intake,
+            CommandSwerveDrivetrain drivetrain) {
         // Drivetrain will execute this command periodically
 
         // https://github.com/Operation-P-E-A-C-C-E-Robotics/frc-2025/blob/main/src/main/java/frc/robot/commands/drivetrain/PeaccyTuner.java
@@ -155,11 +156,23 @@ public class SwerveDrivetrainBindings {
                     var xLimited = RateLimiterX.calculate(xWithDeadband);
                     var yLimited = RateLimiterY.calculate(yWithDeadband);
                     var rotationLimited = RotationLimiter.calculate(rotationWithDeadband);
+
+                    double translationScale = 1.0;
+                    if (driveController.leftBumper().getAsBoolean()) {
+                        translationScale = Math.min(translationScale, DrivetrainConstants.kTurtleSpeedMultiplier);
+                    }
+                    if (IntakeDriveThrottle.shouldThrottleDriveTranslation(intake)) {
+                        translationScale = Math.min(translationScale, DrivetrainConstants.kIntakeDriveTranslationMultiplier);
+                    }
+                    double effectiveMaxSpeed = DrivetrainConstants.MaxSpeed * translationScale;
+                    double effectiveAngularRate = driveController.leftBumper().getAsBoolean()
+                            ? DrivetrainConstants.kTurtleAngularRate
+                            : DrivetrainConstants.MaxAngularRate;
                     
                     // Scale rate-limited joystick inputs to physical units (m/s and rad/s)
-                    var velocityX = coordinateOrientation * xLimited * CurrentSpeed;
-                    var velocityY = coordinateOrientation * yLimited * CurrentSpeed;
-                    var rotationalRate = rotationLimited * CurrentAngularRate;
+                    var velocityX = coordinateOrientation * xLimited * effectiveMaxSpeed;
+                    var velocityY = coordinateOrientation * yLimited * effectiveMaxSpeed;
+                    var rotationalRate = rotationLimited * effectiveAngularRate;
                     
                     // Safety clamping to ensure velocities don't exceed maximums
                     // This provides a safety layer in case of calculation errors
@@ -212,15 +225,7 @@ public class SwerveDrivetrainBindings {
                 .and(() -> currentProfile == InputProfile.TELEOP)
                 .onTrue(Commands.runOnce(() -> m_facingHub.resetProfile(drivetrain.getPose().getRotation())));
 
-        // Turtle Mode while held
-        driveController.leftBumper().onTrue(Commands.runOnce(() -> {
-            CurrentSpeed = DrivetrainConstants.MaxSpeed * DrivetrainConstants.kTurtleSpeedMultiplier;
-            CurrentAngularRate = DrivetrainConstants.kTurtleAngularRate;
-        }));
-        driveController.leftBumper().onFalse(Commands.runOnce(() -> {
-            CurrentSpeed = DrivetrainConstants.MaxSpeed;
-            CurrentAngularRate = DrivetrainConstants.MaxAngularRate;
-        }));
+        // Turtle mode: translation + angular caps applied each frame from drive left bumper (see default command)
 
         // test path
         // driveController
@@ -310,10 +315,14 @@ public class SwerveDrivetrainBindings {
      * Sets up both normal driving and SysId bindings.
      * 
      * @param driveController The drive controller
+     * @param intake Deployable intake (roller-commanded throttle); may be null
      * @param drivetrain The swerve drivetrain
      */
-    public static void configureBindings(CommandXboxController driveController, CommandSwerveDrivetrain drivetrain) {
-        configureNormalBindings(driveController, drivetrain);
+    public static void configureBindings(
+            CommandXboxController driveController,
+            DeployableIntake intake,
+            CommandSwerveDrivetrain drivetrain) {
+        configureNormalBindings(driveController, intake, drivetrain);
         configureSysIdBindings(driveController, drivetrain);
 
         // Initial profile from constants; when switching is disabled this is the only profile

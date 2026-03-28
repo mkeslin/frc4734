@@ -10,6 +10,7 @@ import static frc.robot.Constants.IntakeConstants.DEPLOY_TOLERANCE;
 import static frc.robot.Constants.IntakeConstants.MIN_DEPLOY_POSITION_FOR_INTAKE;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_ACCELERATION;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_CRUISE_VELOCITY;
+import static frc.robot.Constants.IntakeConstants.INTAKE_ROLLER_RUNNING_SPEED_THRESHOLD_RPS;
 import static frc.robot.Constants.IntakeConstants.INTAKE_RUNNING_DEPLOY_HOLD_VOLTAGE;
 import static frc.robot.Constants.IntakeConstants.MOTION_MAGIC_JERK;
 import static frc.robot.Constants.IntakeConstants.kA;
@@ -88,6 +89,9 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
     private MotionMagicVoltage m_deployRequest = new MotionMagicVoltage(0);
 
     private boolean initialized;
+
+    /** True while a velocity-intake command is running with non-zero goal (drive throttle when intake is commanded). */
+    private boolean m_rollerVelocityCommanded;
 
     public DeployableIntake() {
         // SysId routine for deploy motor
@@ -288,11 +292,31 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
 
     @Override
     public void resetIntakeSpeed() {
+        m_rollerVelocityCommanded = false;
         m_intakeMotor.stopMotor();
+    }
+
+    /**
+     * Whether a roller velocity command is actively requesting non-zero speed (internal / telemetry).
+     */
+    public boolean isRollerVelocityCommanded() {
+        return m_rollerVelocityCommanded;
+    }
+
+    /**
+     * Whether to limit swerve translation: commanded non-zero roller setpoint, or roller is measurably spinning.
+     * Hybrid avoids delaying throttle at spin-up (command) while still catching coast-down and non-velocity modes.
+     */
+    public boolean isRollerRunningForDriveThrottle() {
+        if (m_rollerVelocityCommanded) {
+            return true;
+        }
+        return Math.abs(getIntakeSpeed()) >= INTAKE_ROLLER_RUNNING_SPEED_THRESHOLD_RPS;
     }
 
     private Command moveToIntakeSpeedCommand(double goalVelocity) {
         return run(() -> {
+            m_rollerVelocityCommanded = Math.abs(goalVelocity) >= 0.01;
             // Safety check: prevent movement until robot is initialized
             if (RobotState.getInstance().isInitialized()) {
                 // Check if deployed before allowing intake
@@ -318,7 +342,10 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
                 intakeSpeedPub.set(m_positionTracker.getIntakeSpeed());
             }
         })
-                .finallyDo(interrupted -> m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition())))
+                .finallyDo(interrupted -> {
+                    m_rollerVelocityCommanded = false;
+                    m_deployMotor.setControl(m_deployRequest.withPosition(getDeployPosition()));
+                })
                 .withName("deployableIntake.moveToIntakeSpeed");
     }
 
@@ -357,6 +384,7 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
     @Override
     public Command coastMotorsCommand() {
         return runOnce(() -> {
+            m_rollerVelocityCommanded = false;
             m_deployMotor.stopMotor();
             m_intakeMotor.stopMotor();
         })
@@ -397,6 +425,7 @@ public class DeployableIntake extends SubsystemBase implements BaseDeployableInt
         if (m_intakeMotor != null) {
             m_intakeMotor.stopMotor();
         }
+        m_rollerVelocityCommanded = false;
         if (deployPositionPub != null) {
             deployPositionPub.close();
         }

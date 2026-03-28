@@ -34,6 +34,9 @@ public class DrivetrainConstants {
     public static final double kTurtleSpeedMultiplier = 0.15; // Speed multiplier for turtle mode (15% of max speed)
     public static final double kTurtleAngularRate = Math.PI * 0.5; // Max angular velocity for turtle mode (rad/s)
 
+    /** Translation-only multiplier while intake is active (teleop buttons or auto roller commanded). */
+    public static final double kIntakeDriveTranslationMultiplier = 0.7;
+
     // PathPlanner PID constants
     // These control how aggressively the robot follows paths
     // Translation: controls X and Y position error correction

@@ -67,8 +67,11 @@ public class RobotContainer {
         // Create subsystem factory (creates all subsystems, PositionTracker, StateMachine, RobotContext)
         m_subsystemFactory = new SubsystemFactory(m_drivetrain);
 
+        m_drivetrain.registerIntakeDriveThrottle(m_subsystemFactory.getDeployableIntake());
+
         // Configure bindings for swerve drivetrain (drive default command, SysId, profile cycle per constants)
-        SwerveDrivetrainBindings.configureBindings(m_driveController, m_drivetrain);
+        SwerveDrivetrainBindings.configureBindings(
+                m_driveController, m_subsystemFactory.getDeployableIntake(), m_drivetrain);
 
         // Drive tuning path + mechanism bindings (Mechanism Mode and Tuning Mode) via factory
         new ControllerBindingFactory(
