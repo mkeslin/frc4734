@@ -379,7 +379,7 @@ public class AutoRoutines {
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 7: Drive through center (intake on)",
                         edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 Commands.deadline(
-                        new CmdFollowPath(pathToCenter, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain,
+                        new CmdFollowPath(pathToCenter, AutoConstants.AUTO_PATH_THROUGH_CENTER_TIMEOUT_SEC, drivetrain,
                                 AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS,
                                 AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2),
                         CmdIntakeOn.create(intake))
@@ -388,7 +388,7 @@ public class AutoRoutines {
                 // ----- Step 8: Drive back to shot (spin up shooter; slow for testing) -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 8: Drive back to shot (spin up)", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
                 Commands.deadline(
-                        new CmdFollowPath(pathBackToShot, AutoConstants.DEFAULT_PATH_TIMEOUT, drivetrain,
+                        new CmdFollowPath(pathBackToShot, AutoConstants.AUTO_PATH_THROUGH_CENTER_TIMEOUT_SEC, drivetrain,
                                 AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS,
                                 AutoConstants.AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2),
                         new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),

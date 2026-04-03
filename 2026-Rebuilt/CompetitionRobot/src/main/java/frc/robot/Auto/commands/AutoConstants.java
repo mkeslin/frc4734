@@ -21,10 +21,13 @@ public final class AutoConstants {
     public static final double AUTO_PATH_MAX_VELOCITY_MPS = 3.0;
     /** TEMPORARY: max acceleration (m/s²) for auto path following. Use lower value for testing; revert to 3.0 for competition. */
     public static final double AUTO_PATH_MAX_ACCELERATION_MPS2 = 2.0;
-    /** TEMPORARY: max velocity (m/s) for drive-through-center paths. Use same as main paths for reliability. */
-    public static final double AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS = AUTO_PATH_MAX_VELOCITY_MPS / 4;
-    /** TEMPORARY: max acceleration (m/s²) for drive-through-center paths. Use same as main paths for reliability. */
-    public static final double AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2 = AUTO_PATH_MAX_ACCELERATION_MPS2 / 2;
+    /**
+     * Max velocity (m/s) for ShooterAuto ThroughCenter / ThroughCenterReturn. Path files unchanged; this only
+     * caps swerve speed (~⅓ of the prior /4 and /2 limits for slower, more controlled center runs).
+     */
+    public static final double AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS = AUTO_PATH_MAX_VELOCITY_MPS / 12;
+    /** Scaled with {@link #AUTO_PATH_THROUGH_CENTER_MAX_VELOCITY_MPS} so the profile stays consistent at low speed. */
+    public static final double AUTO_PATH_THROUGH_CENTER_MAX_ACCELERATION_MPS2 = AUTO_PATH_MAX_ACCELERATION_MPS2 / 6;
     /** Max velocity (m/s) for ShooterAuto Center path to shot. Slower than main paths for precision. */
     public static final double AUTO_PATH_CENTER_TO_SHOT_MAX_VELOCITY_MPS = 1.0;
     /** Max acceleration (m/s²) for ShooterAuto Center path to shot. Scaled with velocity (ratio ~1.5:1). */
@@ -32,6 +35,8 @@ public final class AutoConstants {
 
     // Default timeouts (seconds)
     public static final double DEFAULT_PATH_TIMEOUT = 10.0;
+    /** Through-center legs use low max speed; allow ~3× default time so the path can finish. */
+    public static final double AUTO_PATH_THROUGH_CENTER_TIMEOUT_SEC = DEFAULT_PATH_TIMEOUT * 3;
     public static final double DEFAULT_POSE_TIMEOUT = 5.0;
     public static final double DEFAULT_HEADING_TIMEOUT = 3.0;
     public static final double DEFAULT_SHOOTER_SPINUP_TIMEOUT = 3.0;
