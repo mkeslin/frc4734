@@ -189,7 +189,7 @@ public class AutoRoutines {
                         () -> intake != null
                                 ? new ParallelCommandGroup(
                                         CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
-                                        intake.shootDeployAgitateCommand())
+                                        intake.shootDeployAgitateWithIntakeRollCommand())
                                 : CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
                         shootSubsystemSet(shooter, feeder, floor, intake)),
 
@@ -372,8 +372,10 @@ public class AutoRoutines {
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 6: Shoot (duration=%.1fs)",
                         edu.wpi.first.wpilibj.Timer.getFPGATimestamp(), shootDurationSupplier.get()))),
                 new DeferredCommand(
-                        () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
-                        Set.of(shooter, feeder, floor)),
+                        () -> new ParallelCommandGroup(
+                                CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
+                                intake.shootDeployAgitateWithIntakeRollCommand()),
+                        shootSubsystemSet(shooter, feeder, floor, intake)),
 
                 // ----- Step 7: Drive through center (intake on) -----
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 7: Drive through center (intake on)",
@@ -398,7 +400,7 @@ public class AutoRoutines {
                 new DeferredCommand(
                         () -> new ParallelCommandGroup(
                                 CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
-                                intake.shootDeployAgitateCommand()),
+                                intake.shootDeployAgitateWithIntakeRollCommand()),
                         shootSubsystemSet(shooter, feeder, floor, intake)),
 
                 // ----- Step 10: Raise intake (reset for next run) -----
