@@ -26,7 +26,7 @@ public class IntakeConstants {
      */
     public static enum IntakeSpeed {
         STOPPED(0),
-        IN(350.0),    // Intake; tune on robot with drive throttle + current limits
+        IN(380.0),    // Intake; tune on robot with drive throttle + current limits
         OUT(-80.0);  // Outtake / reverse
 
         public final double value;
@@ -66,7 +66,7 @@ public class IntakeConstants {
      * Lower deploy setpoint during shoot agitation (rotations). Between stow and {@link DeployPosition#DEPLOYED};
      * tune on robot for feed assist without losing alignment.
      */
-    public static final double SHOOT_AGITATE_DEPLOY_ROTATIONS = 4.5;
+    public static final double SHOOT_AGITATE_DEPLOY_ROTATIONS = 10.0;
 
     /**
      * Minimum deploy position before shoot agitation is allowed; avoids commanding deploy away from stow while shooting.
@@ -93,8 +93,8 @@ public class IntakeConstants {
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
     /** Intake roller: supply and stator limits (amps). */
-    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 40;
-    public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 80;
+    public static final double INTAKE_ROLLER_SUPPLY_CURRENT_LIMIT_AMPS = 50;
+    public static final double INTAKE_ROLLER_STATOR_CURRENT_LIMIT_AMPS = 90;
     /** Intake deploy: supply and stator limits (amps). */
     public static final double INTAKE_DEPLOY_SUPPLY_CURRENT_LIMIT_AMPS = 15;
     public static final double INTAKE_DEPLOY_STATOR_CURRENT_LIMIT_AMPS = 30;

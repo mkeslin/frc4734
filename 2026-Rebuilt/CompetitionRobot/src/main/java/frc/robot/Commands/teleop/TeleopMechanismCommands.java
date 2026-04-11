@@ -122,6 +122,7 @@ public final class TeleopMechanismCommands {
                     shooter.resetSpeed();
                     feeder.resetSpeed();
                     floor.resetSpeed();
+                    intake.resetIntakeSpeed();
                 })
                 .withName("TeleopMechanismCommands.shoot");
     }
