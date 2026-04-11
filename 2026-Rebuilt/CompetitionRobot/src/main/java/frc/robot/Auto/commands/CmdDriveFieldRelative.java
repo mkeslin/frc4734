@@ -76,7 +76,7 @@ public class CmdDriveFieldRelative extends Command {
      * {@link #forDistance} with dy=0 so duration and velocity are not tied to a combined hypot path.
      */
     public static Command forDistanceXOnly(
-            CommandSwerveDrivetrain drivetrain, double distanceXBlue, double speedMps) {
+            CommandSwerveDrivetrain drivetrain, double distanceXBlue, double speedMps, double timeout) {
         if (Math.abs(speedMps) < 0.01) {
             return Commands.none();
         }
@@ -84,7 +84,7 @@ public class CmdDriveFieldRelative extends Command {
         if (dist < 1e-4) {
             return Commands.none();
         }
-        double duration = dist / Math.abs(speedMps);
+        double duration = (timeout == 0) ? dist / Math.abs(speedMps) : timeout;
         double vx = Math.copySign(Math.abs(speedMps), distanceXBlue);
         return new CmdDriveFieldRelative(drivetrain, vx, 0.0, duration);
     }
@@ -93,7 +93,7 @@ public class CmdDriveFieldRelative extends Command {
      * Field-relative move along blue Y only (vx = 0 for the whole command).
      */
     public static Command forDistanceYOnly(
-            CommandSwerveDrivetrain drivetrain, double distanceYBlue, double speedMps) {
+            CommandSwerveDrivetrain drivetrain, double distanceYBlue, double speedMps, double timeout) {
         if (Math.abs(speedMps) < 0.01) {
             return Commands.none();
         }
@@ -101,7 +101,7 @@ public class CmdDriveFieldRelative extends Command {
         if (dist < 1e-4) {
             return Commands.none();
         }
-        double duration = dist / Math.abs(speedMps);
+        double duration = (timeout == 0) ? dist / Math.abs(speedMps) : timeout;
         double vy = Math.copySign(Math.abs(speedMps), distanceYBlue);
         return new CmdDriveFieldRelative(drivetrain, 0.0, vy, duration);
     }

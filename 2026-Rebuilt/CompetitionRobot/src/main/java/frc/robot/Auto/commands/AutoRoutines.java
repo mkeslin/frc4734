@@ -233,12 +233,12 @@ public class AutoRoutines {
                         CmdDriveFieldRelative.forDistanceYOnly(
                                 drivetrain,
                                 AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y,
-                                0.35),
+                                0.35, 4),
                         Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 13b: Nudge X")),
                         CmdDriveFieldRelative.forDistanceXOnly(
                                 drivetrain,
                                 AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_X,
-                                0.35))
+                                0.35, 1.5))
                         .withName("ClimberAuto Step13 nudge Y then X"),
 
                 // ----- Step 14: Stow intake (before retract — avoids clash with extended climber) -----
@@ -668,12 +668,12 @@ public class AutoRoutines {
                         CmdDriveFieldRelative.forDistanceYOnly(
                                 drivetrain,
                                 AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y,
-                                0.25),
+                                0.25, 0),
                         Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 8b: Nudge X")),
                         CmdDriveFieldRelative.forDistanceXOnly(
                                 drivetrain,
                                 AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_X,
-                                0.25))
+                                0.25, 0))
                         .withName("TestClimb Step8 nudge Y then X"),
 
                 // ----- Step 9: Stow intake before climb retract -----
