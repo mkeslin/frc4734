@@ -47,9 +47,9 @@ public class BlueLandmarks {
      * Tower align pose for climb, offset 2 ft toward field center from the bar.
      * Robot extends climber here, then drives 2 ft toward the bar and retracts.
      */
-    public static final Pose2d TowerAlignLeftOffset = getPose(7.6 + 0.6096, 4.85, 270);
+    public static final Pose2d TowerAlignLeftOffset = getPose(1.14 + 0.5, 4.597 + 0.5, 90);
     /** Tower align right, offset 2 ft toward field center. */
-    public static final Pose2d TowerAlignRightOffset = getPose(7.6 + 0.6096, 3.2, 270);
+    public static final Pose2d TowerAlignRightOffset = getPose(1.14 + 0.0, 3.2, 270);
 
     /** Offset for Test - Climb start: 4 ft from tower center toward center and toward sideline. */
     private static final double TEST_CLIMB_OFFSET_4FT_M = 4 * 0.3048;
