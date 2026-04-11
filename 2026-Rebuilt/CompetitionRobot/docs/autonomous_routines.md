@@ -6,7 +6,7 @@ This document describes the autonomous routines available on the robot: how they
 
 ## How Auto Is Run
 
-- **Selection**: The drive team chooses a routine from the **"Auto Mode (manager)"** chooser on SmartDashboard. `AutoManager` holds a `SendableChooser<AutoRoutine>` and publishes it there. For ClimberAuto, **"Climb Side"** (Left / Right) is also on SmartDashboard; the robot cannot climb in the center of the tower, so only left or right is used.
+- **Selection**: The drive team chooses a routine from the **"Auto Mode (manager)"** chooser on SmartDashboard. `AutoManager` holds a `SendableChooser<AutoRoutine>` and publishes it there. **ClimberAuto (Middle)** always uses the **left** tower face (`TowerAlignLeftOffset`); there is no climb-side chooser.
 - **Start**: When the match enters autonomous, `Robot.autonomousInit()` calls `AutoManager.runSelectedRoutine()`. That:
   - Resets odometry to the routine’s **initial pose**
   - Schedules the routine’s command (with a one-time timer stop when the command finishes)
@@ -23,49 +23,22 @@ Landmarks and paths are **alliance-aware**: `Landmarks` uses `AllianceUtils` so 
 | Test - PathPlanner    | POS_1 (left)   | PathPlanner sanity check: seed left start, pathfind to shot pose (`AutoRoutines.buildTestPathPlanner`). |
 | Test - Drive and Shoot | POS_2 (center) | Path to shot, deploy intake, shoot once (`AutoRoutines.buildTestDriveAndShoot`). |
 | Test - Climb          | Test pose      | Short climb checkout (`AutoRoutines.buildTestClimb`). |
-| ClimberAuto (Left)    | POS_1 (left)   | Shoot preload, drive to tower, climb L1, hold. Tower side from **Climb Side** chooser. |
-| ClimberAuto (Middle)  | POS_2 (center) | Same prelude as **ShooterAuto (Center)** (`C_StartToShot` + `SHOOTER_AUTO_CENTER_SHOOT_DURATION`), then tower + climb; **Climb Side** chooser for tower. |
-| ClimberAuto (Right)   | POS_3 (right)  | Same; tower side from **Climb Side** chooser.                                           |
+| ClimberAuto (Middle)  | POS_2 (center) | Same prelude as **ShooterAuto (Center)** (`C_StartToShot` + `SHOOTER_AUTO_CENTER_SHOOT_DURATION`), then tower + climb on the **left** tower face only. |
 | ShooterAuto (Left)    | POS_1 (left)   | Shoot preload → through center (intake) → return → shoot |
 | ShooterAuto (Center)  | POS_2 (center) | C_StartToShot → shoot preload → stop.               |
 | ShooterAuto (Right)   | POS_3 (right)  | Same flow from right start.                         |
 
 ---
 
-## ClimberAuto (Left / Middle / Right)
+## ClimberAuto (Middle)
 
-**Goal**: Shoot the preload, then drive to the tower and climb (L1), then hold until auto ends.
+**Goal**: Shoot the preload from **center start (POS_2)**, then drive to the tower and climb (L1), then hold until auto ends.
 
-### ClimberAuto (Middle) — center start
+**Shot prelude (steps 1–5 of `pathToShotThenShoot`)** matches **ShooterAuto (Center)**: seed at POS_2, tag snap, **`CmdFollowPath` `C_StartToShot`**, deploy intake, shoot for `AutoConstants.SHOOTER_AUTO_CENTER_SHOOT_DURATION`.
 
-Steps **1–7** match **ShooterAuto (Center)** (see that section): seed at POS_2, tag snap, **`CmdFollowPath` `C_StartToShot`** with shooter spin-up, deploy intake, shoot for `AutoConstants.SHOOTER_AUTO_CENTER_SHOOT_DURATION` (same as center shooter auto, not the Shuffleboard “Shoot Duration” used for left/right climber).
+**Tower + climb (steps 8–15)** — drive to **`TowerAlignLeftOffset`** (blue), tag snap, fine align, extend L1, drive toward bar, nudge, retract, hold.
 
-Steps **8–15** are the same tower + climb sequence as left/right below (drive to tower from **Climb Side**, tag snap, fine align, extend L1, drive toward bar, nudge, retract, hold).
-
-### ClimberAuto (Left / Right)
-
-**Steps (in order):**
-
-1. **Seed odometry** – Set pose to the chosen start (`Landmarks.OurStart1()` or `OurStart3()`).
-2. **Tag snap (if good)** – If vision sees enough AprilTags with low ambiguity and within 5 m, snap pose once. Uses `AutoConstants` (e.g. max ambiguity 0.2, min 2 targets).
-3. **Drive to shot pose (with shooter spin-up)** – In parallel:
-   - **CmdDriveToPose** to the **midpoint** between the start pose and the tower align pose for the selected climb side (`Landmarks.midpointShotPose(start, towerAlign)`), so the shot is equidistant from start and tower. XY tolerance 0.1 m, rotation 5°, pose timeout 5 s.
-   - **CmdShooterSpinUp** to 3000 RPM.
-4. **Lower intake** – Deploy (lower) the intake so it does not block the webcam; if no intake subsystem is present, this step is skipped. Timeout 2 s.
-5. **Acquire hub aim** – Vision-based heading to hub; fallback heading 180° if no target.
-6. **Wait shooter at speed** – Block until shooter is at 3000 RPM ± 100.
-7. **Shoot preload** – Feed for 1.0 s (`CmdShootForTime`).
-8. **Drive to tower align pose** – `CmdDriveToPose` to the pose from the **"Climb Side"** Shuffleboard chooser (Left or Right only; center is not physically possible):
-   - **Climb side: Left** → `Landmarks.OurTowerAlignLeft()` (high Y in blue).
-   - **Climb side: Right** → `Landmarks.OurTowerAlignRight()` (low Y in blue).
-   Pose is “back into circle end of tower bar” (e.g. 270° in blue).
-9. **Tag snap again** – Same vision snap for better alignment.
-10. **Drive to tower align again** – Same pose as step 8 for fine alignment.
-11. **Drive forward to acquire bar** – `CmdDriveForward`: robot drives forward a short distance (default 0.2 m) along its current heading to move into the bar and acquire it; align pose stops at the bar, this step completes the approach. Timeout 3 s.
-12. **Climb L1** – `ClimbWhileHeldCommand.ascentToCompletion(climber)` (one full extend L1 → retract cycle), with **15 s** timeout.
-13. **Hold climb until end** – `CmdHoldClimbUntilEnd` keeps climb state until autonomous ends.
-
-**ClimberAuto (Middle)** uses PathPlanner path **`C_StartToShot`** for the shot approach (same as ShooterAuto (Center)). **ClimberAuto (Left / Right)** use **drive-to-pose** only for the shot approach (no PathPlanner path). Tower + climb after the shot are drive-to-pose for all three. Build logic: `AutoRoutines.buildClimberAuto()` (chooser: **ClimberAuto (Left | Middle | Right)**); registration: `AutoConfigurator.registerFullAutos()`. For a detailed walkthrough, see [ClimberAuto walkthrough](climber_auto_walkthrough.md).
+Build: `AutoRoutines.buildClimberAuto()`; registration: `AutoConfigurator.registerFullAutos()`. Walkthrough: [ClimberAuto walkthrough](climber_auto_walkthrough.md).
 
 ---
 
@@ -157,7 +130,7 @@ Routine-specific values (in `AutoConfigurator` when building autos): shooter 300
 |----------------------|----------|
 | Routine builders     | `frc.robot.Auto.commands.AutoRoutines` (class javadoc maps chooser labels → `build*` methods) |
 | Registration         | `frc.robot.AutoConfigurator` (`registerFullAutos`) |
-| Climb side chooser   | SmartDashboard **"Climb Side"** (Left / Right); `ClimbSide` enum, `Landmarks.OurTowerAlignLeft()` / `OurTowerAlignRight()` |
+| Climber tower face   | Hardcoded **left** in `AutoRoutines.buildClimberAuto` (`BlueLandmarks.TowerAlignLeftOffset`) |
 | Selection & execution| `frc.robot.Auto.AutoManager` |
 | Start poses & landmarks | `frc.robot.PathPlanner.Landmarks`, `BlueLandmarks` |
 | Path names (L/C/R)   | `frc.robot.autotest.MoleculeTests.getPathNameForPose()` |

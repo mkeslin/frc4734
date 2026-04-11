@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Auto.AutoRoutine;
@@ -62,9 +60,6 @@ public class AutoConfigurator {
     private final AutoManager m_autoManager;
     private final CommandSwerveDrivetrain m_drivetrain;
     private AutoTestHarness m_testHarness;
-
-    /** Chooser for which side of the tower to climb (left or right). Shown on Shuffleboard. */
-    private final SendableChooser<ClimbSide> m_climbSideChooser = new SendableChooser<>();
 
     /**
      * Creates a new AutoConfigurator with required dependencies.
@@ -215,11 +210,6 @@ public class AutoConfigurator {
         
         // Setup Shuffleboard tab
         AutoTestShuffleboard.setupTab(m_testHarness);
-
-        // Climber auto: choose which side of tower to climb (center not physically possible)
-        m_climbSideChooser.setDefaultOption("Climb side: Left", ClimbSide.LEFT);
-        m_climbSideChooser.addOption("Climb side: Right", ClimbSide.RIGHT);
-        SmartDashboard.putData("Climb Side", m_climbSideChooser);
     }
 
     /**
@@ -470,43 +460,25 @@ public class AutoConfigurator {
                     BlueLandmarks.testClimbStartBlue(ClimbSide.RIGHT)));
         }
 
-        // Climber Auto: three start positions; tower side is chosen via Shuffleboard "Climb Side" (center not usable)
-        // Tower pose is offset 2 ft toward field center so robot extends climber there, then drives to bar and retracts.
-        // Shot and tower poses in blue so pathfinding always gets blue-origin coordinates.
+        // Climber Auto: center start (POS_2) only; tower face hardcoded to left (TowerAlignLeftOffset).
         if (climber != null) {
-            Supplier<Pose2d> towerAlignPoseSupplier = () -> {
-                ClimbSide side = m_climbSideChooser.getSelected();
-                return (side == ClimbSide.RIGHT) ? BlueLandmarks.TowerAlignRightOffset : BlueLandmarks.TowerAlignLeftOffset;
-            };
-            for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_2, StartPoseId.POS_3 }) {
-                String label = startId == StartPoseId.POS_1 ? "Left" : (startId == StartPoseId.POS_2 ? "Middle" : "Right");
-                // Blue coordinates so pathfinding always gets a target inside the nav grid.
-                // Middle: shotPoseSupplier unused — buildClimberAuto uses C_StartToShot + center shoot duration (same as ShooterAuto (Center)).
-                Supplier<Pose2d> shotPoseSupplier = () -> Landmarks.midpointShotPoseBlue(startId, m_climbSideChooser.getSelected());
-                Command climberAuto = AutoRoutines.buildClimberAuto(
-                        startId,
-                        startPoseSuppliers,
-                        shotPoseSupplier,
-                        towerAlignPoseSupplier,
-                        AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
-                        shooterSpeedsCenter,
-                        toleranceCenter.get(),
-                        shootDuration,
-                        m_drivetrain,
-                        vision,
-                        shooter,
-                        feeder,
-                        floor,
-                        intake,
-                        climber);
-                Pose2d initialPoseBlue = startId == StartPoseId.POS_1 ? BlueLandmarks.Start1
-                        : (startId == StartPoseId.POS_2 ? BlueLandmarks.Start2 : BlueLandmarks.Start3);
-                m_autoManager.addRoutine(new AutoRoutine(
-                        "ClimberAuto (" + label + ")",
-                        climberAuto,
-                        List.of(),
-                        initialPoseBlue));
-            }
+            Command climberAuto = AutoRoutines.buildClimberAuto(
+                    startPoseSuppliers,
+                    AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
+                    shooterSpeedsCenter,
+                    toleranceCenter.get(),
+                    m_drivetrain,
+                    vision,
+                    shooter,
+                    feeder,
+                    floor,
+                    intake,
+                    climber);
+            m_autoManager.addRoutine(new AutoRoutine(
+                    "ClimberAuto (Middle)",
+                    climberAuto,
+                    List.of(),
+                    BlueLandmarks.Start2));
         }
         
         // Shooter Auto: Left and Right (shoot → through center → return to shot → shoot)

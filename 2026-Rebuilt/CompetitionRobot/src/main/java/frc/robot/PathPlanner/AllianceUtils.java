@@ -28,17 +28,25 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * ({@code AprilTagFields.k2026RebuiltAndymark}) are set for the 2026 Rebuilt (Andymark) field.
  */
 public final class AllianceUtils {
-    /** Field width in meters (used for rotation calculations). Verified for 2026 Rebuilt field. */
-    private static final double FIELD_WIDTH = 16.540988; // meters
-    
-    /** Field length in meters (used for rotation calculations). Verified for 2026 Rebuilt field. */
-    private static final double FIELD_LENGTH = 8.069326; // meters
-    
-    /** Field center X coordinate in meters */
-    private static final double FIELD_CENTER_X = FIELD_LENGTH / 2.0;
-    
-    /** Field center Y coordinate in meters */
-    private static final double FIELD_CENTER_Y = FIELD_WIDTH / 2.0;
+    /**
+     * PathPlanner / {@link BlueLandmarks} X extent (m): long axis, origin at blue corner, +X toward red.
+     * (Named {@code FIELD_WIDTH} historically; do not swap with {@link #FIELD_LENGTH} when indexing poses.)
+     */
+    private static final double FIELD_WIDTH = 16.540988;
+
+    /**
+     * PathPlanner / {@link BlueLandmarks} Y extent (m): short axis across the field width.
+     */
+    private static final double FIELD_LENGTH = 8.069326;
+
+    /**
+     * Rotation center for {@link #blueToRed} in the same frame as {@code Pose2d} from landmarks:
+     * {@code getX()} is along {@link #FIELD_WIDTH}, {@code getY()} along {@link #FIELD_LENGTH}.
+     * Matches implicit center used by {@link #flipPositionForPathPlanner} ({@code fieldSize/2}).
+     */
+    private static final double FIELD_CENTER_X = FIELD_WIDTH / 2.0;
+
+    private static final double FIELD_CENTER_Y = FIELD_LENGTH / 2.0;
 
     private AllianceUtils() {
         // Utility class - prevent instantiation

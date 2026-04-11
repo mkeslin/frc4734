@@ -39,7 +39,7 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * <tr><td>Test - PathPlanner</td><td>{@link #buildTestPathPlanner}</td></tr>
  * <tr><td>Test - Drive and Shoot</td><td>{@link #buildTestDriveAndShoot}</td></tr>
  * <tr><td>Test - Climb</td><td>{@link #buildTestClimb}</td></tr>
- * <tr><td>ClimberAuto (Left | Middle | Right)</td><td>{@link #buildClimberAuto}</td></tr>
+ * <tr><td>ClimberAuto (Middle)</td><td>{@link #buildClimberAuto}</td></tr>
  * <tr><td>ShooterAuto (Left | Right)</td><td>{@link #buildShooterAutoThroughCenter}</td></tr>
  * <tr><td>ShooterAuto (Center)</td><td>{@link #buildShooterAutoCenter}</td></tr>
  * </table>
@@ -82,65 +82,28 @@ public class AutoRoutines {
     }
 
     /**
-     * SmartDashboard: <strong>ClimberAuto (Left | Middle | Right)</strong> — same builder; start pose is {@code id}.
-     * <p>
-     * <strong>Middle ({@link StartPoseId#POS_2}):</strong> prelude matches {@link #buildShooterAutoCenter}
-     * (path {@code C_StartToShot}, shoot duration {@link AutoConstants#SHOOTER_AUTO_CENTER_SHOOT_DURATION}), then the
-     * same tower + climb sequence as left/right.
-     * <p>
-     * <strong>Left / right:</strong> drive-to midpoint shot (no PathPlanner path), hub aim, shoot, then tower + climb.
-     * 
-     * <p>
-     * This routine:
-     * <ol>
-     * <li>Seeds odometry from start pose</li>
-     * <li>Applies tag snap if vision quality is good</li>
-     * <li>Drives to shot position (midpoint between start and tower align;
-     * parallel: spins up shooter)</li>
-     * <li>Lowers intake if present (deploy so webcam is not blocked)</li>
-     * <li>Acquires hub aim</li>
-     * <li>Waits for shooter at speed</li>
-     * <li>Shoots preload for specified duration</li>
-     * <li>Drives to tower align pose (offset 2 ft toward field center from
-     * bar)</li>
-     * <li>Applies tag snap before final alignment</li>
-     * <li>Drives to tower align pose again (fine alignment)</li>
-     * <li>Extends climber to L1 at offset pose</li>
-     * <li>Drives 2 ft toward the bar (field-relative) to acquire the bar</li>
-     * <li>Retracts climber from L1</li>
-     * <li>Holds climb until auto end</li>
-     * </ol>
-     * 
-     * @param id                 Start pose identifier
-     * @param startPoseSuppliers Map of start pose IDs to suppliers (evaluated at
-     *                           runtime for correct alliance)
-     * @param shotPoseSupplier   Supplier of target pose for shooting (e.g. midpoint
-     *                           of start and tower align)
-     * @param towerAlignPose     Supplier of target pose for tower/climb (e.g. from
-     *                           Shuffleboard climb-side chooser)
-     * @param fallbackHeadingDeg Fallback heading for hub aiming (degrees)
-     * @param targetSpeedsSupplier Supplier of per-motor shooter speeds (left, center, right RPS)
-     * @param rpmTol             RPM tolerance for shooter at-speed check
-     * @param shootDurationSupplier Supplier of shoot duration (seconds); read at runtime for tuning
-     * @param drivetrain         The drivetrain subsystem
-     * @param vision             The PhotonVision subsystem
-     * @param shooter            The shooter subsystem
-     * @param feeder             The feeder subsystem
-     * @param intake             Optional deployable intake; if non-null, intake is
-     *                           lowered before hub aim so webcam is unblocked
-     * @param climber            The climber subsystem
-     * @return A command representing the complete climber auto routine
-     * @throws NullPointerException if any required parameter is null
+     * SmartDashboard: <strong>ClimberAuto (Middle)</strong> only — start {@link StartPoseId#POS_2} (center).
+     * Prelude matches {@link #buildShooterAutoCenter} ({@code C_StartToShot},
+     * {@link AutoConstants#SHOOTER_AUTO_CENTER_SHOOT_DURATION}), then tower align + climb on the
+     * <strong>left</strong> tower face ({@link BlueLandmarks#TowerAlignLeftOffset}).
+     *
+     * @param startPoseSuppliers Map including {@link StartPoseId#POS_2} (evaluated at runtime for alliance)
+     * @param fallbackHeadingDeg Passed through to shared prelude (reserved if aim steps return)
+     * @param targetSpeedsSupplier Center auto shooter RPS (Shuffleboard / override)
+     * @param rpmTol             Tolerance for prelude (reserved in {@link #pathToShotThenShoot})
+     * @param drivetrain         Drivetrain
+     * @param vision             Vision
+     * @param shooter            Shooter
+     * @param feeder             Feeder
+     * @param floor              Optional floor
+     * @param intake             Optional intake
+     * @param climber            Climber
      */
     public static Command buildClimberAuto(
-            StartPoseId id,
             Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
-            Supplier<Pose2d> shotPoseSupplier,
-            Supplier<Pose2d> towerAlignPose,
             double fallbackHeadingDeg,
             Supplier<ShooterSpeeds> targetSpeedsSupplier,
             double rpmTol,
-            Supplier<Double> shootDurationSupplier,
             CommandSwerveDrivetrain drivetrain,
             PhotonVision vision,
             Shooter shooter,
@@ -149,92 +112,35 @@ public class AutoRoutines {
             DeployableIntake intake,
             Climber climber) {
 
-        Objects.requireNonNull(id, "id cannot be null");
         Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
-        Objects.requireNonNull(shotPoseSupplier, "shotPoseSupplier cannot be null");
-        Objects.requireNonNull(towerAlignPose, "towerAlignPose cannot be null");
         Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
         Objects.requireNonNull(vision, "vision cannot be null");
         Objects.requireNonNull(shooter, "shooter cannot be null");
         Objects.requireNonNull(feeder, "feeder cannot be null");
         Objects.requireNonNull(climber, "climber cannot be null");
         Objects.requireNonNull(targetSpeedsSupplier, "targetSpeedsSupplier cannot be null");
-        Objects.requireNonNull(shootDurationSupplier, "shootDurationSupplier cannot be null");
 
-        // Middle start: same path + shoot prelude as ShooterAuto (Center), then shared tower/climb tail.
-        if (id == StartPoseId.POS_2) {
-            Supplier<Double> centerShootDuration = () -> AutoConstants.SHOOTER_AUTO_CENTER_SHOOT_DURATION;
-            return Commands.sequence(
-                    pathToShotThenShoot(
-                            StartPoseId.POS_2,
-                            startPoseSuppliers,
-                            "C_StartToShot",
-                            fallbackHeadingDeg,
-                            targetSpeedsSupplier,
-                            rpmTol,
-                            centerShootDuration,
-                            drivetrain,
-                            vision,
-                            shooter,
-                            feeder,
-                            floor,
-                            intake),
-                    climberAutoTowerAndClimbSequence(towerAlignPose, vision, drivetrain, climber))
-                    .withName("ClimberAuto");
-        }
-
-        // Left / right: drive-to midpoint shot, hub aim, shoot, then tower/climb.
+        Supplier<Double> centerShootDuration = () -> AutoConstants.SHOOTER_AUTO_CENTER_SHOOT_DURATION;
         return Commands.sequence(
-                // ----- Step 1: Seed odometry -----
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 1: Seed odometry")),
-                CmdSeedOdometryFromStartPose.create(id, startPoseSuppliers, drivetrain),
-
-                // ----- Step 2: Tag snap -----
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 2: Tag snap")),
-                new CmdApplyTagSnapIfGood(
+                pathToShotThenShoot(
+                        StartPoseId.POS_2,
+                        startPoseSuppliers,
+                        "C_StartToShot",
+                        fallbackHeadingDeg,
+                        targetSpeedsSupplier,
+                        rpmTol,
+                        centerShootDuration,
+                        drivetrain,
+                        vision,
+                        shooter,
+                        feeder,
+                        floor,
+                        intake),
+                climberAutoTowerAndClimbSequence(
+                        () -> BlueLandmarks.TowerAlignLeftOffset,
                         vision,
                         drivetrain,
-                        AutoConstants.DEFAULT_MAX_AMBIGUITY,
-                        AutoConstants.DEFAULT_MAX_TAG_DISTANCE,
-                        AutoConstants.DEFAULT_MIN_TARGETS),
-
-                // ----- Step 3: Drive to shot pose -----
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 3: Drive to shot")),
-                Commands.deadline(
-                        CmdDriveToPose.create(
-                                drivetrain,
-                                shotPoseSupplier,
-                                AutoConstants.DEFAULT_XY_TOLERANCE,
-                                AutoConstants.DEFAULT_ROTATION_TOLERANCE,
-                                AutoConstants.DEFAULT_PATH_TIMEOUT),
-                        new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
-
-                // ----- Step 4: Lower intake -----
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 4: Lower intake")),
-                intake != null
-                        ? intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
-                                .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
-                        : Commands.none(),
-
-                // ----- Step 5: Acquire hub aim -----
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 5: Acquire hub aim")),
-                CmdAcquireHubAim.create(vision, drivetrain, fallbackHeadingDeg),
-
-                // ----- Step 6: Wait shooter at speed -----
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 6: Wait shooter at speed")),
-                CmdWaitShooterAtSpeed.create(shooter, targetSpeedsSupplier, rpmTol),
-
-                // ----- Step 7: Shoot preload -----
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 7: Shoot")),
-                new DeferredCommand(
-                        () -> intake != null
-                                ? new ParallelCommandGroup(
-                                        CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
-                                        intake.shootDeployAgitateWithIntakeRollCommand())
-                                : CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
-                        shootSubsystemSet(shooter, feeder, floor, intake)),
-
-                climberAutoTowerAndClimbSequence(towerAlignPose, vision, drivetrain, climber))
+                        climber))
                 .withName("ClimberAuto");
     }
 

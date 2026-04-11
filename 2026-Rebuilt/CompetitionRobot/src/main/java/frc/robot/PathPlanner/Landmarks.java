@@ -76,7 +76,7 @@ public class Landmarks {
     /**
      * Shot pose equidistant between start and tower align: midpoint of the two positions,
      * with rotation facing the hub so the robot can aim and shoot.
-     * Used by ClimberAuto so shot position depends on start and selected climb side.
+     * Utility for drive-to-pose autos that need a blue-frame midpoint (e.g. future tuning).
      *
      * @param startPose Start pose (e.g. OurStart1() for this routine)
      * @param towerAlignPose Tower align pose for selected climb side (OurTowerAlignLeft() or OurTowerAlignRight())
