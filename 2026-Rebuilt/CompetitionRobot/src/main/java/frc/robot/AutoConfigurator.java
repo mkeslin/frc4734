@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Auto.AutoRoutine;
 import frc.robot.Auto.commands.AutoConstants;
@@ -44,7 +43,6 @@ import frc.robot.Constants.FeederConstants.FeederSpeed;
 import frc.robot.Constants.CommandConstants;
 import frc.robot.PathPlanner.BlueLandmarks;
 import frc.robot.PathPlanner.Landmarks;
-import frc.robot.ShooterSpeeds;
 import frc.robot.autotest.AutoTestHarness;
 import frc.robot.autotest.AutoTestShuffleboard;
 import frc.robot.autotest.MoleculeTests;
@@ -430,18 +428,7 @@ public class AutoConfigurator {
             PositionTracker positionTracker) {
 
         // Minimal test auto: seed at A (POS_1), pathfind to B (shot position). Use to verify PathPlanner/AutoBuilder.
-        // PathPlanner pathfinding uses the nav grid in blue-origin coordinates; pass blue target so the goal is inside the grid.
-        // AutoBuilder flips the path for red alliance when the flip supplier returns true.
-        // AutoRoutine.getInitialPose() expects blue; it reflects for Red.
-        Command driveAToBTest = Commands.sequence(
-                CmdSeedOdometryFromStartPose.create(StartPoseId.POS_1, startPoseSuppliers, m_drivetrain),
-                CmdDriveToPose.create(
-                        m_drivetrain,
-                        () -> BlueLandmarks.ShotPosition,
-                        AutoConstants.DEFAULT_XY_TOLERANCE,
-                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
-                        AutoConstants.DEFAULT_POSE_TIMEOUT))
-                .withName("PathPlannerTest-AtoB");
+        Command driveAToBTest = AutoRoutines.buildTestPathPlanner(startPoseSuppliers, m_drivetrain);
         m_autoManager.addRoutine(new AutoRoutine("Test - PathPlanner", driveAToBTest, List.of(), BlueLandmarks.Start1));
 
         if (vision == null || shooter == null || feeder == null) {
@@ -494,6 +481,7 @@ public class AutoConfigurator {
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_2, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : (startId == StartPoseId.POS_2 ? "Middle" : "Right");
                 // Blue coordinates so pathfinding always gets a target inside the nav grid.
+                // Middle: shotPoseSupplier unused — buildClimberAuto uses C_StartToShot + center shoot duration (same as ShooterAuto (Center)).
                 Supplier<Pose2d> shotPoseSupplier = () -> Landmarks.midpointShotPoseBlue(startId, m_climbSideChooser.getSelected());
                 Command climberAuto = AutoRoutines.buildClimberAuto(
                         startId,
@@ -532,7 +520,7 @@ public class AutoConfigurator {
                 String shooterPathToShot = MoleculeTests.getPathNameForPose(startId, "StartToShot");
                 String pathThroughCenter = MoleculeTests.getPathNameForPose(startId, "ThroughCenter");
                 String pathThroughCenterReturn = MoleculeTests.getPathNameForPose(startId, "ThroughCenterReturn");
-                Command shooterAuto = AutoRoutines.buildShooterAuto(
+                Command shooterAuto = AutoRoutines.buildShooterAutoThroughCenter(
                         startId,
                         shotPoseSuppliers,
                         shooterPathToShot,
@@ -554,16 +542,10 @@ public class AutoConfigurator {
         }
 
         // Shooter Auto (Center): C_StartToShot → shoot preload → stop (no center run)
-        // Seed at start so the robot drives from start to shot.
-        Supplier<Double> shootDurationCenter = () -> AutoConstants.SHOOTER_AUTO_CENTER_SHOOT_DURATION;
-        Command shooterAutoCenter = AutoRoutines.buildTestDriveAndShoot(
-                StartPoseId.POS_2,
+        Command shooterAutoCenter = AutoRoutines.buildShooterAutoCenter(
                 startPoseSuppliers,
-                "C_StartToShot",
-                AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
                 shooterSpeedsCenter,
                 toleranceCenter.get(),
-                shootDurationCenter,
                 m_drivetrain,
                 vision,
                 shooter,
