@@ -227,12 +227,18 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // ----- Step 13: Nudge toward bar -----
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 13: Nudge toward bar")),
+                // ----- Step 13: Nudge toward bar (Y first, then X) -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 13a: Nudge Y")),
+                CmdDriveFieldRelative.forDistance(
+                        drivetrain,
+                        0.0,
+                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y,
+                        0.35),
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 13b: Nudge X")),
                 CmdDriveFieldRelative.forDistance(
                         drivetrain,
                         AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_X,
-                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y,
+                        0.0,
                         0.35),
 
                 // ----- Step 14: Stow intake (before retract — avoids clash with extended climber) -----
@@ -656,12 +662,18 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),
 
-                // ----- Step 8: Nudge toward bar -----
-                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 8: Nudge toward bar")),
+                // ----- Step 8: Nudge toward bar (Y first, then X) -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 8a: Nudge Y")),
+                CmdDriveFieldRelative.forDistance(
+                        drivetrain,
+                        0.0,
+                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y,
+                        0.25),
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 8b: Nudge X")),
                 CmdDriveFieldRelative.forDistance(
                         drivetrain,
                         AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_X,
-                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y,
+                        0.0,
                         0.25),
 
                 // ----- Step 9: Stow intake before climb retract -----
