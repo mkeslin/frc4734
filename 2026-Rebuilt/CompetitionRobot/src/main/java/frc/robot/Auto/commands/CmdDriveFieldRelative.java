@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /**
@@ -58,16 +59,51 @@ public class CmdDriveFieldRelative extends Command {
             double distanceYBlue,
             double speedMps) {
         if (Math.abs(speedMps) < 0.01) {
-            return edu.wpi.first.wpilibj2.command.Commands.none();
+            return Commands.none();
         }
         double totalDist = Math.hypot(distanceXBlue, distanceYBlue);
         if (totalDist < 0.001) {
-            return edu.wpi.first.wpilibj2.command.Commands.none();
+            return Commands.none();
         }
         double duration = totalDist / Math.abs(speedMps);
         double vx = (distanceXBlue / totalDist) * speedMps;
         double vy = (distanceYBlue / totalDist) * speedMps;
         return new CmdDriveFieldRelative(drivetrain, vx, vy, duration);
+    }
+
+    /**
+     * Field-relative move along blue X only (vy = 0 for the whole command). Prefer this over
+     * {@link #forDistance} with dy=0 so duration and velocity are not tied to a combined hypot path.
+     */
+    public static Command forDistanceXOnly(
+            CommandSwerveDrivetrain drivetrain, double distanceXBlue, double speedMps) {
+        if (Math.abs(speedMps) < 0.01) {
+            return Commands.none();
+        }
+        double dist = Math.abs(distanceXBlue);
+        if (dist < 1e-4) {
+            return Commands.none();
+        }
+        double duration = dist / Math.abs(speedMps);
+        double vx = Math.copySign(Math.abs(speedMps), distanceXBlue);
+        return new CmdDriveFieldRelative(drivetrain, vx, 0.0, duration);
+    }
+
+    /**
+     * Field-relative move along blue Y only (vx = 0 for the whole command).
+     */
+    public static Command forDistanceYOnly(
+            CommandSwerveDrivetrain drivetrain, double distanceYBlue, double speedMps) {
+        if (Math.abs(speedMps) < 0.01) {
+            return Commands.none();
+        }
+        double dist = Math.abs(distanceYBlue);
+        if (dist < 1e-4) {
+            return Commands.none();
+        }
+        double duration = dist / Math.abs(speedMps);
+        double vy = Math.copySign(Math.abs(speedMps), distanceYBlue);
+        return new CmdDriveFieldRelative(drivetrain, 0.0, vy, duration);
     }
 
     @Override
