@@ -65,6 +65,14 @@ public class RobotState {
     }
     
     /**
+     * Sets initialized true immediately when autonomous starts so feeder/floor/climber run with the shooter
+     * on the first tick (same gate as {@link #enableInitializationCommand()}, without waiting for scheduler order).
+     */
+    public void setInitializedOnRobotEnable() {
+        setInitialized(true);
+    }
+
+    /**
      * Returns a command that enables initialization when executed.
      * 
      * @return Command to enable initialization

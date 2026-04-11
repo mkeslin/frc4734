@@ -138,6 +138,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         m_lastEnabledMode = "autonomous";
+        RobotState.getInstance().setInitializedOnRobotEnable();
         m_robotContainer.getAutoManager().runSelectedRoutine();
     }
 
