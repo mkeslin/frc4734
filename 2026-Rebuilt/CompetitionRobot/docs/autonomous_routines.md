@@ -20,6 +20,9 @@ Landmarks and paths are **alliance-aware**: `Landmarks` uses `AllianceUtils` so 
 
 | Routine               | Start position | Description                                      |
 |-----------------------|----------------|--------------------------------------------------|
+| Test - PathPlanner    | POS_1 (left)   | PathPlanner sanity check: seed left start, pathfind to shot pose (`AutoRoutines.buildTestPathPlanner`). |
+| Test - Drive and Shoot | POS_2 (center) | Path to shot, deploy intake, shoot once (`AutoRoutines.buildTestDriveAndShoot`). |
+| Test - Climb          | Test pose      | Short climb checkout (`AutoRoutines.buildTestClimb`). |
 | ClimberAuto (Left)    | POS_1 (left)   | Shoot preload, drive to tower, climb L1, hold. Tower side from **Climb Side** chooser. |
 | ClimberAuto (Middle)  | POS_2 (center) | Same; tower side from **Climb Side** chooser (left or right only).                      |
 | ClimberAuto (Right)   | POS_3 (right)  | Same; tower side from **Climb Side** chooser.                                           |
@@ -54,7 +57,7 @@ Landmarks and paths are **alliance-aware**: `Landmarks` uses `AllianceUtils` so 
 12. **Climb L1** – `ClimbWhileHeldCommand.ascentToCompletion(climber)` (one full extend L1 → retract cycle), with **15 s** timeout.
 13. **Hold climb until end** – `CmdHoldClimbUntilEnd` keeps climb state until autonomous ends.
 
-ClimberAuto uses **no PathPlanner paths**; all motion is **drive-to-pose** via `CmdDriveToPose`. Build logic: `AutoRoutines.buildClimberAuto()`; registration: `AutoConfigurator.registerFullAutos()`. For a detailed walkthrough, see [ClimberAuto walkthrough](climber_auto_walkthrough.md).
+ClimberAuto uses **no PathPlanner paths**; all motion is **drive-to-pose** via `CmdDriveToPose`. Build logic: `AutoRoutines.buildClimberAuto()` (chooser: **ClimberAuto (Left | Middle | Right)**); registration: `AutoConfigurator.registerFullAutos()`. For a detailed walkthrough, see [ClimberAuto walkthrough](climber_auto_walkthrough.md).
 
 ---
 
@@ -83,7 +86,7 @@ ClimberAuto uses **no PathPlanner paths**; all motion is **drive-to-pose** via `
 11. **Wait shooter at speed** – Again.
 12. **Shoot** – Feed for 1.0 s again.
 
-Summary: **preload shot → serpentine through center (intake) → second shot.** Left uses `L_*` paths; Right uses `R_*` paths. Build logic: `AutoRoutines.buildShooterAuto()`; registration: `AutoConfigurator.registerFullAutos()`.
+Summary: **preload shot → serpentine through center (intake) → second shot.** Left uses `L_*` paths; Right uses `R_*` paths. Build logic: `AutoRoutines.buildShooterAutoThroughCenter()` (chooser: **ShooterAuto (Left | Right)**); registration: `AutoConfigurator.registerFullAutos()`.
 
 ---
 
@@ -102,7 +105,7 @@ Summary: **preload shot → serpentine through center (intake) → second shot.*
 7. **Shoot** – Feed for 1.0 s.
 8. **Stop** – Routine ends.
 
-Build logic: `AutoRoutines.buildTestDriveAndShoot()`; registration: `AutoConfigurator.registerFullAutos()`.
+Build logic: `AutoRoutines.buildShooterAutoCenter()` (chooser: **ShooterAuto (Center)**); registration: `AutoConfigurator.registerFullAutos()`.
 
 ---
 
@@ -144,7 +147,7 @@ Routine-specific values (in `AutoConfigurator` when building autos): shooter 300
 
 | Purpose              | Location |
 |----------------------|----------|
-| Routine builders     | `frc.robot.Auto.commands.AutoRoutines` |
+| Routine builders     | `frc.robot.Auto.commands.AutoRoutines` (class javadoc maps chooser labels → `build*` methods) |
 | Registration         | `frc.robot.AutoConfigurator` (`registerFullAutos`) |
 | Climb side chooser   | SmartDashboard **"Climb Side"** (Left / Right); `ClimbSide` enum, `Landmarks.OurTowerAlignLeft()` / `OurTowerAlignRight()` |
 | Selection & execution| `frc.robot.Auto.AutoManager` |

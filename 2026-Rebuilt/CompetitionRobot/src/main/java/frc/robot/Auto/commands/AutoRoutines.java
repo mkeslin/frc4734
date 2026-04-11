@@ -24,32 +24,48 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Logging.RobotLogger;
 import frc.robot.PathPlanner.AllianceUtils;
+import frc.robot.PathPlanner.BlueLandmarks;
 import frc.robot.Subsystems.Cameras.PhotonVision;
 import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
 
 /**
- * Builder class for creating autonomous routines from atomic commands.
- * 
- * <p>
- * This class provides static factory methods that compose atomic commands
- * into complete autonomous routines. It demonstrates command composition
- * patterns including parallel execution, sequencing, and conditional logic.
- * 
- * <p>
- * Example usage:
- * 
- * <pre>
- * Command climberAuto = AutoRoutines.buildClimberAuto(
- *         StartPoseId.POS_1,
- *         "PathToShot",
- *         "PathToTower",
- *         towerAlignPose,
- *         180.0);
- * </pre>
+ * Builder class for autonomous routines registered in {@link frc.robot.AutoConfigurator}.
+ * Method names mirror the SmartDashboard / shuffleboard auto chooser labels so each
+ * routine is easy to locate in code.
+ *
+ * <table border="1">
+ * <caption>Chooser label → builder</caption>
+ * <tr><th>Dashboard name</th><th>Method</th></tr>
+ * <tr><td>Test - PathPlanner</td><td>{@link #buildTestPathPlanner}</td></tr>
+ * <tr><td>Test - Drive and Shoot</td><td>{@link #buildTestDriveAndShoot}</td></tr>
+ * <tr><td>Test - Climb</td><td>{@link #buildTestClimb}</td></tr>
+ * <tr><td>ClimberAuto (Left | Middle | Right)</td><td>{@link #buildClimberAuto}</td></tr>
+ * <tr><td>ShooterAuto (Left | Right)</td><td>{@link #buildShooterAutoThroughCenter}</td></tr>
+ * <tr><td>ShooterAuto (Center)</td><td>{@link #buildShooterAutoCenter}</td></tr>
+ * </table>
  */
 public class AutoRoutines {
     private AutoRoutines() {
         // Utility class - prevent instantiation
+    }
+
+    /**
+     * SmartDashboard: <strong>Test - PathPlanner</strong>. Seeds at left start and pathfinds to the blue shot pose.
+     */
+    public static Command buildTestPathPlanner(
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
+            CommandSwerveDrivetrain drivetrain) {
+        Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
+        Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
+        return Commands.sequence(
+                CmdSeedOdometryFromStartPose.create(StartPoseId.POS_1, startPoseSuppliers, drivetrain),
+                CmdDriveToPose.create(
+                        drivetrain,
+                        () -> BlueLandmarks.ShotPosition,
+                        AutoConstants.DEFAULT_XY_TOLERANCE,
+                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                        AutoConstants.DEFAULT_POSE_TIMEOUT))
+                .withName("Test - PathPlanner");
     }
 
     private static Set<Subsystem> shootSubsystemSet(Shooter shooter, Feeder feeder, Floor floor, DeployableIntake intake) {
@@ -66,8 +82,8 @@ public class AutoRoutines {
     }
 
     /**
-     * Builds a climber autonomous routine using drive-to poses (no PathPlanner
-     * paths).
+     * SmartDashboard: <strong>ClimberAuto (Left | Middle | Right)</strong> — same builder; start pose is {@code id}.
+     * Drive-to poses only (no PathPlanner paths).
      * 
      * <p>
      * This routine:
@@ -272,7 +288,7 @@ public class AutoRoutines {
     }
 
     /**
-     * Builds a shooter autonomous routine.
+     * SmartDashboard: <strong>ShooterAuto (Left)</strong> or <strong>ShooterAuto (Right)</strong> — serpentine through center and second shot.
      * 
      * <p>
      * This routine:
@@ -311,7 +327,7 @@ public class AutoRoutines {
      * @return A command representing the complete shooter auto routine
      * @throws NullPointerException if any required parameter is null
      */
-    public static Command buildShooterAuto(
+    public static Command buildShooterAutoThroughCenter(
             StartPoseId id,
             Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
             String pathToShot,
@@ -409,31 +425,14 @@ public class AutoRoutines {
                 //         .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
 
                 Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Complete", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))))
-                .withName("ShooterAuto");
+                .withName("ShooterAutoThroughCenter");
     }
 
     /**
-     * Builds a test routine: seed, drive to shot, lower intake, aim, shoot (no
-     * center run).
-     * Subset of ShooterAuto for testing drive + shoot flow.
-     *
-     * @param id                 Start pose identifier
-     * @param startPoseSuppliers Map of start pose IDs to suppliers
-     * @param pathToShot         Path name to shooting position
-     * @param fallbackHeadingDeg Fallback heading for hub aiming
-     * @param targetRpmSupplier  Supplier of target shooter RPM (e.g. from Preferences for runtime tuning)
-     * @param rpmTol             RPM tolerance
-     * @param shootDurationSupplier Supplier of shoot duration (seconds); read at runtime for tuning
-     * @param drivetrain         Drivetrain subsystem
-     * @param vision             Vision subsystem
-     * @param shooter            Shooter subsystem
-     * @param feeder             Feeder subsystem
-     * @param floor              Optional floor subsystem; if non-null, runs after
-     *                           delay to feed from conveyor
-     * @param intake             Optional deployable intake; if non-null, lowered
-     *                           before hub aim so webcam is unblocked
+     * Path to shot pose, deploy intake, shoot once (no center run). Shared by
+     * {@link #buildTestDriveAndShoot} and {@link #buildShooterAutoCenter}.
      */
-    public static Command buildTestDriveAndShoot(
+    private static Command pathToShotThenShoot(
             StartPoseId id,
             Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
             String pathToShot,
@@ -504,13 +503,91 @@ public class AutoRoutines {
                 //                 .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT)
                 //         : Commands.none(),
 
-                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Complete", edu.wpi.first.wpilibj.Timer.getFPGATimestamp())))
-        )
-        .withName("TestDriveAndShoot");
+                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Complete", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))));
     }
 
     /**
-     * Builds a test routine: seed, drive to tower, extend L1, drive to bar,
+     * SmartDashboard: <strong>Test - Drive and Shoot</strong>. Seed, path to shot, deploy intake, shoot (no center run).
+     *
+     * @param id                 Start pose identifier
+     * @param startPoseSuppliers Map of start pose IDs to suppliers
+     * @param pathToShot         Path name to shooting position
+     * @param fallbackHeadingDeg Fallback heading for hub aiming if aim steps are re-enabled
+     * @param targetSpeedsSupplier Per-motor RPS for shooter
+     * @param rpmTol             RPM tolerance
+     * @param shootDurationSupplier Shoot duration (seconds); e.g. Shuffleboard tuning
+     * @param drivetrain         Drivetrain subsystem
+     * @param vision             Vision subsystem
+     * @param shooter            Shooter subsystem
+     * @param feeder             Feeder subsystem
+     * @param floor              Optional floor subsystem
+     * @param intake             Optional deployable intake
+     */
+    public static Command buildTestDriveAndShoot(
+            StartPoseId id,
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
+            String pathToShot,
+            double fallbackHeadingDeg,
+            Supplier<ShooterSpeeds> targetSpeedsSupplier,
+            double rpmTol,
+            Supplier<Double> shootDurationSupplier,
+            CommandSwerveDrivetrain drivetrain,
+            PhotonVision vision,
+            Shooter shooter,
+            Feeder feeder,
+            Floor floor,
+            DeployableIntake intake) {
+        return pathToShotThenShoot(
+                id,
+                startPoseSuppliers,
+                pathToShot,
+                fallbackHeadingDeg,
+                targetSpeedsSupplier,
+                rpmTol,
+                shootDurationSupplier,
+                drivetrain,
+                vision,
+                shooter,
+                feeder,
+                floor,
+                intake)
+                .withName("Test - Drive and Shoot");
+    }
+
+    /**
+     * SmartDashboard: <strong>ShooterAuto (Center)</strong>. {@code C_StartToShot}, center start, fixed shoot duration from {@link AutoConstants#SHOOTER_AUTO_CENTER_SHOOT_DURATION}.
+     */
+    public static Command buildShooterAutoCenter(
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
+            Supplier<ShooterSpeeds> targetSpeedsSupplier,
+            double rpmTol,
+            CommandSwerveDrivetrain drivetrain,
+            PhotonVision vision,
+            Shooter shooter,
+            Feeder feeder,
+            Floor floor,
+            DeployableIntake intake) {
+        Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
+        Supplier<Double> shootDurationCenter = () -> AutoConstants.SHOOTER_AUTO_CENTER_SHOOT_DURATION;
+        return pathToShotThenShoot(
+                StartPoseId.POS_2,
+                startPoseSuppliers,
+                "C_StartToShot",
+                AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
+                targetSpeedsSupplier,
+                rpmTol,
+                shootDurationCenter,
+                drivetrain,
+                vision,
+                shooter,
+                feeder,
+                floor,
+                intake)
+                .withName("ShooterAuto (Center)");
+    }
+
+    /**
+     * SmartDashboard: <strong>Test - Climb</strong>. Seed, drive to tower, extend L1, drive to bar,
      * retract.
      * Subset of ClimberAuto for testing climb flow.
      *
@@ -625,6 +702,6 @@ public class AutoRoutines {
                 Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 10: Hold climb")),
                 new CmdHoldClimbUntilEnd(climber, drivetrain),
 
-                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Complete"))).withName("TestClimb");
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Complete"))).withName("Test - Climb");
     }
 }
