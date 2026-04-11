@@ -633,7 +633,7 @@ public class AutoRoutines {
                 Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 8: Nudge toward bar")),
                 CmdDriveFieldRelative.forDistance(
                         drivetrain,
-                        -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
+                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         0.25),
 
