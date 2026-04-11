@@ -52,8 +52,16 @@ public final class AutoConstants {
     public static final double CLIMB_DRIVE_TO_BAR_METERS = 0.6096;
     /** Extra drive (m) toward the bar after initial drive, so robot has enough bar to climb on. ~6 in total. */
     public static final double CLIMB_EXTRA_DRIVE_TOWARD_BAR_METERS = 0.2;
-    /** Final nudge (m) in blue field frame before retract: -X and -Y. 2 in each direction. */
-    public static final double CLIMB_DRIVE_BEFORE_RETRACT_METERS = 0.0508;
+    /** Final nudge +X (m) in blue field frame before climb retract (~2 in). */
+    public static final double CLIMB_DRIVE_BEFORE_RETRACT_METERS_X = 0.0508;
+    /**
+     * Final nudge Y (m) in blue field frame before climb retract (signed). Former shared 2 in value minus 0.1 m.
+     */
+    public static final double CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y = CLIMB_DRIVE_BEFORE_RETRACT_METERS_X - 0.1;
+    /**
+     * After stow intake, wait this long (s) before L1 retract so the robot can settle on the bar.
+     */
+    public static final double CLIMB_PAUSE_BEFORE_RETRACT_SEC = 0.75;
     /** Timeout for the drive-forward-to-acquire-bar step. */
     public static final double DEFAULT_CLIMB_ACQUIRE_TIMEOUT = 3.0;
     public static final double DEFAULT_CLIMB_TIMEOUT = 15.0;

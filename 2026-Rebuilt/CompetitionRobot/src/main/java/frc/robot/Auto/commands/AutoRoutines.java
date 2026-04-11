@@ -231,13 +231,18 @@ public class AutoRoutines {
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 13: Nudge toward bar")),
                 CmdDriveFieldRelative.forDistance(
                         drivetrain,
-                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
-                        -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
-                        0.25),
+                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_X,
+                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y,
+                        0.35),
 
                 // ----- Step 14: Stow intake (before retract — avoids clash with extended climber) -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 14: Stow intake")),
                 stowIntakeBeforeClimbRetract(intake),
+
+                Commands.runOnce(() -> RobotLogger.log(String.format(
+                        "[ClimberAuto] Pause %.2fs before retract",
+                        AutoConstants.CLIMB_PAUSE_BEFORE_RETRACT_SEC))),
+                Commands.waitSeconds(AutoConstants.CLIMB_PAUSE_BEFORE_RETRACT_SEC),
 
                 // ----- Step 15: Retract climber from L1 -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 15: Retract climber")),
@@ -655,13 +660,18 @@ public class AutoRoutines {
                 Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 8: Nudge toward bar")),
                 CmdDriveFieldRelative.forDistance(
                         drivetrain,
-                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
-                        -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
+                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_X,
+                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y,
                         0.25),
 
                 // ----- Step 9: Stow intake before climb retract -----
                 Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 9: Stow intake")),
                 stowIntakeBeforeClimbRetract(intake),
+
+                Commands.runOnce(() -> RobotLogger.log(String.format(
+                        "[TestClimb] Pause %.2fs before retract",
+                        AutoConstants.CLIMB_PAUSE_BEFORE_RETRACT_SEC))),
+                Commands.waitSeconds(AutoConstants.CLIMB_PAUSE_BEFORE_RETRACT_SEC),
 
                 // ----- Step 10: Retract climber from L1 -----
                 Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 10: Retract climber")),
