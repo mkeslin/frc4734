@@ -455,7 +455,8 @@ public class AutoConfigurator {
                     towerAlignPoseSupplier,
                     m_drivetrain,
                     vision,
-                    climber);
+                    climber,
+                    intake);
             m_autoManager.addRoutine(new AutoRoutine("Test - Climb", testClimb, List.of(),
                     BlueLandmarks.testClimbStartBlue(ClimbSide.RIGHT)));
         }

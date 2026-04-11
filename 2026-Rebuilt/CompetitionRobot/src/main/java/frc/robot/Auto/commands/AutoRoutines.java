@@ -82,6 +82,20 @@ public class AutoRoutines {
     }
 
     /**
+     * Stow intake deploy and stop rollers before climber retract to avoid mechanism interference.
+     */
+    private static Command stowIntakeBeforeClimbRetract(DeployableIntake intake) {
+        if (intake == null) {
+            return Commands.none();
+        }
+        return Commands.sequence(
+                intake.moveToSetDeployPositionCommand(() -> DeployPosition.STOWED)
+                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
+                intake.resetIntakeSpeedCommand())
+                .withName("stowIntakeBeforeClimbRetract");
+    }
+
+    /**
      * SmartDashboard: <strong>ClimberAuto (Middle)</strong> only — start {@link StartPoseId#POS_2} (center).
      * Prelude matches {@link #buildShooterAutoCenter} ({@code C_StartToShot},
      * {@link AutoConstants#SHOOTER_AUTO_CENTER_SHOOT_DURATION}), then tower align + climb on the
@@ -140,18 +154,20 @@ public class AutoRoutines {
                         () -> BlueLandmarks.TowerAlignLeftOffset,
                         vision,
                         drivetrain,
-                        climber))
+                        climber,
+                        intake))
                 .withName("ClimberAuto");
     }
 
     /**
-     * ClimberAuto steps after the preload shot: tower align, climb L1, bar acquire, retract, hold.
+     * ClimberAuto steps after the preload shot: tower align, climb L1, bar acquire, stow intake, retract, hold.
      */
     private static Command climberAutoTowerAndClimbSequence(
             Supplier<Pose2d> towerAlignPose,
             PhotonVision vision,
             CommandSwerveDrivetrain drivetrain,
-            Climber climber) {
+            Climber climber,
+            DeployableIntake intake) {
         final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
         return Commands.sequence(
                 // ----- Step 8: Drive to tower align -----
@@ -215,17 +231,21 @@ public class AutoRoutines {
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 13: Nudge toward bar")),
                 CmdDriveFieldRelative.forDistance(
                         drivetrain,
-                        -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
+                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         0.25),
 
-                // ----- Step 14: Retract climber from L1 -----
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 14: Retract climber")),
+                // ----- Step 14: Stow intake (before retract — avoids clash with extended climber) -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 14: Stow intake")),
+                stowIntakeBeforeClimbRetract(intake),
+
+                // ----- Step 15: Retract climber from L1 -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 15: Retract climber")),
                 ClimbWhileHeldCommand.retractFromL1(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
-                // ----- Step 15: Hold climb until end -----
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 15: Hold climb")),
+                // ----- Step 16: Hold climb until end -----
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 16: Hold climb")),
                 new CmdHoldClimbUntilEnd(climber, drivetrain),
 
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Complete")));
@@ -542,6 +562,7 @@ public class AutoRoutines {
      * @param drivetrain         Drivetrain subsystem
      * @param vision             Vision subsystem
      * @param climber            Climber subsystem
+     * @param intake             Optional intake (stowed before climb retract when non-null)
      */
     public static Command buildTestClimb(
             StartPoseId id,
@@ -549,7 +570,8 @@ public class AutoRoutines {
             Supplier<Pose2d> towerAlignPose,
             CommandSwerveDrivetrain drivetrain,
             PhotonVision vision,
-            Climber climber) {
+            Climber climber,
+            DeployableIntake intake) {
         Objects.requireNonNull(id, "id cannot be null");
         Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
         Objects.requireNonNull(towerAlignPose, "towerAlignPose cannot be null");
@@ -637,13 +659,17 @@ public class AutoRoutines {
                         -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         0.25),
 
-                // ----- Step 9: Retract climber from L1 -----
-                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 9: Retract climber")),
+                // ----- Step 9: Stow intake before climb retract -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 9: Stow intake")),
+                stowIntakeBeforeClimbRetract(intake),
+
+                // ----- Step 10: Retract climber from L1 -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 10: Retract climber")),
                 ClimbWhileHeldCommand.retractFromL1(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
-                // ----- Step 10: Hold climb until end -----
-                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 10: Hold climb")),
+                // ----- Step 11: Hold climb until end -----
+                Commands.runOnce(() -> RobotLogger.log("[TestClimb] Step 11: Hold climb")),
                 new CmdHoldClimbUntilEnd(climber, drivetrain),
 
                 Commands.runOnce(() -> RobotLogger.log("[TestClimb] Complete"))).withName("Test - Climb");
