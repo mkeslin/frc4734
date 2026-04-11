@@ -51,6 +51,13 @@ class RobotStateTest {
     }
 
     @Test
+    void testSetInitializedOnRobotEnable() {
+        RobotState state = RobotState.getInstance();
+        state.setInitializedOnRobotEnable();
+        assertTrue(state.isInitialized(), "setInitializedOnRobotEnable() should leave robot initialized");
+    }
+
+    @Test
     void testEnableInitializationCommand() {
         RobotState state = RobotState.getInstance();
         Command enableCommand = state.enableInitializationCommand();

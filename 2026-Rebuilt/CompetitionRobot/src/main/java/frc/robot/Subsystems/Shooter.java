@@ -54,8 +54,12 @@ import frc.robot.Subsystems.Bases.BaseIntake;
  * @see RobotState
  */
 public class Shooter extends SubsystemBase implements BaseIntake<ShooterSpeed> {
-    /** When true, shooter runs without requiring RobotState initialization (for bench troubleshooting only). */
-    private static final boolean BYPASS_ROBOT_STATE_FOR_BENCH = true;
+    /**
+     * When true, shooter runs without requiring RobotState initialization (bench only).
+     * Keep false in competition: floor and feeder still require {@link RobotState}, so bypass causes
+     * shooter-only motion during auto/teleop if initialization is not set.
+     */
+    private static final boolean BYPASS_ROBOT_STATE_FOR_BENCH = false;
 
     private final DoublePublisher shooterSpeedPub = TelemetryCalcs.createMechanismsPublisher("Shooter Speed");
 
