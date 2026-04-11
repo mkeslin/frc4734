@@ -195,7 +195,7 @@ public class AutoRoutines {
                         towerAlignPose,
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
-                        AutoConstants.DEFAULT_POSE_TIMEOUT),
+                        2.0),
 
                 // 11. Extend climber to L1 at offset pose (no retract yet)
                 ClimbWhileHeldCommand.extendL1Only(climber, drivetrain)
