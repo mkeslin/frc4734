@@ -53,12 +53,12 @@ public class ClimberConstants {
     public static final double PEAK_REVERSE_VOLTAGE = -12.0;
 
     /** Voltage for mechanism-mode manual extend/retract (run while held, no position stops). */
-    public static final double CLIMB_MANUAL_VOLTAGE = 8.0;
+    public static final double CLIMB_MANUAL_VOLTAGE = 10.0;
 
-    /** Lift MotionMagic: cruise/accel for mechanism tuning and ascent. */
-    public static final double LIFT_MOTION_MAGIC_CRUISE_VELOCITY = 24;   // rot/s
-    public static final double LIFT_MOTION_MAGIC_ACCELERATION = 44;     // rot/s²
-    public static final double LIFT_MOTION_MAGIC_JERK = 300;            // rot/s³
+    /** Lift MotionMagic: cruise/accel/jerk (auto + position moves). Higher = faster raise/lower; retune if overshoot or brownout. */
+    public static final double LIFT_MOTION_MAGIC_CRUISE_VELOCITY = 45;   // rot/s
+    public static final double LIFT_MOTION_MAGIC_ACCELERATION = 85;     // rot/s²
+    public static final double LIFT_MOTION_MAGIC_JERK = 650;            // rot/s³
 
     // ---- Jaws (left and right, independent open/closed) ----
     /** Position tolerance in rotations for considering a jaw at goal. */

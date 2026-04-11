@@ -216,7 +216,7 @@ public class AutoRoutines {
                 CmdDriveFieldRelative.forDistance(
                         drivetrain,
                         -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
-                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
+                        -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         0.25),
 
                 // ----- Step 14: Retract climber from L1 -----
@@ -634,7 +634,7 @@ public class AutoRoutines {
                 CmdDriveFieldRelative.forDistance(
                         drivetrain,
                         -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
-                        AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
+                        -AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS,
                         0.25),
 
                 // ----- Step 9: Retract climber from L1 -----

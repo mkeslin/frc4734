@@ -85,7 +85,7 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
         slot0Configs.kI = 0.0; // no output for integrated error
         slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
 
-        // Motion Magic: use constants for slow, controlled ascent in mechanism/tuning
+        // Motion Magic: limits from ClimberConstants (tunable for speed vs smoothness)
         var motionMagicConfigs = talonFxConfigs.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = ClimberConstants.LIFT_MOTION_MAGIC_CRUISE_VELOCITY;
         motionMagicConfigs.MotionMagicAcceleration = ClimberConstants.LIFT_MOTION_MAGIC_ACCELERATION;
