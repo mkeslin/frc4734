@@ -481,6 +481,7 @@ public class AutoConfigurator {
             for (StartPoseId startId : new StartPoseId[] { StartPoseId.POS_1, StartPoseId.POS_2, StartPoseId.POS_3 }) {
                 String label = startId == StartPoseId.POS_1 ? "Left" : (startId == StartPoseId.POS_2 ? "Middle" : "Right");
                 // Blue coordinates so pathfinding always gets a target inside the nav grid.
+                // Middle: shotPoseSupplier unused — buildClimberAuto uses C_StartToShot + center shoot duration (same as ShooterAuto (Center)).
                 Supplier<Pose2d> shotPoseSupplier = () -> Landmarks.midpointShotPoseBlue(startId, m_climbSideChooser.getSelected());
                 Command climberAuto = AutoRoutines.buildClimberAuto(
                         startId,

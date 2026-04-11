@@ -83,7 +83,12 @@ public class AutoRoutines {
 
     /**
      * SmartDashboard: <strong>ClimberAuto (Left | Middle | Right)</strong> — same builder; start pose is {@code id}.
-     * Drive-to poses only (no PathPlanner paths).
+     * <p>
+     * <strong>Middle ({@link StartPoseId#POS_2}):</strong> prelude matches {@link #buildShooterAutoCenter}
+     * (path {@code C_StartToShot}, shoot duration {@link AutoConstants#SHOOTER_AUTO_CENTER_SHOOT_DURATION}), then the
+     * same tower + climb sequence as left/right.
+     * <p>
+     * <strong>Left / right:</strong> drive-to midpoint shot (no PathPlanner path), hub aim, shoot, then tower + climb.
      * 
      * <p>
      * This routine:
@@ -156,9 +161,29 @@ public class AutoRoutines {
         Objects.requireNonNull(targetSpeedsSupplier, "targetSpeedsSupplier cannot be null");
         Objects.requireNonNull(shootDurationSupplier, "shootDurationSupplier cannot be null");
 
-        // Captured after extending climber; used by drive-to-bar step (pathfind to pose
-        // toward bar).
-        final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
+        // Middle start: same path + shoot prelude as ShooterAuto (Center), then shared tower/climb tail.
+        if (id == StartPoseId.POS_2) {
+            Supplier<Double> centerShootDuration = () -> AutoConstants.SHOOTER_AUTO_CENTER_SHOOT_DURATION;
+            return Commands.sequence(
+                    pathToShotThenShoot(
+                            StartPoseId.POS_2,
+                            startPoseSuppliers,
+                            "C_StartToShot",
+                            fallbackHeadingDeg,
+                            targetSpeedsSupplier,
+                            rpmTol,
+                            centerShootDuration,
+                            drivetrain,
+                            vision,
+                            shooter,
+                            feeder,
+                            floor,
+                            intake),
+                    climberAutoTowerAndClimbSequence(towerAlignPose, vision, drivetrain, climber))
+                    .withName("ClimberAuto");
+        }
+
+        // Left / right: drive-to midpoint shot, hub aim, shoot, then tower/climb.
         return Commands.sequence(
                 // ----- Step 1: Seed odometry -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 1: Seed odometry")),
@@ -209,6 +234,20 @@ public class AutoRoutines {
                                 : CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get()),
                         shootSubsystemSet(shooter, feeder, floor, intake)),
 
+                climberAutoTowerAndClimbSequence(towerAlignPose, vision, drivetrain, climber))
+                .withName("ClimberAuto");
+    }
+
+    /**
+     * ClimberAuto steps after the preload shot: tower align, climb L1, bar acquire, retract, hold.
+     */
+    private static Command climberAutoTowerAndClimbSequence(
+            Supplier<Pose2d> towerAlignPose,
+            PhotonVision vision,
+            CommandSwerveDrivetrain drivetrain,
+            Climber climber) {
+        final Pose2d[] poseBeforeDriveToBar = new Pose2d[1];
+        return Commands.sequence(
                 // ----- Step 8: Drive to tower align -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 8: Drive to tower")),
                 CmdDriveToPose.create(
@@ -283,8 +322,7 @@ public class AutoRoutines {
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 15: Hold climb")),
                 new CmdHoldClimbUntilEnd(climber, drivetrain),
 
-                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Complete")))
-                .withName("ClimberAuto");
+                Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Complete")));
     }
 
     /**

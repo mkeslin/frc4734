@@ -1,6 +1,6 @@
 # ClimberAuto Walkthrough
 
-This document walks through what the **ClimberAuto (Left)** routine does step by step. The same sequence runs for ClimberAuto (Middle) and ClimberAuto (Right); only the start position and (for tower alignment) the **Climb Side** chooser differ.
+This document walks through what the **ClimberAuto (Left)** routine does step by step. **ClimberAuto (Right)** matches left except start pose (POS_3) and midpoint shot geometry. **ClimberAuto (Middle)** uses the same **shot prelude as ShooterAuto (Center)** (`C_StartToShot` path + `SHOOTER_AUTO_CENTER_SHOOT_DURATION`), then the **same tower + climb steps** as left/right (steps 8–15 below). Only the start position and (for tower alignment) the **Climb Side** chooser differ among routines.
 
 ---
 
