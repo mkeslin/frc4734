@@ -37,7 +37,7 @@ public final class AutoConstants {
     public static final double DEFAULT_PATH_TIMEOUT = 10.0;
     /** Through-center legs use low max speed; allow ~3× default time so the path can finish. */
     public static final double AUTO_PATH_THROUGH_CENTER_TIMEOUT_SEC = DEFAULT_PATH_TIMEOUT * 3;
-    public static final double DEFAULT_POSE_TIMEOUT = 5.0;
+    public static final double DEFAULT_POSE_TIMEOUT = 2.0;
     public static final double DEFAULT_HEADING_TIMEOUT = 3.0;
     public static final double DEFAULT_SHOOTER_SPINUP_TIMEOUT = 3.0;
     public static final double DEFAULT_SHOOT_TIMEOUT = 2.0;
@@ -95,7 +95,7 @@ public final class AutoConstants {
     /** Default shoot duration (seconds) for feeder/floor to launch all balls. Tunable via Auto Tuning tab. */
     public static final double DEFAULT_SHOOT_DURATION = 3.0;
     /** Shoot duration (seconds) for ShooterAuto Center. */
-    public static final double SHOOTER_AUTO_CENTER_SHOOT_DURATION = 5.0;
+    public static final double SHOOTER_AUTO_CENTER_SHOOT_DURATION = 3.0;
     /** Delay (seconds) after shooter at speed before feeder starts, to let shooter stabilize. */
     public static final double SHOOT_SPINUP_DELAY_BEFORE_FEED = 0.75;
     /** ShooterAuto Left/Right: spin-up delay (seconds) before feeder/floor turn on. Longer than center due to angle. */

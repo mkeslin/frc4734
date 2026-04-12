@@ -57,7 +57,7 @@ public class CmdDriveFieldRelative extends Command {
             CommandSwerveDrivetrain drivetrain,
             double distanceXBlue,
             double distanceYBlue,
-            double speedMps) {
+            double speedMps, double timeout) {
         if (Math.abs(speedMps) < 0.01) {
             return Commands.none();
         }
@@ -65,7 +65,7 @@ public class CmdDriveFieldRelative extends Command {
         if (totalDist < 0.001) {
             return Commands.none();
         }
-        double duration = totalDist / Math.abs(speedMps);
+        double duration = (timeout == 0) ? totalDist / Math.abs(speedMps) : timeout;
         double vx = (distanceXBlue / totalDist) * speedMps;
         double vy = (distanceYBlue / totalDist) * speedMps;
         return new CmdDriveFieldRelative(drivetrain, vx, vy, duration);
