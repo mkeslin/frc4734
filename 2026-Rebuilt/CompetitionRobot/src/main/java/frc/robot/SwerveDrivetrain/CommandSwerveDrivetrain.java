@@ -599,13 +599,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // // rightPrimaryMotor.setVoltage(volts);
     // }
 
+    /**
+     * Stops motion immediately: clears commanded robot-relative velocity, then applies wheel brake.
+     * Do not use {@link #applyRequest} here — it returns an unscheduled {@link Command}, so calling it
+     * without the scheduler would not run {@code setControl}.
+     */
     public void stop() {
-        var brake = new SwerveRequest.SwerveDriveBrake();
-        applyRequest(() -> brake);
-        // leftPrimaryMotor.setVoltage(0);
-        // leftSecondaryMotor.setVoltage(0);
-        // rightPrimaryMotor.setVoltage(0);
-        // rightSecondaryMotor.setVoltage(0);
+        applyChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.0));
+        setControl(new SwerveRequest.SwerveDriveBrake());
     }
 
     // public void stop() {

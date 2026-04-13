@@ -95,9 +95,9 @@ public class BlueLandmarks {
      * Corral auto (middle): waypoint after center preload shot, before a short +Y run with intake on.
      * Blue-frame coordinates; pathfinding flips on red like other landmarks.
      */
-    public static final Pose2d PoseCorralStart = getPose(.84, 5.10, 135);
+    public static final Pose2d PoseCorralStart = getPose(.14, 5.10, 135);
     /** End pose for corral intake segment (same heading, further +Y). */
-    public static final Pose2d PoseCorralStop = getPose(.84, 6.36, 135);
+    public static final Pose2d PoseCorralStop = getPose(.14, 6.36, 135);
 
     /** Second shot pose for CorralAuto (middle): return volley after corral pickup. */
     public static final Pose2d PoseAutoShootMiddle = getPose(1.4, 4.035, 0);

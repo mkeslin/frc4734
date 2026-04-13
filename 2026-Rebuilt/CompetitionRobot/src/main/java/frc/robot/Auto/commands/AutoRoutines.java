@@ -256,18 +256,24 @@ public class AutoRoutines {
                                 AutoConstants.DEFAULT_XY_TOLERANCE,
                                 AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                                 AutoConstants.DEFAULT_POSE_TIMEOUT),
-                        new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
+                        new CmdShooterSpinUp(shooter, targetSpeedsSupplier))
+                        // PathPlanner may release drive before default command is blocked; pin brake before non-drive steps.
+                        .andThen(Commands.runOnce(() -> drivetrain.stop())),
                 Commands.runOnce(() -> RobotLogger.log("[CorralAuto] Deploy intake before second volley")),
-                intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
-                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
-                pathToShotThenShootVolley(
-                        shooter,
-                        feeder,
-                        floor,
-                        intake,
-                        targetSpeedsSupplier,
-                        shootDurationSupplier,
-                        "[CorralAuto] Second volley"),
+                // Second volley does not require drivetrain; hold brake so teleop default cannot creep during shoot.
+                Commands.deadline(
+                        Commands.sequence(
+                                intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
+                                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
+                                pathToShotThenShootVolley(
+                                        shooter,
+                                        feeder,
+                                        floor,
+                                        intake,
+                                        targetSpeedsSupplier,
+                                        shootDurationSupplier,
+                                        "[CorralAuto] Second volley")),
+                        Commands.run(() -> drivetrain.stop(), drivetrain)),
                 Commands.runOnce(() -> RobotLogger.log("[CorralAuto] Complete")));
     }
 
