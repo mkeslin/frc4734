@@ -201,7 +201,8 @@ public class Climber extends SubsystemBase implements BaseSingleJointedArm<Climb
 
     @Override
     public void resetPosition() {
-        m_climber.setPosition(ClimberPosition.DOWN.value);
+        // Match-start pose: extended (zeroed); retracted stow is ClimberPosition.DOWN.
+        m_climber.setPosition(ClimberPosition.CLIMB.value);
         if (m_jawLeft != null) {
             m_jawLeft.setPosition(ClimberConstants.LEFT_JAW_CLOSED_ROTATIONS);
         }

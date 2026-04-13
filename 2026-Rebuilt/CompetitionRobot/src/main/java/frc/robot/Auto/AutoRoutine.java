@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
+import frc.robot.PathPlanner.AllianceUtils;
+
 /**
  * A dataclass that stores additional information about an autonomous routine.
  * Used by {@link AutoManager}.
@@ -83,9 +85,11 @@ public class AutoRoutine {
     }
 
     /**
-     * Gets the initial pose for the routine. When the DriverStation is set to the
-     * red alliance, this is reflected over the field length
-     * 
+     * Gets the initial pose for the routine in the current alliance frame.
+     * {@code initialPose} is stored in blue coordinates; on red, applies the same
+     * 180° field-center rotation as {@link AllianceUtils#blueToRed} (PathPlanner /
+     * landmarks), not legacy mirror reflection.
+     *
      * @return the initial pose for the routine, or the pose at (0,0) if no
      *         trajectories are used.
      */
@@ -95,9 +99,7 @@ public class AutoRoutine {
             return new Pose2d();
         }
         if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-            var newPose1 = Reflector.reflectPose2d(base, 17.521);
-            var newY2 = ((newPose1.getY() - 4.009) * -1) + 4.009;
-            return new Pose2d(newPose1.getX(), newY2, newPose1.getRotation());
+            return AllianceUtils.blueToRed(base);
         }
         return base;
     }

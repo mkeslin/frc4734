@@ -132,7 +132,7 @@ public final class TelemetrySnapshot {
             metrics.put("ballCount", -1.0);
         }
         
-        // Climb qualified (checks if climber is near CLIMB position)
+        // Climb qualified: near default extended (match-start) pose
         if (climber != null) {
             double currentPosition = climber.getPosition();
             double targetPosition = ClimberPosition.CLIMB.value;

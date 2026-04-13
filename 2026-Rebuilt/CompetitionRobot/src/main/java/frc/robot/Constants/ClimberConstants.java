@@ -9,12 +9,13 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 public class ClimberConstants {
     /**
      * Enumeration of predefined climber positions in rotations.
-     * DOWN, ACQUIRE, and CLIMB positions for different climbing states.
+     * <p>{@link ClimberPosition#CLIMB} — default / match start: extended (zero). Former ACQUIRE used the same value.
+     * <p>{@link ClimberPosition#DOWN} — retracted / stow after pulling on the bar.
      */
     public static enum ClimberPosition {
-        DOWN(0),
-        ACQUIRE(-130),
-        CLIMB(-260);
+        // ACQUIRE(0) removed — use CLIMB for extended / bar-contact / starting configuration.
+        CLIMB(0),
+        DOWN(130);
 
         public final double value;
 
@@ -104,14 +105,14 @@ public class ClimberConstants {
     /** Looser tolerance for extend-only (auto): finish sooner so drive to bar can start without waiting for full settle. */
     public static final double CLIMB_EXTEND_ONLY_TOLERANCE_ROTATIONS = 2.0;
 
-    /** Level 1: extend target (head at bar), start target (retracted). */
-    public static final double CLIMB_L1_EXTEND_ROTATIONS = ClimberPosition.ACQUIRE.value;
+    /** Level 1: extended at bar (same as {@link ClimberPosition#CLIMB}); retract target is {@link ClimberPosition#DOWN}. */
+    public static final double CLIMB_L1_EXTEND_ROTATIONS = ClimberPosition.CLIMB.value;
     public static final double CLIMB_L1_START_ROTATIONS = ClimberPosition.DOWN.value;
     /** Level 2: extend and start (tune to match mechanism). */
-    public static final double CLIMB_L2_EXTEND_ROTATIONS = -150;
+    public static final double CLIMB_L2_EXTEND_ROTATIONS = -20;
     public static final double CLIMB_L2_START_ROTATIONS = ClimberPosition.DOWN.value;
-    /** Level 3: full extend and start. */
-    public static final double CLIMB_L3_EXTEND_ROTATIONS = ClimberPosition.CLIMB.value;
+    /** Level 3: deeper pull past default extended (not an enum — distinct from {@link ClimberPosition#CLIMB}). */
+    public static final double CLIMB_L3_EXTEND_ROTATIONS = -130;
     public static final double CLIMB_L3_START_ROTATIONS = ClimberPosition.DOWN.value;
 
     /** Descend v1: single target (retract to rest). Multi-level descend can use same L1/L2/L3 extend values in reverse. */

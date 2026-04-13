@@ -8,19 +8,17 @@ import frc.robot.Constants.ClimberConstants.ClimberPosition;
 import frc.robot.Subsystems.Climber;
 
 /**
- * Command to execute L1 climb sequence.
- * 
- * <p>This command moves the climber to the CLIMB position to execute an L1 climb.
- * It includes timeout protection and checks if the climber has reached the
- * qualified position if such a method exists.
- * 
+ * Drives the climber to the default extended pose ({@link ClimberPosition#CLIMB}).
+ *
+ * <p>That pose is match start / bar contact; retract-after-climb targets
+ * {@link ClimberPosition#DOWN} (see {@link ClimbWhileHeldCommand}).
+ *
  * <p>Completion conditions:
  * <ul>
  *   <li>Climber reaches CLIMB position</li>
- *   <li>Climber is L1 qualified (if method exists)</li>
  *   <li>Timeout expires</li>
  * </ul>
- * 
+ *
  * @param climber The climber subsystem
  * @param timeoutSec Maximum time to complete climb
  */

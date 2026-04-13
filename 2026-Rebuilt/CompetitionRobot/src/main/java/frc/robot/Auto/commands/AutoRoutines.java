@@ -226,7 +226,7 @@ public class AutoRoutines {
                         AutoConstants.DEFAULT_XY_TOLERANCE,
                         AutoConstants.DEFAULT_ROTATION_TOLERANCE,
                         AutoConstants.DEFAULT_POSE_TIMEOUT),*/
-                        
+
                 // ----- Step 13: Nudge toward bar (Y first, then X) — nested sequence so Y fully ends before X -----
                 Commands.sequence(
                         Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 13a: Nudge Y")),
@@ -239,7 +239,7 @@ public class AutoRoutines {
                                 drivetrain,
                                 AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_X,
                                 AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y,
-                        0.35, 1))
+                                0.35, 1))
                         .withName("ClimberAuto Step13 nudge Y then X"),
 
                 // ----- Step 14: Stow intake (before retract — avoids clash with extended climber) -----
@@ -253,7 +253,7 @@ public class AutoRoutines {
 
                 // ----- Step 15: Retract climber from L1 -----
                 Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 15: Retract climber")),
-                ClimbWhileHeldCommand.extendL1Only(climber, drivetrain)
+                ClimbWhileHeldCommand.retractFromL1(climber, drivetrain)
                         .withTimeout(AutoConstants.DEFAULT_CLIMB_TIMEOUT),
 
                 // ----- Step 16: Hold climb until end -----
