@@ -164,7 +164,8 @@ public class AutoRoutines {
      * SmartDashboard: <strong>CorralAuto (Middle)</strong> — same preload as {@link #buildClimberAuto}
      * ({@link StartPoseId#POS_2}, {@code C_StartToShot}, center shoot duration), then pathfind to
      * {@link BlueLandmarks#PoseCorralStart}, deploy intake, pathfind to {@link BlueLandmarks#PoseCorralStop}
-     * with intake rollers on, then stop intake and drivetrain.
+     * with intake rollers on, then stop rollers; pathfind to {@link BlueLandmarks#PoseAutoShootMiddle} with shooter
+     * spin-up; deploy and shoot a second volley identical to {@link #pathToShotThenShoot}'s shoot step.
      *
      * @param intake required for the corral segment (non-null)
      */
@@ -204,13 +205,25 @@ public class AutoRoutines {
                         feeder,
                         floor,
                         intake),
-                corralAutoMiddleAfterShoot(drivetrain, intake))
+                corralAutoMiddleAfterShoot(
+                        drivetrain,
+                        intake,
+                        shooter,
+                        feeder,
+                        floor,
+                        targetSpeedsSupplier,
+                        centerShootDuration))
                 .withName("CorralAuto");
     }
 
     private static Command corralAutoMiddleAfterShoot(
             CommandSwerveDrivetrain drivetrain,
-            DeployableIntake intake) {
+            DeployableIntake intake,
+            Shooter shooter,
+            Feeder feeder,
+            Floor floor,
+            Supplier<ShooterSpeeds> targetSpeedsSupplier,
+            Supplier<Double> shootDurationSupplier) {
         return Commands.sequence(
                 Commands.runOnce(() -> RobotLogger.log("[CorralAuto] Drive to PoseCorralStart")),
                 CmdDriveToPose.create(
@@ -233,9 +246,56 @@ public class AutoRoutines {
                         .andThen(intake.resetIntakeSpeedCommand())
                         .andThen(Commands.runOnce(() -> {
                             drivetrain.stop();
-                            RobotLogger.log("[CorralAuto] Stopped drivetrain and intake");
+                            RobotLogger.log("[CorralAuto] Stopped rollers at PoseCorralStop");
                         })),
+                Commands.runOnce(() -> RobotLogger.log("[CorralAuto] Drive to PoseAutoShootMiddle + spin up shooter")),
+                Commands.deadline(
+                        CmdDriveToPose.create(
+                                drivetrain,
+                                () -> BlueLandmarks.PoseAutoShootMiddle,
+                                AutoConstants.DEFAULT_XY_TOLERANCE,
+                                AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                                AutoConstants.DEFAULT_POSE_TIMEOUT),
+                        new CmdShooterSpinUp(shooter, targetSpeedsSupplier)),
+                Commands.runOnce(() -> RobotLogger.log("[CorralAuto] Deploy intake before second volley")),
+                intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
+                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
+                pathToShotThenShootVolley(
+                        shooter,
+                        feeder,
+                        floor,
+                        intake,
+                        targetSpeedsSupplier,
+                        shootDurationSupplier,
+                        "[CorralAuto] Second volley"),
                 Commands.runOnce(() -> RobotLogger.log("[CorralAuto] Complete")));
+    }
+
+    /**
+     * Timed shoot + intake agitate, matching step 5 of {@link #pathToShotThenShoot} (same {@link CmdShootForTime}
+     * and {@link DeployableIntake#shootDeployAgitateWithIntakeRollCommand()}).
+     */
+    private static Command pathToShotThenShootVolley(
+            Shooter shooter,
+            Feeder feeder,
+            Floor floor,
+            DeployableIntake intake,
+            Supplier<ShooterSpeeds> targetSpeedsSupplier,
+            Supplier<Double> shootDurationSupplier,
+            String logTag) {
+        Objects.requireNonNull(shooter, "shooter cannot be null");
+        Objects.requireNonNull(feeder, "feeder cannot be null");
+        Objects.requireNonNull(targetSpeedsSupplier, "targetSpeedsSupplier cannot be null");
+        Objects.requireNonNull(shootDurationSupplier, "shootDurationSupplier cannot be null");
+        return Commands.sequence(
+                Commands.runOnce(() -> RobotLogger.log(String.format("%s (t=%.2f)", logTag, edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
+                Commands.deadline(
+                        new DeferredCommand(
+                                () -> CmdShootForTime.create(
+                                        shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
+                                floor != null ? Set.of(shooter, feeder, floor) : Set.of(shooter, feeder)),
+                        intake != null ? intake.shootDeployAgitateWithIntakeRollCommand() : Commands.none())
+                        .andThen(intake != null ? intake.resetIntakeSpeedCommand() : Commands.none()));
     }
 
     /**
@@ -543,13 +603,14 @@ public class AutoRoutines {
                         : Commands.none(),
 
                 // ----- Step 5: Shoot (intake rolls + deploy agitate during shoot; single command avoids intake conflict) -----
-                Commands.runOnce(() -> RobotLogger.log(String.format("[ShooterAuto] t=%.2f Step 5: Shoot", edu.wpi.first.wpilibj.Timer.getFPGATimestamp()))),
-                Commands.deadline(
-                        new DeferredCommand(
-                                () -> CmdShootForTime.create(shooter, feeder, floor, shootDurationSupplier.get(), 0.0, targetSpeedsSupplier),
-                                floor != null ? Set.of(shooter, feeder, floor) : Set.of(shooter, feeder)),
-                        intake != null ? intake.shootDeployAgitateWithIntakeRollCommand() : Commands.none())
-                        .andThen(intake != null ? intake.resetIntakeSpeedCommand() : Commands.none()),
+                pathToShotThenShootVolley(
+                        shooter,
+                        feeder,
+                        floor,
+                        intake,
+                        targetSpeedsSupplier,
+                        shootDurationSupplier,
+                        "[ShooterAuto] Step 5: Shoot"),
 
                 // ----- Step 7: Raise intake (reset for next run) -----
                 // Commands.runOnce(() -> RobotLogger.log("[ShooterAuto] Step 7: Raise intake")),

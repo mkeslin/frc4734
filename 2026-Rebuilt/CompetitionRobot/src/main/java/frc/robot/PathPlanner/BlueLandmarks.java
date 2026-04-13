@@ -99,6 +99,9 @@ public class BlueLandmarks {
     /** End pose for corral intake segment (same heading, further +Y). */
     public static final Pose2d PoseCorralStop = getPose(.84, 6.36, 135);
 
+    /** Second shot pose for CorralAuto (middle): return volley after corral pickup. */
+    public static final Pose2d PoseAutoShootMiddle = getPose(1.4, 4.035, 0);
+
     private static Pose2d getPose(double x, double y, double rotationDegrees) {
         return new Pose2d(x, y, Rotation2d.fromDegrees(rotationDegrees));
     }
