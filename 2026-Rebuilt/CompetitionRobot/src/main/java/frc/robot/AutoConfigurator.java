@@ -481,7 +481,27 @@ public class AutoConfigurator {
                     List.of(),
                     BlueLandmarks.Start2));
         }
-        
+
+        // Corral Auto (Middle): same preload as ClimberAuto, then corral path + intake run
+        if (intake != null) {
+            Command corralAuto = AutoRoutines.buildCorralAuto(
+                    startPoseSuppliers,
+                    AutoConstants.DEFAULT_FALLBACK_HEADING_DEG,
+                    shooterSpeedsCenter,
+                    toleranceCenter.get(),
+                    m_drivetrain,
+                    vision,
+                    shooter,
+                    feeder,
+                    floor,
+                    intake);
+            m_autoManager.addRoutine(new AutoRoutine(
+                    "CorralAuto (Middle)",
+                    corralAuto,
+                    List.of(),
+                    BlueLandmarks.Start2));
+        }
+
         // Shooter Auto: Left and Right (shoot → through center → return to shot → shoot)
         Map<StartPoseId, Supplier<Pose2d>> shotPoseSuppliers = new HashMap<>();
         shotPoseSuppliers.put(StartPoseId.POS_1, Landmarks::OurShotPositionLeft);

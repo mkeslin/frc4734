@@ -40,6 +40,7 @@ import frc.robot.SwerveDrivetrain.CommandSwerveDrivetrain;
  * <tr><td>Test - Drive and Shoot</td><td>{@link #buildTestDriveAndShoot}</td></tr>
  * <tr><td>Test - Climb</td><td>{@link #buildTestClimb}</td></tr>
  * <tr><td>ClimberAuto (Middle)</td><td>{@link #buildClimberAuto}</td></tr>
+ * <tr><td>CorralAuto (Middle)</td><td>{@link #buildCorralAuto}</td></tr>
  * <tr><td>ShooterAuto (Left | Right)</td><td>{@link #buildShooterAutoThroughCenter}</td></tr>
  * <tr><td>ShooterAuto (Center)</td><td>{@link #buildShooterAutoCenter}</td></tr>
  * </table>
@@ -157,6 +158,84 @@ public class AutoRoutines {
                         climber,
                         intake))
                 .withName("ClimberAuto");
+    }
+
+    /**
+     * SmartDashboard: <strong>CorralAuto (Middle)</strong> — same preload as {@link #buildClimberAuto}
+     * ({@link StartPoseId#POS_2}, {@code C_StartToShot}, center shoot duration), then pathfind to
+     * {@link BlueLandmarks#PoseCorralStart}, deploy intake, pathfind to {@link BlueLandmarks#PoseCorralStop}
+     * with intake rollers on, then stop intake and drivetrain.
+     *
+     * @param intake required for the corral segment (non-null)
+     */
+    public static Command buildCorralAuto(
+            Map<StartPoseId, Supplier<Pose2d>> startPoseSuppliers,
+            double fallbackHeadingDeg,
+            Supplier<ShooterSpeeds> targetSpeedsSupplier,
+            double rpmTol,
+            CommandSwerveDrivetrain drivetrain,
+            PhotonVision vision,
+            Shooter shooter,
+            Feeder feeder,
+            Floor floor,
+            DeployableIntake intake) {
+
+        Objects.requireNonNull(startPoseSuppliers, "startPoseSuppliers cannot be null");
+        Objects.requireNonNull(drivetrain, "drivetrain cannot be null");
+        Objects.requireNonNull(vision, "vision cannot be null");
+        Objects.requireNonNull(shooter, "shooter cannot be null");
+        Objects.requireNonNull(feeder, "feeder cannot be null");
+        Objects.requireNonNull(targetSpeedsSupplier, "targetSpeedsSupplier cannot be null");
+        Objects.requireNonNull(intake, "intake cannot be null");
+
+        Supplier<Double> centerShootDuration = () -> AutoConstants.SHOOTER_AUTO_CENTER_SHOOT_DURATION;
+        return Commands.sequence(
+                pathToShotThenShoot(
+                        StartPoseId.POS_2,
+                        startPoseSuppliers,
+                        "C_StartToShot",
+                        fallbackHeadingDeg,
+                        targetSpeedsSupplier,
+                        rpmTol,
+                        centerShootDuration,
+                        drivetrain,
+                        vision,
+                        shooter,
+                        feeder,
+                        floor,
+                        intake),
+                corralAutoMiddleAfterShoot(drivetrain, intake))
+                .withName("CorralAuto");
+    }
+
+    private static Command corralAutoMiddleAfterShoot(
+            CommandSwerveDrivetrain drivetrain,
+            DeployableIntake intake) {
+        return Commands.sequence(
+                Commands.runOnce(() -> RobotLogger.log("[CorralAuto] Drive to PoseCorralStart")),
+                CmdDriveToPose.create(
+                        drivetrain,
+                        () -> BlueLandmarks.PoseCorralStart,
+                        AutoConstants.DEFAULT_XY_TOLERANCE,
+                        AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                        AutoConstants.DEFAULT_POSE_TIMEOUT),
+                Commands.runOnce(() -> RobotLogger.log("[CorralAuto] Deploy intake; drive to PoseCorralStop with rollers")),
+                intake.moveToSetDeployPositionCommand(() -> DeployPosition.DEPLOYED)
+                        .withTimeout(AutoConstants.DEFAULT_INTAKE_DEPLOY_TIMEOUT),
+                Commands.deadline(
+                        CmdDriveToPose.create(
+                                drivetrain,
+                                () -> BlueLandmarks.PoseCorralStop,
+                                AutoConstants.DEFAULT_XY_TOLERANCE,
+                                AutoConstants.DEFAULT_ROTATION_TOLERANCE,
+                                AutoConstants.DEFAULT_POSE_TIMEOUT),
+                        CmdIntakeOn.create(intake))
+                        .andThen(intake.resetIntakeSpeedCommand())
+                        .andThen(Commands.runOnce(() -> {
+                            drivetrain.stop();
+                            RobotLogger.log("[CorralAuto] Stopped drivetrain and intake");
+                        })),
+                Commands.runOnce(() -> RobotLogger.log("[CorralAuto] Complete")));
     }
 
     /**

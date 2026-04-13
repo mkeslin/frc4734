@@ -91,6 +91,14 @@ public class BlueLandmarks {
     /** Center note stack center. 523.22", 158.845" */
     public static final Pose2d CenterStackCenter = getPose(13.290, 4.035, 0);
 
+    /**
+     * Corral auto (middle): waypoint after center preload shot, before a short +Y run with intake on.
+     * Blue-frame coordinates; pathfinding flips on red like other landmarks.
+     */
+    public static final Pose2d PoseCorralStart = getPose(.84, 5.10, 135);
+    /** End pose for corral intake segment (same heading, further +Y). */
+    public static final Pose2d PoseCorralStop = getPose(.84, 6.36, 135);
+
     private static Pose2d getPose(double x, double y, double rotationDegrees) {
         return new Pose2d(x, y, Rotation2d.fromDegrees(rotationDegrees));
     }
