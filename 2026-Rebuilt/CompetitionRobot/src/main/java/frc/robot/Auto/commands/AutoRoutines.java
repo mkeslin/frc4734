@@ -378,7 +378,7 @@ public class AutoRoutines {
                         CmdDriveFieldRelative.forDistanceYOnly(
                                 drivetrain,
                                 AutoConstants.CLIMB_DRIVE_BEFORE_RETRACT_METERS_Y,
-                                0.35, 2),
+                                0.35, 2.5),
                         Commands.runOnce(() -> RobotLogger.log("[ClimberAuto] Step 13b: Nudge X")),
                         CmdDriveFieldRelative.forDistance(
                                 drivetrain,
