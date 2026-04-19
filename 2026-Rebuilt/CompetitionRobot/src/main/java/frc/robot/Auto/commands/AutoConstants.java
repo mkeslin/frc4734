@@ -53,7 +53,7 @@ public final class AutoConstants {
     /** Extra drive (m) toward the bar after initial drive, so robot has enough bar to climb on. ~6 in total. */
     public static final double CLIMB_EXTRA_DRIVE_TOWARD_BAR_METERS = 0.2;
     /** Final nudge +X (m) in blue field frame, second leg of pre-retract nudge (after Y). */
-    public static final double CLIMB_DRIVE_BEFORE_RETRACT_METERS_X = 0.0508;
+    public static final double CLIMB_DRIVE_BEFORE_RETRACT_METERS_X = 0.0708;
     /**
      * Final nudge Y (m) in blue field frame, first leg of pre-retract nudge (signed). Former shared 2 in minus 0.1 m.
      */
